@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::AccountsController < Api::BaseController
-  before_action -> { authorize_if_got_token! :read, :'read:accounts' }, except: [:create, :follow, :unfollow, :subscribe, :unsubscribe, :block, :unblock, :mute, :unmute]
-  before_action -> { doorkeeper_authorize! :follow, :write, :'write:follows' }, only: [:follow, :unfollow, :subscribe, :unsubscribe]
+  before_action -> { authorize_if_got_token! :read, :'read:accounts' }, except: [:create, :follow, :unfollow, :remove_from_followers, :subscribe, :unsubscribe, :block, :unblock, :mute, :unmute]
+  before_action -> { doorkeeper_authorize! :follow, :write, :'write:follows' }, only: [:follow, :unfollow, :remove_from_followers, :subscribe, :unsubscribe]
   before_action -> { doorkeeper_authorize! :follow, :write, :'write:mutes' }, only: [:mute, :unmute]
   before_action -> { doorkeeper_authorize! :follow, :write, :'write:blocks' }, only: [:block, :unblock]
   before_action -> { doorkeeper_authorize! :write, :'write:accounts' }, only: [:create]
@@ -76,9 +76,13 @@ class Api::V1::AccountsController < Api::BaseController
     render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships
   end
 
+  def remove_from_followers
+    RemoveFromFollowersService.new.call(current_user.account, @account)
+    render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships
+  end
+
   def unsubscribe
     UnsubscribeAccountService.new.call(current_user.account, @account, list_id: params[:list_id])
-    render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships
   end
 
   def unblock
