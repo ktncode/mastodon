@@ -4127,12 +4127,13 @@ emittery@^0.7.1:
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.7.1.tgz#c02375a927a40948c0345cc903072597f5270451"
   integrity sha512-d34LN4L6h18Bzz9xpoku2nPwKxCPlPMr3EEKTkoEBi+1/+b0lcRkRJ1UVyyZaKNeqGR3swcGl6s390DNO4YVgQ==
 
-emoji-mart@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-3.0.1.tgz#9ce86706e02aea0506345f98464814a662ca54c6"
-  integrity sha512-sxpmMKxqLvcscu6mFn9ITHeZNkGzIvD0BSNFE/LJESPbCA8s1jM6bCDPjWbV31xHq7JXaxgpHxLB54RCbBZSlg==
+"emoji-mart@npm:emoji-mart-lazyload":
+  version "3.0.1-j"
+  resolved "https://registry.npmjs.org/emoji-mart-lazyload/-/emoji-mart-lazyload-3.0.1-j.tgz#87a90d30b79d9145ece078d53e3e683c1a10ce9c"
+  integrity sha512-0wKF7MR0/iAeCIoiBLY+JjXCugycTgYRC2SL0y9/bjNSQlbeMdzILmPQJAufU/mgLFDUitOvjxLDhOZ9yxZ48g==
   dependencies:
     "@babel/runtime" "^7.0.0"
+    intersection-observer "^0.12.0"
     prop-types "^15.6.0"
 
 emoji-regex@^7.0.1:
