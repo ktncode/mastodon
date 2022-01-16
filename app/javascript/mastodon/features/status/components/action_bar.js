@@ -284,6 +284,7 @@ class ActionBar extends React.PureComponent {
     const { status, relationship, intl, referenced, contextReferenced, referenceCountLimit } = this.props;
 
     const publicStatus       = ['public', 'unlisted'].includes(status.get('visibility'));
+    const pinnableStatus     = ['public', 'unlisted', 'private'].includes(status.get('visibility'));
     const mutingConversation = status.get('muted');
     const account            = status.get('account');
     const writtenByMe        = status.getIn(['account', 'id']) === me;
@@ -336,7 +337,7 @@ class ActionBar extends React.PureComponent {
     menu.push(null);
 
     if (writtenByMe) {
-      if (publicStatus && !expired) {
+      if (pinnableStatus && !expired) {
         menu.push({ text: intl.formatMessage(status.get('pinned') ? messages.unpin : messages.pin), action: this.handlePinClick });
         menu.push(null);
       }

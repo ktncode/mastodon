@@ -215,7 +215,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   def pinnable?
     owned_status? &&
       !object.reblog? &&
-      %w(public unlisted).include?(object.visibility)
+      %w(public unlisted private).include?(object.visibility)
   end
 
   def source_requested?

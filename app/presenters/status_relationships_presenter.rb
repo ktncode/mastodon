@@ -17,7 +17,7 @@ class StatusRelationshipsPresenter
       statuses            = statuses.compact
       status_ids          = statuses.flat_map { |s| [s.id, s.reblog_of_id] }.uniq.compact
       conversation_ids    = statuses.filter_map(&:conversation_id).uniq
-      pinnable_status_ids = statuses.map(&:proper).filter_map { |s| s.id if s.account_id == current_account_id && %w(public unlisted).include?(s.visibility) }
+      pinnable_status_ids = statuses.map(&:proper).filter_map { |s| s.id if s.account_id == current_account_id && %w(public unlisted private).include?(s.visibility) }
 
       result = ActiveRecord::Base.connection.select_all(ActiveRecord::Base.sanitize_sql_array([<<-SQL.squish, account_id: current_account_id, status_ids: status_ids, conversation_ids: conversation_ids, pinnable_status_ids: pinnable_status_ids])).to_a.first
         select
