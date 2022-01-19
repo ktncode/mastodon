@@ -1031,6 +1031,18 @@ ActiveRecord::Schema.define(version: 2025_03_17_173338) do
     t.index ["status_id"], name: "index_status_capability_tokens_on_status_id"
   end
 
+  create_table "status_edits", force: :cascade do |t|
+    t.bigint "status_id", null: false
+    t.bigint "account_id"
+    t.text "text", default: "", null: false
+    t.text "spoiler_text", default: "", null: false
+    t.boolean "media_attachments_changed", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id"], name: "index_status_edits_on_account_id"
+    t.index ["status_id"], name: "index_status_edits_on_status_id"
+  end
+
   create_table "status_expires", force: :cascade do |t|
     t.bigint "status_id", null: false
     t.datetime "expires_at", null: false
@@ -1370,6 +1382,8 @@ ActiveRecord::Schema.define(version: 2025_03_17_173338) do
   add_foreign_key "session_activations", "oauth_access_tokens", column: "access_token_id", name: "fk_957e5bda89", on_delete: :cascade
   add_foreign_key "session_activations", "users", name: "fk_e5fda67334", on_delete: :cascade
   add_foreign_key "status_capability_tokens", "statuses", on_delete: :cascade
+  add_foreign_key "status_edits", "accounts", on_delete: :nullify
+  add_foreign_key "status_edits", "statuses", on_delete: :cascade
   add_foreign_key "status_expires", "statuses", on_delete: :cascade
   add_foreign_key "status_pins", "accounts", name: "fk_d4cb435b62", on_delete: :cascade
   add_foreign_key "status_pins", "statuses", on_delete: :cascade

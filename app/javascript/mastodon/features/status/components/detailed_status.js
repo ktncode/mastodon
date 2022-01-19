@@ -194,6 +194,7 @@ class DetailedStatus extends ImmutablePureComponent {
     let favouriteLink        = '';
     let emojiReactionLink    = '';
     let statusReferredByLink = '';
+    let edited               = '';
 
     const reblogsCount = status.get('reblogs_count');
     const favouritesCount = status.get('favourites_count');
@@ -487,7 +488,7 @@ class DetailedStatus extends ImmutablePureComponent {
           <div className='detailed-status__meta'>
             <a className='detailed-status__datetime' href={status.get('url')} target='_blank' rel='noopener noreferrer'>
               <FormattedDate value={new Date(status.get('created_at'))} hour12={false} year='numeric' month='short' day='2-digit' hour='2-digit' minute='2-digit' />
-            </a>
+            </a>{edited}
             {status.get('expires_at') &&
               <span className='detailed-status__expiration-time'>
                 <time dateTime={expires_at} title={intl.formatDate(expires_date, dateFormatOptions)}>

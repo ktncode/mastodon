@@ -9,7 +9,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
              :favourites_count, :emoji_reactions, :emoji_reactions_count,
              :status_reference_ids,
              :status_references_count, :status_referred_by_count,
-             :searchability
+             :searchability, :edited_at
 
   attribute :favourited, if: :current_user?
   attribute :reblogged, if: :current_user?

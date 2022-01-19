@@ -81,10 +81,11 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def process_status
-    @tags         = []
-    @mentions     = []
-    @params       = {}
-    @object_links = []
+    @tags                 = []
+    @mentions             = []
+    @silenced_account_ids = []
+    @params               = {}
+    @object_links         = []
 
     process_link_tags
     process_status_params
@@ -119,6 +120,28 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     # Do nothing when the index server is down
   end
 
+  def distribute
+    crawl_links(@status)
+
+    return unless @options[:delivery]
+
+    notify_about_reblog(@status) if reblog_of_local_account?(@status) && !reblog_by_following_group_account?(@status)
+    notify_about_mentions(@status)
+
+    # Only continue if the status is supposed to have arrived in real-time.
+    # Note that if @options[:override_timestamps] isn't set, the status
+    # may have a lower snowflake id than other existing statuses, potentially
+    # "hiding" it from paginated API calls
+    return unless @options[:override_timestamps] || @status.within_realtime_window?
+
+    ::DistributionWorker.perform_async(@status.id, silenced_account_ids: @silenced_account_ids)
+  end
+
+  def crawl_links(status)
+    # Spread out crawling randomly to avoid DDoSing the link
+    LinkCrawlWorker.perform_in(rand(1..59).seconds, status.id)
+  end
+
   def find_existing_status
     status   = status_from_uri(object_uri)
     status ||= Status.find_by(uri: @object['atomUri']) if @object['atomUri'].present?
@@ -126,19 +149,22 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def process_status_params
+    @status_parser = ActivityPub::Parser::StatusParser.new(@json, followers_collection: @account.followers_url)
+
     @params = begin
       {
-        uri: object_uri,
-        url: object_url || object_uri,
+        uri: @status_parser.uri,
+        url: @status_parser.url || @status_parser.uri,
         account: @account,
-        text: add_compatible_content(text_from_content || ''),
-        language: detected_language,
-        spoiler_text: converted_object_type? ? '' : (text_from_summary || ''),
-        created_at: @object['published'],
+        text: converted_object_type? ? converted_text : (@status_parser.text || ''),
+        language: @status_parser.language || detected_language,
+        spoiler_text: converted_object_type? ? '' : (@status_parser.spoiler_text || ''),
+        created_at: @status_parser.created_at,
+        edited_at: @status_parser.edited_at,
         override_timestamps: @options[:override_timestamps],
-        reply: @object['inReplyTo'].present?,
-        sensitive: @account.sensitized? || @object['sensitive'] || false,
-        visibility: visibility_from_audience_with_correction,
+        reply: @status_parser.reply,
+        sensitive: @account.sensitized? || @status_parser.sensitive || false,
+        visibility: @status_parser.visibility || visibility_from_audience_with_correction,
         searchability: searchability,
         thread: replied_to_status,
         conversation: conversation_from_context,
@@ -166,6 +192,53 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         expires_action: :mark,
       })
     end
+  end
+
+  def process_audience
+    # Unlike with tags, there is no point in resolving accounts we don't already
+    # know here, because silent mentions would only be used for local access control anyway
+    accounts_in_audience = (audience_to + audience_cc).uniq.filter_map do |audience|
+      account_from_uri(audience) unless ActivityPub::TagManager.instance.public_collection?(audience)
+    end
+
+    # If the payload was delivered to a specific inbox, the inbox owner must have
+    # access to it, unless they already have access to it anyway
+    if @options[:delivered_to_account_id]
+      accounts_in_audience << delivered_to_account
+      accounts_in_audience.uniq!
+    end
+
+    accounts_in_audience.each do |account|
+      # This runs after tags are processed, and those translate into non-silent
+      # mentions, which take precedence
+      next if @mentions.any? { |mention| mention.account_id == account.id }
+
+      @mentions << Mention.new(account: account, silent: true)
+
+      # If there is at least one silent mention, then the status can be considered
+      # as a limited-audience status, and not strictly a direct message, but only
+      # if we considered a direct message in the first place
+      @params[:visibility] = :limited if @params[:visibility] == :direct
+    end
+
+    # Accounts that are tagged but are not in the audience are not
+    # supposed to be notified explicitly
+    @silenced_account_ids = @mentions.map(&:account_id) - accounts_in_audience.map(&:id)
+  end
+
+  def postprocess_audience_and_deliver
+    return if @status.mentions.find_by(account_id: @options[:delivered_to_account_id])
+
+    @status.mentions.create(account: delivered_to_account, silent: true)
+    @status.update(visibility: :limited) if @status.direct_visibility?
+
+    return unless delivered_to_account.following?(@account)
+
+    FeedInsertWorker.perform_async(@status.id, delivered_to_account.id, :home)
+  end
+
+  def delivered_to_account
+    @delivered_to_account ||= Account.find(@options[:delivered_to_account_id])
   end
 
   def attach_tags(status)
@@ -281,34 +354,22 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
   def process_emoji(tag)
     return if skip_download?
-    return if tag['name'].blank? || tag['icon'].blank? || tag['icon']['url'].blank?
 
-    shortcode       = tag['name'].delete(':')
-    image_url       = tag['icon']['url']
-    uri             = tag['id']
+    custom_emoji_parser = ActivityPub::Parser::CustomEmojiParser.new(tag)
 
-    emoji = CustomEmoji.find_or_initialize_by(shortcode: shortcode, domain: @account.domain) { |emoji| emoji.uri = uri }
+    return if custom_emoji_parser.shortcode.blank? || custom_emoji_parser.image_remote_url.blank?
 
-    emoji.org_category     = tag['category']
-    emoji.copy_permission  = case tag['copyPermission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
-    emoji.license          = tag['license']
-    emoji.misskey_license  = value_or_hash_value(tag['_misskey_license'], 'freeText')
-    emoji.alternate_name   = tag['alternate_name']
-    emoji.ruby             = tag['ruby']
-    emoji.aliases          = as_array(tag['keywords'])
-    emoji.copyright_notice = tag['copyrightNotice']
-    emoji.credit_text      = tag['creditText']
-    emoji.usage_info       = tag['usageInfo']
-    emoji.related_links    = as_array(tag['relatedLink'])
-    emoji.creator          = tag['creator']
-    emoji.description      = tag['description']
-    emoji.is_based_on      = tag['isBasedOn']
-    emoji.sensitive        = !!tag['sensitive']
-    emoji.image_remote_url = tag['icon']['url']
-    emoji.updated_at       = tag['updated'] if tag['updated']
-    emoji.save
-  rescue Seahorse::Client::NetworkingError => e
-    Rails.logger.warn "Error storing emoji: #{e}"
+    emoji = CustomEmoji.find_by(shortcode: custom_emoji_parser.shortcode, domain: @account.domain)
+
+    return unless emoji.nil? || custom_emoji_parser.image_remote_url != emoji.image_remote_url || (custom_emoji_parser.updated_at && custom_emoji_parser.updated_at >= emoji.updated_at)
+
+    begin
+      emoji ||= CustomEmoji.new(domain: @account.domain, shortcode: custom_emoji_parser.shortcode, uri: custom_emoji_parser.uri)
+      emoji.image_remote_url = custom_emoji_parser.image_remote_url
+      emoji.save
+    rescue Seahorse::Client::NetworkingError => e
+      Rails.logger.warn "Error storing emoji: #{e}"
+    end
   end
 
   def resolve_references(status, mentions, collection)
@@ -323,21 +384,23 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     media_attachments = []
 
     as_array(@object['attachment']).each do |attachment|
-      next if attachment['url'].blank? || media_attachments.size >= Setting.attachments_max
+      media_attachment_parser = ActivityPub::Parser::MediaAttachmentParser.new(attachment)
+
+      next if media_attachment_parser.remote_url.blank? || media_attachments.size >= 4
 
       begin
         media_attachment = MediaAttachment.create(
-          account:              @account,
-          remote_url:           remote_url_from_attachment(attachment),
-          thumbnail_remote_url: thumbnail_remote_url_from_attachment(attachment),
-          description:          attachment['summary'].presence || attachment['name'].presence,
-          focus:                attachment['focalPoint'],
-          blurhash:             supported_blurhash?(attachment['blurhash']) ? attachment['blurhash'] : nil,
-          thumbhash:            attachment['thumbhash'],
+          account: @account,
+          remote_url: media_attachment_parser.remote_url,
+          thumbnail_remote_url: media_attachment_parser.thumbnail_remote_url,
+          description: media_attachment_parser.description,
+          focus: media_attachment_parser.focus,
+          blurhash: media_attachment_parser.blurhash
         )
+
         media_attachments << media_attachment
 
-        next if unsupported_media_type?(attachment['mediaType']) || skip_download?
+        next if unsupported_media_type?(media_attachment_parser.file_content_type) || skip_download?
 
         media_attachment.download_file!
         media_attachment.download_thumbnail!
@@ -355,49 +418,17 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     media_attachments
   end
 
-  def remote_url_from_attachment(attachment)
-    url = Addressable::URI.parse(attachment['url'])&.normalize&.to_s
-    url unless unsupported_uri_scheme?(url)
-  rescue Addressable::URI::InvalidURIError
-    nil
-  end
-
-  def thumbnail_remote_url_from_attachment(attachment)
-    url = Addressable::URI.parse(attachment['icon'].is_a?(Hash) ? attachment['icon']['url'] : attachment['icon'])&.normalize&.to_s
-    url unless unsupported_uri_scheme?(url)
-  rescue Addressable::URI::InvalidURIError
-    nil
-  end
-
   def process_poll
-    return unless @object['type'] == 'Question' && (@object['anyOf'].is_a?(Array) || @object['oneOf'].is_a?(Array))
+    poll_parser = ActivityPub::Parser::PollParser.new(@object)
 
-    expires_at = begin
-      if @object['closed'].is_a?(String)
-        @object['closed']
-      elsif !@object['closed'].nil? && !@object['closed'].is_a?(FalseClass)
-        Time.now.utc
-      else
-        @object['endTime']
-      end
-    end
-
-    if @object['anyOf'].is_a?(Array)
-      multiple = true
-      items    = @object['anyOf']
-    else
-      multiple = false
-      items    = @object['oneOf']
-    end
-
-    voters_count = @object['votersCount']
+    return unless poll_parser.valid?
 
     @account.polls.new(
-      multiple: multiple,
-      expires_at: expires_at,
-      options: items.map { |item| item['name'].presence || item['content'] }.compact,
-      cached_tallies: items.map { |item| item.dig('replies', 'totalItems') || 0 },
-      voters_count: voters_count
+      multiple: poll_parser.multiple,
+      expires_at: poll_parser.expires_at,
+      options: poll_parser.options,
+      cached_tallies: poll_parser.cached_tallies,
+      voters_count: poll_parser.voters_count
     )
   end
 
@@ -585,15 +616,6 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
   def unsupported_media_type?(mime_type)
     mime_type.present? && !MediaAttachment.supported_mime_types.include?(mime_type)
-  end
-
-  def supported_blurhash?(blurhash)
-    components = blurhash.blank? || !blurhash_valid_chars?(blurhash) ? nil : Blurhash.components(blurhash)
-    components.present? && components.none? { |comp| comp > 5 }
-  end
-
-  def blurhash_valid_chars?(blurhash)
-    /^[\w#$%*+-.:;=?@\[\]^{|}~]+$/.match?(blurhash)
   end
 
   def skip_download?

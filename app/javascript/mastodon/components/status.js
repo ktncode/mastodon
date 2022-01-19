@@ -103,6 +103,7 @@ const messages = defineMessages({
   mark_ancestor: { id: 'thread_mark.ancestor', defaultMessage: 'Has reference' },
   mark_descendant: { id: 'thread_mark.descendant', defaultMessage: 'Has reply' },
   mark_both: { id: 'thread_mark.both', defaultMessage: 'Has reference and reply' },
+  edited: { id: 'status.edited', defaultMessage: 'Edited {date}' },
 });
 
 const dateFormatOptions = {
@@ -847,9 +848,10 @@ class Status extends ImmutablePureComponent {
             <div className='status__expand' onClick={this.handleExpandClick} role='presentation' />
             <div className='status__info'>
               {status.get('expires_at') && <span className='status__expiration-time'><time dateTime={expires_at} title={intl.formatDate(expires_date, dateFormatOptions)}><i className='fa fa-clock-o' aria-hidden='true' /></time></span>}
-              <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
+              <a onClick={this.handleClick} href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
                 {threadMark}
-                {disableRelativeTime ? <AbsoluteTimestamp timestamp={status.get('created_at')} /> : <RelativeTimestamp timestamp={status.get('created_at')} /> }
+                {disableRelativeTime ? <AbsoluteTimestamp timestamp={status.get('created_at')} /> : <RelativeTimestamp timestamp={status.get('created_at')} />}
+                {status.get('edited_at') && <abbr title={intl.formatMessage(messages.edited, { date: intl.formatDate(status.get('edited_at'), { hour12: false, year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }) })}> *</abbr>}
               </a>
               <span className='status__visibility-icon'>{visibilityLink}</span>
 

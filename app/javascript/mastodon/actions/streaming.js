@@ -13,6 +13,7 @@ import { getHomeVisibilities } from 'mastodon/selectors';
 import { updateNotifications, expandNotifications } from './notifications';
 import { updateConversations } from './conversations';
 import { updateEmojiReaction } from './interactions';
+import { updateStatus } from './statuses';
 import {
   fetchAnnouncements,
   updateAnnouncements,
@@ -78,6 +79,9 @@ export const connectTimelineStream = (timelineId, channelName, params = {}, opti
         switch(data.event) {
         case 'update':
           dispatch(updateTimeline(timelineId, JSON.parse(data.payload), options.accept));
+          break;
+        case 'status.update':
+          dispatch(updateStatus(JSON.parse(data.payload)));
           break;
         case 'delete':
           dispatch(deleteFromTimelines(data.payload));

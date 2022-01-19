@@ -440,6 +440,7 @@ Rails.application.routes.draw do
           post '/unreact/:id', to: 'emoji_reactions#destroy', constraints: { id: %r{[^/]+} }
 
           resource :history, only: :show
+          resource :source, only: :show
         end
 
         member do
