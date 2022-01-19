@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-class Api::V1::Statuses::HistoriesController < Api::BaseController
+class Api::V1::Statuses::SourcesController < Api::BaseController
   include Authorization
 
-  before_action -> { authorize_if_got_token! :read, :'read:statuses' }
+  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }
   before_action :set_status
 
   def show
-    render json: @status.edits, each_serializer: REST::StatusEditSerializer
+    render json: @status, serializer: REST::StatusSourceSerializer
   end
 
   private
