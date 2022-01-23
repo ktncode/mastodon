@@ -63,41 +63,21 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "6e4051854bb62e2ddbc671f82d6c2328892e1134b8b28105ecba9b0122540714",
+      "fingerprint": "75fcd147b7611763ab6915faf8c5b0709e612b460f27c05c72d8b9bd0a6a77f8",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/account.rb",
-      "line": 479,
+      "file": "lib/mastodon/snowflake.rb",
+      "line": 87,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "find_by_sql([\"          WITH first_degree AS (\\n            SELECT target_account_id\\n            FROM follows\\n            WHERE account_id = ?\\n            UNION ALL\\n            SELECT ?\\n          )\\n          SELECT\\n            accounts.*,\\n            (count(f.id) + 1) * ts_rank_cd(#{textsearch}, #{query}, 32) AS rank\\n          FROM accounts\\n          LEFT OUTER JOIN follows AS f ON (accounts.id = f.account_id AND f.target_account_id = ?)\\n          WHERE accounts.id IN (SELECT * FROM first_degree)\\n            AND #{query} @@ #{textsearch}\\n            AND accounts.suspended_at IS NULL\\n            AND accounts.moved_to_account_id IS NULL\\n          GROUP BY accounts.id\\n          ORDER BY rank DESC\\n          LIMIT ? OFFSET ?\\n\".squish, account.id, account.id, account.id, limit, offset])",
+      "code": "connection.execute(\"CREATE OR REPLACE FUNCTION timestamp_id(table_name text)\\nRETURNS bigint AS\\n$$\\n  DECLARE\\n    time_part bigint;\\n    sequence_base bigint;\\n    tail bigint;\\n  BEGIN\\n    time_part := (\\n      -- Get the time in milliseconds\\n      ((date_part('epoch', now()) * 1000))::bigint\\n      -- And shift it over two bytes\\n      << 16);\\n\\n    sequence_base := (\\n      'x' ||\\n      -- Take the first two bytes (four hex characters)\\n      substr(\\n        -- Of the MD5 hash of the data we documented\\n        md5(table_name || '#{SecureRandom.hex(16)}' || time_part::text),\\n        1, 4\\n      )\\n    -- And turn it into a bigint\\n    )::bit(16)::bigint;\\n\\n    -- Finally, add our sequence number to our base, and chop\\n    -- it to the last two bytes\\n    tail := (\\n      (sequence_base + nextval(table_name || '_id_seq'))\\n      & 65535);\\n\\n    -- Return the time part and the sequence part. OR appears\\n    -- faster here than addition, but they're equivalent:\\n    -- time_part has no trailing two bytes, and tail is only\\n    -- the last two bytes.\\n    RETURN time_part | tail;\\n  END\\n$$ LANGUAGE plpgsql VOLATILE;\\n\")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Account",
-        "method": "advanced_search_for"
+        "class": "Mastodon::Snowflake",
+        "method": "define_timestamp_id"
       },
-      "user_input": "textsearch",
+      "user_input": "SecureRandom.hex(16)",
       "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "6f075c1484908e3ec9bed21ab7cf3c7866be8da3881485d1c82e13093aefcbd7",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/status.rb",
-      "line": 105,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "result.joins(\"LEFT OUTER JOIN statuses_tags t#{id} ON t#{id}.status_id = statuses.id AND t#{id}.tag_id = #{id}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Status",
-        "method": null
-      },
-      "user_input": "id",
-      "confidence": "Weak",
       "note": ""
     },
     {
