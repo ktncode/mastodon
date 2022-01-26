@@ -261,7 +261,7 @@ class FanOutOnWriteService < BaseService
   end
 
   def update?
-    @is_update
+    @options[:update]
   end
 
   def broadcastable?
