@@ -17,7 +17,7 @@ class UnsubscribeAccountService < BaseService
       if list_id.nil? && !source_account.delivery_following?(target_account)
         UnmergeWorker.perform_async(target_account.id, source_account.id)
       elsif !ListAccount.where(list_id: list_id, account_id: target_account.id).exists?
-        UnmergeWorker.perform_async(target_account.id, source_account.id, list_id: list_id)
+        UnmergeWorker.perform_async(target_account.id, source_account.id, { 'list_id' => list_id })
       end
     end
   end

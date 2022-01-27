@@ -14,7 +14,7 @@ class FollowMigrationService < FollowService
     notify    = follow&.notify?
     delivery  = follow&.delivery?
 
-    super(source_account, target_account, reblogs: reblogs, notify: notify, delivery: delivery, bypass_locked: bypass_locked, bypass_limit: true)
+    super(source_account, target_account, { reblogs: reblogs, notify: notify, delivery: delivery, bypass_locked: bypass_locked, bypass_limit: true} )
   end
 
   private

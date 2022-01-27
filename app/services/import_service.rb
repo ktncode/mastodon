@@ -97,7 +97,7 @@ class ImportService < BaseService
         option = scope[:list_id] ? { list_id: scope[:list_id] } : {}
 
         if items[key]
-          Import::RelationshipWorker.perform_async(@account.id, acct, action, items.delete(key))
+          Import::RelationshipWorker.perform_async(@account.id, acct, action, items.delete(key).stringify_keys)
         else
           Import::RelationshipWorker.perform_async(@account.id, acct, undo_action, option)
         end
@@ -111,7 +111,7 @@ class ImportService < BaseService
     sorted_items    = preceding_items + (items - preceding_items)
 
     Import::RelationshipWorker.push_bulk(sorted_items) do |acct, extra|
-      [@account.id, acct, action, extra]
+      [@account.id, acct, action, extra.stringify_keys]
     end
   end
 

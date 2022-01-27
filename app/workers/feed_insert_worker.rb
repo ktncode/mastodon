@@ -3,9 +3,10 @@
 class FeedInsertWorker
   include Sidekiq::Worker
 
-  def perform(status_id, id, type = :home)
-    @type     = type.to_sym
-    @status   = Status.find(status_id)
+  def perform(status_id, id, type = 'home', options = {})
+    @type      = type.to_sym
+    @status    = Status.find(status_id)
+    @options   = options.symbolize_keys
 
     case @type
     when :home

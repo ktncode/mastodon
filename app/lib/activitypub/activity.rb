@@ -318,8 +318,8 @@ class ActivityPub::Activity
     return unless delivered_to_account.following?(@account)
 
     @account.high_priority? ?
-      PriorityFeedInsertWorker.perform_async(@status.id, delivered_to_account.id, :home) :
-      FeedInsertWorker.perform_async(@status.id, delivered_to_account.id, :home)
+      PriorityFeedInsertWorker.perform_async(@status.id, delivered_to_account.id, 'home') :
+      FeedInsertWorker.perform_async(@status.id, delivered_to_account.id, 'home')
   end
 
   def visibility_from_audience

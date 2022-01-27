@@ -29,7 +29,7 @@ class AccountSubscribeService < BaseService
     ActivityTracker.increment('activity:interactions')
 
     subscribe = @source_account.subscribe!(@target_account, @options)
-    MergeWorker.perform_async(@target_account.id, @source_account.id, @options.merge(public_only: true))
+    MergeWorker.perform_async(@target_account.id, @source_account.id, @options.merge(public_only: true).stringify_keys)
     subscribe
   end
 

@@ -75,7 +75,7 @@ class FanOutOnWriteService < BaseService
 
     status.account.followers_for_local_distribution.select(:id).reorder(nil).find_in_batches do |followers|
       @feedInsertWorker.push_bulk(followers) do |follower|
-        [status.id, follower.id, :home]
+        [status.id, follower.id, 'home']
       end
     end
   end
@@ -85,7 +85,7 @@ class FanOutOnWriteService < BaseService
 
     status.account.subscribers_for_local_distribution.with_reblog(status.reblog?).with_media(status.proper).select(:id, :account_id).reorder(nil).find_in_batches do |subscribings|
       @feedInsertWorker.push_bulk(subscribings) do |subscribing|
-        [status.id, subscribing.account_id, :home]
+        [status.id, subscribing.account_id, 'home']
       end
     end
   end
@@ -95,7 +95,7 @@ class FanOutOnWriteService < BaseService
 
     status.account.list_subscribers_for_local_distribution.with_reblog(status.reblog?).with_media(status.proper).select(:id, :list_id).reorder(nil).find_in_batches do |subscribings|
       @feedInsertWorker.push_bulk(subscribings) do |subscribing|
-        [status.id, subscribing.list_id, :list]
+        [status.id, subscribing.list_id, 'list']
       end
     end
   end
@@ -110,7 +110,7 @@ class FanOutOnWriteService < BaseService
   def deliver_to_domain_subscribers_home(status)
     DomainSubscribe.domain_to_home(status.account.domain).with_reblog(status.reblog?).with_media(status.proper).select(:id, :account_id).find_in_batches do |subscribes|
       @feedInsertWorker.push_bulk(subscribes) do |subscribe|
-        [status.id, subscribe.account_id, :home]
+        [status.id, subscribe.account_id, 'home']
       end
     end
   end
@@ -118,7 +118,7 @@ class FanOutOnWriteService < BaseService
   def deliver_to_domain_subscribers_list(status)
     DomainSubscribe.domain_to_list(status.account.domain).with_reblog(status.reblog?).with_media(status.proper).select(:id, :list_id).find_in_batches do |subscribes|
       @feedInsertWorker.push_bulk(subscribes) do |subscribe|
-        [status.id, subscribe.list_id, :list]
+        [status.id, subscribe.list_id, 'list']
       end
     end
   end
@@ -135,7 +135,7 @@ class FanOutOnWriteService < BaseService
     match_ids          = keyword_subscribes.chunk(&:account_id).filter_map { |id, subscribes| id if subscribes.any? { |s| s.match?(status.searchable_text) } }
 
     @feedInsertWorker.push_bulk(match_ids) do |account_id|
-      [status.id, account_id, :home]
+      [status.id, account_id, 'home']
     end
   end
 
@@ -144,7 +144,7 @@ class FanOutOnWriteService < BaseService
     match_ids          = keyword_subscribes.chunk(&:list_id).filter_map { |id, subscribes| id if subscribes.any? { |s| s.match?(status.searchable_text) } }
 
     @feedInsertWorker.push_bulk(match_ids) do |list_id|
-      [status.id, list_id, :list]
+      [status.id, list_id, 'list']
     end
   end
 
@@ -163,7 +163,7 @@ class FanOutOnWriteService < BaseService
 
     status.account.lists_for_local_distribution.select(:id).reorder(nil).find_in_batches do |lists|
       @feedInsertWorker.push_bulk(lists) do |list|
-        [status.id, list.id, :list]
+        [status.id, list.id, 'list']
       end
     end
   end
@@ -180,7 +180,7 @@ class FanOutOnWriteService < BaseService
 
     mentions.select(:id, :account_id).reorder(nil).find_in_batches do |mentions|
       @feedInsertWorker.push_bulk(mentions) do |mention|
-        [status.id, mention.account_id, :home]
+        [status.id, mention.account_id, 'home']
       end
     end
   end
@@ -193,7 +193,7 @@ class FanOutOnWriteService < BaseService
 
     lists.select(:id).reorder(nil).find_in_batches do |lists|
       @feedInsertWorker.push_bulk(lists) do |list|
-        [status.id, list.id, :list]
+        [status.id, list.id, 'list']
       end
     end
   end
@@ -230,13 +230,13 @@ class FanOutOnWriteService < BaseService
 
   def deliver_to_hashtag_followers_home(status)
     @feedInsertWorker.push_bulk(FollowTag.home.where(tag: status.tags_without_mute).with_media(status.proper).merge(visibility_scope(status, FollowTag)).pluck(:account_id).uniq) do |follower|
-      [status.id, follower, :home]
+      [status.id, follower, 'home']
     end
   end
 
   def deliver_to_hashtag_followers_list(status)
     @feedInsertWorker.push_bulk(FollowTag.list.where(tag: status.tags_without_mute).with_media(status.proper).merge(visibility_scope(status, FollowTag)).pluck(:list_id).uniq) do |list_id|
-      [status.id, list_id, :list]
+      [status.id, list_id, 'list']
     end
   end
 
@@ -318,7 +318,7 @@ class FanOutOnWriteService < BaseService
 
   def deliver_to_self_included_lists(status)
     @feedInsertWorker.push_bulk(status.account.self_included_lists.pluck(:id)) do |list_id|
-      [status.id, list_id, :list]
+      [status.id, list_id, 'list']
     end
   end
 end

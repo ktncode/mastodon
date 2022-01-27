@@ -46,7 +46,7 @@ class Form::StatusBatch
   def delete_statuses
     Status.include_expired.where(id: status_ids).reorder(nil).find_each do |status|
       status.discard
-      RemovalWorker.perform_async(status.id, immediate: true)
+      RemovalWorker.perform_async(status.id, { 'immediate' => true })
       Tombstone.find_or_create_by(uri: status.uri, account: status.account, by_moderator: true)
       log_action :destroy, status
     end
