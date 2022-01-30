@@ -167,8 +167,29 @@ jobs:
           name: Create database
           command: ./bin/rails db:create
       - run:
-          name: Run migrations
+          command: ./bin/rails db:migrate VERSION=20171010025614
+          name: Run migrations up to v2.0.0
+      - run:
+          command: ./bin/rails tests:migrations:populate_v2
+          name: Populate database with test data
+      - run:
+          command: ./bin/rails db:migrate VERSION=20180514140000
+          name: Run migrations up to v2.4.0
+      - run:
+          command: ./bin/rails tests:migrations:populate_v2_4
+          name: Populate database with test data
+      - run:
+          command: ./bin/rails db:migrate VERSION=20180707154237
+          name: Run migrations up to v2.4.3
+      - run:
+          command: ./bin/rails tests:migrations:populate_v2_4_3
+          name: Populate database with test data
+      - run:
           command: ./bin/rails db:migrate
+          name: Run all remaining migrations
+      - run:
+          command: ./bin/rails tests:migrations:check_database
+          name: Check migration result
 
 commands:
   install-system-dependencies:
@@ -304,8 +325,22 @@ jobs:
           ruby-version: '3.2'
       - wait-db
       - run:
-          name: Run jest
-          command: yarn test:jest
+          command: ./bin/rails db:create
+          name: Create database
+      - run:
+          command: ./bin/rails db:migrate VERSION=20171010025614
+          name: Run migrations up to v2.0.0
+      - run:
+          command: ./bin/rails tests:migrations:populate_v2
+          name: Populate database with test data
+      - run:
+          command: ./bin/rails db:migrate
+          name: Run all pre-deployment migrations
+          evironment:
+            SKIP_POST_DEPLOYMENT_MIGRATIONS: true
+      - run:
+          command: ./bin/rails db:migrate
+          name: Run all post-deployment remaining migrations
 
 workflows:
   version: 2
@@ -336,8 +371,14 @@ workflows:
             - install-ruby2.7
       - test-migrations:
           requires:
-            - install-ruby2.7
-      - test-ruby2.7:
+            - build
+      - test-two-step-migrations:
+          requires:
+            - build
+      - node/run:
+          cache-version: v1
+          name: test-webui
+          pkg-manager: yarn
           requires:
             - install-ruby2.7
             - build
