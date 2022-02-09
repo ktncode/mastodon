@@ -263,6 +263,10 @@ class MediaAttachment < ApplicationRecord
     file_meta.nil? || !file_meta.key?(version.to_s)
   end
 
+  def significantly_changed?
+    description_previously_changed? || thumbnail_updated_at_previously_changed? || file_meta_previously_changed?
+  end
+
   def larger_media_format?
     video? || gifv? || audio?
   end

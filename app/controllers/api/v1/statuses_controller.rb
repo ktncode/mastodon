@@ -3,8 +3,8 @@
 class Api::V1::StatusesController < Api::BaseController
   include Authorization
 
-  before_action -> { authorize_if_got_token! :read, :'read:statuses' }, except: [:create, :destroy]
-  before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only:   [:create, :destroy]
+  before_action -> { authorize_if_got_token! :read, :'read:statuses' }, except: [:create, :update, :destroy]
+  before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only:   [:create, :update, :destroy]
   before_action :require_user!, except:      [:index, :show, :context, :updated]
   before_action :set_statuses, only:         [:index]
   before_action :set_updated_statuses, only: [:updated]
@@ -83,9 +83,25 @@ class Api::V1::StatusesController < Api::BaseController
                                          status_reference_urls: status_params[:status_reference_urls] || [],
                                          searchability: status_params[:searchability]
     )
-                                         
 
     render json: @status, serializer: @status.is_a?(ScheduledStatus) ? REST::ScheduledStatusSerializer : REST::StatusSerializer
+  end
+
+  def update
+    @status = Status.where(account: current_account).find(params[:id])
+    authorize @status, :update?
+
+    UpdateStatusService.new.call(
+      @status,
+      current_account.id,
+      text: status_params[:status],
+      media_ids: status_params[:media_ids],
+      sensitive: status_params[:sensitive],
+      spoiler_text: status_params[:spoiler_text],
+      poll: status_params[:poll]
+    )
+
+    render json: @status, serializer: REST::StatusSerializer
   end
 
   def destroy

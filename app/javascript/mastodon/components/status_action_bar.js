@@ -15,6 +15,7 @@ import ReactionPickerDropdownContainer from '../containers/reaction_picker_dropd
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
   redraft: { id: 'status.redraft', defaultMessage: 'Delete & re-draft' },
+  edit: { id: 'status.edit', defaultMessage: 'Edit' },
   direct: { id: 'status.direct', defaultMessage: 'Direct message @{name}' },
   showMemberList: { id: 'status.show_member_list', defaultMessage: 'Show member list' },
   mention: { id: 'status.mention', defaultMessage: 'Mention @{name}' },
@@ -209,6 +210,10 @@ class StatusActionBar extends ImmutablePureComponent {
 
   handleRedraftClick = () => {
     this.props.onDelete(this.props.status, this.context.router.history, true);
+  }
+
+  handleEditClick = () => {
+    this.props.onEdit(this.props.status, this.context.router.history);
   }
 
   handlePinClick = () => {
@@ -411,6 +416,7 @@ class StatusActionBar extends ImmutablePureComponent {
     }
 
     if (writtenByMe) {
+      menu.push({ text: intl.formatMessage(messages.edit), action: this.handleEditClick });
       menu.push({ text: intl.formatMessage(messages.delete), action: this.handleDeleteClick });
       if (!disablePost) {
         menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick });

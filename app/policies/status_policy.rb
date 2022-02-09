@@ -48,7 +48,7 @@ class StatusPolicy < ApplicationPolicy
   alias unreblog? destroy?
 
   def update?
-    staff?
+    staff? || owned?
   end
 
   def show_mentions?

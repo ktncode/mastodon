@@ -217,24 +217,19 @@ class ActivityPub::ProcessStatusUpdateService < BaseService
 
     return if @status.edits.any?
 
-    @status.edits.create(
-      text: @status.text,
-      spoiler_text: @status.spoiler_text,
+    @status.snapshot!(
       media_attachments_changed: false,
-      account_id: @account.id,
-      created_at: @status.created_at
+      at_time: @status.created_at
     )
   end
 
   def create_edit!
     return unless @status.text_previously_changed? || @status.spoiler_text_previously_changed? || @media_attachments_changed
 
-    @status_edit = @status.edits.create(
-      text: @status.text,
-      spoiler_text: @status.spoiler_text,
+    @status.snapshot!(
       media_attachments_changed: @media_attachments_changed,
       account_id: @account.id,
-      created_at: @status.edited_at
+      at_time: @status.edited_at
     )
   end
 

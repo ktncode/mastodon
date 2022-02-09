@@ -22,6 +22,7 @@ const mapStateToProps = state => ({
   caretPosition: state.getIn(['compose', 'caretPosition']),
   preselectDate: state.getIn(['compose', 'preselectDate']),
   isSubmitting: state.getIn(['compose', 'is_submitting']),
+  isEditing: state.getIn(['compose', 'id']) !== null,
   isChangingUpload: state.getIn(['compose', 'is_changing_upload']),
   isUploading: state.getIn(['compose', 'is_uploading']),
   isCircleUnselected: state.getIn(['compose', 'privacy']) === 'limited' && state.getIn(['compose', 'reply_status', 'visibility']) !== 'limited' && !state.getIn(['compose', 'circle_id']),
