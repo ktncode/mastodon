@@ -1249,6 +1249,7 @@ en:
     other: Other
     posting_defaults: Posting defaults
     public_timelines: Public timelines
+    searching_defaults: Searching default
   reactions:
     errors:
       limit_reached: Limit of different reactions reached
@@ -1293,6 +1294,14 @@ en:
     over_daily_limit: You have exceeded the limit of %{limit} scheduled posts for today
     over_total_limit: You have exceeded the limit of %{limit} scheduled posts
     too_soon: The scheduled date must be in the future
+  search:
+    searchabilities:
+      direct: Reacted-posts-only
+      direct_long: Only search to own or reacted posts
+      private: Follows-and-reaced-posts
+      private_long: Only search to own or follows or reacted posts
+      public: Public
+      public_long: Everyone can search
   sessions:
     activity: Last activity
     browser: Browser
@@ -1412,6 +1421,13 @@ en:
       one: '%{count} other / '
       other: '%{count} others / '
     references_private: (Private reference)
+    searchabilities:
+      direct: Reacted-users-only
+      direct_long: Only users who mention or react to your post can search your post
+      private: Followers-only
+      private_long: Only users who your followers, or mention or react to your post can search your post
+      public: Public
+      public_long: Everyone can search your post (also published to external search services)
     show_more: Show more
     show_newer: Show newer
     show_older: Show older

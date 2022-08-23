@@ -40,6 +40,11 @@
   .fields-group
     = f.input :setting_show_application, as: :boolean, wrapper: :with_label, recommended: true
 
+  %h4= t 'preferences.searching_defaults'
+
+  .fields-group
+    = f.input :setting_default_search_searchability, collection: Status.selectable_searchabilities, wrapper: :with_label, include_blank: false, label_method: lambda { |searchability| safe_join([I18n.t("search.searchabilities.#{searchability}"), I18n.t("search.searchabilities.#{searchability}_long")], ' - ') }, required: false, hint: true, fedibird_features: true
+
   %h4= t 'preferences.fedibird_features'
 
   .fields-group

@@ -2,13 +2,14 @@
 
 class SearchService < BaseService
   def call(query, account, limit, options = {})
-    @query   = query&.strip
-    @account = account
-    @options = options
-    @limit   = limit.to_i
-    @offset  = options[:type].blank? ? 0 : options[:offset].to_i
-    @resolve = options[:resolve] || false
-    @profile = options[:with_profiles] || false
+    @query         = query&.strip
+    @account       = account
+    @options       = options
+    @limit         = limit.to_i
+    @offset        = options[:type].blank? ? 0 : options[:offset].to_i
+    @resolve       = options[:resolve] || false
+    @profile       = options[:with_profiles] || false
+    @searchability = options[:searchability] || @account.user&.setting_default_search_searchability || 'private'
 
     default_results.tap do |results|
       next if @query.blank? || @limit.zero?
@@ -69,6 +70,14 @@ class SearchService < BaseService
   def perform_statuses_search!
     definition = parsed_query.apply(StatusesIndex.filter(term: { searchable_by: @account.id }))
 
+    case @searchability
+    when 'public'
+      definition = definition.or(StatusesIndex.filter(term: { searchability: 'public' }))
+      definition = definition.or(StatusesIndex.filter(terms: { searchability: %w(unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
+    when 'unlisted', 'private'
+      definition = definition.or(StatusesIndex.filter(terms: { searchability: %w(public unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
+    end
+
     if @options[:account_id].present?
       definition = definition.filter(term: { account_id: @options[:account_id] })
     end
@@ -80,7 +89,8 @@ class SearchService < BaseService
       definition = definition.filter(range: { id: range })
     end
 
-    results           = definition.limit(@limit).offset(@offset).objects.compact
+    result_ids        = definition.limit(@limit).offset(@offset).pluck(:id).compact
+    results           = Status.where(id: result_ids)
     account_ids       = results.map(&:account_id)
     account_relations = relations_map_for_account(@account, account_ids)
     status_relations  = relations_map_for_status(@account, results)
@@ -180,5 +190,14 @@ class SearchService < BaseService
 
   def parsed_query
     SearchQueryTransformer.new.apply(SearchQueryParser.new.parse(@query))
+  end
+
+  def following_account_ids
+    return @following_account_ids if defined?(@following_account_ids)
+
+    account_exists_sql     = Account.where('accounts.id = follows.target_account_id').where(searchability: %w(public unlisted private)).reorder(nil).select(1).to_sql
+    status_exists_sql      = Status.where('statuses.account_id = follows.target_account_id').where(reblog_of_id: nil).where(searchability: %w(public unlisted private)).reorder(nil).select(1).to_sql
+    following_accounts     = Follow.where(account_id: @account.id).merge(Account.where("EXISTS (#{account_exists_sql})").or(Account.where("EXISTS (#{status_exists_sql})")))
+    @following_account_ids = following_accounts.pluck(:target_account_id)
   end
 end

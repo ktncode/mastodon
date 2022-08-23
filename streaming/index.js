@@ -840,25 +840,35 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:local':
-      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
+      if (!req.accountId) {
+        resolve({
+          channelIds: ['timeline:index'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
+        resolve({
+          channelIds: ['timeline:public'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else {
         reject('No local stream provided');
       }
-
-      resolve({
-        channelIds: ['timeline:public'],
-        options: { needsFiltering: true, notificationOnly: false },
-      });
 
       break;
     case 'public:local:nobot':
-      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
+      if (!req.accountId) {
+        resolve({
+          channelIds: ['timeline:index'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
+        resolve({
+          channelIds: ['timeline:public:nobot'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else {
         reject('No local stream provided');
       }
-
-      resolve({
-        channelIds: ['timeline:public:nobot'],
-        options: { needsFiltering: true, notificationOnly: false },
-      });
 
       break;
     case 'public:remote':
@@ -923,25 +933,35 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:local:media':
-      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
-        reject('No local media stream provided');
+      if (!req.accountId) {
+        resolve({
+          channelIds: ['timeline:index'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
+        resolve({
+          channelIds: ['timeline:public:media'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else {
+        reject('No local stream provided');
       }
-
-      resolve({
-        channelIds: ['timeline:public:media'],
-        options: { needsFiltering: true, notificationOnly: false },
-      });
 
       break;
     case 'public:local:nobot:media':
-      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
-        reject('No local media stream provided');
+      if (!req.accountId) {
+        resolve({
+          channelIds: ['timeline:index'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
+        resolve({
+          channelIds: ['timeline:public:nobot:media'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else {
+        reject('No local stream provided');
       }
-
-      resolve({
-        channelIds: ['timeline:public:nobot:media'],
-        options: { needsFiltering: true, notificationOnly: false },
-      });
 
       break;
     case 'public:remote:media':
@@ -995,25 +1015,35 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:local:nomedia':
-      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
-        reject('No local nomedia stream provided');
+      if (!req.accountId) {
+        resolve({
+          channelIds: ['timeline:index'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
+        resolve({
+          channelIds: ['timeline:public:nomedia'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else {
+        reject('No local stream provided');
       }
-
-      resolve({
-        channelIds: ['timeline:public:nomedia'],
-        options: { needsFiltering: true, notificationOnly: false },
-      });
 
       break;
     case 'public:local:nobot:nomedia':
-      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
-        reject('No local nomedia stream provided');
+      if (!req.accountId) {
+        resolve({
+          channelIds: ['timeline:index'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
+        resolve({
+          channelIds: ['timeline:public:nobot:nomedia'],
+          options: { needsFiltering: true, notificationOnly: false },
+        });
+      } else {
+        reject('No local stream provided');
       }
-
-      resolve({
-        channelIds: ['timeline:public:nobot:nomedia'],
-        options: { needsFiltering: true, notificationOnly: false },
-      });
 
       break;
     case 'public:remote:nomedia':

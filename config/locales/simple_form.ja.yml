@@ -53,9 +53,11 @@ ja:
         password: 少なくとも8文字は入力してください
         phrase: 投稿内容の大文字小文字や閲覧注意に関係なく一致
         scopes: アプリの API に許可するアクセス権を選択してください。最上位のスコープを選択する場合、個々のスコープを選択する必要はありません。
+        searchability: この指定は、現時点ではFedibirdでのみ期待通り動作します。指定にかかわらず、Mastodonは『リアクション限定』の動作を、外部検索サイトは収集した公開投稿全てを検索対象にすることが多く、Misskeyは全ての投稿を検索対象にします。
         setting_aggregate_reblogs: 最近ブーストされた投稿が新たにブーストされても表示しません (設定後受信したものにのみ影響)
         setting_compact_reaction: 詳細表示以外の絵文字リアクション表示を件数のみにする
         setting_confirm_follow_from_bot: Botアカウントからのフォローを手動で承認する
+        setting_default_search_searchability: 範囲の詳細設定に対応していないクライアントでは、ここで設定を切り替えてください。Mastodonの標準動作は『リアクション限定』です。『公開』を対象にすると未知の情報を発見しやすくなりますが、結果にノイズが多い場合は検索範囲を狭めると効果的です。
         setting_default_sensitive: 閲覧注意状態のメディアはデフォルトでは内容が伏せられ、クリックして初めて閲覧できるようになります
         setting_disable_joke_appearance: エイプリルフール等のジョーク機能を無効にします
         setting_display_media_default: 閲覧注意としてマークされたメディアは隠す
@@ -205,6 +207,7 @@ ja:
         otp_attempt: 二段階認証コード
         password: パスワード
         phrase: キーワードまたはフレーズ
+        searchability: あなたの投稿の検索範囲
         setting_add_reference_modal: フォロワー限定投稿への参照を追加する前に確認ダイアログを表示する
         setting_advanced_layout: 上級者向け UI を有効にする
         setting_aggregate_reblogs: ブーストをまとめる
@@ -217,6 +220,7 @@ ja:
         setting_crop_images: 投稿の詳細以外では画像を16:9に切り抜く
         setting_default_language: 投稿する言語
         setting_default_privacy: 投稿の公開範囲
+        setting_default_search_searchability: 検索の対象とする範囲
         setting_default_sensitive: メディアを常に閲覧注意としてマークする
         setting_delete_modal: 投稿を削除する前に確認ダイアログを表示する
         setting_disable_joke_appearance: ジョーク機能による見た目の変更を無効にする

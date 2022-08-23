@@ -29,6 +29,7 @@ module ContextHelper
     other_setting: { 'fedibird' => 'http://fedibird.com/ns#', 'otherSetting' => 'fedibird:otherSetting' },
     references: { 'fedibird' => 'http://fedibird.com/ns#', 'references' => { '@id' => "fedibird:references", '@type' => '@id' } },
     emoji_reactions: { 'fedibird' => 'http://fedibird.com/ns#', 'emojiReactions' => { '@id' => "fedibird:emojiReactions", '@type' => '@id' } },
+    searchable_by: { 'fedibird' => 'http://fedibird.com/ns#', 'searchableBy' => { '@id' => "fedibird:searchableBy", '@type' => '@id' } },
     is_cat: { 'misskey' => 'https://misskey-hub.net/ns#', 'isCat' => 'misskey:isCat' },
     vcard: { 'vcard' => 'http://www.w3.org/2006/vcard/ns#' },
   }.freeze

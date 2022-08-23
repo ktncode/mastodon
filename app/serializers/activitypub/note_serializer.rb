@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 class ActivityPub::NoteSerializer < ActivityPub::Serializer
-  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quote_uri, :expiry, :references, :emoji_reactions
+  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quote_uri, :expiry, :references, :emoji_reactions, :searchable_by
 
   attributes :id, :type, :summary,
              :in_reply_to, :published, :url,
              :attributed_to, :to, :cc, :sensitive,
              :atom_uri, :in_reply_to_atom_uri,
-             :conversation, :context
+             :conversation, :context,
+             :searchable_by
 
   attribute :quote_uri, if: -> { object.quote? }
   attribute :misskey_quote, key: :_misskey_quote, if: -> { object.quote? }
@@ -130,6 +131,10 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
 
   def cc
     ActivityPub::TagManager.instance.cc(object)
+  end
+
+  def searchable_by
+    ActivityPub::TagManager.instance.searchable_by(object)
   end
 
   def sensitive

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class InitialStateSerializer < ActiveModel::Serializer
-  attributes :meta, :compose, :accounts, :lists,
+  attributes :meta, :compose, :search, :accounts, :lists,
              :media_attachments, :status_references, :settings
 
   has_one :push_subscription, serializer: REST::WebPushSubscriptionSerializer
@@ -86,13 +86,20 @@ class InitialStateSerializer < ActiveModel::Serializer
     store = {}
 
     if object.current_account
-      store[:me]                = object.current_account.id.to_s
-      store[:default_privacy]   = object.visibility || object.current_account.user.setting_default_privacy
-      store[:default_sensitive] = object.current_account.user.setting_default_sensitive
+      store[:me]                    = object.current_account.id.to_s
+      store[:default_privacy]       = object.visibility || object.current_account.user.setting_default_privacy
+      store[:default_searchability] = object.current_account.searchability
+      store[:default_sensitive]     = object.current_account.user.setting_default_sensitive
     end
 
     store[:text] = object.text if object.text
 
+    store
+  end
+
+  def search
+    store = {}
+    store[:default_searchability] = object.current_account.user.setting_default_search_searchability if object.current_account
     store
   end
 

@@ -18,7 +18,8 @@ class AccountFullTextSearchService < BaseService
   def perform_account_text_search!
     definition = parsed_query.apply(AccountsIndex.filter(term: { discoverable: true }))
 
-    results             = definition.order(last_status_at: :desc).limit(@limit).offset(@offset).objects.compact
+    result_ids          = definition.order(last_status_at: :desc).limit(@limit).offset(@offset).pluck(:id).compact
+    results             = Account.where(id: result_ids)
     account_ids         = results.map(&:id)
     preloaded_relations = relations_map_for_account(@account, account_ids)
 

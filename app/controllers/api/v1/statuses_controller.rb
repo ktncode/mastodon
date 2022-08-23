@@ -70,7 +70,8 @@ class Api::V1::StatusesController < Api::BaseController
                                          with_rate_limit: true,
                                          quote_id: status_params[:quote_id].presence,
                                          status_reference_ids: (Array(status_params[:status_reference_ids]).uniq.map(&:to_i)),
-                                         status_reference_urls: status_params[:status_reference_urls] || []
+                                         status_reference_urls: status_params[:status_reference_urls] || [],
+                                         searchability: status_params[:searchability]
     )
                                          
 
@@ -154,6 +155,7 @@ class Api::V1::StatusesController < Api::BaseController
       :expires_at,
       :expires_action,
       :with_reference,
+      :searchability,
       media_ids: [],
       poll: [
         :multiple,

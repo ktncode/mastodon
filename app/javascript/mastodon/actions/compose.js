@@ -50,13 +50,14 @@ export const COMPOSE_TAG_HISTORY_UPDATE = 'COMPOSE_TAG_HISTORY_UPDATE';
 export const COMPOSE_MOUNT   = 'COMPOSE_MOUNT';
 export const COMPOSE_UNMOUNT = 'COMPOSE_UNMOUNT';
 
-export const COMPOSE_SENSITIVITY_CHANGE  = 'COMPOSE_SENSITIVITY_CHANGE';
-export const COMPOSE_SPOILERNESS_CHANGE  = 'COMPOSE_SPOILERNESS_CHANGE';
-export const COMPOSE_SPOILER_TEXT_CHANGE = 'COMPOSE_SPOILER_TEXT_CHANGE';
-export const COMPOSE_VISIBILITY_CHANGE   = 'COMPOSE_VISIBILITY_CHANGE';
-export const COMPOSE_CIRCLE_CHANGE       = 'COMPOSE_CIRCLE_CHANGE';
-export const COMPOSE_LISTABILITY_CHANGE  = 'COMPOSE_LISTABILITY_CHANGE';
-export const COMPOSE_COMPOSING_CHANGE    = 'COMPOSE_COMPOSING_CHANGE';
+export const COMPOSE_SENSITIVITY_CHANGE   = 'COMPOSE_SENSITIVITY_CHANGE';
+export const COMPOSE_SPOILERNESS_CHANGE   = 'COMPOSE_SPOILERNESS_CHANGE';
+export const COMPOSE_SPOILER_TEXT_CHANGE  = 'COMPOSE_SPOILER_TEXT_CHANGE';
+export const COMPOSE_VISIBILITY_CHANGE    = 'COMPOSE_VISIBILITY_CHANGE';
+export const COMPOSE_SEARCHABILITY_CHANGE = 'COMPOSE_SEARCHABILITY_CHANGE';
+export const COMPOSE_CIRCLE_CHANGE        = 'COMPOSE_CIRCLE_CHANGE';
+export const COMPOSE_LISTABILITY_CHANGE   = 'COMPOSE_LISTABILITY_CHANGE';
+export const COMPOSE_COMPOSING_CHANGE     = 'COMPOSE_COMPOSING_CHANGE';
 
 export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
 
@@ -277,6 +278,7 @@ export function submitCompose(routerHistory) {
       expires_in: expires_in,
       expires_action: expires_action,
       status_reference_ids: statusReferenceIds,
+      searchability: getState().getIn(['compose', 'searchability']),
     }, {
       headers: {
         'Idempotency-Key': getState().getIn(['compose', 'idempotencyKey']),
@@ -752,6 +754,13 @@ export function changeComposeSpoilerText(text) {
 export function changeComposeVisibility(value) {
   return {
     type: COMPOSE_VISIBILITY_CHANGE,
+    value,
+  };
+};
+
+export function changeComposeSearchability(value) {
+  return {
+    type: COMPOSE_SEARCHABILITY_CHANGE,
     value,
   };
 };

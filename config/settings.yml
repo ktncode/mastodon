@@ -106,6 +106,7 @@ defaults: &defaults
   enable_empty_column: false
   hide_bot_on_public_timeline: false
   confirm_follow_from_bot: true
+  default_search_searchability: 'public'
 
 development:
   <<: *defaults

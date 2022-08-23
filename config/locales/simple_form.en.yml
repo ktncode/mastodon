@@ -53,9 +53,11 @@ en:
         password: Use at least 8 characters
         phrase: Will be matched regardless of casing in text or content warning of a post
         scopes: Which APIs the application will be allowed to access. If you select a top-level scope, you don't need to select individual ones.
+        searchability: This specification currently works as expected only in Fedibird. Regardless of what you specify, Mastodon uses "Reacted-users-only" behavior, external search sites often search only collected public posts, and Misskey searches all posts.
         setting_aggregate_reblogs: Do not show new boosts for posts that have been recently boosted (only affects newly-received boosts)
         setting_compact_reaction: Emoji reaction display to be only the number of cases, except for the detail display
         setting_confirm_follow_from_bot: Manually approve followers from bot accounts 
+        setting_default_search_searchability: For clients that do not support advanced range settings, switch the settings here. Mastodon's standard behavior is "Reacted-users-only". Targeting "Public" makes it easier to discover unknown information, but if the results are noisy, narrowing the search range is effective.
         setting_default_sensitive: Sensitive media is hidden by default and can be revealed with a click
         setting_disable_joke_appearance: Disable April Fools' Day and other joke functions
         setting_display_media_default: Hide media marked as sensitive
@@ -205,6 +207,7 @@ en:
         otp_attempt: Two-factor code
         password: Password
         phrase: Keyword or phrase
+        searchability: Search scope for your posts
         setting_add_reference_modal: Show confirmation dialog before adding a reference to a private post
         setting_advanced_layout: Enable advanced web interface
         setting_aggregate_reblogs: Group boosts in timelines
@@ -217,6 +220,7 @@ en:
         setting_crop_images: Crop images in non-expanded posts to 16x9
         setting_default_language: Posting language
         setting_default_privacy: Posting privacy
+        setting_default_search_searchability: Search range
         setting_default_sensitive: Always mark media as sensitive
         setting_delete_modal: Show confirmation dialog before deleting a post
         setting_disable_joke_appearance: Disable joke feature to change appearance

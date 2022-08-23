@@ -13,6 +13,7 @@ import UploadButtonContainer from '../containers/upload_button_container';
 import { defineMessages, injectIntl } from 'react-intl';
 import SpoilerButtonContainer from '../containers/spoiler_button_container';
 import PrivacyDropdownContainer from '../containers/privacy_dropdown_container';
+import SearchabilityDropdownContainer from '../containers/searchability_dropdown_container';
 import CircleDropdownContainer from '../containers/circle_dropdown_container';
 import DateTimeFormContainer from '../containers/datetime_form_container';
 import EmojiPickerDropdown from '../containers/emoji_picker_dropdown_container';
@@ -265,6 +266,7 @@ class ComposeForm extends ImmutablePureComponent {
             <PrivacyDropdownContainer />
             <SpoilerButtonContainer />
             <DateTimeButtonContainer />
+            <SearchabilityDropdownContainer />
           </div>
           <div className='character-counter__wrapper'><CharacterCounter max={500} text={this.getFulltextForCharacterCounting()} /></div>
         </div>

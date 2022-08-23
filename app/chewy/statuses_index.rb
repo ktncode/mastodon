@@ -78,5 +78,6 @@ class StatusesIndex < Chewy::Index
     end
 
     field :searchable_by, type: 'long', value: ->(status, crutches) { status.searchable_by(crutches) }
+    field :searchability, type: 'keyword', value: ->(status) { status.compute_searchability }
   end
 end

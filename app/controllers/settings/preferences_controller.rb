@@ -93,6 +93,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_content_emoji_reaction_size,
       :setting_hide_bot_on_public_timeline,
       :setting_confirm_follow_from_bot,
+      :setting_default_search_searchability,
       notification_emails: %i(follow follow_request reblog favourite emoji_reaction status_reference mention digest report pending_account trending_tag),
       interactions: %i(must_be_follower must_be_following must_be_following_dm)
     )

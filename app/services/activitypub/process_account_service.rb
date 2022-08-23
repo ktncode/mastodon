@@ -23,6 +23,7 @@ class ActivityPub::ProcessAccountService < BaseService
         @account          ||= Account.find_remote(@username, @domain)
         @old_public_key     = @account&.public_key
         @old_protocol       = @account&.protocol
+        @old_searchability  = @account&.searchability
         @suspension_changed = false
 
         create_account if @account.nil?
@@ -42,6 +43,7 @@ class ActivityPub::ProcessAccountService < BaseService
     after_key_change! if key_changed? && !@options[:signed_with_known_key]
     clear_tombstones! if key_changed?
     after_suspension_change! if suspension_changed?
+    # after_searchability_change! if searchability_changed?
 
     unless @options[:only_key] || @account.suspended?
       check_featured_collection! if @account.featured_collection_url.present?
@@ -101,6 +103,7 @@ class ActivityPub::ProcessAccountService < BaseService
     @account.settings                = defer_settings.merge(other_settings, birthday, address, is_cat)
     @account.also_known_as           = as_array(@json['alsoKnownAs'] || []).map { |item| value_or_id(item) }
     @account.discoverable            = @json['discoverable'] || false
+    @account.searchability           = searchability_from_audience
   end
 
   def set_fetchable_key!
@@ -151,6 +154,10 @@ class ActivityPub::ProcessAccountService < BaseService
     else
       Admin::UnsuspensionWorker.perform_async(@account.id)
     end
+  end
+
+  def after_searchability_change!
+    SearchabilityUpdateWorker.perform_async(@account.id) if @account.statuses.unset_searchability.exists?
   end
 
   def check_featured_collection!
@@ -204,6 +211,24 @@ class ActivityPub::ProcessAccountService < BaseService
       nil
     else
       url_candidate
+    end
+  end
+
+  def audience_searchable_by
+    return nil if @json['searchableBy'].nil?
+
+    as_array(@json['searchableBy']).map { |x| value_or_id(x) }
+  end
+
+  def searchability_from_audience
+    if audience_searchable_by.nil?
+      :direct
+    elsif audience_searchable_by.any? { |uri| ActivityPub::TagManager.instance.public_collection?(uri) }
+      :public
+    elsif audience_searchable_by.include?(@account.followers_url)
+      :private
+    else
+      :direct
     end
   end
 
@@ -320,6 +345,10 @@ class ActivityPub::ProcessAccountService < BaseService
 
   def protocol_changed?
     !@old_protocol.nil? && @old_protocol != @account.protocol
+  end
+
+  def searchability_changed?
+    !@old_searchability.nil? && @old_searchability != @account.searchability
   end
 
   def lock_options

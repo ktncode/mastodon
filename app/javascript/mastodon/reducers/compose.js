@@ -29,6 +29,7 @@ import {
   COMPOSE_SPOILERNESS_CHANGE,
   COMPOSE_SPOILER_TEXT_CHANGE,
   COMPOSE_VISIBILITY_CHANGE,
+  COMPOSE_SEARCHABILITY_CHANGE,
   COMPOSE_CIRCLE_CHANGE,
   COMPOSE_COMPOSING_CHANGE,
   COMPOSE_EMOJI_INSERT,
@@ -69,6 +70,7 @@ const initialState = ImmutableMap({
   spoiler: false,
   spoiler_text: '',
   privacy: null,
+  searchability: null,
   circle_id: null,
   text: '',
   focusDate: null,
@@ -92,6 +94,7 @@ const initialState = ImmutableMap({
   suggestions: ImmutableList(),
   default_privacy: 'public',
   default_sensitive: false,
+  default_searchability: 'private',
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   tagHistory: ImmutableList(),
@@ -151,6 +154,7 @@ const clearAll = state => {
     map.set('quote_from', null);
     map.set('reply_status', null);
     map.set('privacy', state.get('default_privacy'));
+    map.set('searchability', state.get('default_searchability'));
     map.set('circle_id', null);
     map.set('sensitive', false);
     map.update('media_attachments', list => list.clear());
@@ -239,9 +243,20 @@ const insertEmoji = (state, position, emojiData, needsSpace) => {
   });
 };
 
-const privacyPreference = (a, b) => {
+const privacyExpand = (a, b) => {
+  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct'];
+  return order[Math.min(order.indexOf(a), order.indexOf(b), order.length - 1)];
+};
+
+const privacyCap = (a, b) => {
   const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct'];
   return order[Math.max(order.indexOf(a), order.indexOf(b), 0)];
+};
+
+const searchabilityCap = (a, b) => {
+  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct'];
+  const to    = ['public', 'private',  'private', 'direct', 'direct',  'direct'];
+  return to[Math.max(order.indexOf(a), order.indexOf(b), 0)];
 };
 
 const hydrate = (state, hydratedState) => {
@@ -347,10 +362,26 @@ export default function compose(state = initialState, action) {
       .set('idempotencyKey', uuid());
   case COMPOSE_VISIBILITY_CHANGE:
     return state.withMutations(map => {
+      const searchability = searchabilityCap(action.value, state.get('searchability'));
+
       map.set('text', statusToTextMentions(state.get('text'), action.value, state.get('reply_status')));
       map.set('privacy', action.value);
+      map.set('searchability', searchability);
       map.set('idempotencyKey', uuid());
       map.set('circle_id', null);
+    });
+  case COMPOSE_SEARCHABILITY_CHANGE:
+    return state.withMutations(map => {
+      map.set('searchability', action.value);
+      map.set('idempotencyKey', uuid());
+
+      const privacy = privacyExpand(action.value, state.get('privacy'));
+
+      if (privacy !== state.get('privacy')) {
+        map.set('text', statusToTextMentions(state.get('text'), action.value, state.get('reply_status')));
+        map.set('privacy', privacy);
+        map.set('circle_id', null);
+      }
     });
   case COMPOSE_CIRCLE_CHANGE:
     return state
@@ -363,15 +394,17 @@ export default function compose(state = initialState, action) {
   case COMPOSE_COMPOSING_CHANGE:
     return state.set('is_composing', action.value);
   case COMPOSE_REPLY:
-    const privacy = privacyPreference(action.status.get('visibility'), state.get('default_privacy'));
-
     return state.withMutations(map => {
+      const privacy = privacyCap(action.status.get('visibility'), state.get('default_privacy'));
+      const searchability = searchabilityCap(action.status.get('visibility'), state.get('default_searchability'));
+
       map.set('in_reply_to', action.status.get('id'));
       map.set('quote_from', null);
       map.set('quote_from_url', null);
       map.set('reply_status', action.status);
       map.set('text', statusToTextMentions('', privacy, action.status));
       map.set('privacy', privacy);
+      map.set('searchability', searchability);
       map.set('circle_id', null);
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
@@ -382,7 +415,7 @@ export default function compose(state = initialState, action) {
       map.set('expires', null);
       map.set('expires_action', 'mark');
       map.update('context_references', set => set.clear().concat(action.context_references));
-  
+
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
         map.set('spoiler_text', action.status.get('spoiler_text'));
@@ -393,11 +426,15 @@ export default function compose(state = initialState, action) {
     });
   case COMPOSE_QUOTE:
     return state.withMutations(map => {
+      const privacy = privacyCap(action.status.get('visibility'), state.get('default_privacy'));
+      const searchability = searchabilityCap(action.status.get('visibility'), state.get('default_searchability'));
+
       map.set('in_reply_to', null);
       map.set('quote_from', action.status.get('id'));
       map.set('quote_from_url', action.status.get('url'));
       map.set('text', '');
-      map.set('privacy', privacyPreference(action.status.get('visibility'), state.get('default_privacy')));
+      map.set('privacy', privacy);
+      map.set('searchability', searchability);
       map.set('focusDate', new Date());
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
@@ -406,7 +443,7 @@ export default function compose(state = initialState, action) {
       map.set('expires', null);
       map.set('expires_action', 'mark');
       map.update('context_references', set => set.clear().add(action.status.get('id')));
-  
+
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
         map.set('spoiler_text', action.status.get('spoiler_text'));
@@ -427,6 +464,7 @@ export default function compose(state = initialState, action) {
       map.set('spoiler', false);
       map.set('spoiler_text', '');
       map.set('privacy', state.get('default_privacy'));
+      map.set('searchability', state.get('default_searchability'));
       map.set('circle_id', null);
       map.set('poll', null);
       map.set('idempotencyKey', uuid());
@@ -499,6 +537,7 @@ export default function compose(state = initialState, action) {
     return state.withMutations(map => {
       map.update('text', text => [text.trim(), `@${action.account.get('acct')} `].filter((str) => str.length !== 0).join(' '));
       map.set('privacy', 'direct');
+      map.set('searchability', 'direct');
       map.set('circle_id', null);
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
@@ -542,6 +581,7 @@ export default function compose(state = initialState, action) {
       map.set('quote_from_url', action.status.getIn(['quote', 'url']));
       map.set('reply_status', action.replyStatus);
       map.set('privacy', action.status.get('visibility'));
+      map.set('searchability', action.status.get('searchability'));
       map.set('circle_id', action.status.get('circle_id'));
       map.set('media_attachments', action.status.get('media_attachments'));
       map.set('focusDate', new Date());
@@ -554,7 +594,7 @@ export default function compose(state = initialState, action) {
       map.set('expires_action', action.status.get('expires_action') ?? 'mark');
       map.update('references', set => set.clear().concat(action.status.get('status_reference_ids')));
       map.update('context_references', set => set.clear().concat(action.context_references));
-  
+
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
         map.set('spoiler_text', action.status.get('spoiler_text'));

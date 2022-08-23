@@ -6,7 +6,8 @@ class REST::StatusSerializer < ActiveModel::Serializer
              :uri, :url, :replies_count, :reblogs_count,
              :favourites_count, :emoji_reactions_count, :emoji_reactions,
              :status_reference_ids,
-             :status_references_count, :status_referred_by_count
+             :status_references_count, :status_referred_by_count,
+             :searchability
 
   attribute :favourited, if: :current_user?
   attribute :reblogged, if: :current_user?
@@ -100,6 +101,10 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   def visibility_ex
     object.visibility
+  end
+
+  def searchability
+    object.compute_searchability
   end
 
   def sensitive

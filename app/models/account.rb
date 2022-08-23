@@ -49,6 +49,7 @@
 #  sensitized_at                 :datetime
 #  settings                      :jsonb            default("{}"), not null
 #  silence_mode                  :integer          default(0), not null
+#  searchability                 :integer          default(3), not null
 #
 
 class Account < ApplicationRecord
@@ -85,6 +86,7 @@ class Account < ApplicationRecord
   enum protocol: [:ostatus, :activitypub]
   enum suspension_origin: [:local, :remote], _prefix: true
   enum silence_mode: { soft: 0, hard: 1 }, _suffix: :silence_mode
+  enum searchability: [:public, :unlisted, :private, :direct, :limited, :mutual], _suffix: :searchability
 
   validates :username, presence: true
   validates_with UniqueUsernameValidator, if: -> { will_save_change_to_username? }

@@ -25,6 +25,7 @@
 #  deleted_at             :datetime
 #  quote_id               :bigint(8)
 #  expired_at             :datetime
+#  searchability          :integer
 #
 
 class Status < ApplicationRecord
@@ -51,6 +52,7 @@ class Status < ApplicationRecord
   update_index('statuses', :proper)
 
   enum visibility: [:public, :unlisted, :private, :direct, :limited, :mutual], _suffix: :visibility
+  enum searchability: [:public, :unlisted, :private, :direct, :limited, :mutual], _suffix: :searchability
 
   belongs_to :application, class_name: 'Doorkeeper::Application', optional: true
 
@@ -130,6 +132,7 @@ class Status < ApplicationRecord
             .where("t#{id}.tag_id IS NULL")
     end
   }
+  scope :unset_searchability, -> { where(searchability: nil, reblog_of_id: nil) }
 
   cache_associated :application,
                    :media_attachments,
@@ -183,6 +186,10 @@ class Status < ApplicationRecord
     end
 
     ids.uniq
+  end
+
+  def compute_searchability
+    searchability || Status.searchabilities.invert.fetch([Account.searchabilities[account.searchability], Status.visibilities[visibility] || 0].max, nil) || 'direct'
   end
 
   def reply?
@@ -382,6 +389,7 @@ class Status < ApplicationRecord
   before_validation :prepare_contents, on: :create, if: :local?
   before_validation :set_reblog, on: :create
   before_validation :set_visibility, on: :create
+  before_validation :set_searchability, on: :create
   before_validation :set_conversation, on: :create
   before_validation :set_local, on: :create
 
@@ -391,6 +399,10 @@ class Status < ApplicationRecord
   class << self
     def selectable_visibilities
       visibilities.keys - %w(direct limited)
+    end
+
+    def selectable_searchabilities
+      searchabilities.keys - %w(unlisted limited mutual)
     end
 
     def favourites_map(status_ids, account_id)
@@ -554,6 +566,12 @@ class Status < ApplicationRecord
     self.visibility = reblog.visibility if reblog? && visibility.nil?
     self.visibility = (account.locked? ? :private : :public) if visibility.nil?
     self.sensitive  = false if sensitive.nil?
+  end
+
+  def set_searchability
+    return if searchability.nil?
+
+    self.searchability = [Status.searchabilities[searchability], Status.visibilities[visibility]].max
   end
 
   def set_conversation

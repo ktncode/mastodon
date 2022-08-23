@@ -1,3 +1,4 @@
+import { STORE_HYDRATE } from '../actions/store';
 import {
   SEARCH_CHANGE,
   SEARCH_CLEAR,
@@ -19,10 +20,23 @@ const initialState = ImmutableMap({
   hidden: false,
   results: ImmutableMap(),
   searchTerm: '',
+  searchability: 'private',
+  default_searchability: 'private',
 });
 
 export default function search(state = initialState, action) {
   switch(action.type) {
+  case STORE_HYDRATE:
+    const default_searchability = action.state.getIn(['search', 'default_searchability']);
+
+    if (default_searchability) {
+      return state.withMutations(map => {
+        map.set('searchability', default_searchability);
+        map.set('default_searchability', default_searchability);
+      });
+    }
+
+    return state;
   case SEARCH_CHANGE:
     return state.set('value', action.value);
   case SEARCH_CLEAR:
@@ -31,6 +45,7 @@ export default function search(state = initialState, action) {
       map.set('results', ImmutableMap());
       map.set('submitted', false);
       map.set('hidden', false);
+      map.set('searchability', state.get('default_searchability'));
     });
   case SEARCH_SHOW:
     return state.set('hidden', false);

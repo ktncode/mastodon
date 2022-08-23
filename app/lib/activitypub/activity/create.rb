@@ -87,6 +87,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     resolve_references(@status, @mentions, @object['references'])
     resolve_thread(@status)
     fetch_replies(@status)
+    StatusesIndex.import @status if Chewy.enabled?
     distribute(@status)
     forward_for_conversation
     forward_for_reply
@@ -113,6 +114,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         reply: @object['inReplyTo'].present?,
         sensitive: @account.sensitized? || @object['sensitive'] || false,
         visibility: visibility_from_audience_with_silence,
+        searchability: searchability,
         thread: replied_to_status,
         conversation: conversation_from_context,
         media_attachment_ids: process_attachments.take(4).map(&:id),

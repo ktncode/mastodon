@@ -8,13 +8,15 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   context_extensions :manually_approves_followers, :featured, :also_known_as,
                      :moved_to, :property_value, :identity_proof,
                      :discoverable, :olm, :suspended, :other_setting,
-                     :vcard
+                     :vcard,
+                     :searchable_by
 
   attributes :id, :type, :following, :followers,
              :inbox, :outbox, :featured, :featured_tags,
              :preferred_username, :name, :summary,
              :url, :manually_approves_followers,
-             :discoverable, :published
+             :discoverable, :published,
+             :searchable_by
 
   has_one :public_key, serializer: ActivityPub::PublicKeySerializer
 
@@ -165,6 +167,10 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
 
   def published
     object.created_at.midnight.iso8601
+  end
+
+  def searchable_by
+    ActivityPub::TagManager.instance.account_searchable_by(object)
   end
 
   def bday

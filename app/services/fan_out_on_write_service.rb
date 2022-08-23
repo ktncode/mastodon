@@ -34,6 +34,7 @@ class FanOutOnWriteService < BaseService
 
     if !status.reblog? && (!status.reply? || status.in_reply_to_account_id == status.account_id)
       deliver_to_public(status)
+      deliver_to_index(status)
       if status.media_attachments.any?
         deliver_to_media(status)
       else
@@ -245,6 +246,10 @@ class FanOutOnWriteService < BaseService
       Redis.current.publish("timeline:public:domain:#{status.account.domain.mb_chars.downcase}", @payload)
       Redis.current.publish("timeline:public:domain:nobot:#{status.account.domain.mb_chars.downcase}", @payload) unless status.account.bot?
     end
+  end
+
+  def deliver_to_index(status)
+    Redis.current.publish('timeline:index', @payload) if status.local? && status.public_searchability?
   end
 
   def deliver_to_media(status)

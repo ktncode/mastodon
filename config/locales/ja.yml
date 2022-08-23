@@ -1195,6 +1195,7 @@ ja:
     other: その他
     posting_defaults: デフォルトの投稿設定
     public_timelines: 公開タイムライン
+    searching_defaults: デフォルトの検索設定
   reactions:
     errors:
       limit_reached: リアクションの種類が上限に達しました
@@ -1239,6 +1240,14 @@ ja:
     over_daily_limit: その日予約できる投稿数 %{limit} を超えています
     over_total_limit: 予約できる投稿数 %{limit} を超えています
     too_soon: より先の時間を指定してください
+  search:
+    searchabilities:
+      direct: リアクション限定
+      direct_long: 自身の投稿、リアクションした投稿を検索できます
+      private: フォローとリアクション限定
+      private_long: フォローしているアカウントの投稿、リアクション限定の投稿を検索できます
+      public: 公開
+      public_long: 検索を公開に指定した投稿、フォロワー限定、リアクション限定の投稿を検索できます
   sessions:
     activity: 最後のアクティビティ
     browser: ブラウザ
@@ -1349,6 +1358,13 @@ ja:
       zero: ''
       other: '他%{count}件 / '
     references_private: （限定公開の参照）
+    searchabilities:
+      direct: リアクション限定
+      direct_long: あなたの投稿にメンションやリアクションした相手だけがあなたの投稿を検索できます
+      private: フォロワー限定
+      private_long: あなたのフォロワーと、あなたの投稿にメンション・リアクションした相手だけがあなたの投稿を検索できます
+      public: 公開
+      public_long: 誰でもあなたの投稿を検索できます（外部検索サービスにも公開されます）
     show_more: もっと見る
     show_newer: 新しいものから表示
     show_older: 古いものから表示
