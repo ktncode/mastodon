@@ -63,20 +63,21 @@ export function importFetchedStatuses(statuses) {
     const polls = [];
 
     function processStatus(status) {
-      pushUnique(normalStatuses, normalizeStatus(status, getState().getIn(['statuses', status.id])));
-      pushUnique(accounts, status.account);
-
-      if (status.reblog && status.reblog.id) {
-        processStatus(status.reblog);
-      }
-
-      if (status.quote && status.quote.id) {
-        processStatus(status.quote);
-      }
-
       if (status.poll && status.poll.id) {
         pushUnique(polls, normalizePoll(status.poll));
       }
+
+      if (typeof status.account === 'object') {
+        pushUnique(accounts, status.account);
+      }
+
+      if (status.reblog && status.reblog.id) {
+        processStatus(status.reblog);
+      } else if (status.quote && status.quote.id) {
+        processStatus(status.quote);
+      }
+
+      pushUnique(normalStatuses, normalizeStatus(status, getState().getIn(['statuses', status.id])));
     }
 
     statuses.forEach(processStatus);

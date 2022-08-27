@@ -1,7 +1,6 @@
-import { fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
 import api, { getLinks } from '../api';
-import { importFetchedStatuses } from './importer';
-import { uniq } from '../utils/uniq';
+import { importFetchedStatuses, importFetchedAccounts } from './importer';
 
 export const FAVOURITED_STATUSES_FETCH_REQUEST = 'FAVOURITED_STATUSES_FETCH_REQUEST';
 export const FAVOURITED_STATUSES_FETCH_SUCCESS = 'FAVOURITED_STATUSES_FETCH_SUCCESS';
@@ -19,13 +18,21 @@ export function fetchFavouritedStatuses() {
 
     dispatch(fetchFavouritedStatusesRequest());
 
-    api(getState).get('/api/v1/favourites').then(response => {
+    api(getState).get('/api/v1/favourites?compact=true').then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(fetchFavouritedStatusesSuccess(statuses, next ? next.uri : null));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(fetchFavouritedStatusesSuccess(statuses, next ? next.uri : null));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(fetchFavouritedStatusesSuccess(statuses, next ? next.uri : null));
+      }
     }).catch(error => {
       dispatch(fetchFavouritedStatusesFail(error));
     });
@@ -68,11 +75,19 @@ export function expandFavouritedStatuses() {
 
     api(getState).get(url).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(expandFavouritedStatusesSuccess(statuses, next ? next.uri : null));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(expandFavouritedStatusesSuccess(statuses, next ? next.uri : null));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(expandFavouritedStatusesSuccess(statuses, next ? next.uri : null));
+      }
     }).catch(error => {
       dispatch(expandFavouritedStatusesFail(error));
     });

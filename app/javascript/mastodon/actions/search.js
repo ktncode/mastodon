@@ -1,5 +1,5 @@
 import api from '../api';
-import { fetchRelationships, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationships, fetchAccountsFromStatuses } from './accounts';
 import { importFetchedAccounts, importFetchedStatuses } from './importer';
 
 export const SEARCH_CHANGE = 'SEARCH_CHANGE';
@@ -44,6 +44,7 @@ export function submitSearch() {
         resolve: true,
         limit: 5,
         with_profiles: true,
+        compact: true,
       },
     }).then(response => {
       if (response.data.accounts) {
@@ -55,8 +56,16 @@ export function submitSearch() {
       }
 
       if (response.data.statuses) {
-        dispatch(importFetchedStatuses(response.data.statuses));
-        dispatch(fetchAccountsFromStatuses(response.data.statuses));
+        if (response.data.statuses.statuses && response.data.statuses.accounts) {
+          const { statuses, referenced_statuses, accounts, relationships } = response.data.statuses;
+          response.data.statuses = statuses;
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+          dispatch(importFetchedAccounts(accounts));
+          dispatch(fetchRelationshipsSuccess(relationships));
+        } else {
+          dispatch(importFetchedStatuses(response.data.statuses));
+          dispatch(fetchAccountsFromStatuses(response.data.statuses));
+        }
       }
 
       dispatch(fetchSearchSuccess(response.data, value));
@@ -101,6 +110,7 @@ export const expandSearch = type => (dispatch, getState) => {
       type,
       offset,
       with_profiles: true,
+      compact: true,
     },
   }).then(({ data }) => {
     if (data.accounts) {
@@ -112,8 +122,16 @@ export const expandSearch = type => (dispatch, getState) => {
     }
 
     if (data.statuses) {
-      dispatch(importFetchedStatuses(data.statuses));
-      dispatch(fetchAccountsFromStatuses(data.statuses));
+      if (data.statuses.statuses && data.statuses.accounts) {
+        const { statuses, referenced_statuses, accounts, relationships } = data.statuses;
+        data.statuses = statuses;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+      } else {
+        dispatch(importFetchedStatuses(data.statuses));
+        dispatch(fetchAccountsFromStatuses(data.statuses));
+      }
     }
 
     dispatch(expandSearchSuccess(data, value, type));

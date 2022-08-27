@@ -6,7 +6,14 @@ class Api::V1::Timelines::GroupController < Api::BaseController
 
   def show
     @statuses = load_statuses
-    render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id)
+
+    if compact?
+      render json: CompactStatusesPresenter.new(statuses: @statuses), serializer: REST::CompactStatusesSerializer
+    else
+      account_ids = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
+
+      render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(account_ids, current_user&.account_id)
+    end
   end
 
   private
@@ -46,6 +53,10 @@ class Api::V1::Timelines::GroupController < Api::BaseController
 
   def without_bot?
     true & (params[:without_bot].nil? && current_user&.setting_hide_bot_on_public_timeline || truthy_param?(:without_bot))
+  end
+
+  def compact?
+    truthy_param?(:compact)
   end
 
   def insert_pagination_headers

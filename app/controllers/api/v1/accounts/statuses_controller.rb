@@ -7,9 +7,15 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   after_action :insert_pagination_headers, unless: -> { truthy_param?(:pinned) }
 
   def index
-    @statuses  = load_statuses
-    accountIds = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
-    render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(accountIds, current_user&.account_id)
+    @statuses = load_statuses
+
+    if compact?
+      render json: CompactStatusesPresenter.new(statuses: @statuses), serializer: REST::CompactStatusesSerializer
+    else
+      account_ids = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
+
+      render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(account_ids, current_user&.account_id)
+    end
   end
 
   private
@@ -42,6 +48,10 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
     @account.permitted_statuses(current_account)
   end
 
+  def compact?
+    truthy_param?(:compact)
+  end
+
   def only_media_scope
     Status.include_expired.joins(:media_attachments).merge(@account.media_attachments.reorder(nil)).group(:id)
   end
@@ -71,7 +81,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   end
 
   def pagination_params(core_params)
-    params.slice(:limit, :only_media, :exclude_replies).permit(:limit, :only_media, :exclude_replies).merge(core_params)
+    params.slice(:limit, :only_media, :exclude_replies, :compact).permit(:limit, :only_media, :exclude_replies, :compact).merge(core_params)
   end
 
   def insert_pagination_headers

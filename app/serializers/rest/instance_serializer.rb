@@ -135,6 +135,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       :misskey_location,
       :status_reference,
       :searchability,
+      :status_compact_mode,
     ]
 
     capabilities << :profile_search unless Chewy.enabled?

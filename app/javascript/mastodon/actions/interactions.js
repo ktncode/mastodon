@@ -1,6 +1,6 @@
 import api, { getLinks } from '../api';
 import { importFetchedAccounts, importFetchedStatus, importFetchedStatuses } from './importer';
-import { fetchRelationships, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationships, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
 import { me } from '../initial_state';
 
 export const REBLOG_REQUEST = 'REBLOG_REQUEST';
@@ -567,13 +567,21 @@ export function fetchReferredByStatuses(id) {
   return (dispatch, getState) => {
     dispatch(fetchReferredByStatusesRequest(id));
 
-    api(getState).get(`/api/v1/statuses/${id}/referred_by`).then(response => {
+    api(getState).get(`/api/v1/statuses/${id}/referred_by?compact=true`).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(fetchReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(fetchReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(fetchReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
+      }
     }).catch(error => {
       dispatch(fetchReferredByStatusesFail(id, error));
     });
@@ -616,11 +624,19 @@ export function expandReferredByStatuses(id) {
 
     api(getState).get(url).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(expandReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(expandReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(expandReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
+      }
     }).catch(error => {
       dispatch(expandReferredByStatusesFail(id, error));
     });

@@ -44,10 +44,7 @@ class Status < ApplicationRecord
 
   # If `override_timestamps` is set at creation time, Snowflake ID creation
   # will be based on current time instead of `created_at`
-  attr_accessor :override_timestamps
-
-  attr_accessor :circle
-  attr_accessor :expires_at, :expires_action
+  attr_accessor :override_timestamps, :circle, :expires_at, :expires_action
 
   update_index('statuses', :proper)
 
@@ -85,7 +82,7 @@ class Status < ApplicationRecord
   has_many :references, through: :reference_relationships, source: :target_status
   has_many :referred_by_relationships, class_name: 'StatusReference', foreign_key: :target_status_id, dependent: :destroy
   has_many :referred_by, through: :referred_by_relationships, source: :status
-  
+
   has_one :notification, as: :activity, dependent: :destroy
   has_one :status_stat, inverse_of: :status
   has_one :poll, inverse_of: :status, dependent: :destroy
@@ -335,6 +332,19 @@ class Status < ApplicationRecord
     status_stat&.status_referred_by_count || 0
   end
 
+  def account_ids(recursive: true)
+    ids = (Oj.load(status_stat&.emoji_reactions_cache || '', mode: :strict) || []).flat_map { |emoji_reaction| emoji_reaction['account_ids'] }
+    ids << account_id.to_s
+
+    if recursive
+      ids.concat(quote.account_ids(recursive: false)) unless quote.nil?
+      ids.concat(reblog.account_ids(recursive: false)) unless reblog.nil?
+      ids.concat(reblog.quote.account_ids(recursive: false)) unless reblog&.quote.nil?
+    end
+
+    ids.uniq
+  end
+
   def grouped_emoji_reactions(account = nil)
     (Oj.load(status_stat&.emoji_reactions_cache || '', mode: :strict) || []).tap do |emoji_reactions|
       if account.present?
@@ -431,7 +441,7 @@ class Status < ApplicationRecord
 
     def relations_map_for_account(account, account_ids)
       return {} if account.nil?
-  
+
       presenter = AccountRelationshipsPresenter.new(account_ids, account)
       {
         blocking: presenter.blocking,
@@ -442,10 +452,10 @@ class Status < ApplicationRecord
         domain_blocking_by_domain: presenter.domain_blocking,
       }
     end
-  
+
     def relations_map_for_status(account, statuses)
       return {} if account.nil?
-  
+
       presenter = StatusRelationshipsPresenter.new(statuses, account)
       {
         reblogs_map: presenter.reblogs_map,
@@ -482,11 +492,11 @@ class Status < ApplicationRecord
       account_ids       = statuses.map(&:account_id).uniq
       account_relations = relations_map_for_account(account, account_ids)
       status_relations  = relations_map_for_status(account, statuses)
-  
+
       statuses.reject! { |status| StatusFilter.new(status, account, account_relations, status_relations).filtered? }
       statuses
     end
-  
+
     def permitted_for(target_account, account)
       visibility = [:public, :unlisted]
 
@@ -513,13 +523,12 @@ class Status < ApplicationRecord
       return [] if text.blank?
 
       text.scan(FetchLinkCardService::URL_PATTERN).map(&:first).uniq.filter_map do |url|
-        status = begin
+        status =
           if TagManager.instance.local_url?(url)
             ActivityPub::TagManager.instance.uri_to_resource(url, Status)
           else
             EntityCache.instance.status(url)
           end
-        end
         status&.distributable? ? status : nil
       end
     end

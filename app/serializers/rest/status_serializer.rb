@@ -24,13 +24,14 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   attribute :quote_id, if: :quote?
 
-  attribute :expires_at, if: :has_expires?
-  attribute :expires_action, if: :has_expires?
+  attribute :expires_at, if: :expires?
+  attribute :expires_action, if: :expires?
   attribute :visibility_ex, if: :visibility_ex?
 
-  belongs_to :reblog, serializer: REST::StatusSerializer
+  attribute :account
+  attribute :reblog
+
   belongs_to :application, if: :show_application?
-  belongs_to :account, serializer: REST::AccountSerializer
 
   has_many :media_attachments, serializer: REST::MediaAttachmentSerializer
   has_many :ordered_mentions, key: :mentions
@@ -39,6 +40,8 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   has_one :preview_card, key: :card, serializer: REST::PreviewCardSerializer
   has_one :preloadable_poll, key: :poll, serializer: REST::PollSerializer
+
+  delegate :quote?, to: :object
 
   def id
     object.id.to_s
@@ -56,6 +59,24 @@ class REST::StatusSerializer < ActiveModel::Serializer
     object.quote_id.to_s
   end
 
+  def account
+    if instance_options[:compact]
+      object.account.id.to_s
+    else
+      REST::AccountSerializer.new(object.account, root: false, scope: current_user, scope_name: :current_user)
+    end
+  end
+
+  def reblog
+    if object.reblog.nil?
+      nil
+    elsif instance_options[:compact]
+      object.reblog.id.to_s
+    else
+      REST::StatusSerializer.new(object.reblog, root: false, relationships: instance_options[:relationships], account_relationships: instance_options[:account_relationships], compact: false, scope: current_user, scope_name: :current_user)
+    end
+  end
+
   def current_user?
     !current_user.nil?
   end
@@ -68,11 +89,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
     object.account.user_shows_application? || owned_status?
   end
 
-  def quote?
-    object.quote?
-  end
-
-  def has_expires?
+  def expires?
     object.expires? || object.expired?
   end
 
@@ -262,12 +279,23 @@ class REST::NestedQuoteSerializer < REST::StatusSerializer
     if instance_options && instance_options[:account_relationships]
       instance_options[:account_relationships].muting[object.account_id] ? true : false || instance_options[:account_relationships].blocking[object.account_id] || instance_options[:account_relationships].blocked_by[object.account_id] || instance_options[:account_relationships].domain_blocking[object.account_id] || false
     else
-      current_user.account.muting?(object.account) || object.account.blocking?(current_user.account) || current_user.account.blocking?(object.account) || current_user.account.domain_blocking?(object.account.domain) 
+      current_user.account.muting?(object.account) || object.account.blocking?(current_user.account) || current_user.account.blocking?(object.account) || current_user.account.domain_blocking?(object.account.domain)
     end
   end
-
 end
 
 class REST::StatusSerializer < ActiveModel::Serializer
-  belongs_to :quote, serializer: REST::NestedQuoteSerializer
+  attribute :quote
+
+  def quote
+    if object.quote.nil?
+      nil
+    elsif instance_options[:compact]
+      object.quote.id.to_s
+    else
+      REST::NestedQuoteSerializer.new(object.quote, root: false, relationships: instance_options[:relationships], account_relationships: instance_options[:account_relationships], compact: false, scope: current_user, scope_name: :current_user)
+    end
+  end
+
+
 end

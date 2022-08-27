@@ -1,10 +1,10 @@
-import { fetchRelationshipsFromStatus, fetchAccountsFromStatus, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
-import { importFetchedStatus, importFetchedStatuses } from './importer';
+import { fetchRelationshipsSuccess, fetchRelationshipsFromStatus, fetchAccountsFromStatus, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { importFetchedStatus, importFetchedStatuses, importFetchedAccounts } from './importer';
 import { submitMarkers } from './markers';
 import api, { getLinks } from 'mastodon/api';
 import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 import compareId from 'mastodon/compare_id';
-import { usePendingItems as preferPendingItems } from 'mastodon/initial_state';
+import { usePendingItems as preferPendingItems, show_follow_button_on_timeline, show_subscribe_button_on_timeline } from 'mastodon/initial_state';
 import { getHomeVisibilities, getLimitedVisibilities } from 'mastodon/selectors';
 
 export const TIMELINE_UPDATE  = 'TIMELINE_UPDATE';
@@ -42,8 +42,12 @@ export function updateTimeline(timeline, status, accept) {
     }
 
     dispatch(importFetchedStatus(status));
-    dispatch(fetchRelationshipsFromStatus(status));
-    dispatch(fetchAccountsFromStatus(status));
+    if (show_follow_button_on_timeline || show_subscribe_button_on_timeline || status.quote_id) {
+      dispatch(fetchRelationshipsFromStatus(status));
+    }
+    if (status.emoji_reactions.length) {
+      dispatch(fetchAccountsFromStatus(status));
+    }
 
     const insertTimeline = timeline => {
       dispatch({
@@ -140,17 +144,27 @@ export function expandTimeline(timelineId, path, params = {}, done = noOp) {
       }
     }
 
+    params.compact = true;
+
     const isLoadingRecent = !!params.since_id;
 
     dispatch(expandTimelineRequest(timelineId, isLoadingMore));
 
     api(getState).get(path, { params }).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
+      }
 
       if (timelineId === 'home') {
         dispatch(submitMarkers());

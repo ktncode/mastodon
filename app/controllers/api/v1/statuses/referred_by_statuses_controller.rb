@@ -8,9 +8,15 @@ class Api::V1::Statuses::ReferredByStatusesController < Api::BaseController
   after_action :insert_pagination_headers
 
   def index
-    @statuses  = load_statuses
-    accountIds = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
-    render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(accountIds, current_user&.account_id)
+    @statuses = load_statuses
+
+    if compact?
+      render json: CompactStatusesPresenter.new(statuses: @statuses), serializer: REST::CompactStatusesSerializer
+    else
+      account_ids = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
+
+      render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(account_ids, current_user&.account_id)
+    end
   end
 
   private
@@ -20,7 +26,7 @@ class Api::V1::Statuses::ReferredByStatusesController < Api::BaseController
   end
 
   def cached_referred_by_statuses
-    cache_collection(Status.where(id: results.pluck(:id)), Status)
+    cache_collection(results, Status)
   end
 
   def results
@@ -32,6 +38,10 @@ class Api::V1::Statuses::ReferredByStatusesController < Api::BaseController
 
   def referred_by_statuses
     @status.referred_by_statuses(current_user&.account)
+  end
+
+  def compact?
+    truthy_param?(:compact)
   end
 
   def insert_pagination_headers
@@ -66,6 +76,6 @@ class Api::V1::Statuses::ReferredByStatusesController < Api::BaseController
   end
 
   def pagination_params(core_params)
-    params.slice(:limit).permit(:limit).merge(core_params)
+    params.slice(:limit, :compact).permit(:limit, :compact).merge(core_params)
   end
 end

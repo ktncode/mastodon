@@ -138,14 +138,11 @@ export function fetchAccountsFromStatuses(statuses) {
   return fetchAccounts(
     uniq(
       statuses
-      .flatMap(status => status.reblog ? status.reblog.emoji_reactions : status.emoji_reactions)
-      .concat(
-        statuses
-        .flatMap(status => status.quote ? status.quote.emoji_reactions : null)
-      )
-      .flatMap(emoji_reaction => emoji_reaction?.account_ids)
-      .filter(e => !!e)
-    )
+        .map(status => status.reblog ? status.reblog : status)
+        .flatMap(status => [status.emoji_reactions, status.quote?.emoji_reactions])
+        .flatMap(emoji_reaction => emoji_reaction?.account_ids)
+        .filter(e => !!e),
+    ),
   );
 };
 
@@ -671,7 +668,7 @@ export function fetchSubscribing(id) {
   return (dispatch, getState) => {
     dispatch(fetchSubscribeRequest(id));
 
-    api(getState).get(`/api/v1/accounts/subscribing`).then(response => {
+    api(getState).get('/api/v1/accounts/subscribing').then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
 
       dispatch(importFetchedAccounts(response.data));
@@ -761,13 +758,10 @@ export function fetchRelationshipsFromStatuses(statuses) {
   return fetchRelationships(
     uniq(
       statuses
-      .map(status => status.reblog ? status.reblog.account.id : status.account.id)
-      .concat(
-        statuses
-        .map(status => status.quote ? status.quote.account.id : null)
-      )
-      .filter(e => !!e)
-    )
+        .map(status => status.reblog ? status.reblog : status)
+        .flatMap(status => [status.account.id, status.quote?.account?.id])
+        .filter(e => !!e),
+    ),
   );
 };
 

@@ -86,60 +86,54 @@ export const getFiltersRegex = makeGetFiltersRegex();
 export const makeGetStatus = () => {
   return createSelector(
     [
-      (state, { id }) => state.getIn(['statuses', id]),
-      (state, { id }) => state.getIn(['statuses', state.getIn(['statuses', id, 'reblog'])]),
-      (state, { id }) => state.getIn(['statuses', state.getIn(['statuses', id, 'quote_id'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['statuses', id, 'account'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'account'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['statuses', state.getIn(['statuses', id, 'quote_id']), 'account'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote', 'account'])]),
-      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', id, 'account'])]),
-      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'account'])]),
-      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', state.getIn(['statuses', id, 'quote_id']), 'account'])]),
-      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote', 'account'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['accounts', state.getIn(['statuses', id, 'account']), 'moved'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['accounts', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'account']), 'moved'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['accounts', state.getIn(['statuses', state.getIn(['statuses', id, 'quote_id']), 'account']), 'moved'])]),
-      (state, { id }) => state.getIn(['accounts', state.getIn(['accounts', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote', 'account']), 'moved'])]),
+      (state, { id }) =>                               state.getIn(['statuses', id], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', id,                                                                             'account'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', id,                                                                             'account']), 'moved'], null),
+      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', id,                                                                             'account'])], null),
+
+      (state, { id }) =>                               state.getIn(['statuses', state.getIn(['statuses', id,                                      'reblog'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', state.getIn(['statuses', id,                                      'reblog']),   'account'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', state.getIn(['statuses', id,                                      'reblog']),   'account']), 'moved'], null),
+      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', state.getIn(['statuses', id,                                      'reblog']),   'account'])], null),
+
+      (state, { id }) =>                               state.getIn(['statuses', state.getIn(['statuses', id,                                      'quote_id'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', state.getIn(['statuses', id,                                      'quote_id']), 'account'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', state.getIn(['statuses', id,                                      'quote_id']), 'account']), 'moved'], null),
+      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', state.getIn(['statuses', id,                                      'quote_id']), 'account'])], null),
+
+      (state, { id }) =>                               state.getIn(['statuses', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote_id'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote_id']), 'account'])], null),
+      (state, { id }) => state.getIn(['accounts',      state.getIn(['statuses', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote_id']), 'account']), 'moved'], null),
+      (state, { id }) => state.getIn(['relationships', state.getIn(['statuses', state.getIn(['statuses', state.getIn(['statuses', id, 'reblog']), 'quote_id']), 'account'])], null),
+
       getFiltersRegex,
     ],
 
-    (statusBase, statusReblog, statusQuote, accountBase, accountReblog, accountQuote, accountReblogQuote, relationship, reblogRelationship, quoteRelationship, reblogQuoteRelationship, moved, reblogMoved, quoteMoved, reblogQuoteMoved, filtersRegex) => {
-      if (!statusBase) {
+    (
+      statusBase,
+      accountBase,
+      moved,
+      relationship,
+
+      statusReblog,
+      accountReblog,
+      reblogMoved,
+      reblogRelationship,
+
+      statusQuote,
+      accountQuote,
+      quoteMoved,
+      quoteRelationship,
+
+      statusReblogQuote,
+      accountReblogQuote,
+      reblogQuoteMoved,
+      reblogQuoteRelationship,
+
+      filtersRegex,
+    ) => {
+      if (!statusBase || !accountBase) {
         return null;
-      }
-
-      accountBase = accountBase.withMutations(map => {
-        map.set('relationship', relationship);
-        map.set('moved', moved);
-      });
-
-      if (statusReblog) {
-        accountReblog = accountReblog.withMutations(map => {
-          map.set('relationship', reblogRelationship);
-          map.set('moved', reblogMoved);
-        });
-        statusReblog = statusReblog.set('account', accountReblog);
-      } else {
-        statusReblog = null;
-      }
-
-      if (statusQuote) {
-        accountQuote = accountQuote.withMutations(map => {
-          map.set('relationship', quoteRelationship);
-          map.set('moved', quoteMoved);
-        });
-        statusQuote = statusQuote.set('account', accountQuote);
-      } else {
-        statusQuote = null;
-      }
-
-      if (statusReblog && accountReblogQuote) {
-        accountReblogQuote = accountReblog.withMutations(map => {
-          map.set('relationship', reblogQuoteRelationship);
-          map.set('moved', reblogQuoteMoved);
-        });
-        statusReblog = statusReblog.setIn(['quote', 'account'], accountReblogQuote);
       }
 
       const dropRegex = (accountReblog || accountBase).get('id') !== me && filtersRegex[0];
@@ -150,12 +144,50 @@ export const makeGetStatus = () => {
       const regex     = (accountReblog || accountBase).get('id') !== me && filtersRegex[1];
       const filtered  = regex && regex.test(statusBase.get('reblog') ? statusReblog.get('search_index') : statusBase.get('search_index'));
 
-      return statusBase.withMutations(map => {
+      if (statusReblogQuote && accountReblogQuote) {
+        accountReblogQuote = accountReblogQuote.withMutations(map => {
+          map.set('relationship', reblogQuoteRelationship);
+          map.set('moved', reblogQuoteMoved);
+        });
+        statusReblogQuote = statusReblogQuote.withMutations(map => {
+          map.set('account', accountReblogQuote);
+        });
+      }
+
+      if (statusReblog  && accountReblog) {
+        accountReblog = accountReblog.withMutations(map => {
+          map.set('relationship', reblogRelationship);
+          map.set('moved', reblogMoved);
+        });
+        statusReblog = statusReblog.withMutations(map => {
+          map.set('quote', statusReblogQuote);
+          map.set('account', accountReblog);
+        });
+      }
+
+      if (statusQuote && accountQuote) {
+        accountQuote = accountQuote.withMutations(map => {
+          map.set('relationship', quoteRelationship);
+          map.set('moved', quoteMoved);
+        });
+        statusQuote = statusQuote.withMutations(map => {
+          map.set('account', accountQuote);
+        });
+      }
+
+      accountBase = accountBase.withMutations(map => {
+        map.set('relationship', relationship);
+        map.set('moved', moved);
+      });
+
+      statusBase = statusBase.withMutations(map => {
         map.set('reblog', statusReblog);
         map.set('quote', statusQuote);
         map.set('account', accountBase);
         map.set('filtered', filtered);
       });
+
+      return statusBase;
     },
   );
 };
@@ -220,9 +252,9 @@ export const getHomeVisibilities = createSelector(
   shows => {
     return enable_limited_timeline ? (
       ['public', 'unlisted']
-      .concat(shows.get('private') ? ['private'] : [])
-      .concat(shows.get('limited') ? ['limited'] : [])
-      .concat(shows.get('direct')  ? ['direct']  : [])
+        .concat(shows.get('private') ? ['private'] : [])
+        .concat(shows.get('limited') ? ['limited'] : [])
+        .concat(shows.get('direct')  ? ['direct']  : [])
     ) : [];
 });
 
@@ -231,8 +263,8 @@ export const getLimitedVisibilities = createSelector(
   shows => {
     return enable_limited_timeline ? (
       []
-      .concat(shows.get('private') ? ['private'] : [])
-      .concat(shows.get('limited') ? ['limited'] : [])
-      .concat(shows.get('direct')  ? ['direct']  : [])
+        .concat(shows.get('private') ? ['private'] : [])
+        .concat(shows.get('limited') ? ['limited'] : [])
+        .concat(shows.get('direct')  ? ['direct']  : [])
     ) : [];
 });

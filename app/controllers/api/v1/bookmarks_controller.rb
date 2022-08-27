@@ -6,9 +6,15 @@ class Api::V1::BookmarksController < Api::BaseController
   after_action :insert_pagination_headers
 
   def index
-    @statuses  = load_statuses
-    accountIds = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
-    render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(accountIds, current_user&.account_id)
+    @statuses = load_statuses
+
+    if compact?
+      render json: CompactStatusesPresenter.new(statuses: @statuses), serializer: REST::CompactStatusesSerializer
+    else
+      account_ids = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
+
+      render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(account_ids, current_user&.account_id)
+    end
   end
 
   private
@@ -18,11 +24,11 @@ class Api::V1::BookmarksController < Api::BaseController
   end
 
   def cached_bookmarks
-    cache_collection(Status.include_expired.where(id: results.pluck(:status_id)), Status)
+    cache_collection(results.map(&:status), Status)
   end
 
   def results
-    @_results ||= account_bookmarks.joins('INNER JOIN statuses ON statuses.deleted_at IS NULL AND statuses.id = bookmarks.status_id').to_a_paginated_by_id(
+    @_results ||= account_bookmarks.joins(:status).eager_load(:status).to_a_paginated_by_id(
       limit_param(DEFAULT_STATUSES_LIMIT),
       params_slice(:max_id, :since_id, :min_id)
     )
@@ -30,6 +36,10 @@ class Api::V1::BookmarksController < Api::BaseController
 
   def account_bookmarks
     current_account.bookmarks
+  end
+
+  def compact?
+    truthy_param?(:compact)
   end
 
   def insert_pagination_headers
@@ -57,6 +67,6 @@ class Api::V1::BookmarksController < Api::BaseController
   end
 
   def pagination_params(core_params)
-    params.slice(:limit).permit(:limit).merge(core_params)
+    params.slice(:limit, :compact).permit(:limi, :compact).merge(core_params)
   end
 end

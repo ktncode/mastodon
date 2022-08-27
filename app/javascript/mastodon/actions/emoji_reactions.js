@@ -1,7 +1,6 @@
-import { fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
 import api, { getLinks } from '../api';
-import { importFetchedStatuses } from './importer';
-import { uniq } from '../utils/uniq';
+import { importFetchedStatuses, importFetchedAccounts } from './importer';
 
 export const EMOJI_REACTIONED_STATUSES_FETCH_REQUEST = 'EMOJI_REACTIONED_STATUSES_FETCH_REQUEST';
 export const EMOJI_REACTIONED_STATUSES_FETCH_SUCCESS = 'EMOJI_REACTIONED_STATUSES_FETCH_SUCCESS';
@@ -19,13 +18,21 @@ export function fetchEmojiReactionedStatuses() {
 
     dispatch(fetchEmojiReactionedStatusesRequest());
 
-    api(getState).get('/api/v1/emoji_reactions').then(response => {
+    api(getState).get('/api/v1/emoji_reactions?compact=true').then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(fetchEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(fetchEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(fetchEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
+      }
     }).catch(error => {
       dispatch(fetchEmojiReactionedStatusesFail(error));
     });
@@ -65,11 +72,19 @@ export function expandEmojiReactionedStatuses() {
 
     api(getState).get(url).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      const statuses = response.data;
-      dispatch(importFetchedStatuses(statuses));
-      dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
-      dispatch(expandEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
+      if ('statuses' in response.data && 'accounts' in response.data) {
+        const { statuses, referenced_statuses, accounts, relationships } = response.data;
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+        dispatch(importFetchedAccounts(accounts));
+        dispatch(fetchRelationshipsSuccess(relationships));
+        dispatch(expandEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
+      } else {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(fetchAccountsFromStatuses(statuses));
+        dispatch(expandEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
+      }
     }).catch(error => {
       dispatch(expandEmojiReactionedStatusesFail(error));
     });

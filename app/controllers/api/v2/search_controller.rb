@@ -10,12 +10,18 @@ class Api::V2::SearchController < Api::BaseController
 
   def index
     @search = Search.new(search_results)
-    render json: @search, serializer: REST::SearchSerializer
+    render json: @search, serializer: compact? ? REST::CompactSearchSerializer : REST::SearchSerializer
   end
 
   private
 
   def search_results
+    search_service_results.tap do |results|
+      results[:statuses] = CompactStatusesPresenter.new(statuses: results[:statuses]) if compact?
+    end
+  end
+
+  def search_service_results
     SearchService.new.call(
       params[:q],
       current_account,
@@ -24,7 +30,11 @@ class Api::V2::SearchController < Api::BaseController
     )
   end
 
+  def compact?
+    truthy_param?(:compact)
+  end
+
   def search_params
-    params.permit(:type, :offset, :min_id, :max_id, :account_id, :with_profiles, :searchability)
+    params.permit(:type, :offset, :min_id, :max_id, :account_id, :with_profiles, :searchability, :compact)
   end
 end
