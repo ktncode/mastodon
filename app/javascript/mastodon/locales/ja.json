@@ -550,6 +550,7 @@
   "status.redraft": "削除して下書きに戻す",
   "status.reference": "参照",
   "status.referred_by": "参照",
+  "status.reload": "再読み込み",
   "status.remove_bookmark": "ブックマークを削除",
   "status.reply": "返信",
   "status.replyAll": "全員に返信",

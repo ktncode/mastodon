@@ -88,6 +88,7 @@ class UserSettingsDecorator
     user.settings['hide_bot_on_public_timeline']       = hide_bot_on_public_timeline_preference if change?('setting_hide_bot_on_public_timeline')
     user.settings['confirm_follow_from_bot']           = confirm_follow_from_bot_preference if change?('setting_confirm_follow_from_bot')
     user.settings['default_search_searchability']      = default_search_searchability_preference if change?('setting_default_search_searchability')
+    user.settings['show_reload_button']                = show_reload_button_preference if change?('setting_show_reload_button')
 end
 
   def merged_notification_emails
@@ -324,6 +325,10 @@ end
 
   def default_search_searchability_preference
     settings['setting_default_search_searchability']
+  end
+
+  def show_reload_button_preference
+    boolean_cast_setting 'setting_show_reload_button'
   end
 
   def boolean_cast_setting(key)

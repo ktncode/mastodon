@@ -83,6 +83,7 @@ en:
         setting_show_follow_button_on_timeline: You can easily check the follow status and build a follow list quickly
         setting_show_navigation_panel: Show the navigation panel at the right end of the advanced UI
         setting_show_quote_button: Selects whether to display the button on the action bar. It does not enable/disable the citation function.
+        setting_show_reload_button: Show reload button at the top of the iPhone / iPad timeline
         setting_show_reply_tree_button: Blue marker for replies to another post, yellow marker for posts with replies, and green marker for both
         setting_show_subscribe_button_on_timeline: You can easily check the status of your subscriptions and quickly build a subscription list
         setting_show_tab_bar_label: When adding a list etc. to the tab bar, it is recommended to display the label because it is not possible to distinguish by the icon alone
@@ -257,6 +258,7 @@ en:
         setting_show_follow_button_on_timeline: Show follow button on timeline
         setting_show_navigation_panel: Show the navigation panel
         setting_show_quote_button: Show the quote button on the action bar
+        setting_show_reload_button: Show reload button
         setting_show_reply_tree_button: Show markers on posts where a reply relationship exists
         setting_show_subscribe_button_on_timeline: Show subscribe button on timeline
         setting_show_tab_bar_label: Show labels in the tab bar

@@ -4,9 +4,12 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import StatusContainer from '../containers/status_container';
 import ImmutablePureComponent from 'react-immutable-pure-component';
+import ReloadZone from './reload_zone';
 import LoadGap from './load_gap';
 import ScrollableList from './scrollable_list';
 import RegenerationIndicator from 'mastodon/components/regeneration_indicator';
+import { isIOS } from 'mastodon/is_mobile';
+import { showReloadButton } from '../initial_state';
 
 export default class StatusList extends ImmutablePureComponent {
 
@@ -58,6 +61,10 @@ export default class StatusList extends ImmutablePureComponent {
   handleLoadOlder = debounce(() => {
     this.props.onLoadMore(this.props.statusIds.size > 0 ? this.props.statusIds.last() : undefined);
   }, 300, { leading: true })
+
+  handleReload = () => {
+    location.reload();
+  }
 
   _selectChild (index, align_top) {
     const container = this.node.node;
@@ -120,6 +127,10 @@ export default class StatusList extends ImmutablePureComponent {
           showCard={showCard}
         />
       )).concat(scrollableContent);
+    }
+
+    if (showReloadButton && scrollableContent && isIOS()) {
+      scrollableContent = scrollableContent.unshift(<ReloadZone key='reload' onClick={this.handleReload} />);
     }
 
     return (

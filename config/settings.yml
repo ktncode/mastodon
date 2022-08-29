@@ -107,6 +107,7 @@ defaults: &defaults
   hide_bot_on_public_timeline: false
   confirm_follow_from_bot: true
   default_search_searchability: 'public'
+  show_reload_button: true
 
 development:
   <<: *defaults

@@ -550,6 +550,7 @@
   "status.redraft": "Delete & re-draft",
   "status.reference": "Reference",
   "status.referred_by": "Referred",
+  "status.reload": "Reload",
   "status.remove_bookmark": "Remove bookmark",
   "status.reply": "Reply",
   "status.replyAll": "Reply to thread",

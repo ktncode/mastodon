@@ -51,5 +51,6 @@ export const enableStatusReference = getMeta('enable_status_reference');
 export const maxReferences = initialState?.status_references?.max_references;
 export const matchVisibilityOfReferences = getMeta('match_visibility_of_references');
 export const enableEmptyColumn = getMeta('enable_empty_column');
+export const showReloadButton = getMeta('show_reload_button');
 
 export default initialState;
