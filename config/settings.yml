@@ -78,6 +78,7 @@ defaults: &defaults
     pending_account: true
     trending_tag: true
   interactions:
+    must_be_dm_to_send_email: false
     must_be_follower: false
     must_be_following: false
     must_be_following_dm: false

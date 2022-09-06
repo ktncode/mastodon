@@ -307,6 +307,7 @@ ja:
         show_reblogs: ブーストを表示
         timeline: タイムライン
       interactions:
+        must_be_dm_to_send_email: ダイレクトメッセージ以外のメンションからの電子メール通知をブロックする
         must_be_follower: フォロワー以外からの通知をブロック
         must_be_following: フォローしていないユーザーからの通知をブロック
         must_be_following_dm: フォローしていないユーザーからのダイレクトメッセージをブロック

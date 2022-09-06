@@ -67,6 +67,10 @@ class NotifyService < BaseService
     @recipient.user.settings.interactions['must_be_following'] && !following_sender?
   end
 
+  def optional_non_direct_message?
+    message? && @recipient.user.settings.interactions['must_be_dm_to_send_email'] && !@notification.target_status.direct_visibility?
+  end
+
   def message?
     @notification.type == :mention
   end
@@ -199,7 +203,7 @@ class NotifyService < BaseService
   end
 
   def send_email!
-    return if @notification.activity.nil?
+    return if @notification.activity.nil? || optional_non_direct_message?
     NotificationMailer.public_send(@notification.type, @recipient, @notification).deliver_later(wait: 2.minutes)
   end
 

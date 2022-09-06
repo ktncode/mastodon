@@ -303,6 +303,7 @@ en:
         show_reblogs: Show boost
         timeline: Timeline
       interactions:
+        must_be_dm_to_send_email: Block e-mail notifications from mentions to you other than direct messages
         must_be_follower: Block notifications from non-followers
         must_be_following: Block notifications from people you don't follow
         must_be_following_dm: Block direct messages from people you don't follow
