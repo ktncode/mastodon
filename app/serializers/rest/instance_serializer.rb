@@ -136,6 +136,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       :status_reference,
       :searchability,
       :status_compact_mode,
+      :account_conversations,
     ]
 
     capabilities << :profile_search unless Chewy.enabled?

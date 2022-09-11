@@ -99,6 +99,10 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     dispatch(directCompose(account, router));
   },
 
+  onConversations (account, router) {
+    router.push(`/accounts/${account.get('id')}/conversations`);
+  },
+
   onReblogToggle (account) {
     if (account.getIn(['relationship', 'showing_reblogs'])) {
       dispatch(followAccount(account.get('id'), { reblogs: false }));

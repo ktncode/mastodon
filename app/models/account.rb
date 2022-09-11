@@ -425,6 +425,14 @@ class Account < ApplicationRecord
     end.permitted_for(self, account)
   end
 
+  def conversation_statuses(account)
+    if account.nil? || account.class.name == 'Account' && account.id == id
+      Status.unscoped.recent.union_all(Status.include_expired.joins(:mentions).where(account_id: id, mentions: {silent: false})).union_all(Status.include_expired.joins(:mentions).where(mentions: {account_id: id, silent: false}))
+    else
+      Status.unscoped.recent.union_all(Status.include_expired.joins(:mentions).where(account_id: id, mentions: {account_id: account.id, silent: false})).union_all(Status.include_expired.joins(:mentions).where(account_id: account.id, mentions: {account_id: id, silent: false}))
+    end
+  end
+
   def index_text
     ActionController::Base.helpers.strip_tags(note)
   end

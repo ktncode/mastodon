@@ -11,6 +11,8 @@
   "account.blocked": "ブロック済み",
   "account.browse_more_on_origin_server": "リモートで表示",
   "account.cancel_follow_request": "フォローリクエストを取り消す",
+  "account.conversations": "@{name}さんとの会話を表示",
+  "account.conversations_all": "すべての会話を表示",
   "account.direct": "@{name}さんにダイレクトメッセージ",
   "account.disable_notifications": "@{name} の投稿時の通知を停止",
   "account.domain_blocked": "ドメインブロック中",

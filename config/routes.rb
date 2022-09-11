@@ -479,6 +479,7 @@ Rails.application.routes.draw do
         resources :circles, only: :index, controller: 'accounts/circles'
         resources :identity_proofs, only: :index, controller: 'accounts/identity_proofs'
         resources :featured_tags, only: :index, controller: 'accounts/featured_tags'
+        resources :conversations, only: :index, controller: 'accounts/conversations'
 
         member do
           post :follow

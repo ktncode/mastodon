@@ -34,6 +34,7 @@ import {
   GroupTimeline,
   AccountTimeline,
   AccountGallery,
+  AccountConversations,
   HomeTimeline,
   Followers,
   Following,
@@ -204,6 +205,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/accounts/:accountId/following' component={Following} content={children} />
           <WrappedRoute path='/accounts/:accountId/subscribing' component={Subscribing} content={children} />
           <WrappedRoute path='/accounts/:accountId/media' component={AccountGallery} content={children} />
+          <WrappedRoute path='/accounts/:accountId/conversations' component={AccountConversations} content={children} />
 
           <WrappedRoute path='/follow_requests' component={FollowRequests} content={children} />
           <WrappedRoute path='/blocks' component={Blocks} content={children} />

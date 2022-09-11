@@ -11,6 +11,8 @@
   "account.blocked": "Blocked",
   "account.browse_more_on_origin_server": "Browse more on the original profile",
   "account.cancel_follow_request": "Cancel follow request",
+  "account.conversations": "Show conversations with @{name}",
+  "account.conversations_all": "Show all conversations",
   "account.direct": "Direct message @{name}",
   "account.disable_notifications": "Stop notifying me when @{name} posts",
   "account.domain_blocked": "Domain blocked",

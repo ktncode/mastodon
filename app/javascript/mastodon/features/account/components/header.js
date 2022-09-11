@@ -27,6 +27,8 @@ const messages = defineMessages({
   edit_profile: { id: 'account.edit_profile', defaultMessage: 'Edit profile' },
   linkVerifiedOn: { id: 'account.link_verified_on', defaultMessage: 'Ownership of this link was checked on {date}' },
   account_locked: { id: 'account.locked_info', defaultMessage: 'This account privacy status is set to locked. The owner manually reviews who can follow them.' },
+  conversations: { id: 'account.conversations', defaultMessage: 'Show conversations with @{name}' },
+  conversations_all: { id: 'account.conversations_all', defaultMessage: 'Show all conversations' },
   mention: { id: 'account.mention', defaultMessage: 'Mention @{name}' },
   direct: { id: 'account.direct', defaultMessage: 'Direct message @{name}' },
   unmute: { id: 'account.unmute', defaultMessage: 'Unmute @{name}' },
@@ -79,6 +81,7 @@ class Header extends ImmutablePureComponent {
     onBlock: PropTypes.func.isRequired,
     onMention: PropTypes.func.isRequired,
     onDirect: PropTypes.func.isRequired,
+    onConversations: PropTypes.func.isRequired,
     onReblogToggle: PropTypes.func.isRequired,
     onNotifyToggle: PropTypes.func.isRequired,
     onReport: PropTypes.func.isRequired,
@@ -207,7 +210,12 @@ class Header extends ImmutablePureComponent {
       menu.push({ text: intl.formatMessage(messages.mention, { name: account.get('username') }), action: this.props.onMention });
       menu.push({ text: intl.formatMessage(messages.direct, { name: account.get('username') }), action: this.props.onDirect });
       menu.push(null);
+
+      menu.push({ text: intl.formatMessage(messages.conversations, { name: account.get('username') }), action: this.props.onConversations });
+    } else {
+      menu.push({ text: intl.formatMessage(messages.conversations_all), action: this.props.onConversations });
     }
+    menu.push(null);
 
     if ('share' in navigator) {
       menu.push({ text: intl.formatMessage(messages.share, { name: account.get('username') }), action: this.handleShare });

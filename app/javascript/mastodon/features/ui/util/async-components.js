@@ -74,6 +74,10 @@ export function AccountGallery () {
   return import(/* webpackChunkName: "features/account_gallery" */'../../account_gallery');
 }
 
+export function AccountConversations () {
+  return import(/* webpackChunkName: "features/account_conversations" */'../../account_conversations');
+}
+
 export function Followers () {
   return import(/* webpackChunkName: "features/followers" */'../../followers');
 }
