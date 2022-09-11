@@ -75,7 +75,7 @@ const initialState = ImmutableMap({
       poll: true,
       status: true,
       emoji_reaction: true,
-      status_reference: false,
+      status_reference: true,
     }),
 
     sounds: ImmutableMap({
@@ -87,7 +87,7 @@ const initialState = ImmutableMap({
       poll: true,
       status: true,
       emoji_reaction: true,
-      status_reference: false,
+      status_reference: true,
     }),
   }),
 

@@ -67,12 +67,20 @@ class NotifyService < BaseService
     @recipient.user.settings.interactions['must_be_following'] && !following_sender?
   end
 
+  def optional_non_following_and_reference?
+    status_reference? && @recipient.user.settings.interactions['must_be_following_reference'] && !following_sender?
+  end
+
   def optional_non_direct_message?
     message? && @recipient.user.settings.interactions['must_be_dm_to_send_email'] && !@notification.target_status.direct_visibility?
   end
 
   def message?
     @notification.type == :mention
+  end
+
+  def status_reference?
+    @notification.type == :status_reference
   end
 
   def direct_message?
@@ -162,6 +170,7 @@ class NotifyService < BaseService
     blocked ||= hellbanned?                                      # Hellban
     blocked ||= optional_non_follower?                           # Options
     blocked ||= optional_non_following?                          # Options
+    blocked ||= optional_non_following_and_reference?            # Options
     blocked ||= optional_non_following_and_direct?               # Options
     blocked ||= conversation_muted?
     blocked ||= send("blocked_#{@notification.type}?")           # Type-dependent filters

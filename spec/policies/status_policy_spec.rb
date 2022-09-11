@@ -25,6 +25,37 @@ RSpec.describe StatusPolicy, type: :model do
     end
   end
 
+  permissions :subscribe? do
+    it 'grants access when public and account is viewer' do
+      viewer = Fabricate(:account)
+      status.visibility = :public
+
+      expect(subject).to permit(viewer, status)
+    end
+
+    it 'grants access when direct and viewer is mentioned' do
+      status.visibility = :unlisted
+      status.mentions = [Fabricate(:mention, account: alice)]
+
+      expect(subject).to permit(alice, status)
+    end
+
+    it 'grants access when unlisted and account is following viewer' do
+      follow = Fabricate(:follow)
+      status.visibility = :unlisted
+      status.account = follow.target_account
+
+      expect(subject).to permit(follow.account, status)
+    end
+
+    it 'denies access when unlisted and account is not mentioned or following viewer' do
+      viewer = Fabricate(:account)
+      status.visibility = :unlisted
+
+      expect(subject).to_not permit(viewer, status)
+    end
+  end
+
   permissions :show? do
     it 'grants access when direct and account is viewer' do
       status.visibility = :direct

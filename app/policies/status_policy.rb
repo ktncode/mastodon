@@ -56,7 +56,7 @@ class StatusPolicy < ApplicationPolicy
   def subscribe?
     return false unless show?
 
-    !unlisted? || owned? || following_author? || mention_exists?
+    public? || owned? || following_author? || mention_exists?
   end
 
   private
@@ -67,6 +67,10 @@ class StatusPolicy < ApplicationPolicy
 
   def owned?
     author.id == current_account&.id
+  end
+
+  def public?
+    record.public_visibility?
   end
 
   def unlisted?

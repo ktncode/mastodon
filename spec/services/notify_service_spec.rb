@@ -126,6 +126,66 @@ RSpec.describe NotifyService, type: :service do
     end
   end
 
+  describe 'status references' do
+    let(:target_status) { Fabricate(:status, account: recipient, visibility: :public) }
+    let(:activity)      { Fabricate(:status_reference, status: status, target_status: target_status) }
+    let(:type)          { :status_reference }
+
+    before do
+      user.settings.interactions = user.settings.interactions.merge('must_be_following_reference' => enabled)
+    end
+
+    context 'if must_be_following_reference is true' do
+      let(:enabled) { true }
+
+      describe 'with public' do
+        let(:status) { Fabricate(:status, account: sender, visibility: :public) }
+
+        it 'does notify' do
+          is_expected.to_not change(Notification, :count)
+        end
+      end
+
+      describe 'with unlisted' do
+        let(:status) { Fabricate(:status, account: sender, visibility: :unlisted) }
+
+        it 'does notify when sender is followed' do
+          recipient.follow!(sender)
+          is_expected.to change(Notification, :count)
+        end
+
+        it 'does not notify when sender is not followed' do
+          is_expected.to_not change(Notification, :count)
+        end
+      end
+    end
+
+    context 'if must_be_following_reference is false' do
+      let(:enabled) { false }
+
+      describe 'with public' do
+        let(:status) { Fabricate(:status, account: sender, visibility: :public) }
+
+        it 'does notify' do
+          is_expected.to change(Notification, :count)
+        end
+      end
+
+      describe 'with unlisted' do
+        let(:status) { Fabricate(:status, account: sender, visibility: :unlisted) }
+
+        it 'does notify when sender is followed' do
+          recipient.follow!(sender)
+          is_expected.to change(Notification, :count)
+        end
+
+        it 'does not notify when sender is not followed' do
+          is_expected.to_not change(Notification, :count)
+        end
+      end
+    end
+  end
+
   context do
     let(:asshole)  { Fabricate(:account, username: 'asshole') }
     let(:reply_to) { Fabricate(:status, account: asshole) }
