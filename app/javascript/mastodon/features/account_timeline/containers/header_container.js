@@ -34,10 +34,12 @@ const messages = defineMessages({
 const makeMapStateToProps = () => {
   const getAccount = makeGetAccount();
 
-  const mapStateToProps = (state, { accountId }) => ({
+  const mapStateToProps = (state, { accountId, hideTabs, hideProfile }) => ({
     account: getAccount(state, accountId),
     domain: state.getIn(['meta', 'domain']),
     identity_proofs: state.getIn(['identity_proofs', accountId], ImmutableList()),
+    hideProfile: hideTabs || hideProfile,
+    advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], false),
   });
 
   return mapStateToProps;

@@ -10,6 +10,7 @@ import ScrollableList from './scrollable_list';
 import RegenerationIndicator from 'mastodon/components/regeneration_indicator';
 import { isIOS } from 'mastodon/is_mobile';
 import { showReloadButton } from '../initial_state';
+import { List as ImmutableList } from 'immutable';
 
 export default class StatusList extends ImmutablePureComponent {
 
@@ -112,7 +113,7 @@ export default class StatusList extends ImmutablePureComponent {
           showCard={showCard}
         />
       ))
-    ) : null;
+    ) : ImmutableList();
 
     if (scrollableContent && featuredStatusIds) {
       scrollableContent = featuredStatusIds.map(statusId => (

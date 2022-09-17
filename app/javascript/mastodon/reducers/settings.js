@@ -16,6 +16,17 @@ const initialState = ImmutableMap({
     show: true,
   }),
 
+  account: ImmutableMap({
+    other: ImmutableMap({
+      advancedMode: true,
+      openPostsFirst: false,
+      withoutReblogs: false,
+      showPostsInAbout: true,
+      hideFeaturedTags: false,
+      hideRelation: false,
+    }),
+  }),
+
   home: ImmutableMap({
     shows: ImmutableMap({
       reblog: true,

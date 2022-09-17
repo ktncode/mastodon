@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import Button from 'mastodon/components/button';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { autoPlayGif, me, isStaff, show_followed_by, follow_button_to_list_adder } from 'mastodon/initial_state';
@@ -9,12 +9,7 @@ import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import IconButton from 'mastodon/components/icon_button';
 import Avatar from 'mastodon/components/avatar';
-import { counterRenderer } from 'mastodon/components/common_counter';
-import ShortNumber from 'mastodon/components/short_number';
-import { NavLink } from 'react-router-dom';
 import DropdownMenuContainer from 'mastodon/containers/dropdown_menu_container';
-import AccountNoteContainer from '../containers/account_note_container';
-import age from 's-age';
 
 const messages = defineMessages({
   unfollow: { id: 'account.unfollow', defaultMessage: 'Unfollow' },
@@ -25,10 +20,8 @@ const messages = defineMessages({
   requested: { id: 'account.requested', defaultMessage: 'Awaiting approval. Click to cancel follow request' },
   unblock: { id: 'account.unblock', defaultMessage: 'Unblock @{name}' },
   edit_profile: { id: 'account.edit_profile', defaultMessage: 'Edit profile' },
-  linkVerifiedOn: { id: 'account.link_verified_on', defaultMessage: 'Ownership of this link was checked on {date}' },
   account_locked: { id: 'account.locked_info', defaultMessage: 'This account privacy status is set to locked. The owner manually reviews who can follow them.' },
   conversations: { id: 'account.conversations', defaultMessage: 'Show conversations with @{name}' },
-  conversations_all: { id: 'account.conversations_all', defaultMessage: 'Show all conversations' },
   mention: { id: 'account.mention', defaultMessage: 'Mention @{name}' },
   direct: { id: 'account.direct', defaultMessage: 'Direct message @{name}' },
   unmute: { id: 'account.unmute', defaultMessage: 'Unmute @{name}' },
@@ -57,24 +50,13 @@ const messages = defineMessages({
   add_or_remove_from_list: { id: 'account.add_or_remove_from_list', defaultMessage: 'Add or Remove from lists' },
   add_or_remove_from_circle: { id: 'account.add_or_remove_from_circle', defaultMessage: 'Add or Remove from circles' },
   admin_account: { id: 'status.admin_account', defaultMessage: 'Open moderation interface for @{name}' },
-  secret: { id: 'account.secret', defaultMessage: 'Secret' },
 });
 
-const dateFormatOptions = {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-  hour12: false,
-  hour: '2-digit',
-  minute: '2-digit',
-};
-
 export default @injectIntl
-class Header extends ImmutablePureComponent {
+class HeaderCommon extends ImmutablePureComponent {
 
   static propTypes = {
     account: ImmutablePropTypes.map,
-    identity_props: ImmutablePropTypes.list,
     onFollow: PropTypes.func.isRequired,
     onSubscribe: PropTypes.func.isRequired,
     onAddToList: PropTypes.func.isRequired,
@@ -93,7 +75,6 @@ class Header extends ImmutablePureComponent {
     onEditAccountNote: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
     domain: PropTypes.string.isRequired,
-    hideProfile: PropTypes.bool.isRequired,
   };
 
   openEditProfile = () => {
@@ -155,7 +136,7 @@ class Header extends ImmutablePureComponent {
   }
 
   render () {
-    const { account, intl, domain, identity_proofs, hideProfile } = this.props;
+    const { account, intl, domain } = this.props;
 
     if (!account) {
       return null;
@@ -211,11 +192,9 @@ class Header extends ImmutablePureComponent {
       menu.push({ text: intl.formatMessage(messages.mention, { name: account.get('username') }), action: this.props.onMention });
       menu.push({ text: intl.formatMessage(messages.direct, { name: account.get('username') }), action: this.props.onDirect });
       menu.push(null);
-
-      menu.push({ text: intl.formatMessage(messages.conversations, { name: account.get('username') }), action: this.props.onConversations });
-    } else {
-      menu.push({ text: intl.formatMessage(messages.conversations_all), action: this.props.onConversations });
     }
+
+    menu.push({ text: intl.formatMessage(messages.conversations, { name: account.get('username') }), action: this.props.onConversations });
     menu.push(null);
 
     if ('share' in navigator) {
@@ -289,9 +268,7 @@ class Header extends ImmutablePureComponent {
       menu.push({ text: intl.formatMessage(messages.admin_account, { name: account.get('username') }), href: `/admin/accounts/${account.get('id')}` });
     }
 
-    const content         = { __html: account.get('note_emojified') };
     const displayNameHtml = { __html: account.get('display_name_html') };
-    const fields          = account.get('fields');
     const acct            = account.get('acct').indexOf('@') === -1 && domain ? `${account.get('acct')}@${domain}` : account.get('acct');
 
     let badge;
@@ -344,16 +321,8 @@ class Header extends ImmutablePureComponent {
       buttons = <Fragment>{subscribing_buttons}{following_buttons}</Fragment>;
     }
 
-    const hide_statuses_count = account.getIn(['other_settings', 'hide_statuses_count'], false);
-    const hide_following_count = account.getIn(['other_settings', 'hide_following_count'], false);
-    const hide_followers_count = account.getIn(['other_settings', 'hide_followers_count'], false);
-
-    const location = account.getIn(['other_settings', 'location']);
-    const birthday = account.getIn(['other_settings', 'birthday']);
-    const joined = account.get('created_at');
-
     return (
-      <div className={classNames('account__header', { inactive: !!account.get('moved') })} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+      <div className={classNames('account__header', 'advanced', { inactive: !!account.get('moved') })} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
         <div className='account__header__image'>
           <div className='account__header__info'>
             {!suspended && info}
@@ -388,98 +357,6 @@ class Header extends ImmutablePureComponent {
             <div className='account__header__tabs__name__relationship account__relationship'>
               {buttons}
             </div>
-          </div>
-
-          <div className='account__header__extra'>
-            {!hideProfile && (
-              <div className='account__header__bio'>
-                {(fields.size > 0 || identity_proofs.size > 0) && (
-                  <div className='account__header__fields'>
-                    {identity_proofs.map((proof, i) => (
-                      <dl key={i}>
-                        <dt dangerouslySetInnerHTML={{ __html: proof.get('provider') }} />
-
-                        <dd className='verified'>
-                          <a href={proof.get('proof_url')} target='_blank' rel='noopener noreferrer'><span title={intl.formatMessage(messages.linkVerifiedOn, { date: intl.formatDate(proof.get('updated_at'), dateFormatOptions) })}>
-                            <Icon id='check' className='verified__mark' />
-                          </span></a>
-                          <a href={proof.get('profile_url')} target='_blank' rel='noopener noreferrer'><span dangerouslySetInnerHTML={{ __html: ' '+proof.get('provider_username') }} /></a>
-                        </dd>
-                      </dl>
-                    ))}
-                    {fields.map((pair, i) => (
-                      <dl key={i}>
-                        <dt dangerouslySetInnerHTML={{ __html: pair.get('name_emojified') }} title={pair.get('name')} className='translate' />
-
-                        <dd className={`${pair.get('verified_at') ? 'verified' : ''} translate`} title={pair.get('value_plain')}>
-                          {pair.get('verified_at') && <span title={intl.formatMessage(messages.linkVerifiedOn, { date: intl.formatDate(pair.get('verified_at'), dateFormatOptions) })}><Icon id='check' className='verified__mark' /></span>} <span dangerouslySetInnerHTML={{ __html: pair.get('value_emojified') }} />
-                        </dd>
-                      </dl>
-                    ))}
-                  </div>
-                )}
-
-                {account.get('id') !== me && !suspended && <AccountNoteContainer account={account} />}
-
-                {account.get('note').length > 0 && account.get('note') !== '<p></p>' && <div className='account__header__content translate' dangerouslySetInnerHTML={content} />}
-
-                <div className='account__header__personal--wrapper'>
-                  <table className='account__header__personal'>
-                    <tbody>
-                      {location && <tr>
-                        <th><Icon id='map-marker' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.location' defaultMessage='Location' /></th>
-                        <td>{location}</td>
-                      </tr>}
-                      {birthday && <tr>
-                        <th><Icon id='birthday-cake' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.birthday' defaultMessage='Birthday' /></th>
-                        <td><FormattedDate value={birthday} hour12={false} year='numeric' month='short' day='2-digit' />(<FormattedMessage id='account.age' defaultMessage='{age} years old}' values={{age: age(birthday)}} />)</td>
-                      </tr>}
-                      <tr>
-                        <th><Icon id='calendar' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.joined' defaultMessage='Joined' /></th>
-                        <td><FormattedDate value={joined} hour12={false} year='numeric' month='short' day='2-digit' /></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {!hideProfile && !suspended && (
-              <div className='account__header__extra__links'>
-                <NavLink isActive={this.isStatusesPageActive} activeClassName='active' to={`/accounts/${account.get('id')}/posts`} title={hide_statuses_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('statuses_count'))}>
-                  <ShortNumber
-                    hide={hide_statuses_count}
-                    value={account.get('statuses_count')}
-                    renderer={counterRenderer('statuses')}
-                  />
-                </NavLink>
-
-                <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/following`} title={hide_following_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('following_count'))}>
-                  <ShortNumber
-                    hide={hide_following_count}
-                    value={account.get('following_count')}
-                    renderer={counterRenderer('following')}
-                  />
-                </NavLink>
-
-                <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/followers`} title={hide_followers_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('followers_count'))}>
-                  <ShortNumber
-                    hide={hide_followers_count}
-                    value={account.get('followers_count')}
-                    renderer={counterRenderer('followers')}
-                  />
-                </NavLink>
-
-                { (me === account.get('id')) && (
-                  <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/subscribing`} title={intl.formatNumber(account.get('subscribing_count'))}>
-                    <ShortNumber
-                      value={account.get('subscribing_count')}
-                      renderer={counterRenderer('subscribers')}
-                    />
-                  </NavLink>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </div>

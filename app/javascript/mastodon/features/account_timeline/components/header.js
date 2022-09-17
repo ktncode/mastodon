@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import InnerHeader from '../../account/components/header';
+import InnerHeaderCommon from '../../account/components/header_common';
+import InnerHeaderExtra from '../../account/components/header_extra';
+import InnerHeaderExtraLinks from '../../account/components/header_extra_links';
+import FeaturedTags from '../../account/components/featured_tags';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { follow_button_to_list_adder } from 'mastodon/initial_state';
 import MovedNote from './moved_note';
 import { FormattedMessage } from 'react-intl';
 import { NavLink } from 'react-router-dom';
+import Icon from 'mastodon/components/icon';
 
 export default class Header extends ImmutablePureComponent {
 
@@ -28,8 +33,16 @@ export default class Header extends ImmutablePureComponent {
     onEndorseToggle: PropTypes.func.isRequired,
     onAddToList: PropTypes.func.isRequired,
     onAddToCircle: PropTypes.func.isRequired,
-    hideTabs: PropTypes.bool,
+    hideRelation: PropTypes.bool,
+    hideProfile: PropTypes.bool,
+    advancedMode: PropTypes.bool,
+    tagged: PropTypes.string,
+    hideFeaturedTags: PropTypes.bool,
     domain: PropTypes.string.isRequired,
+  };
+
+  static defaultProps = {
+    hideProfile: false,
   };
 
   static contextTypes = {
@@ -117,7 +130,7 @@ export default class Header extends ImmutablePureComponent {
   }
 
   render () {
-    const { account, hideTabs, identity_proofs } = this.props;
+    const { account, hideRelation, identity_proofs, hideProfile, advancedMode, tagged, hideFeaturedTags } = this.props;
 
     if (account === null) {
       return null;
@@ -127,34 +140,72 @@ export default class Header extends ImmutablePureComponent {
       <div className='account-timeline__header'>
         {account.get('moved') && <MovedNote from={account} to={account.get('moved')} />}
 
-        <InnerHeader
-          account={account}
-          identity_proofs={identity_proofs}
-          onFollow={this.handleFollow}
-          onSubscribe={this.handleSubscribe}
-          onBlock={this.handleBlock}
-          onMention={this.handleMention}
-          onDirect={this.handleDirect}
-          onConversations={this.handleConversations}
-          onReblogToggle={this.handleReblogToggle}
-          onNotifyToggle={this.handleNotifyToggle}
-          onReport={this.handleReport}
-          onMute={this.handleMute}
-          onBlockDomain={this.handleBlockDomain}
-          onUnblockDomain={this.handleUnblockDomain}
-          onEndorseToggle={this.handleEndorseToggle}
-          onAddToList={this.handleAddToList}
-          onAddToCircle={this.handleAddToCircle}
-          onEditAccountNote={this.handleEditAccountNote}
-          domain={this.props.domain}
-        />
+        {advancedMode ? (
+          <Fragment>
+            <InnerHeaderCommon
+              account={account}
+              onFollow={this.handleFollow}
+              onSubscribe={this.handleSubscribe}
+              onBlock={this.handleBlock}
+              onMention={this.handleMention}
+              onDirect={this.handleDirect}
+              onConversations={this.handleConversations}
+              onReblogToggle={this.handleReblogToggle}
+              onNotifyToggle={this.handleNotifyToggle}
+              onReport={this.handleReport}
+              onMute={this.handleMute}
+              onBlockDomain={this.handleBlockDomain}
+              onUnblockDomain={this.handleUnblockDomain}
+              onEndorseToggle={this.handleEndorseToggle}
+              onAddToList={this.handleAddToList}
+              onAddToCircle={this.handleAddToCircle}
+              onEditAccountNote={this.handleEditAccountNote}
+              domain={this.props.domain}
+            />
 
-        {!hideTabs && (
-          <div className='account__section-headline'>
-            <NavLink exact to={`/accounts/${account.get('id')}`}><FormattedMessage id='account.posts' defaultMessage='Toots' /></NavLink>
-            <NavLink exact to={`/accounts/${account.get('id')}/with_replies`}><FormattedMessage id='account.posts_with_replies' defaultMessage='Toots and replies' /></NavLink>
-            <NavLink exact to={`/accounts/${account.get('id')}/media`}><FormattedMessage id='account.media' defaultMessage='Media' /></NavLink>
-          </div>
+            <div className='account__section-headline with-short-label'>
+              <NavLink exact to={`/accounts/${account.get('id')}/posts`}><Icon id='home' fixedWidth /><span className='account__section-headline__short-label'><FormattedMessage id='account.short.posts' defaultMessage='Posts' children={msg=> <>{msg}</>} /></span></NavLink>
+              <NavLink exact to={`/accounts/${account.get('id')}/with_replies`}><Icon id='reply-all' fixedWidth /><span className='account__section-headline__short-label'><FormattedMessage id='account.short.with_replies' defaultMessage='Posts & Replies' children={msg=> <>{msg}</>} /></span></NavLink>
+              <NavLink exact to={`/accounts/${account.get('id')}/media`}><Icon id='picture-o' fixedWidth /><span className='account__section-headline__short-label'><FormattedMessage id='account.short.media' defaultMessage='Media' children={msg=> <>{msg}</>} /></span></NavLink>
+              <NavLink exact to={`/accounts/${account.get('id')}/conversations`}><Icon id='at' fixedWidth /><span className='account__section-headline__short-label'><FormattedMessage id='account.short.conversations' defaultMessage='Conversations' children={msg=> <>{msg}</>} /></span></NavLink>
+              <NavLink exact to={`/accounts/${account.get('id')}/about`}><Icon id='address-card-o' fixedWidth /><span className='account__section-headline__short-label'><FormattedMessage id='account.short.about' defaultMessage='About' children={msg=> <>{msg}</>} /></span></NavLink>
+            </div>
+
+            {hideProfile && !hideFeaturedTags && <FeaturedTags account={account} tagged={tagged} />}
+            {!hideRelation && <InnerHeaderExtraLinks account={account} />}
+            {!hideProfile && <InnerHeaderExtra account={account} identity_proofs={identity_proofs} />}
+          </Fragment>
+        ) : (
+          <Fragment>
+            <InnerHeader
+              account={account}
+              identity_proofs={identity_proofs}
+              onFollow={this.handleFollow}
+              onSubscribe={this.handleSubscribe}
+              onBlock={this.handleBlock}
+              onMention={this.handleMention}
+              onDirect={this.handleDirect}
+              onConversations={this.handleConversations}
+              onReblogToggle={this.handleReblogToggle}
+              onNotifyToggle={this.handleNotifyToggle}
+              onReport={this.handleReport}
+              onMute={this.handleMute}
+              onBlockDomain={this.handleBlockDomain}
+              onUnblockDomain={this.handleUnblockDomain}
+              onEndorseToggle={this.handleEndorseToggle}
+              onAddToList={this.handleAddToList}
+              onAddToCircle={this.handleAddToCircle}
+              onEditAccountNote={this.handleEditAccountNote}
+              domain={this.props.domain}
+              hideProfile={hideProfile}
+            />
+
+            <div className='account__section-headline'>
+              <NavLink exact to={`/accounts/${account.get('id')}`}><FormattedMessage id='account.posts' defaultMessage='Toots' /></NavLink>
+              <NavLink exact to={`/accounts/${account.get('id')}/with_replies`}><FormattedMessage id='account.posts_with_replies' defaultMessage='Toots and replies' /></NavLink>
+              <NavLink exact to={`/accounts/${account.get('id')}/media`}><FormattedMessage id='account.media' defaultMessage='Media' /></NavLink>
+            </div>
+          </Fragment>
         )}
       </div>
     );

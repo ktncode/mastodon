@@ -10,14 +10,20 @@ import {
   fetchFollowing,
   expandFollowing,
 } from '../../actions/accounts';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import AccountContainer from '../../containers/account_container';
-import Column from '../ui/components/column';
+import Column from '../../components/column';
+import ColumnHeader from '../../components/column_header';
+import ColumnSettingsContainer from '../account_timeline/containers/column_settings_container';
 import HeaderContainer from '../account_timeline/containers/header_container';
-import ColumnBackButton from '../../components/column_back_button';
 import ScrollableList from '../../components/scrollable_list';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import TimelineHint from 'mastodon/components/timeline_hint';
+import { new_features_policy } from 'mastodon/initial_state';
+
+const messages = defineMessages({
+  title: { id: 'column.account', defaultMessage: 'Account' },
+});
 
 const mapStateToProps = (state, props) => ({
   remote: !!(state.getIn(['accounts', props.params.accountId, 'acct']) !== state.getIn(['accounts', props.params.accountId, 'username'])),
@@ -27,6 +33,7 @@ const mapStateToProps = (state, props) => ({
   hasMore: !!state.getIn(['user_lists', 'following', props.params.accountId, 'next']),
   isLoading: state.getIn(['user_lists', 'following', props.params.accountId, 'isLoading'], true),
   blockedBy: state.getIn(['relationships', props.params.accountId, 'blocked_by'], false),
+  advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
 });
 
 const RemoteHint = ({ url }) => (
@@ -38,12 +45,14 @@ RemoteHint.propTypes = {
 };
 
 export default @connect(mapStateToProps)
+@injectIntl
 class Following extends ImmutablePureComponent {
 
   static propTypes = {
     params: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     accountIds: ImmutablePropTypes.list,
+    advancedMode: PropTypes.bool,
     hasMore: PropTypes.bool,
     isLoading: PropTypes.bool,
     blockedBy: PropTypes.bool,
@@ -71,8 +80,16 @@ class Following extends ImmutablePureComponent {
     this.props.dispatch(expandFollowing(this.props.params.accountId));
   }, 300, { leading: true });
 
+  handleHeaderClick = () => {
+    this.column.scrollTop();
+  }
+
+  setRef = c => {
+    this.column = c;
+  }
+
   render () {
-    const { accountIds, hasMore, blockedBy, isAccount, multiColumn, isLoading, remote, remoteUrl } = this.props;
+    const { accountIds, hasMore, blockedBy, isAccount, multiColumn, isLoading, remote, remoteUrl, intl } = this.props;
 
     if (!isAccount) {
       return (
@@ -103,15 +120,24 @@ class Following extends ImmutablePureComponent {
     const remoteMessage = remote ? <RemoteHint url={remoteUrl} /> : null;
 
     return (
-      <Column>
-        <ColumnBackButton multiColumn={multiColumn} />
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+        <ColumnHeader
+          icon='user'
+          active={false}
+          title={intl.formatMessage(messages.title)}
+          onClick={this.handleHeaderClick}
+          pinned={false}
+          multiColumn={multiColumn}
+        >
+          <ColumnSettingsContainer />
+        </ColumnHeader>
 
         <ScrollableList
           scrollKey='following'
           hasMore={hasMore}
           isLoading={isLoading}
           onLoadMore={this.handleLoadMore}
-          prepend={<HeaderContainer accountId={this.props.params.accountId} hideTabs />}
+          prepend={<HeaderContainer accountId={this.props.params.accountId} hideProfile hideFeaturedTags />}
           alwaysPrepend
           append={remoteMessage}
           emptyMessage={emptyMessage}

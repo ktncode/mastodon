@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
 import { fetchAccount } from 'mastodon/actions/accounts';
 import { expandAccountMediaTimeline } from '../../actions/timelines';
 import LoadingIndicator from 'mastodon/components/loading_indicator';
-import Column from '../ui/components/column';
-import ColumnBackButton from 'mastodon/components/column_back_button';
+import Column from '../../components/column';
+import ColumnHeader from '../../components/column_header';
+import ColumnSettingsContainer from '../account_timeline/containers/column_settings_container';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { getAccountGallery } from 'mastodon/selectors';
 import MediaItem from './components/media_item';
@@ -15,7 +16,12 @@ import ScrollContainer from 'mastodon/containers/scroll_container';
 import LoadMore from 'mastodon/components/load_more';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import { openModal } from 'mastodon/actions/modal';
-import { FormattedMessage } from 'react-intl';
+import { new_features_policy } from 'mastodon/initial_state';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+
+const messages = defineMessages({
+  title: { id: 'column.account', defaultMessage: 'Account' },
+});
 
 const mapStateToProps = (state, props) => ({
   isAccount: !!state.getIn(['accounts', props.params.accountId]),
@@ -24,6 +30,8 @@ const mapStateToProps = (state, props) => ({
   hasMore: state.getIn(['timelines', `account:${props.params.accountId}:media`, 'hasMore']),
   suspended: state.getIn(['accounts', props.params.accountId, 'suspended'], false),
   blockedBy: state.getIn(['relationships', props.params.accountId, 'blocked_by'], false),
+  advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
+  hideRelation: state.getIn(['settings', 'account', 'other', 'hideRelation'], false),
 });
 
 class LoadMoreMedia extends ImmutablePureComponent {
@@ -49,6 +57,7 @@ class LoadMoreMedia extends ImmutablePureComponent {
 }
 
 export default @connect(mapStateToProps)
+@injectIntl
 class AccountGallery extends ImmutablePureComponent {
 
   static propTypes = {
@@ -58,6 +67,8 @@ class AccountGallery extends ImmutablePureComponent {
     isLoading: PropTypes.bool,
     hasMore: PropTypes.bool,
     isAccount: PropTypes.bool,
+    advancedMode: PropTypes.bool,
+    hideRelation: PropTypes.bool,
     blockedBy: PropTypes.bool,
     suspended: PropTypes.bool,
     multiColumn: PropTypes.bool,
@@ -125,8 +136,16 @@ class AccountGallery extends ImmutablePureComponent {
     }
   }
 
+  handleHeaderClick = () => {
+    this.column.scrollTop();
+  }
+
+  setRef = c => {
+    this.column = c;
+  }
+
   render () {
-    const { attachments, isLoading, hasMore, isAccount, multiColumn, blockedBy, suspended } = this.props;
+    const { attachments, isLoading, hasMore, isAccount, multiColumn, blockedBy, suspended, hideRelation, intl } = this.props;
     const { width } = this.state;
 
     if (!isAccount) {
@@ -160,12 +179,21 @@ class AccountGallery extends ImmutablePureComponent {
     }
 
     return (
-      <Column>
-        <ColumnBackButton multiColumn={multiColumn} />
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+        <ColumnHeader
+          icon='user'
+          active={false}
+          title={intl.formatMessage(messages.title)}
+          onClick={this.handleHeaderClick}
+          pinned={false}
+          multiColumn={multiColumn}
+        >
+          <ColumnSettingsContainer />
+        </ColumnHeader>
 
         <ScrollContainer scrollKey='account_gallery'>
           <div className='scrollable scrollable--flex' onScroll={this.handleScroll}>
-            <HeaderContainer accountId={this.props.params.accountId} />
+            <HeaderContainer accountId={this.props.params.accountId} hideProfile hideRelation={hideRelation} hideFeaturedTags />
 
             {(suspended || blockedBy) ? (
               <div className='empty-column-indicator'>

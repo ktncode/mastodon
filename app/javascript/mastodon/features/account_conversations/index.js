@@ -6,30 +6,37 @@ import { fetchAccount } from '../../actions/accounts';
 import { expandAccountCoversations } from '../../actions/timelines';
 import StatusList from '../../components/status_list';
 import LoadingIndicator from '../../components/loading_indicator';
-import Column from '../ui/components/column';
+import Column from '../../components/column';
+import ColumnHeader from '../../components/column_header';
+import ColumnSettingsContainer from '../account_timeline/containers/column_settings_container';
 import HeaderContainer from '../account_timeline/containers/header_container';
 import ColumnBackButton from '../../components/column_back_button';
 import { List as ImmutableList } from 'immutable';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { fetchAccountIdentityProofs } from '../../actions/identity_proofs';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import TimelineHint from 'mastodon/components/timeline_hint';
+import { new_features_policy } from 'mastodon/initial_state';
+
+const messages = defineMessages({
+  title: { id: 'column.account', defaultMessage: 'Account' },
+});
 
 const emptyList = ImmutableList();
 
-const mapStateToProps = (state, { params: { accountId } }) => {
-  return {
-    remote: !!(state.getIn(['accounts', accountId, 'acct']) !== state.getIn(['accounts', accountId, 'username'])),
-    remoteUrl: state.getIn(['accounts', accountId, 'url']),
-    isAccount: !!state.getIn(['accounts', accountId]),
-    statusIds: state.getIn(['timelines', `account:${accountId}:conversations`, 'items'], emptyList),
-    isLoading: state.getIn(['timelines', `account:${accountId}:conversations`, 'isLoading']),
-    hasMore: state.getIn(['timelines', `account:${accountId}:conversations`, 'hasMore']),
-    suspended: state.getIn(['accounts', accountId, 'suspended'], false),
-    blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
-  };
-};
+const mapStateToProps = (state, { params: { accountId } }) => ({
+  remote: !!(state.getIn(['accounts', accountId, 'acct']) !== state.getIn(['accounts', accountId, 'username'])),
+  remoteUrl: state.getIn(['accounts', accountId, 'url']),
+  isAccount: !!state.getIn(['accounts', accountId]),
+  statusIds: state.getIn(['timelines', `account:${accountId}:conversations`, 'items'], emptyList),
+  isLoading: state.getIn(['timelines', `account:${accountId}:conversations`, 'isLoading']),
+  hasMore: state.getIn(['timelines', `account:${accountId}:conversations`, 'hasMore']),
+  suspended: state.getIn(['accounts', accountId, 'suspended'], false),
+  blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
+  advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
+  hideRelation: state.getIn(['settings', 'account', 'other', 'hideRelation'], false),
+});
 
 const RemoteHint = ({ url }) => (
   <TimelineHint url={url} resource={<FormattedMessage id='timeline_hint.resources.statuses' defaultMessage='Older toots' />} />
@@ -40,6 +47,7 @@ RemoteHint.propTypes = {
 };
 
 export default @connect(mapStateToProps)
+@injectIntl
 class AccountConversations extends ImmutablePureComponent {
 
   static propTypes = {
@@ -49,11 +57,11 @@ class AccountConversations extends ImmutablePureComponent {
     isLoading: PropTypes.bool,
     hasMore: PropTypes.bool,
     withReplies: PropTypes.bool,
+    advancedMode: PropTypes.bool,
+    hideRelation: PropTypes.bool,
     blockedBy: PropTypes.bool,
     isAccount: PropTypes.bool,
     suspended: PropTypes.bool,
-    remote: PropTypes.bool,
-    remoteUrl: PropTypes.string,
     multiColumn: PropTypes.bool,
   };
 
@@ -81,8 +89,16 @@ class AccountConversations extends ImmutablePureComponent {
     this.props.dispatch(expandAccountCoversations(this.props.params.accountId, { maxId }));
   }
 
+  handleHeaderClick = () => {
+    this.column.scrollTop();
+  }
+
+  setRef = c => {
+    this.column = c;
+  }
+
   render () {
-    const { statusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, remote, remoteUrl } = this.props;
+    const { statusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, hideRelation, intl } = this.props;
 
     if (!isAccount) {
       return (
@@ -107,22 +123,26 @@ class AccountConversations extends ImmutablePureComponent {
       emptyMessage = <FormattedMessage id='empty_column.account_suspended' defaultMessage='Account suspended' />;
     } else if (blockedBy) {
       emptyMessage = <FormattedMessage id='empty_column.account_unavailable' defaultMessage='Profile unavailable' />;
-    } else if (remote && statusIds.isEmpty()) {
-      emptyMessage = <RemoteHint url={remoteUrl} />;
     } else {
-      emptyMessage = <FormattedMessage id='empty_column.account_timeline' defaultMessage='No toots here!' />;
+      emptyMessage = <FormattedMessage id='empty_column.conversation_unavailable' defaultMessage='No conversation with this user yet' />;
     }
 
-    const remoteMessage = remote ? <RemoteHint url={remoteUrl} /> : null;
-
     return (
-      <Column>
-        <ColumnBackButton multiColumn={multiColumn} />
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+        <ColumnHeader
+          icon='user'
+          active={false}
+          title={intl.formatMessage(messages.title)}
+          onClick={this.handleHeaderClick}
+          pinned={false}
+          multiColumn={multiColumn}
+        >
+          <ColumnSettingsContainer />
+        </ColumnHeader>
 
         <StatusList
-          prepend={<HeaderContainer accountId={this.props.params.accountId} />}
+          prepend={<HeaderContainer accountId={this.props.params.accountId} hideProfile hideRelation={hideRelation} hideFeaturedTags />}
           alwaysPrepend
-          append={remoteMessage}
           scrollKey='account_conversations'
           statusIds={(suspended || blockedBy) ? emptyList : statusIds}
           isLoading={isLoading}

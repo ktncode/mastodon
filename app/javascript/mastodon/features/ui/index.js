@@ -87,6 +87,8 @@ const mapStateToProps = state => ({
   canUploadMore: !state.getIn(['compose', 'media_attachments']).some(x => ['audio', 'video'].includes(x.get('type'))) && state.getIn(['compose', 'media_attachments']).size < 4,
   dropdownMenuIsOpen: state.getIn(['dropdown_menu', 'openId']) !== null,
   firstLaunch: state.getIn(['settings', 'introductionVersion'], 0) < INTRODUCTION_VERSION,
+  advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], false),
+  openPostsFirst: state.getIn(['settings', 'account', 'other', 'openPostsFirst'], false),
   visibilities: getHomeVisibilities(state),
 });
 
@@ -129,6 +131,8 @@ class SwitchingColumnsArea extends React.PureComponent {
     children: PropTypes.node,
     location: PropTypes.object,
     mobile: PropTypes.bool,
+    advancedMode: PropTypes.bool,
+    openPostsFirst: PropTypes.bool,
   };
 
   componentWillMount () {
@@ -159,13 +163,15 @@ class SwitchingColumnsArea extends React.PureComponent {
   }
 
   render () {
-    const { children, mobile } = this.props;
+    const { children, mobile, advancedMode, openPostsFirst } = this.props;
     const redirect = mobile ? <Redirect from='/' to='/timelines/home' exact /> : enableEmptyColumn ? <Redirect from='/' to='/empty' exact /> : <Redirect from='/' to='/getting-started' exact />;
+    const account_redirect = advancedMode && openPostsFirst ? <Redirect from='/accounts/:accountId' to='/accounts/:accountId/posts' exact /> : <Redirect from='/accounts/:accountId' to='/accounts/:accountId/about' exact />;
 
     return (
       <ColumnsAreaContainer ref={this.setRef} singleColumn={mobile}>
         <WrappedSwitch>
           {redirect}
+          {account_redirect}
           <WrappedRoute path='/getting-started' component={GettingStarted} content={children} />
           <WrappedRoute path='/keyboard-shortcuts' component={KeyboardShortcuts} content={children} />
           <WrappedRoute path='/timelines/home' component={HomeTimeline} content={children} />
@@ -200,7 +206,9 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/statuses/:statusId/mentions' component={Mentions} content={children} />
 
           <WrappedRoute path='/accounts/:accountId' exact component={AccountTimeline} content={children} />
+          <WrappedRoute path='/accounts/:accountId/about' exact component={AccountTimeline} content={children} componentParams={{ about: true }} />
           <WrappedRoute path='/accounts/:accountId/with_replies' component={AccountTimeline} content={children} componentParams={{ withReplies: true }} />
+          <WrappedRoute path='/accounts/:accountId/posts/:tagged?' component={AccountTimeline} content={children} componentParams={{ posts: true }} />
           <WrappedRoute path='/accounts/:accountId/followers' component={Followers} content={children} />
           <WrappedRoute path='/accounts/:accountId/following' component={Following} content={children} />
           <WrappedRoute path='/accounts/:accountId/subscribing' component={Subscribing} content={children} />
@@ -246,6 +254,8 @@ class UI extends React.PureComponent {
     layout: PropTypes.string.isRequired,
     firstLaunch: PropTypes.bool,
     visibilities: PropTypes.arrayOf(PropTypes.string),
+    advancedMode: PropTypes.bool,
+    openPostsFirst: PropTypes.bool,
   };
 
   state = {
@@ -534,7 +544,7 @@ class UI extends React.PureComponent {
 
   render () {
     const { draggingOver } = this.state;
-    const { children, isComposing, location, dropdownMenuIsOpen, layout } = this.props;
+    const { children, isComposing, location, dropdownMenuIsOpen, layout, advancedMode, openPostsFirst } = this.props;
 
     const handlers = {
       help: this.handleHotkeyToggleHelp,
@@ -561,7 +571,7 @@ class UI extends React.PureComponent {
     return (
       <HotKeys keyMap={keyMap} handlers={handlers} ref={this.setHotkeysRef} attach={window} focused>
         <div className={classNames('ui', { 'is-composing': isComposing })} ref={this.setRef} style={{ pointerEvents: dropdownMenuIsOpen ? 'none' : null }}>
-          <SwitchingColumnsArea location={location} mobile={layout === 'mobile' || layout === 'single-column'}>
+          <SwitchingColumnsArea location={location} mobile={layout === 'mobile' || layout === 'single-column'} advancedMode={advancedMode} openPostsFirst={openPostsFirst}>
             {children}
           </SwitchingColumnsArea>
 
