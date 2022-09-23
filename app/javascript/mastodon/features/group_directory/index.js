@@ -13,6 +13,8 @@ import RadioButton from 'mastodon/components/radio_button';
 import classNames from 'classnames';
 import LoadMore from 'mastodon/components/load_more';
 import { ScrollContainer } from 'react-router-scroll-4';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
   title: { id: 'column.group_directory', defaultMessage: 'Browse groups' },
@@ -23,6 +25,7 @@ const messages = defineMessages({
 const mapStateToProps = state => ({
   accountIds: state.getIn(['user_lists', 'group_directory', 'items'], ImmutableList()),
   isLoading: state.getIn(['user_lists', 'group_directory', 'isLoading'], true),
+  columnWidth: state.getIn(['settings', 'group_directory', 'columnWidth'], defaultColumnWidth),
 });
 
 export default @connect(mapStateToProps)
@@ -40,6 +43,7 @@ class GroupDirectory extends React.PureComponent {
     columnId: PropTypes.string,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     params: PropTypes.shape({
       order: PropTypes.string,
     }),
@@ -107,8 +111,12 @@ class GroupDirectory extends React.PureComponent {
     dispatch(expandGroupDirectory(this.getParams(this.props, this.state)));
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['group_directory', 'columnWidth'], value));
+  }
+
   render () {
-    const { isLoading, accountIds, intl, columnId, multiColumn } = this.props;
+    const { isLoading, accountIds, intl, columnId, multiColumn, columnWidth } = this.props;
     const { order }  = this.getParams(this.props, this.state);
     const pinned = !!columnId;
 
@@ -130,7 +138,7 @@ class GroupDirectory extends React.PureComponent {
     );
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='address-book-o'
           title={intl.formatMessage(messages.title)}
@@ -139,6 +147,8 @@ class GroupDirectory extends React.PureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         />
 
         {multiColumn && !pinned ? <ScrollContainer scrollKey='group_directory'>{scrollableArea}</ScrollContainer> : scrollableArea}

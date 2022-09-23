@@ -16,6 +16,9 @@ import { createSelector } from 'reselect';
 import { Map as ImmutableMap } from 'immutable';
 import ReactedHeaderContaier from '../reactioned/containers/header_container';
 import { debounce } from 'lodash';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   refresh: { id: 'refresh', defaultMessage: 'Refresh' },
@@ -23,12 +26,20 @@ const messages = defineMessages({
 
 const customEmojiMap = createSelector([state => state.get('custom_emojis')], items => items.reduce((map, emoji) => map.set(emoji.get('shortcode'), emoji), ImmutableMap()));
 
-const mapStateToProps = (state, props) => ({
-  emojiReactions: state.getIn(['user_lists', 'emoji_reactioned_by', props.params.statusId, 'items']),
-  isLoading: state.getIn(['user_lists', 'emoji_reactioned_by', props.params.statusId, 'isLoading'], true),
-  hasMore: !!state.getIn(['user_lists', 'emoji_reactioned_by', props.params.statusId, 'next']),
-  emojiMap: customEmojiMap(state),
-});
+const mapStateToProps = (state, { columnId, params }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'emoji_reactions', 'columnWidth']);
+
+  return {
+    emojiReactions: state.getIn(['user_lists', 'emoji_reactioned_by', params.statusId, 'items']),
+    isLoading: state.getIn(['user_lists', 'emoji_reactioned_by', params.statusId, 'isLoading'], true),
+    hasMore: !!state.getIn(['user_lists', 'emoji_reactioned_by', params.statusId, 'next']),
+    emojiMap: customEmojiMap(state),
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 class Reaction extends ImmutablePureComponent {
 
@@ -65,6 +76,7 @@ class EmojiReactions extends ImmutablePureComponent {
     dispatch: PropTypes.func.isRequired,
     emojiReactions: ImmutablePropTypes.list,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     emojiMap: ImmutablePropTypes.map.isRequired,
     intl: PropTypes.object.isRequired,
     hasMore: PropTypes.bool,
@@ -91,8 +103,18 @@ class EmojiReactions extends ImmutablePureComponent {
     this.props.dispatch(expandEmojiReactions(this.props.params.statusId));
   }, 300, { leading: true })
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['emoji_reactions', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, emojiReactions, multiColumn, emojiMap, hasMore, isLoading } = this.props;
+    const { intl, emojiReactions, multiColumn, emojiMap, hasMore, isLoading, columnWidth } = this.props;
 
     if (!emojiReactions) {
       return (
@@ -105,10 +127,12 @@ class EmojiReactions extends ImmutablePureComponent {
     const emptyMessage = <FormattedMessage id='empty_column.emoji_reactions' defaultMessage='No one has reactioned this post yet. When someone does, they will show up here.' />;
 
     return (
-      <Column bindToDocument={!multiColumn}>
+      <Column bindToDocument={!multiColumn} columnWidth={columnWidth}>
         <ColumnHeader
           showBackButton
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
           extraButton={(
             <button className='column-header__button' title={intl.formatMessage(messages.refresh)} aria-label={intl.formatMessage(messages.refresh)} onClick={this.handleRefresh}><Icon id='refresh' /></button>
           )}

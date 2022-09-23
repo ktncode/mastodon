@@ -62,6 +62,9 @@
   .fields-group
     = f.input :setting_enable_empty_column, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  .fields-group
+    = f.input :setting_default_column_width, collection: ['x080', 'x100', 'x125', 'x150', 'free'], label_method: lambda { |item| t("simple_form.hints.defaults.setting_default_column_width_#{item}") }, wrapper: :with_label, include_blank: false, fedibird_features: true
+
   %h4= t 'appearance.animations_and_accessibility'
 
   .fields-group

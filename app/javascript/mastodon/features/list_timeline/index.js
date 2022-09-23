@@ -16,6 +16,9 @@ import MissingIndicator from '../../components/missing_indicator';
 import LoadingIndicator from '../../components/loading_indicator';
 import Icon from 'mastodon/components/icon';
 import RadioButton from 'mastodon/components/radio_button';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   deleteMessage: { id: 'confirmations.delete_list.message', defaultMessage: 'Are you sure you want to permanently delete this list?' },
@@ -25,10 +28,18 @@ const messages = defineMessages({
   list:  { id: 'lists.replies_policy.list', defaultMessage: 'Members of the list' },
 });
 
-const mapStateToProps = (state, props) => ({
-  list: state.getIn(['lists', props.params.id]),
-  hasUnread: state.getIn(['timelines', `list:${props.params.id}`, 'unread']) > 0,
-});
+const mapStateToProps = (state, { columnId, params }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'list', 'columnWidth']);
+
+  return {
+    list: state.getIn(['lists', params.id]),
+    hasUnread: state.getIn(['timelines', `list:${params.id}`, 'unread']) > 0,
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 export default @connect(mapStateToProps)
 @injectIntl
@@ -44,6 +55,7 @@ class ListTimeline extends React.PureComponent {
     columnId: PropTypes.string,
     hasUnread: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     list: PropTypes.oneOfType([ImmutablePropTypes.map, PropTypes.bool]),
     intl: PropTypes.object.isRequired,
   };
@@ -140,8 +152,18 @@ class ListTimeline extends React.PureComponent {
     dispatch(updateList(id, undefined, false, target.value));
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['list', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { hasUnread, columnId, multiColumn, list, intl } = this.props;
+    const { hasUnread, columnId, multiColumn, list, columnWidth, intl } = this.props;
     const { id } = this.props.params;
     const pinned = !!columnId;
     const title  = list ? list.get('title') : id;
@@ -165,7 +187,7 @@ class ListTimeline extends React.PureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={title}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={title} columnWidth={columnWidth}>
         <ColumnHeader
           icon='list-ul'
           active={hasUnread}
@@ -175,6 +197,8 @@ class ListTimeline extends React.PureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <div className='column-settings__row column-header__links'>
             <button className='text-btn column-header__setting-btn' tabIndex='0' onClick={this.handleEditClick}>

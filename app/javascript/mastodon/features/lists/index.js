@@ -13,6 +13,7 @@ import NewListForm from './components/new_list_form';
 import List from './components/list';
 import { createSelector } from 'reselect';
 import ScrollableList from '../../components/scrollable_list';
+import { defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   heading: { id: 'column.lists', defaultMessage: 'Lists' },
@@ -29,6 +30,7 @@ const getOrderedLists = createSelector([state => state.get('lists')], lists => {
 
 const mapStateToProps = state => ({
   lists: getOrderedLists(state),
+  columnWidth: defaultColumnWidth,
 });
 
 export default @connect(mapStateToProps)
@@ -41,6 +43,7 @@ class Lists extends ImmutablePureComponent {
     lists: ImmutablePropTypes.list,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -48,7 +51,7 @@ class Lists extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, lists, multiColumn } = this.props;
+    const { intl, lists, multiColumn, columnWidth } = this.props;
 
     if (!lists) {
       return (
@@ -61,7 +64,7 @@ class Lists extends ImmutablePureComponent {
     const emptyMessage = <FormattedMessage id='empty_column.lists' defaultMessage="You don't have any lists yet. When you create one, it will show up here." />;
 
     return (
-      <Column bindToDocument={!multiColumn} icon='list-ul' heading={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} icon='list-ul' heading={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
 
         <NewListForm />

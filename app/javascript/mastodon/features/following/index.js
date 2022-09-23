@@ -19,7 +19,8 @@ import HeaderContainer from '../account_timeline/containers/header_container';
 import ScrollableList from '../../components/scrollable_list';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import TimelineHint from 'mastodon/components/timeline_hint';
-import { new_features_policy } from 'mastodon/initial_state';
+import { new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
   title: { id: 'column.account', defaultMessage: 'Account' },
@@ -34,6 +35,7 @@ const mapStateToProps = (state, props) => ({
   isLoading: state.getIn(['user_lists', 'following', props.params.accountId, 'isLoading'], true),
   blockedBy: state.getIn(['relationships', props.params.accountId, 'blocked_by'], false),
   advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
+  columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
 });
 
 const RemoteHint = ({ url }) => (
@@ -60,6 +62,7 @@ class Following extends ImmutablePureComponent {
     remote: PropTypes.bool,
     remoteUrl: PropTypes.string,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -84,12 +87,16 @@ class Following extends ImmutablePureComponent {
     this.column.scrollTop();
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['account', 'columnWidth'], value));
+  }
+
   setRef = c => {
     this.column = c;
   }
 
   render () {
-    const { accountIds, hasMore, blockedBy, isAccount, multiColumn, isLoading, remote, remoteUrl, intl } = this.props;
+    const { accountIds, hasMore, blockedBy, isAccount, multiColumn, isLoading, remote, remoteUrl, columnWidth, intl } = this.props;
 
     if (!isAccount) {
       return (
@@ -120,7 +127,7 @@ class Following extends ImmutablePureComponent {
     const remoteMessage = remote ? <RemoteHint url={remoteUrl} /> : null;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='user'
           active={false}
@@ -128,6 +135,8 @@ class Following extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={false}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer />
         </ColumnHeader>

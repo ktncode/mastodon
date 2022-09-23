@@ -65,6 +65,9 @@ import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from
 import { textForScreenReader, defaultMediaVisibility } from '../../components/status';
 import Icon from 'mastodon/components/icon';
 import DetailedHeaderContaier from './containers/header_container';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   deleteConfirm: { id: 'confirmations.delete.confirm', defaultMessage: 'Delete' },
@@ -148,8 +151,12 @@ const makeMapStateToProps = () => {
     return ImmutableList(contextReference.get(statusId));
   });
 
-  const mapStateToProps = (state, props) => {
-    const status         = getStatus(state, { id: props.params.statusId });
+  const mapStateToProps = (state, { columnId, params }) => {
+    const uuid = columnId;
+    const columns = state.getIn(['settings', 'columns']);
+    const index = columns.findIndex(c => c.get('uuid') === uuid);
+    const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'status', 'columnWidth']);
+    const status         = getStatus(state, { id: params.statusId });
     const ancestorsIds   = status ? getAncestorsIds(state, { id: status.get('in_reply_to_id') }) : ImmutableList();
     const descendantsIds = status ? getDescendantsIds(state, { id: status.get('id') }) : ImmutableList();
     const referencesIds  = status ? getReferencesIds(state, { id: status.get('id') }) : ImmutableList();
@@ -161,10 +168,11 @@ const makeMapStateToProps = () => {
       descendantsIds,
       askReplyConfirmation: state.getIn(['compose', 'text']).trim().length !== 0,
       domain: state.getIn(['meta', 'domain']),
-      pictureInPicture: getPictureInPicture(state, { id: props.params.statusId }),
+      pictureInPicture: getPictureInPicture(state, { id: params.statusId }),
       emojiMap: customEmojiMap(state),
       referenced: state.getIn(['compose', 'references']).has(id),
       contextReferenced: state.getIn(['compose', 'context_references']).has(id),
+      columnWidth: columnWidth ?? defaultColumnWidth,
     };
   };
 
@@ -190,6 +198,7 @@ class Status extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
     askReplyConfirmation: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     domain: PropTypes.string.isRequired,
     pictureInPicture: ImmutablePropTypes.contains({
       inUse: PropTypes.bool,
@@ -561,9 +570,19 @@ class Status extends ImmutablePureComponent {
     this.setState({ fullscreen: isFullscreen() });
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['status', 'columnWidth'], value));
+    }
+  }
+
   render () {
     let ancestors, descendants;
-    const { status, ancestorsIds, descendantsIds, intl, domain, multiColumn, pictureInPicture, emojiMap, referenced, contextReferenced } = this.props;
+    const { status, ancestorsIds, descendantsIds, intl, domain, multiColumn, pictureInPicture, emojiMap, referenced, contextReferenced, columnWidth } = this.props;
     const { fullscreen } = this.state;
 
     if (status === null) {
@@ -599,10 +618,12 @@ class Status extends ImmutablePureComponent {
     };
 
     return (
-      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.detailedStatus)}>
+      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.detailedStatus)} columnWidth={columnWidth}>
         <ColumnHeader
           showBackButton
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
           extraButton={(
             <button className='column-header__button' title={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} aria-label={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} onClick={this.handleToggleAll} aria-pressed={status.get('hidden') ? 'false' : 'true'}><Icon id={status.get('hidden') ? 'eye-slash' : 'eye'} /></button>
           )}

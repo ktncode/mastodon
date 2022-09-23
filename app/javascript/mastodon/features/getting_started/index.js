@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, profile_directory, showTrends, enable_limited_timeline, enableEmptyColumn } from '../../initial_state';
+import { me, profile_directory, showTrends, enable_limited_timeline, enableEmptyColumn, defaultColumnWidth } from '../../initial_state';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { fetchFavouriteDomains } from 'mastodon/actions/favourite_domains';
 import { fetchFavouriteTags } from 'mastodon/actions/favourite_tags';
@@ -61,6 +61,7 @@ const mapStateToProps = state => ({
   lists: getOrderedLists(state),
   favourite_domains: getOrderedDomains(state),
   favourite_tags: getOrderedTags(state),
+  columnWidth: defaultColumnWidth,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -94,6 +95,7 @@ class GettingStarted extends ImmutablePureComponent {
     myAccount: ImmutablePropTypes.map.isRequired,
     columns: ImmutablePropTypes.list,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     fetchFollowRequests: PropTypes.func.isRequired,
     fetchFavouriteDomains: PropTypes.func.isRequired,
     fetchFavouriteTags: PropTypes.func.isRequired,
@@ -118,7 +120,7 @@ class GettingStarted extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, myAccount, columns, multiColumn, unreadFollowRequests, lists, favourite_domains, favourite_tags } = this.props;
+    const { intl, myAccount, columns, multiColumn, unreadFollowRequests, lists, favourite_domains, favourite_tags, columnWidth } = this.props;
   
     const navItems = [];
     let height = (multiColumn) ? 0 : 60;
@@ -264,7 +266,7 @@ class GettingStarted extends ImmutablePureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.menu)}>
+      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.menu)} columnWidth={columnWidth}>
         {multiColumn && <div className='column-header__wrapper'>
           <h1 className='column-header'>
             <button>

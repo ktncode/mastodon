@@ -18,7 +18,8 @@ import ColumnSettingsContainer from '../account_timeline/containers/column_setti
 import HeaderContainer from '../account_timeline/containers/header_container';
 import ScrollableList from '../../components/scrollable_list';
 import MissingIndicator from 'mastodon/components/missing_indicator';
-import { new_features_policy } from 'mastodon/initial_state';
+import { new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
   title: { id: 'column.account', defaultMessage: 'Account' },
@@ -31,6 +32,7 @@ const mapStateToProps = (state, props) => ({
   isLoading: state.getIn(['user_lists', 'subscribing', props.params.accountId, 'isLoading'], true),
   blockedBy: state.getIn(['relationships', props.params.accountId, 'blocked_by'], false),
   advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
+  columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
 });
 
 export default @connect(mapStateToProps)
@@ -46,6 +48,7 @@ class Subscribing extends ImmutablePureComponent {
     blockedBy: PropTypes.bool,
     isAccount: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -70,12 +73,16 @@ class Subscribing extends ImmutablePureComponent {
     this.column.scrollTop();
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['account', 'columnWidth'], value));
+  }
+
   setRef = c => {
     this.column = c;
   }
 
   render () {
-    const { accountIds, hasMore, blockedBy, isAccount, multiColumn, isLoading, intl } = this.props;
+    const { accountIds, hasMore, blockedBy, isAccount, multiColumn, isLoading, columnWidth, intl } = this.props;
 
     if (!isAccount) {
       return (
@@ -96,7 +103,7 @@ class Subscribing extends ImmutablePureComponent {
     const emptyMessage = blockedBy ? <FormattedMessage id='empty_column.account_unavailable' defaultMessage='Profile unavailable' /> : <FormattedMessage id='account.subscribes.empty' defaultMessage="This user doesn't subscribe anyone yet." />;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='user'
           active={false}
@@ -104,6 +111,8 @@ class Subscribing extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={false}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer />
         </ColumnHeader>

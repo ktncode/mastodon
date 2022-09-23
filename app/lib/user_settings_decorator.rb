@@ -89,6 +89,7 @@ class UserSettingsDecorator
     user.settings['confirm_follow_from_bot']           = confirm_follow_from_bot_preference if change?('setting_confirm_follow_from_bot')
     user.settings['default_search_searchability']      = default_search_searchability_preference if change?('setting_default_search_searchability')
     user.settings['show_reload_button']                = show_reload_button_preference if change?('setting_show_reload_button')
+    user.settings['default_column_width']              = default_column_width_preference if change?('setting_default_column_width')
 end
 
   def merged_notification_emails
@@ -329,6 +330,10 @@ end
 
   def show_reload_button_preference
     boolean_cast_setting 'setting_show_reload_button'
+  end
+
+  def default_column_width_preference
+    settings['setting_default_column_width']
   end
 
   def boolean_cast_setting(key)

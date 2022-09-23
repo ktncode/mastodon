@@ -9,11 +9,15 @@ import { expandDomainTimeline } from '../../actions/timelines';
 import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
 import ColumnSettingsContainer from './containers/column_settings_container';
 import { connectDomainStream } from '../../actions/streaming';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const mapStateToProps = (state, props) => {
   const uuid = props.columnId;
   const columns = state.getIn(['settings', 'columns']);
   const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (props.columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'domain', 'columnWidth']);
   const onlyMedia = (props.columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'onlyMedia']) : state.getIn(['settings', 'domain', 'other', 'onlyMedia']);
   const withoutMedia = (props.columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutMedia']) : state.getIn(['settings', 'domain', 'other', 'withoutMedia']);
   const withoutBot = (props.columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutBot']) : state.getIn(['settings', 'domain', 'other', 'withoutBot']);
@@ -26,6 +30,7 @@ const mapStateToProps = (state, props) => {
     withoutMedia,
     withoutBot,
     domain: domain,
+    columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
 
@@ -50,6 +55,7 @@ class DomainTimeline extends React.PureComponent {
     intl: PropTypes.object.isRequired,
     hasUnread: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     onlyMedia: PropTypes.bool,
     withoutMedia: PropTypes.bool,
     withoutBot: PropTypes.bool,
@@ -109,12 +115,22 @@ class DomainTimeline extends React.PureComponent {
     dispatch(expandDomainTimeline(domain, { maxId, onlyMedia, withoutMedia, withoutBot }));
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['domain', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { hasUnread, columnId, multiColumn, onlyMedia, withoutMedia, withoutBot, domain } = this.props;
+    const { hasUnread, columnId, multiColumn, onlyMedia, withoutMedia, withoutBot, domain, columnWidth } = this.props;
     const pinned = !!columnId;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={domain}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={domain} columnWidth={columnWidth}>
         <ColumnHeader
           icon='users'
           active={hasUnread}
@@ -125,6 +141,8 @@ class DomainTimeline extends React.PureComponent {
           pinned={pinned}
           multiColumn={multiColumn}
           showBackButton
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer columnId={columnId} />
         </ColumnHeader>

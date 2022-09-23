@@ -14,6 +14,9 @@ import { fetchAnnouncements, toggleShowAnnouncements } from 'mastodon/actions/an
 import AnnouncementsContainer from 'mastodon/features/getting_started/containers/announcements_container';
 import classNames from 'classnames';
 import IconWithBadge from 'mastodon/components/icon_with_badge';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   title: { id: 'column.home', defaultMessage: 'Home' },
@@ -21,14 +24,22 @@ const messages = defineMessages({
   hide_announcements: { id: 'home.hide_announcements', defaultMessage: 'Hide announcements' },
 });
 
-const mapStateToProps = state => ({
-  hasUnread: state.getIn(['timelines', 'home', 'unread']) > 0,
-  isPartial: state.getIn(['timelines', 'home', 'isPartial']),
-  hasAnnouncements: !state.getIn(['announcements', 'items']).isEmpty(),
-  unreadAnnouncements: state.getIn(['announcements', 'items']).count(item => !item.get('read')),
-  showAnnouncements: state.getIn(['announcements', 'show']),
-  visibilities: getHomeVisibilities(state),
-});
+const mapStateToProps = (state, { columnId }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'home', 'columnWidth']);
+
+  return {
+    hasUnread: state.getIn(['timelines', 'home', 'unread']) > 0,
+    isPartial: state.getIn(['timelines', 'home', 'isPartial']),
+    hasAnnouncements: !state.getIn(['announcements', 'items']).isEmpty(),
+    unreadAnnouncements: state.getIn(['announcements', 'items']).count(item => !item.get('read')),
+    showAnnouncements: state.getIn(['announcements', 'show']),
+    visibilities: getHomeVisibilities(state),
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 export default @connect(mapStateToProps)
 @injectIntl
@@ -41,6 +52,7 @@ class HomeTimeline extends React.PureComponent {
     isPartial: PropTypes.bool,
     columnId: PropTypes.string,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     hasAnnouncements: PropTypes.bool,
     unreadAnnouncements: PropTypes.number,
     showAnnouncements: PropTypes.bool,
@@ -121,8 +133,18 @@ class HomeTimeline extends React.PureComponent {
     this.props.dispatch(toggleShowAnnouncements());
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['home', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, hasUnread, columnId, multiColumn, hasAnnouncements, unreadAnnouncements, showAnnouncements } = this.props;
+    const { intl, hasUnread, columnId, multiColumn, hasAnnouncements, unreadAnnouncements, showAnnouncements, columnWidth } = this.props;
     const pinned = !!columnId;
 
     let announcementsButton = null;
@@ -142,7 +164,7 @@ class HomeTimeline extends React.PureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='home'
           active={hasUnread}
@@ -154,6 +176,8 @@ class HomeTimeline extends React.PureComponent {
           multiColumn={multiColumn}
           extraButton={announcementsButton}
           appendContent={hasAnnouncements && showAnnouncements && <AnnouncementsContainer />}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer />
         </ColumnHeader>

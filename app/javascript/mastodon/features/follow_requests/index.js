@@ -11,7 +11,7 @@ import ColumnBackButtonSlim from '../../components/column_back_button_slim';
 import AccountAuthorizeContainer from './containers/account_authorize_container';
 import { fetchFollowRequests, expandFollowRequests } from '../../actions/accounts';
 import ScrollableList from '../../components/scrollable_list';
-import { me } from '../../initial_state';
+import { me, defaultColumnWidth } from '../../initial_state';
 
 const messages = defineMessages({
   heading: { id: 'column.follow_requests', defaultMessage: 'Follow requests' },
@@ -23,6 +23,7 @@ const mapStateToProps = state => ({
   hasMore: !!state.getIn(['user_lists', 'follow_requests', 'next']),
   locked: !!state.getIn(['accounts', me, 'locked']),
   domain: state.getIn(['meta', 'domain']),
+  columnWidth: defaultColumnWidth,
 });
 
 export default @connect(mapStateToProps)
@@ -39,6 +40,7 @@ class FollowRequests extends ImmutablePureComponent {
     domain: PropTypes.string,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -50,7 +52,7 @@ class FollowRequests extends ImmutablePureComponent {
   }, 300, { leading: true });
 
   render () {
-    const { intl, accountIds, hasMore, multiColumn, locked, domain, isLoading } = this.props;
+    const { intl, accountIds, hasMore, multiColumn, locked, domain, isLoading, columnWidth } = this.props;
 
     if (!accountIds) {
       return (
@@ -72,7 +74,7 @@ class FollowRequests extends ImmutablePureComponent {
     );
 
     return (
-      <Column bindToDocument={!multiColumn} icon='user-plus' heading={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} icon='user-plus' heading={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
         <ScrollableList
           scrollKey='follow_requests'

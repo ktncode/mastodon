@@ -12,6 +12,9 @@ import ScrollableList from 'mastodon/components/scrollable_list';
 import Hashtag from 'mastodon/components/hashtag';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   heading: { id: 'trends.heading', defaultMessage: 'Trends' },
@@ -19,10 +22,18 @@ const messages = defineMessages({
   refresh: { id: 'refresh', defaultMessage: 'Refresh' },
 });
 
-const mapStateToProps = state => ({
-  trends: state.getIn(['trends', 'items']),
-  isLoading: state.getIn(['trends', 'isLoading'], true),
-});
+const mapStateToProps = (state, { columnId }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'trends', 'columnWidth']);
+
+  return {
+    trends: state.getIn(['trends', 'items']),
+    isLoading: state.getIn(['trends', 'isLoading'], true),
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 export default @connect(mapStateToProps)
 @injectIntl
@@ -34,6 +45,7 @@ class Trends extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
     columnId: PropTypes.string,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     isLoading: PropTypes.bool,
   };
 
@@ -81,14 +93,24 @@ class Trends extends ImmutablePureComponent {
     this.column = c;
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['trends', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, trends, columnId, multiColumn, isLoading } = this.props;
+    const { intl, trends, columnId, multiColumn, isLoading, columnWidth } = this.props;
     const pinned = !!columnId;
 
     const emptyMessage = <FormattedMessage id='empty_column.trends' defaultMessage='No one has trends yet.' />;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='line-chart'
           title={intl.formatMessage(messages.heading)}
@@ -97,6 +119,8 @@ class Trends extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
           showBackButton
           extraButton={(
             <button className='column-header__button' title={intl.formatMessage(messages.refresh)} aria-label={intl.formatMessage(messages.refresh)} onClick={this.handleRefresh}><Icon id='refresh' /></button>

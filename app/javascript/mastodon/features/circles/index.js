@@ -13,6 +13,7 @@ import NewCircleForm from './components/new_circle_form';
 import Circle from './components/circle';
 import { createSelector } from 'reselect';
 import ScrollableList from '../../components/scrollable_list';
+import { defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   heading: { id: 'column.circles', defaultMessage: 'Circles' },
@@ -29,6 +30,7 @@ const getOrderedCircles = createSelector([state => state.get('circles')], circle
 
 const mapStateToProps = state => ({
   circles: getOrderedCircles(state),
+  columnWidth: defaultColumnWidth,
 });
 
 export default @connect(mapStateToProps)
@@ -41,6 +43,7 @@ class Circles extends ImmutablePureComponent {
     circles: ImmutablePropTypes.list,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -48,7 +51,7 @@ class Circles extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, circles, multiColumn } = this.props;
+    const { intl, circles, multiColumn, columnWidth } = this.props;
 
     if (!circles) {
       return (
@@ -61,7 +64,7 @@ class Circles extends ImmutablePureComponent {
     const emptyMessage = <FormattedMessage id='empty_column.circles' defaultMessage="You don't have any circles yet. When you create one, it will show up here." />;
 
     return (
-      <Column bindToDocument={!multiColumn} icon='user-circle' heading={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} icon='user-circle' heading={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
 
         <NewCircleForm />

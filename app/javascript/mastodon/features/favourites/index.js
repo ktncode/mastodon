@@ -13,16 +13,27 @@ import Icon from 'mastodon/components/icon';
 import ColumnHeader from '../../components/column_header';
 import ReactedHeaderContaier from '../reactioned/containers/header_container';
 import { debounce } from 'lodash';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   refresh: { id: 'refresh', defaultMessage: 'Refresh' },
 });
 
-const mapStateToProps = (state, props) => ({
-  accountIds: state.getIn(['user_lists', 'favourited_by', props.params.statusId, 'items']),
-  isLoading: state.getIn(['user_lists', 'favourited_by', props.params.statusId, 'isLoading'], true),
-  hasMore: !!state.getIn(['user_lists', 'favourited_by', props.params.statusId, 'next']),
-});
+const mapStateToProps = (state, { columnId, params }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'favourites', 'columnWidth']);
+
+  return {
+    accountIds: state.getIn(['user_lists', 'favourited_by', params.statusId, 'items']),
+    isLoading: state.getIn(['user_lists', 'favourited_by', params.statusId, 'isLoading'], true),
+    hasMore: !!state.getIn(['user_lists', 'favourited_by', params.statusId, 'next']),
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 export default @connect(mapStateToProps)
 @injectIntl
@@ -33,6 +44,7 @@ class Favourites extends ImmutablePureComponent {
     dispatch: PropTypes.func.isRequired,
     accountIds: ImmutablePropTypes.list,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     intl: PropTypes.object.isRequired,
     hasMore: PropTypes.bool,
     isLoading: PropTypes.bool,
@@ -58,8 +70,18 @@ class Favourites extends ImmutablePureComponent {
     this.props.dispatch(expandFavourites(this.props.params.statusId));
   }, 300, { leading: true })
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['favourites', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, accountIds, multiColumn, hasMore, isLoading } = this.props;
+    const { intl, accountIds, multiColumn, hasMore, isLoading, columnWidth } = this.props;
 
     if (!accountIds) {
       return (
@@ -72,10 +94,12 @@ class Favourites extends ImmutablePureComponent {
     const emptyMessage = <FormattedMessage id='empty_column.favourites' defaultMessage='No one has favourited this post yet. When someone does, they will show up here.' />;
 
     return (
-      <Column bindToDocument={!multiColumn}>
+      <Column bindToDocument={!multiColumn} columnWidth={columnWidth}>
         <ColumnHeader
           showBackButton
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
           extraButton={(
             <button className='column-header__button' title={intl.formatMessage(messages.refresh)} aria-label={intl.formatMessage(messages.refresh)} onClick={this.handleRefresh}><Icon id='refresh' /></button>
           )}

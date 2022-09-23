@@ -8,12 +8,25 @@ import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { connectDirectStream } from '../../actions/streaming';
 import ConversationsListContainer from './containers/conversations_list_container';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   title: { id: 'column.direct', defaultMessage: 'Direct messages' },
 });
 
-export default @connect()
+const mapStateToProps = (state, { columnId }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'direct', 'columnWidth']);
+
+  return {
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
+export default @connect(mapStateToProps)
 @injectIntl
 class DirectTimeline extends React.PureComponent {
 
@@ -23,6 +36,7 @@ class DirectTimeline extends React.PureComponent {
     intl: PropTypes.object.isRequired,
     hasUnread: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   handlePin = () => {
@@ -69,12 +83,22 @@ class DirectTimeline extends React.PureComponent {
     this.props.dispatch(expandConversations({ maxId }));
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['direct', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, hasUnread, columnId, multiColumn } = this.props;
+    const { intl, hasUnread, columnId, multiColumn, columnWidth } = this.props;
     const pinned = !!columnId;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='envelope'
           active={hasUnread}
@@ -84,6 +108,8 @@ class DirectTimeline extends React.PureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         />
 
         <ConversationsListContainer

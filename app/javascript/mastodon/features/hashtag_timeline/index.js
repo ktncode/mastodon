@@ -14,16 +14,27 @@ import { isEqual } from 'lodash';
 import { fetchHashtag, followHashtag, unfollowHashtag } from 'mastodon/actions/tags';
 import Icon from 'mastodon/components/icon';
 import classNames from 'classnames';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   followHashtag: { id: 'hashtag.follow', defaultMessage: 'Follow hashtag' },
   unfollowHashtag: { id: 'hashtag.unfollow', defaultMessage: 'Unfollow hashtag' },
 });
 
-const mapStateToProps = (state, props) => ({
-  hasUnread: state.getIn(['timelines', `hashtag:${props.params.id}`, 'unread']) > 0,
-  tag: state.getIn(['tags', props.params.id]),
-});
+const mapStateToProps = (state, { columnId, params }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'hashtag', 'columnWidth']);
+
+  return {
+    hasUnread: state.getIn(['timelines', `hashtag:${params.id}`, 'unread']) > 0,
+    tag: state.getIn(['tags', params.id]),
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 export default @connect(mapStateToProps)
 @injectIntl
@@ -38,6 +49,7 @@ class HashtagTimeline extends React.PureComponent {
     hasUnread: PropTypes.bool,
     tag: ImmutablePropTypes.map,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     intl: PropTypes.object,
   };
 
@@ -166,8 +178,18 @@ class HashtagTimeline extends React.PureComponent {
     }
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['hashtag', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { hasUnread, columnId, multiColumn, tag, intl } = this.props;
+    const { hasUnread, columnId, multiColumn, tag, columnWidth, intl } = this.props;
     const { id } = this.props.params;
     const pinned = !!columnId;
 
@@ -184,7 +206,7 @@ class HashtagTimeline extends React.PureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={`#${id}`}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={`#${id}`} columnWidth={columnWidth}>
         <ColumnHeader
           icon='hashtag'
           active={hasUnread}
@@ -196,6 +218,8 @@ class HashtagTimeline extends React.PureComponent {
           multiColumn={multiColumn}
           extraButton={followButton}
           showBackButton
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           {columnId && <ColumnSettingsContainer columnId={columnId} />}
         </ColumnHeader>

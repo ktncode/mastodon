@@ -15,6 +15,9 @@ import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
 import ColumnSettingsContainer from './containers/column_settings_container';
 import GroupDetail from './components/group_detail';
 import { connectGroupStream } from '../../actions/streaming';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   title: { id: 'column.group', defaultMessage: 'Group timeline' },
@@ -32,6 +35,7 @@ const makeMapStateToProps = () => {
     const onlyMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'onlyMedia']) : state.getIn(['settings', 'group', 'other', 'onlyMedia']);
     const withoutMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutMedia']) : state.getIn(['settings', 'group', 'other', 'withoutMedia']);
     const timelineState = state.getIn(['timelines', `group:${id}${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}${tagged ? `:${tagged}` : ''}`]);
+    const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'group', 'columnWidth']);
     const account = getAccount(state, id);
 
     return {
@@ -39,6 +43,7 @@ const makeMapStateToProps = () => {
       onlyMedia,
       withoutMedia,
       account,
+      columnWidth: columnWidth ?? defaultColumnWidth,
     };
   };
 
@@ -66,6 +71,7 @@ class GroupTimeline extends React.PureComponent {
     intl: PropTypes.object.isRequired,
     hasUnread: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     onlyMedia: PropTypes.bool,
     withoutMedia: PropTypes.bool,
   };
@@ -138,8 +144,18 @@ class GroupTimeline extends React.PureComponent {
     this.setState({ animating: false });
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['group', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, hasUnread, columnId, multiColumn, onlyMedia, withoutMedia, params: { id, tagged }, account } = this.props;
+    const { intl, hasUnread, columnId, multiColumn, onlyMedia, withoutMedia, params: { id, tagged }, account, columnWidth } = this.props;
     const pinned = !!columnId;
 
     const { collapsed, animating } = this.state;
@@ -179,7 +195,7 @@ class GroupTimeline extends React.PureComponent {
     );
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={title}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={title} columnWidth={columnWidth}>
         <ColumnHeader
           icon='users'
           active={hasUnread}
@@ -190,6 +206,8 @@ class GroupTimeline extends React.PureComponent {
           pinned={pinned}
           multiColumn={multiColumn}
           extraButton={groupDetailButton}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer columnId={columnId} />
         </ColumnHeader>

@@ -110,6 +110,7 @@ defaults: &defaults
   confirm_follow_from_bot: true
   default_search_searchability: 'public'
   show_reload_button: true
+  default_column_width: 'x100'
 
 development:
   <<: *defaults

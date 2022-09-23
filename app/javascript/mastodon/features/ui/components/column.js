@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 import { scrollTop } from '../../../scroll';
 import { isMobile } from '../../../is_mobile';
+import classNames from 'classnames';
 
 export default class Column extends React.PureComponent {
 
@@ -13,6 +14,7 @@ export default class Column extends React.PureComponent {
     children: PropTypes.node,
     active: PropTypes.bool,
     hideHeadingOnMobile: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   handleHeaderClick = () => {
@@ -47,7 +49,7 @@ export default class Column extends React.PureComponent {
   }
 
   render () {
-    const { heading, icon, children, active, hideHeadingOnMobile } = this.props;
+    const { heading, icon, children, active, hideHeadingOnMobile, columnWidth } = this.props;
 
     const showHeading = heading && (!hideHeadingOnMobile || (hideHeadingOnMobile && !isMobile(window.innerWidth)));
 
@@ -60,7 +62,7 @@ export default class Column extends React.PureComponent {
         ref={this.setRef}
         role='region'
         aria-labelledby={columnHeaderId}
-        className='column'
+        className={classNames('column', columnWidth)}
         onScroll={this.handleScroll}
       >
         {header}

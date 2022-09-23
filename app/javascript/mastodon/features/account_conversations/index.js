@@ -17,7 +17,8 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { fetchAccountIdentityProofs } from '../../actions/identity_proofs';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import TimelineHint from 'mastodon/components/timeline_hint';
-import { new_features_policy } from 'mastodon/initial_state';
+import { new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
   title: { id: 'column.account', defaultMessage: 'Account' },
@@ -36,6 +37,7 @@ const mapStateToProps = (state, { params: { accountId } }) => ({
   blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
   advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
   hideRelation: state.getIn(['settings', 'account', 'other', 'hideRelation'], false),
+  columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
 });
 
 const RemoteHint = ({ url }) => (
@@ -63,6 +65,7 @@ class AccountConversations extends ImmutablePureComponent {
     isAccount: PropTypes.bool,
     suspended: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -93,12 +96,16 @@ class AccountConversations extends ImmutablePureComponent {
     this.column.scrollTop();
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['account', 'columnWidth'], value));
+  }
+
   setRef = c => {
     this.column = c;
   }
 
   render () {
-    const { statusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, hideRelation, intl } = this.props;
+    const { statusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, hideRelation, columnWidth, intl } = this.props;
 
     if (!isAccount) {
       return (
@@ -128,7 +135,7 @@ class AccountConversations extends ImmutablePureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='user'
           active={false}
@@ -136,6 +143,8 @@ class AccountConversations extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={false}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer />
         </ColumnHeader>

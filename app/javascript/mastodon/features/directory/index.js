@@ -13,6 +13,8 @@ import RadioButton from 'mastodon/components/radio_button';
 import classNames from 'classnames';
 import LoadMore from 'mastodon/components/load_more';
 import ScrollContainer from 'mastodon/containers/scroll_container';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
   title: { id: 'column.directory', defaultMessage: 'Browse profiles' },
@@ -26,6 +28,7 @@ const mapStateToProps = state => ({
   accountIds: state.getIn(['user_lists', 'directory', 'items'], ImmutableList()),
   isLoading: state.getIn(['user_lists', 'directory', 'isLoading'], true),
   domain: state.getIn(['meta', 'domain']),
+  columnWidth: state.getIn(['settings', 'directory', 'columnWidth'], defaultColumnWidth),
 });
 
 export default @connect(mapStateToProps)
@@ -43,6 +46,7 @@ class Directory extends React.PureComponent {
     columnId: PropTypes.string,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     domain: PropTypes.string.isRequired,
     params: PropTypes.shape({
       order: PropTypes.string,
@@ -123,8 +127,12 @@ class Directory extends React.PureComponent {
     dispatch(expandDirectory(this.getParams(this.props, this.state)));
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['directory', 'columnWidth'], value));
+  }
+
   render () {
-    const { isLoading, accountIds, intl, columnId, multiColumn, domain } = this.props;
+    const { isLoading, accountIds, intl, columnId, multiColumn, domain, columnWidth } = this.props;
     const { order, local }  = this.getParams(this.props, this.state);
     const pinned = !!columnId;
 
@@ -151,7 +159,7 @@ class Directory extends React.PureComponent {
     );
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='address-book-o'
           title={intl.formatMessage(messages.title)}
@@ -160,6 +168,8 @@ class Directory extends React.PureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         />
 
         {multiColumn && !pinned ? <ScrollContainer scrollKey='directory'>{scrollableArea}</ScrollContainer> : scrollableArea}

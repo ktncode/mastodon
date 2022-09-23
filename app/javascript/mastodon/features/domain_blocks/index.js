@@ -11,6 +11,7 @@ import ColumnBackButtonSlim from '../../components/column_back_button_slim';
 import DomainContainer from '../../containers/domain_container';
 import { fetchDomainBlocks, expandDomainBlocks } from '../../actions/domain_blocks';
 import ScrollableList from '../../components/scrollable_list';
+import { defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   heading: { id: 'column.domain_blocks', defaultMessage: 'Blocked domains' },
@@ -20,6 +21,7 @@ const messages = defineMessages({
 const mapStateToProps = state => ({
   domains: state.getIn(['domain_lists', 'blocks', 'items']),
   hasMore: !!state.getIn(['domain_lists', 'blocks', 'next']),
+  columnWidth: defaultColumnWidth,
 });
 
 export default @connect(mapStateToProps)
@@ -33,6 +35,7 @@ class Blocks extends ImmutablePureComponent {
     domains: ImmutablePropTypes.orderedSet,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -44,7 +47,7 @@ class Blocks extends ImmutablePureComponent {
   }, 300, { leading: true });
 
   render () {
-    const { intl, domains, hasMore, multiColumn } = this.props;
+    const { intl, domains, hasMore, multiColumn, columnWidth } = this.props;
 
     if (!domains) {
       return (
@@ -57,7 +60,7 @@ class Blocks extends ImmutablePureComponent {
     const emptyMessage = <FormattedMessage id='empty_column.domain_blocks' defaultMessage='There are no blocked domains yet.' />;
 
     return (
-      <Column bindToDocument={!multiColumn} icon='minus-circle' heading={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} icon='minus-circle' heading={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
         <ScrollableList
           scrollKey='domain_blocks'

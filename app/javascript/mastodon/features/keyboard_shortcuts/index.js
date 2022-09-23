@@ -4,24 +4,31 @@ import ColumnBackButtonSlim from '../../components/column_back_button_slim';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import ImmutablePureComponent from 'react-immutable-pure-component';
+import { defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   heading: { id: 'keyboard_shortcuts.heading', defaultMessage: 'Keyboard Shortcuts' },
 });
 
-export default @injectIntl
+const mapStateToProps = state => ({
+  columnWidth: defaultColumnWidth,
+});
+
+export default @connect(mapStateToProps)
+@injectIntl
 class KeyboardShortcuts extends ImmutablePureComponent {
 
   static propTypes = {
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   render () {
-    const { intl, multiColumn } = this.props;
+    const { intl, multiColumn, columnWidth } = this.props;
 
     return (
-      <Column bindToDocument={!multiColumn} icon='question' heading={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} icon='question' heading={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
         <div className='keyboard-shortcuts scrollable optionally-scrollable'>
           <table>

@@ -9,6 +9,9 @@ import { expandPublicTimeline } from '../../actions/timelines';
 import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
 import ColumnSettingsContainer from './containers/column_settings_container';
 import { connectPublicStream } from '../../actions/streaming';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   title: { id: 'column.public', defaultMessage: 'Federated timeline' },
@@ -22,6 +25,7 @@ const mapStateToProps = (state, { columnId }) => {
   const withoutMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutMedia']) : state.getIn(['settings', 'public', 'other', 'withoutMedia']);
   const withoutBot = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutBot']) : state.getIn(['settings', 'public', 'other', 'withoutBot']);
   const onlyRemote = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'onlyRemote']) : state.getIn(['settings', 'public', 'other', 'onlyRemote']);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'public', 'columnWidth']);
   const timelineState = state.getIn(['timelines', `public${onlyRemote ? ':remote' : ''}${withoutBot ? ':nobot' : ':bot'}${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}`]);
 
   return {
@@ -30,6 +34,7 @@ const mapStateToProps = (state, { columnId }) => {
     withoutMedia,
     withoutBot,
     onlyRemote,
+    columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
 
@@ -53,6 +58,7 @@ class PublicTimeline extends React.PureComponent {
     intl: PropTypes.object.isRequired,
     columnId: PropTypes.string,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     hasUnread: PropTypes.bool,
     onlyMedia: PropTypes.bool,
     withoutMedia: PropTypes.bool,
@@ -77,6 +83,16 @@ class PublicTimeline extends React.PureComponent {
 
   handleHeaderClick = () => {
     this.column.scrollTop();
+  }
+
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['public', 'columnWidth'], value));
+    }
   }
 
   componentDidMount () {
@@ -114,11 +130,11 @@ class PublicTimeline extends React.PureComponent {
   }
 
   render () {
-    const { intl, columnId, hasUnread, multiColumn, onlyMedia, withoutMedia, withoutBot, onlyRemote } = this.props;
+    const { intl, columnId, hasUnread, multiColumn, onlyMedia, withoutMedia, withoutBot, onlyRemote, columnWidth } = this.props;
     const pinned = !!columnId;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='globe'
           active={hasUnread}
@@ -128,6 +144,8 @@ class PublicTimeline extends React.PureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer columnId={columnId} />
         </ColumnHeader>

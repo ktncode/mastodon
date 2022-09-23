@@ -22,6 +22,9 @@ import ImmutablePureComponent from 'react-immutable-pure-component';
 import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from '../ui/util/fullscreen';
 import Icon from 'mastodon/components/icon';
 import DetailedHeaderContaier from '../status/containers/header_container';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   revealAll: { id: 'status.show_more_all', defaultMessage: 'Show more for all' },
@@ -39,13 +42,18 @@ const makeMapStateToProps = () => {
     return ImmutableList(contextReference.get(statusId));
   });
 
-  const mapStateToProps = (state, props) => {
-    const status         = getStatus(state, { id: props.params.statusId });
+  const mapStateToProps = (state, { columnId, params }) => {
+    const uuid = columnId;
+    const columns = state.getIn(['settings', 'columns']);
+    const index = columns.findIndex(c => c.get('uuid') === uuid);
+    const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'status_references', 'columnWidth']);
+    const status         = getStatus(state, { id: params.statusId });
     const referencesIds  = status ? getReferencesIds(state, { id: status.get('id') }) : ImmutableList();
 
     return {
       status,
       referencesIds,
+      columnWidth: columnWidth ?? defaultColumnWidth,
     };
   };
 
@@ -67,6 +75,7 @@ class StatusReferences extends ImmutablePureComponent {
     referencesIds: ImmutablePropTypes.list,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   state = {
@@ -154,8 +163,18 @@ class StatusReferences extends ImmutablePureComponent {
     this.setState({ fullscreen: isFullscreen() });
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['status_references', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { status, referencesIds, intl, multiColumn } = this.props;
+    const { status, referencesIds, intl, multiColumn, columnWidth } = this.props;
     const { fullscreen } = this.state;
 
     if (status === null) {
@@ -173,10 +192,12 @@ class StatusReferences extends ImmutablePureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.detailedStatus)}>
+      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.detailedStatus)} columnWidth={columnWidth}>
         <ColumnHeader
           showBackButton
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
           extraButton={(
             <button className='column-header__button' title={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} aria-label={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} onClick={this.handleToggleAll} aria-pressed={status.get('hidden') ? 'false' : 'true'}><Icon id={status.get('hidden') ? 'eye-slash' : 'eye'} /></button>
           )}

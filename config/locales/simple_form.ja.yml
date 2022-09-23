@@ -57,6 +57,11 @@ ja:
         setting_aggregate_reblogs: 最近ブーストされた投稿が新たにブーストされても表示しません (設定後受信したものにのみ影響)
         setting_compact_reaction: 詳細表示以外の絵文字リアクション表示を件数のみにする
         setting_confirm_follow_from_bot: Botアカウントからのフォローを手動で承認する
+        setting_default_column_width_free: フリー - 画面に応じてカラム幅が変わります
+        setting_default_column_width_x080: 80% - 標準の80%の幅に固定します
+        setting_default_column_width_x100: 100% - Mastodon標準のカラム幅に固定します
+        setting_default_column_width_x125: 125% - 標準の125%の幅に固定します
+        setting_default_column_width_x150: 150% - 標準の150%の幅に固定します
         setting_default_search_searchability: 範囲の詳細設定に対応していないクライアントでは、ここで設定を切り替えてください。Mastodonの標準動作は『リアクション限定』です。『公開』を対象にすると未知の情報を発見しやすくなりますが、結果にノイズが多い場合は検索範囲を狭めると効果的です。
         setting_default_sensitive: 閲覧注意状態のメディアはデフォルトでは内容が伏せられ、クリックして初めて閲覧できるようになります
         setting_disable_joke_appearance: エイプリルフール等のジョーク機能を無効にします
@@ -219,6 +224,7 @@ ja:
         setting_content_emoji_reaction_size: 投稿の絵文字リアクションのサイズ
         setting_content_font_size: 投稿のフォントサイズ
         setting_crop_images: 投稿の詳細以外では画像を16:9に切り抜く
+        setting_default_column_width: デフォルトのカラム幅
         setting_default_language: 投稿する言語
         setting_default_privacy: 投稿の公開範囲
         setting_default_search_searchability: 検索の対象とする範囲

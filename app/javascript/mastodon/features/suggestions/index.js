@@ -11,6 +11,9 @@ import ScrollableList from 'mastodon/components/scrollable_list';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import AccountContainer from 'mastodon/containers/account_container';
 import ImmutablePureComponent from 'react-immutable-pure-component';
+import { defaultColumnWidth } from 'mastodon/initial_state';
+import { changeSetting } from '../../actions/settings';
+import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   heading: { id: 'suggestions.heading', defaultMessage: 'Suggestions' },
@@ -18,10 +21,18 @@ const messages = defineMessages({
   dismissSuggestion: { id: 'suggestions.dismiss', defaultMessage: 'Dismiss suggestion' },
 });
 
-const mapStateToProps = state => ({
-  suggestions: state.getIn(['suggestions', 'items']),
-  isLoading: state.getIn(['suggestions', 'isLoading'], true),
-});
+const mapStateToProps = (state, { columnId }) => {
+  const uuid = columnId;
+  const columns = state.getIn(['settings', 'columns']);
+  const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'suggestions', 'columnWidth']);
+
+  return {
+    suggestions: state.getIn(['suggestions', 'items']),
+    isLoading: state.getIn(['suggestions', 'isLoading'], true),
+    columnWidth: columnWidth ?? defaultColumnWidth,
+  };
+};
 
 export default @connect(mapStateToProps)
 @injectIntl
@@ -33,6 +44,7 @@ class Suggestions extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
     columnId: PropTypes.string,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
     isLoading: PropTypes.bool,
   };
 
@@ -75,14 +87,24 @@ class Suggestions extends ImmutablePureComponent {
     this.column = c;
   }
 
+  handleWidthChange = (value) => {
+    const { columnId, dispatch } = this.props;
+
+    if (columnId) {
+      dispatch(changeColumnParams(columnId, 'columnWidth', value));
+    } else {
+      dispatch(changeSetting(['suggestions', 'columnWidth'], value));
+    }
+  }
+
   render () {
-    const { intl, suggestions, columnId, multiColumn, isLoading } = this.props;
+    const { intl, suggestions, columnId, multiColumn, isLoading, columnWidth } = this.props;
     const pinned = !!columnId;
 
     const emptyMessage = <FormattedMessage id='empty_column.suggestions' defaultMessage='No one has suggestions yet.' />;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='user-plus'
           title={intl.formatMessage(messages.heading)}
@@ -91,6 +113,8 @@ class Suggestions extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
           showBackButton
         />
 

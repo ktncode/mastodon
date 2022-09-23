@@ -1,10 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import Icon from 'mastodon/components/icon';
-import { enableEmptyColumn } from 'mastodon/initial_state';
+import { enableEmptyColumn, defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   show: { id: 'column_header.show_settings', defaultMessage: 'Show settings' },
@@ -13,7 +14,20 @@ const messages = defineMessages({
   moveRight: { id: 'column_header.moveRight_settings', defaultMessage: 'Move column to the right' },
 });
 
-export default @injectIntl
+const column_width_message = [
+  { id: 'x080', defaultMessage: <FormattedMessage id={'column_width.x080'} defaultMessage='80%' /> },
+  { id: 'x100', defaultMessage: <FormattedMessage id={'column_width.x100'} defaultMessage='100%' /> },
+  { id: 'x125', defaultMessage: <FormattedMessage id={'column_width.x125'} defaultMessage='125%' /> },
+  { id: 'x150', defaultMessage: <FormattedMessage id={'column_width.x150'} defaultMessage='150%' /> },
+  { id: 'free', defaultMessage: <FormattedMessage id={'column_width.free'} defaultMessage='Free' /> },
+];
+
+const mapStateToProps = (state, { columnWidth }) => ({
+  columnWidth: columnWidth ?? defaultColumnWidth,
+});
+
+export default @connect(mapStateToProps)
+@injectIntl
 class ColumnHeader extends React.PureComponent {
 
   static contextTypes = {
@@ -36,6 +50,8 @@ class ColumnHeader extends React.PureComponent {
     onClick: PropTypes.func,
     appendContent: PropTypes.node,
     collapseIssues: PropTypes.bool,
+    columnWidth: PropTypes.string,
+    onWidthChange: PropTypes.func,
   };
 
   state = {
@@ -88,8 +104,15 @@ class ColumnHeader extends React.PureComponent {
     this.props.onPin();
   }
 
+  handleChangeWidth = e => {
+    e.stopPropagation();
+    if (this.props.onWidthChange) {
+      this.props.onWidthChange(e.target.value);
+    }
+  }
+
   render () {
-    const { title, icon, active, children, pinned, multiColumn, extraButton, showBackButton, intl: { formatMessage }, placeholder, appendContent, collapseIssues } = this.props;
+    const { title, icon, active, children, pinned, multiColumn, extraButton, showBackButton, intl: { formatMessage }, placeholder, appendContent, collapseIssues, columnWidth } = this.props;
     const { collapsed, animating } = this.state;
 
     const wrapperClassName = classNames('column-header__wrapper', {
@@ -146,11 +169,25 @@ class ColumnHeader extends React.PureComponent {
       );
     }
 
+    const widthButton = (
+      <div className='column-settings__row' role='group' key='column-width'>
+        <div className='column-width' role='group'>
+          {column_width_message.map(({ id, defaultMessage }) => (
+            <label key={id} className={classNames('column-width__item', { active: columnWidth === id })}>
+              <input name='width' type='radio' value={id} checked={columnWidth === id} onChange={this.handleChangeWidth} />
+              {defaultMessage}
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+
     const collapsedContent = [
       extraContent,
     ];
 
     if (multiColumn) {
+      collapsedContent.unshift(widthButton);
       collapsedContent.push(moveButtons);
       collapsedContent.push(pinButton);
     }

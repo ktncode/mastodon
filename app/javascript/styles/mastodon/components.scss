@@ -2346,6 +2346,57 @@ a.account__display-name {
   > .scrollable {
     background: $ui-base-color;
   }
+
+  .layout-multiple-columns &.free {
+    flex: 1 1 auto;
+    min-width: 350px;
+  }
+
+  .layout-multiple-columns &.x080 {
+    width: 350px * 0.8;
+
+    .status__action-bar {
+      zoom: 0.8;
+    }
+  }
+
+  .layout-multiple-columns &.x125 {
+    width: 350px * 1.25;
+  }
+
+  .layout-multiple-columns &.x150 {
+    width: 350px * 1.5;
+  }
+
+  .layout-multiple-columns &.x200 {
+    width: 350px * 2;
+  }
+}
+
+.column-width {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+
+  &__item {
+    flex: 0 0 auto;
+    min-width: 36px;
+    padding: 4px;
+    margin: 0 2px;
+    border-radius: 4px;
+    text-align: center;
+    background-color: $ui-base-color;
+  }
+
+  &__item.active {
+    color: $primary-text-color;
+    background-color: $ui-highlight-color;
+  }
+
+  input[type=radio] {
+    display: none;
+  }
 }
 
 .ui {

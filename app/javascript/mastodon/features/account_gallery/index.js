@@ -16,8 +16,9 @@ import ScrollContainer from 'mastodon/containers/scroll_container';
 import LoadMore from 'mastodon/components/load_more';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import { openModal } from 'mastodon/actions/modal';
-import { new_features_policy } from 'mastodon/initial_state';
+import { new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
   title: { id: 'column.account', defaultMessage: 'Account' },
@@ -32,6 +33,7 @@ const mapStateToProps = (state, props) => ({
   blockedBy: state.getIn(['relationships', props.params.accountId, 'blocked_by'], false),
   advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
   hideRelation: state.getIn(['settings', 'account', 'other', 'hideRelation'], false),
+  columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
 });
 
 class LoadMoreMedia extends ImmutablePureComponent {
@@ -72,6 +74,7 @@ class AccountGallery extends ImmutablePureComponent {
     blockedBy: PropTypes.bool,
     suspended: PropTypes.bool,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   state = {
@@ -140,12 +143,16 @@ class AccountGallery extends ImmutablePureComponent {
     this.column.scrollTop();
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['account', 'columnWidth'], value));
+  }
+
   setRef = c => {
     this.column = c;
   }
 
   render () {
-    const { attachments, isLoading, hasMore, isAccount, multiColumn, blockedBy, suspended, hideRelation, intl } = this.props;
+    const { attachments, isLoading, hasMore, isAccount, multiColumn, blockedBy, suspended, hideRelation, columnWidth, intl } = this.props;
     const { width } = this.state;
 
     if (!isAccount) {
@@ -179,7 +186,7 @@ class AccountGallery extends ImmutablePureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='user'
           active={false}
@@ -187,6 +194,8 @@ class AccountGallery extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={false}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer />
         </ColumnHeader>

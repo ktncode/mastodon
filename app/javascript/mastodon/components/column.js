@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import { scrollTop } from '../scroll';
+import classNames from 'classnames';
 
 export default class Column extends React.PureComponent {
 
@@ -9,6 +10,7 @@ export default class Column extends React.PureComponent {
     children: PropTypes.node,
     label: PropTypes.string,
     bindToDocument: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   scrollTop () {
@@ -50,10 +52,10 @@ export default class Column extends React.PureComponent {
   }
 
   render () {
-    const { label, children } = this.props;
+    const { label, columnWidth, children } = this.props;
 
     return (
-      <div role='region' aria-label={label} className='column' ref={this.setRef}>
+      <div role='region' aria-label={label} className={classNames('column', columnWidth)} ref={this.setRef}>
         {children}
       </div>
     );

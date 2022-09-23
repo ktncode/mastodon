@@ -8,6 +8,7 @@ import ColumnBackButtonSlim from '../../components/column_back_button_slim';
 import StatusList from '../../components/status_list';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
+import { defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   heading: { id: 'column.pins', defaultMessage: 'Pinned toot' },
@@ -16,6 +17,7 @@ const messages = defineMessages({
 const mapStateToProps = state => ({
   statusIds: state.getIn(['status_lists', 'pins', 'items']),
   hasMore: !!state.getIn(['status_lists', 'pins', 'next']),
+  columnWidth: defaultColumnWidth,
 });
 
 export default @connect(mapStateToProps)
@@ -28,6 +30,7 @@ class PinnedStatuses extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
     hasMore: PropTypes.bool.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -43,10 +46,10 @@ class PinnedStatuses extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, statusIds, hasMore, multiColumn } = this.props;
+    const { intl, statusIds, hasMore, multiColumn, columnWidth } = this.props;
 
     return (
-      <Column bindToDocument={!multiColumn} icon='thumb-tack' heading={intl.formatMessage(messages.heading)} ref={this.setRef}>
+      <Column bindToDocument={!multiColumn} icon='thumb-tack' heading={intl.formatMessage(messages.heading)} ref={this.setRef} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
         <StatusList
           statusIds={statusIds}

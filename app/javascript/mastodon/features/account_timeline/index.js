@@ -17,9 +17,10 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { fetchAccountIdentityProofs } from '../../actions/identity_proofs';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import TimelineHint from 'mastodon/components/timeline_hint';
-import { me, new_features_policy } from 'mastodon/initial_state';
+import { me, new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
 import { connectTimeline, disconnectTimeline } from 'mastodon/actions/timelines';
 import { fetchFeaturedTags } from '../../actions/featured_tags';
+import { changeSetting } from '../../actions/settings';
 
 const emptyList = ImmutableList();
 
@@ -54,6 +55,7 @@ const mapStateToProps = (state, { params: { accountId, tagged }, about, withRepl
     withoutReblogs,
     showPostsInAbout,
     hideRelation,
+    columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
   };
 };
 
@@ -90,6 +92,7 @@ class AccountTimeline extends ImmutablePureComponent {
     remote: PropTypes.bool,
     remoteUrl: PropTypes.string,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   static defaultProps = {
@@ -169,12 +172,16 @@ class AccountTimeline extends ImmutablePureComponent {
     this.column.scrollTop();
   }
 
+  handleWidthChange = (value) => {
+    this.props.dispatch(changeSetting(['account', 'columnWidth'], value));
+  }
+
   setRef = c => {
     this.column = c;
   }
 
   render () {
-    const { intl, statusIds, featuredStatusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, remote, remoteUrl, about, withReplies, posts, advancedMode, hideFeaturedTags, showPostsInAbout, hideRelation } = this.props;
+    const { intl, statusIds, featuredStatusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, remote, remoteUrl, about, withReplies, posts, advancedMode, hideFeaturedTags, showPostsInAbout, hideRelation, columnWidth } = this.props;
 
     if (!isAccount) {
       return (
@@ -210,7 +217,7 @@ class AccountTimeline extends ImmutablePureComponent {
     const remoteMessage = (!about && remote) ? <RemoteHint url={remoteUrl} /> : null;
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
         <ColumnHeader
           icon='user'
           active={false}
@@ -218,6 +225,8 @@ class AccountTimeline extends ImmutablePureComponent {
           onClick={this.handleHeaderClick}
           pinned={false}
           multiColumn={multiColumn}
+          columnWidth={columnWidth}
+          onWidthChange={this.handleWidthChange}
         >
           <ColumnSettingsContainer />
         </ColumnHeader>

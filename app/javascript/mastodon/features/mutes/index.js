@@ -11,6 +11,7 @@ import ColumnBackButtonSlim from '../../components/column_back_button_slim';
 import AccountContainer from '../../containers/account_container';
 import { fetchMutes, expandMutes } from '../../actions/mutes';
 import ScrollableList from '../../components/scrollable_list';
+import { defaultColumnWidth } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   heading: { id: 'column.mutes', defaultMessage: 'Muted users' },
@@ -20,6 +21,7 @@ const mapStateToProps = state => ({
   accountIds: state.getIn(['user_lists', 'mutes', 'items']),
   hasMore: !!state.getIn(['user_lists', 'mutes', 'next']),
   isLoading: state.getIn(['user_lists', 'mutes', 'isLoading'], true),
+  columnWidth: defaultColumnWidth,
 });
 
 export default @connect(mapStateToProps)
@@ -34,6 +36,7 @@ class Mutes extends ImmutablePureComponent {
     accountIds: ImmutablePropTypes.list,
     intl: PropTypes.object.isRequired,
     multiColumn: PropTypes.bool,
+    columnWidth: PropTypes.string,
   };
 
   componentWillMount () {
@@ -45,7 +48,7 @@ class Mutes extends ImmutablePureComponent {
   }, 300, { leading: true });
 
   render () {
-    const { intl, hasMore, accountIds, multiColumn, isLoading } = this.props;
+    const { intl, hasMore, accountIds, multiColumn, isLoading, columnWidth } = this.props;
 
     if (!accountIds) {
       return (
@@ -58,7 +61,7 @@ class Mutes extends ImmutablePureComponent {
     const emptyMessage = <FormattedMessage id='empty_column.mutes' defaultMessage="You haven't muted any users yet." />;
 
     return (
-      <Column bindToDocument={!multiColumn} icon='volume-off' heading={intl.formatMessage(messages.heading)}>
+      <Column bindToDocument={!multiColumn} icon='volume-off' heading={intl.formatMessage(messages.heading)} columnWidth={columnWidth}>
         <ColumnBackButtonSlim />
         <ScrollableList
           scrollKey='mutes'

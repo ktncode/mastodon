@@ -72,6 +72,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:hide_bot_on_public_timeline]       = object.current_account.user.setting_hide_bot_on_public_timeline
       store[:confirm_follow_from_bot]           = object.current_account.user.setting_confirm_follow_from_bot
       store[:show_reload_button]                = object.current_account.user.setting_show_reload_button
+      store[:default_column_width]              = object.current_account.user.setting_default_column_width
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

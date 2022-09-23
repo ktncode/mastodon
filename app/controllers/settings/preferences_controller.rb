@@ -95,6 +95,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_confirm_follow_from_bot,
       :setting_default_search_searchability,
       :setting_show_reload_button,
+      :setting_default_column_width,
       notification_emails: %i(follow follow_request reblog favourite emoji_reaction status_reference mention digest report pending_account trending_tag),
       interactions: %i(must_be_follower must_be_following must_be_following_dm must_be_dm_to_send_email must_be_following_reference)
     )
