@@ -57,6 +57,7 @@ class UserSettingsDecorator
     user.settings['use_pending_items']                 = use_pending_items_preference if change?('setting_use_pending_items')
     user.settings['trends']                            = trends_preference if change?('setting_trends')
     user.settings['crop_images']                       = crop_images_preference if change?('setting_crop_images')
+    user.settings['confirm_domain_block']              = confirm_domain_block_preference if change?('setting_confirm_domain_block')
     user.settings['show_follow_button_on_timeline']    = show_follow_button_on_timeline_preference if change?('setting_show_follow_button_on_timeline')
     user.settings['show_subscribe_button_on_timeline'] = show_subscribe_button_on_timeline_preference if change?('setting_show_subscribe_button_on_timeline')
     user.settings['show_followed_by']                  = show_followed_by_preference if change?('setting_show_followed_by')
@@ -90,7 +91,7 @@ class UserSettingsDecorator
     user.settings['default_search_searchability']      = default_search_searchability_preference if change?('setting_default_search_searchability')
     user.settings['show_reload_button']                = show_reload_button_preference if change?('setting_show_reload_button')
     user.settings['default_column_width']              = default_column_width_preference if change?('setting_default_column_width')
-end
+  end
 
   def merged_notification_emails
     user.settings['notification_emails'].merge coerced_settings('notification_emails').to_h
@@ -202,6 +203,10 @@ end
 
   def crop_images_preference
     boolean_cast_setting 'setting_crop_images'
+  end
+
+  def confirm_domain_block_preference
+    boolean_cast_setting 'setting_confirm_domain_block'
   end
 
   def show_follow_button_on_timeline_preference

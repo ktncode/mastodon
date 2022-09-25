@@ -220,6 +220,7 @@ ja:
         setting_auto_play_gif: アニメーションGIFを自動再生する
         setting_boost_modal: ブーストする前に確認ダイアログを表示する
         setting_compact_reaction: リアクションをコンパクトに表示
+        setting_confirm_domain_block: ドメインブロックにドメイン入力を要求する
         setting_confirm_follow_from_bot: Bot承認制アカウントにする
         setting_content_emoji_reaction_size: 投稿の絵文字リアクションのサイズ
         setting_content_font_size: 投稿のフォントサイズ

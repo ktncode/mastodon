@@ -42,6 +42,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:is_staff]                          = object.current_account.user.staff?
       store[:trends]                            = Setting.trends && object.current_account.user.setting_trends
       store[:crop_images]                       = object.current_account.user.setting_crop_images
+      store[:confirm_domain_block]              = object.current_account.user.setting_confirm_domain_block
       store[:show_follow_button_on_timeline]    = object.current_account.user.setting_show_follow_button_on_timeline
       store[:show_subscribe_button_on_timeline] = object.current_account.user.setting_show_subscribe_button_on_timeline
       store[:show_followed_by]                  = object.current_account.user.setting_show_followed_by

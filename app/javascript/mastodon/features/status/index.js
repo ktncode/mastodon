@@ -60,7 +60,7 @@ import { openModal } from '../../actions/modal';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { HotKeys } from 'react-hotkeys';
-import { boostModal, deleteModal, enableStatusReference } from '../../initial_state';
+import { boostModal, deleteModal, confirmDomainBlock, enableStatusReference } from '../../initial_state';
 import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from '../ui/util/fullscreen';
 import { textForScreenReader, defaultMediaVisibility } from '../../components/status';
 import Icon from 'mastodon/components/icon';
@@ -82,6 +82,7 @@ const messages = defineMessages({
   quoteConfirm: { id: 'confirmations.quote.confirm', defaultMessage: 'Quote' },
   quoteMessage: { id: 'confirmations.quote.message', defaultMessage: 'Quoting now will overwrite the message you are currently composing. Are you sure you want to proceed?' },
   blockDomainConfirm: { id: 'confirmations.domain_block.confirm', defaultMessage: 'Hide entire domain' },
+  blockDomainPassphrase: { id: 'confirmations.domain_block.passphrase', defaultMessage: 'block' },
 });
 
 const makeMapStateToProps = () => {
@@ -430,6 +431,8 @@ class Status extends ImmutablePureComponent {
       message: <FormattedMessage id='confirmations.domain_block.message' defaultMessage='Are you really, really sure you want to block the entire {domain}? In most cases a few targeted blocks or mutes are sufficient and preferable. You will not see content from that domain in any public timelines or your notifications. Your followers from that domain will be removed.' values={{ domain: <strong>{domain}</strong> }} />,
       confirm: this.props.intl.formatMessage(messages.blockDomainConfirm),
       onConfirm: () => this.props.dispatch(blockDomain(domain)),
+      passphrase: confirmDomainBlock && this.props.intl.formatMessage(messages.blockDomainPassphrase),
+      destructive: true,
     }));
   }
 

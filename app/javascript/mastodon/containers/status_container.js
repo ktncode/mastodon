@@ -52,7 +52,7 @@ import { initReport } from '../actions/reports';
 import { openModal } from '../actions/modal';
 import { deployPictureInPicture } from '../actions/picture_in_picture';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { boostModal, deleteModal, unfollowModal, unsubscribeModal } from '../initial_state';
+import { boostModal, deleteModal, unfollowModal, unsubscribeModal, confirmDomainBlock } from '../initial_state';
 import { showAlertForError } from '../actions/alerts';
 
 import { createSelector } from 'reselect';
@@ -68,6 +68,7 @@ const messages = defineMessages({
   quoteConfirm: { id: 'confirmations.quote.confirm', defaultMessage: 'Quote' },
   quoteMessage: { id: 'confirmations.quote.message', defaultMessage: 'Quoting now will overwrite the message you are currently composing. Are you sure you want to proceed?' },
   blockDomainConfirm: { id: 'confirmations.domain_block.confirm', defaultMessage: 'Hide entire domain' },
+  blockDomainPassphrase: { id: 'confirmations.domain_block.passphrase', defaultMessage: 'block' },
   unfollowConfirm: { id: 'confirmations.unfollow.confirm', defaultMessage: 'Unfollow' },
   unsubscribeConfirm: { id: 'confirmations.unsubscribe.confirm', defaultMessage: 'Unsubscribe' },
 });
@@ -254,6 +255,8 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
       message: <FormattedMessage id='confirmations.domain_block.message' defaultMessage='Are you really, really sure you want to block the entire {domain}? In most cases a few targeted blocks or mutes are sufficient and preferable. You will not see content from that domain in any public timelines or your notifications. Your followers from that domain will be removed.' values={{ domain: <strong>{domain}</strong> }} />,
       confirm: intl.formatMessage(messages.blockDomainConfirm),
       onConfirm: () => dispatch(blockDomain(domain)),
+      passphrase: confirmDomainBlock && intl.formatMessage(messages.blockDomainPassphrase),
+      destructive: true,
     }));
   },
 
