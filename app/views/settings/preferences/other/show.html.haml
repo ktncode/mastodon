@@ -40,6 +40,14 @@
   .fields-group
     = f.input :setting_show_application, as: :boolean, wrapper: :with_label, recommended: true
 
+  .fields-row
+    .fields-group.fields-row__column.fields-row__column-6
+      = f.input :setting_default_expires_in, wrapper: :with_label, input_html: { maxlength: 30, pattern: '^(?:(\d+)y)?(?:(\d+)m(?=[\do])o?)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?$' }, fedibird_features: true
+
+    .fields-group.fields-row__column.fields-row__column-6
+      %span.fedibird_features.float Fedibird
+      = f.input :setting_default_expires_action, collection: ['mark', 'delete'], label_method: lambda { |item| t("simple_form.labels.defaults.setting_default_expires_action_#{item}") }, hint: t("simple_form.hints.defaults.setting_default_expires_action"), as: :radio_buttons, collection_wrapper_tag: 'ul', item_wrapper_tag: 'li', wrapper: :with_floating_label
+
   %h4= t 'preferences.searching_defaults'
 
   .fields-group

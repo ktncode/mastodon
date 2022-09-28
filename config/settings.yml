@@ -112,6 +112,8 @@ defaults: &defaults
   default_search_searchability: 'public'
   show_reload_button: true
   default_column_width: 'x100'
+  default_expires_in: ''
+  default_expires_action: 'mark'
 
 development:
   <<: *defaults

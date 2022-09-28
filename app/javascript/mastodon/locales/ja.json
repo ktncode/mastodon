@@ -213,7 +213,7 @@
   "datetime_button.add_datetime": "日時を追加",
   "datetime_button.remove_datetime": "日時を削除",
   "datetime.expires": "終了日時",
-  "datetime.expires_action.mark": "保持",
+  "datetime.expires_action.mark": "期限切れマーク",
   "datetime.expires_action.delete": "削除",
   "datetime.open_calendar": "カレンダーを開く",
   "datetime.placeholder": "日付か期間を入力",

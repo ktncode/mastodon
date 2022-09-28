@@ -160,10 +160,10 @@ const clearAll = state => {
     map.update('media_attachments', list => list.clear());
     map.set('poll', null);
     map.set('idempotencyKey', uuid());
-    map.set('datetime_form', null);
+    map.set('datetime_form', state.get('default_expires_in') ? true : null);
     map.set('scheduled', null);
-    map.set('expires', null);
-    map.set('expires_action', 'mark');
+    map.set('expires', state.get('default_expires_in', null));
+    map.set('expires_action', state.get('default_expires_action', 'mark'));
     map.update('references', set => set.clear());
     map.update('context_references', set => set.clear());
 });
@@ -410,10 +410,10 @@ export default function compose(state = initialState, action) {
       map.set('caretPosition', null);
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
-      map.set('datetime_form', null);
+      map.set('datetime_form', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
-      map.set('expires', null);
-      map.set('expires_action', 'mark');
+      map.set('expires', state.get('default_expires_in', null));
+      map.set('expires_action', state.get('default_expires_action', 'mark'));
       map.update('context_references', set => set.clear().concat(action.context_references));
 
       if (action.status.get('spoiler_text').length > 0) {
@@ -438,10 +438,10 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
-      map.set('datetime_form', null);
+      map.set('datetime_form', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
-      map.set('expires', null);
-      map.set('expires_action', 'mark');
+      map.set('expires', state.get('default_expires_in', null));
+      map.set('expires_action', state.get('default_expires_action', 'mark'));
       map.update('context_references', set => set.clear().add(action.status.get('id')));
 
       if (action.status.get('spoiler_text').length > 0) {
@@ -468,10 +468,10 @@ export default function compose(state = initialState, action) {
       map.set('circle_id', null);
       map.set('poll', null);
       map.set('idempotencyKey', uuid());
-      map.set('datetime_form', null);
+      map.set('datetime_form', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
-      map.set('expires', null);
-      map.set('expires_action', 'mark');
+      map.set('expires', state.get('default_expires_in', null));
+      map.set('expires_action', state.get('default_expires_action', 'mark'));
       map.update('context_references', set => set.clear());
       if (action.type == COMPOSE_RESET) {
         map.update('references', set => set.clear());
@@ -575,6 +575,8 @@ export default function compose(state = initialState, action) {
       }));
   case REDRAFT:
     return state.withMutations(map => {
+      const default_expires_in_exist = state.get('default_expires_in') ? true : null;
+
       map.set('text', action.raw_text || unescapeHTML(rejectQuoteAltText(expandMentions(action.status))));
       map.set('in_reply_to', action.status.get('in_reply_to_id'));
       map.set('quote_from', action.status.getIn(['quote', 'id']));
@@ -588,10 +590,10 @@ export default function compose(state = initialState, action) {
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
       map.set('sensitive', action.status.get('sensitive'));
-      map.set('datetime_form', !!action.status.get('scheduled_at') || !!action.status.get('expires_at') ? true : null);
+      map.set('datetime_form', !!action.status.get('scheduled_at') || !!action.status.get('expires_at') ? true : default_expires_in_exist);
       map.set('scheduled', action.status.get('scheduled_at'));
-      map.set('expires', action.status.get('expires_at') ? format(parseISO(action.status.get('expires_at')), 'yyyy-MM-dd HH:mm') : null);
-      map.set('expires_action', action.status.get('expires_action') ?? 'mark');
+      map.set('expires', action.status.get('expires_at') ? format(parseISO(action.status.get('expires_at')), 'yyyy-MM-dd HH:mm') : state.get('default_expires_in', null));
+      map.set('expires_action', action.status.get('expires_action') ?? state.get('default_expires_action', 'mark'));
       map.update('references', set => set.clear().concat(action.status.get('status_reference_ids')));
       map.update('context_references', set => set.clear().concat(action.context_references));
 

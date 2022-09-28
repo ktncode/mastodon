@@ -89,10 +89,12 @@ class InitialStateSerializer < ActiveModel::Serializer
     store = {}
 
     if object.current_account
-      store[:me]                    = object.current_account.id.to_s
-      store[:default_privacy]       = object.visibility || object.current_account.user.setting_default_privacy
-      store[:default_searchability] = object.current_account.searchability
-      store[:default_sensitive]     = object.current_account.user.setting_default_sensitive
+      store[:me]                     = object.current_account.id.to_s
+      store[:default_privacy]        = object.visibility || object.current_account.user.setting_default_privacy
+      store[:default_searchability]  = object.current_account.searchability
+      store[:default_sensitive]      = object.current_account.user.setting_default_sensitive
+      store[:default_expires_in]     = object.current_account.user.setting_default_expires_in
+      store[:default_expires_action] = object.current_account.user.setting_default_expires_action
     end
 
     store[:text] = object.text if object.text

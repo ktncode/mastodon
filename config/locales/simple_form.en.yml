@@ -62,6 +62,12 @@ en:
         setting_default_column_width_x100: 100% - Fix to Mastodon standard column width
         setting_default_column_width_x125: 125% - Fix to 125% of standard width
         setting_default_column_width_x150: 150% - Fix to 150% of standard width
+        setting_default_expires_action: |
+          Submissions whose publication period has ended will be marked or deleted.
+          Marked posts will no longer be visible, but only the poster and those who reacted (favourite, emoji reaction, bookmark) to the post will be able to see it.
+        setting_default_expires_in: |
+          Specify the end date and time as the starting point of the posting date and time.
+          The format is 1y2mo3d4h5m (1 year, 2 months, 3 days, 4 hours, 5 minutes later).
         setting_default_search_searchability: For clients that do not support advanced range settings, switch the settings here. Mastodon's standard behavior is "Reacted-users-only". Targeting "Public" makes it easier to discover unknown information, but if the results are noisy, narrowing the search range is effective.
         setting_default_sensitive: Sensitive media is hidden by default and can be revealed with a click
         setting_disable_joke_appearance: Disable April Fools' Day and other joke functions
@@ -226,6 +232,10 @@ en:
         setting_content_font_size: Content font size
         setting_crop_images: Crop images in non-expanded posts to 16x9
         setting_default_column_width: Default column width
+        setting_default_expires_action: Default expiry action
+        setting_default_expires_action_mark: Mark as expired
+        setting_default_expires_action_delete: Delete
+        setting_default_expires_in: Default expiry duration
         setting_default_language: Posting language
         setting_default_privacy: Posting privacy
         setting_default_search_searchability: Search range

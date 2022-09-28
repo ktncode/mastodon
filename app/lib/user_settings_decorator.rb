@@ -91,7 +91,9 @@ class UserSettingsDecorator
     user.settings['default_search_searchability']      = default_search_searchability_preference if change?('setting_default_search_searchability')
     user.settings['show_reload_button']                = show_reload_button_preference if change?('setting_show_reload_button')
     user.settings['default_column_width']              = default_column_width_preference if change?('setting_default_column_width')
-  end
+    user.settings['default_expires_in']                = default_expires_in_preference if change?('setting_default_expires_in')
+    user.settings['default_expires_action']            = default_expires_action_preference if change?('setting_default_expires_action')
+end
 
   def merged_notification_emails
     user.settings['notification_emails'].merge coerced_settings('notification_emails').to_h
@@ -339,6 +341,14 @@ class UserSettingsDecorator
 
   def default_column_width_preference
     settings['setting_default_column_width']
+  end
+
+  def default_expires_in_preference
+    settings['setting_default_expires_in']
+  end
+
+  def default_expires_action_preference
+    settings['setting_default_expires_action']
   end
 
   def boolean_cast_setting(key)

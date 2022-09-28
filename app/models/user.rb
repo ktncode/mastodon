@@ -141,7 +141,7 @@ class User < ApplicationRecord
            :multi_column_customize, :multi_column_content_font_size, :multi_column_info_font_size, :multi_column_content_emoji_reaction_size,
            :mobile_customize, :mobile_content_font_size, :mobile_info_font_size, :mobile_content_emoji_reaction_size,
            :hide_bot_on_public_timeline, :confirm_follow_from_bot,
-           :default_search_searchability,
+           :default_search_searchability, :default_expires_in, :default_expires_action,
            :show_reload_button, :default_column_width,
 
            to: :settings, prefix: :setting, allow_nil: false

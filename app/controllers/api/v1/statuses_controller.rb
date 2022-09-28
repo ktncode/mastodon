@@ -20,6 +20,7 @@ class Api::V1::StatusesController < Api::BaseController
   # conversations as quasi-unlimited, it would be too much work to render more
   # than this anyway
   CONTEXT_LIMIT = 4_096
+  DURATION_RE = /^(?:(?<year>\d+)y)?(?:(?<month>\d+)m(?=[\do])o?)?(?:(?<day>\d+)d)?(?:(?<hour>\d+)h)?(?:(?<minute>\d+)m)?$/
 
   def index
     @statuses = cache_collection(@statuses, Status)
@@ -128,7 +129,18 @@ class Api::V1::StatusesController < Api::BaseController
   end
 
   def set_expire
-    @expires_at = status_params[:expires_at] || (status_params[:expires_in].blank? ? nil : (@scheduled_at || Time.now.utc) + status_params[:expires_in].to_i.seconds)
+    expires_in =
+      if status_params.has_key?(:expires_in)
+        status_params[:expires_in].blank? ? nil : status_params[:expires_in].to_i.seconds
+      elsif (match = current_user.setting_default_expires_in.match(DURATION_RE))
+        year, month, day, hour, minute = match.to_a.values_at(1,2,3,4,5).map(&:to_i)
+        seconds = (year.years + month.months + day.days + hour.hours + minute.minutes).to_i.seconds
+        seconds < 1.minutes ? nil : seconds
+      else
+        nil
+      end
+
+    @expires_at = status_params[:expires_at] || (expires_in.nil? ? nil : (@scheduled_at || Time.now.utc) + expires_in)
   end
 
   def status_ids
