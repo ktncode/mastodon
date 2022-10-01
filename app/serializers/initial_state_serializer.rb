@@ -70,6 +70,8 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:content_font_size]                 = object.current_account.user.setting_content_font_size
       store[:info_font_size]                    = object.current_account.user.setting_info_font_size
       store[:content_emoji_reaction_size]       = object.current_account.user.setting_content_emoji_reaction_size
+      store[:emoji_scale]                       = object.current_account.user.setting_emoji_scale
+      store[:picker_emoji_size]                 = object.current_account.user.setting_picker_emoji_size
       store[:hide_bot_on_public_timeline]       = object.current_account.user.setting_hide_bot_on_public_timeline
       store[:confirm_follow_from_bot]           = object.current_account.user.setting_confirm_follow_from_bot
       store[:show_reload_button]                = object.current_account.user.setting_show_reload_button

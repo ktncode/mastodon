@@ -243,6 +243,7 @@ ja:
         setting_display_media_default: 標準
         setting_display_media_hide_all: 非表示
         setting_display_media_show_all: 表示
+        setting_emoji_scale: 単独絵文字のサイズ
         setting_enable_empty_column: 最終カラムを閉じられるようにする
         setting_enable_limited_timeline: 限定ホームを有効にする
         setting_enable_reaction: リアクションを有効にする
@@ -262,6 +263,7 @@ ja:
         setting_new_features_policy_default: 推奨に従う（デフォルト）
         setting_new_features_policy_tester: ベータテストに参加する
         setting_noindex: 検索エンジンによるインデックスを拒否する
+        setting_picker_emoji_size: 絵文字ピッカーの表示サイズ
         setting_place_tab_bar_at_bottom: タブバーを下に配置する
         setting_post_reference_modal: 参照を含む投稿をする前に確認ダイアログを表示する
         setting_reduce_motion: アニメーションの動きを減らす

@@ -848,7 +848,7 @@
 .quote-indicator__content {
   position: relative;
   font-size: var(--content-font-size, 15px);
-  line-height: calc(var(--content-font-size, 15px)*1.33);
+  line-height: calc(var(--content-font-size, 15px) * 1.33);
   word-wrap: break-word;
   font-weight: 400;
   overflow: hidden;
@@ -869,13 +869,37 @@
   }
 
   .emojione {
-    width: calc(var(--content-font-size, 15px)*1.33);
-    height: calc(var(--content-font-size, 15px)*1.33);
+    width: calc(var(--content-font-size, 15px) * 1.33);
+    height: calc(var(--content-font-size, 15px) * 1.33);
     margin: -3px 0 0;
   }
 
+  .emoji-single {
+    .emojione {
+      width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale, 1));
+      height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale, 1));
+    }
+  }
+
+  .emoji-multi {
+    font-size: calc(var(--content-font-size, 15px) * (var(--emoji-scale, 1) / 3 + 0.67));
+    line-height: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+
+    .emojione {
+      width: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+      height: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+    }
+  }
+
+  .emoji-mix {
+    .emojione {
+      width: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+      height: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+    }
+  }
+
   p {
-    margin-bottom: calc(var(--content-font-size, 15px)*1.33);
+    margin-bottom: calc(var(--content-font-size, 15px) * 1.33);
     white-space: pre-wrap;
     unicode-bidi: plaintext;
 
@@ -949,8 +973,8 @@
   overflow-y: auto;
 
   .emojione {
-    width: calc(var(--content-font-size, 15px)*1.33);
-    height: calc(var(--content-font-size, 15px)*1.33);
+    width: calc(var(--content-font-size, 15px) * 1.33);
+    height: calc(var(--content-font-size, 15px) * 1.33);
     margin: -3px 0 0;
   }
 
@@ -1298,7 +1322,7 @@
   color: $dark-text-color;
   padding: 8px 0;
   padding-bottom: 2px;
-  font-size: calc(var(--content-font-size, 15px)*0.933);
+  font-size: calc(var(--content-font-size, 15px) * 0.933);
   position: relative;
 
   .status__display-name strong {
@@ -1374,17 +1398,41 @@
   }
 
   .status__content {
-    font-size: calc(var(--content-font-size, 15px)*1.27);
-    line-height: calc(var(--content-font-size, 15px)*1.6);
+    font-size: calc(var(--content-font-size, 15px) * 1.27);
+    line-height: calc(var(--content-font-size, 15px) * 1.6);
 
     .emojione {
-      width: calc(var(--content-font-size, 15px)*1.6);
-      height: calc(var(--content-font-size, 15px)*1.6);
+      width: calc(var(--content-font-size, 15px) * 1.6);
+      height: calc(var(--content-font-size, 15px) * 1.6);
       margin: -1px 0 0;
     }
 
+    .emoji-single {
+      .emojione {
+        width: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale, 1));
+        height: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale, 1));
+      }
+    }
+  
+    .emoji-multi {
+      font-size: calc(var(--content-font-size, 15px) * 1.27 * (var(--emoji-scale, 1) / 3 + 0.67));
+      line-height: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+
+      .emojione {
+        width: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+        height: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+      }
+    }
+
+    .emoji-mix {
+      .emojione {
+        width: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+        height: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+      }
+    }
+
     .status__content__spoiler-link {
-      line-height: calc(var(--content-font-size, 15px)*1.6);
+      line-height: calc(var(--content-font-size, 15px) * 1.6);
       margin: -1px 0 0;
     }
   }
@@ -1864,8 +1912,8 @@ a.account__display-name {
   padding: 8px 0 0;
   cursor: default;
   color: $darker-text-color;
-  font-size: calc(var(--content-font-size, 15px)*0.933);
-  line-height: calc(var(--content-font-size, 15px)*1.467);
+  font-size: calc(var(--content-font-size, 15px) * 0.933);
+  line-height: calc(var(--content-font-size, 15px) * 1.467);
   position: relative;
 
   .fa {

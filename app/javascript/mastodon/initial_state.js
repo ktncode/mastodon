@@ -54,5 +54,6 @@ export const matchVisibilityOfReferences = getMeta('match_visibility_of_referenc
 export const enableEmptyColumn = getMeta('enable_empty_column');
 export const showReloadButton = getMeta('show_reload_button');
 export const defaultColumnWidth = getMeta('default_column_width');
+export const pickerEmojiSize = getMeta('picker_emoji_size');
 
 export default initialState;

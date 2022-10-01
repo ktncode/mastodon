@@ -247,6 +247,7 @@ en:
         setting_display_media_default: Default
         setting_display_media_hide_all: Hide all
         setting_display_media_show_all: Show all
+        setting_emoji_scale: Single emoji size
         setting_enable_empty_column: Enable last column to be closed
         setting_enable_limited_timeline: Enable limited timeline
         setting_enable_reaction: Enable reaction
@@ -266,6 +267,7 @@ en:
         setting_new_features_policy_conservative: Leave it disabled. I use it if necessary
         setting_new_features_policy_default: Follow recommendations (default)
         setting_noindex: Opt-out of search engine indexing
+        setting_picker_emoji_size: Emoji size in picker
         setting_place_tab_bar_at_bottom: Place the tab bar at the bottom
         setting_post_reference_modal: Show a confirmation dialog before making a post containing references
         setting_reduce_motion: Reduce motion in animations

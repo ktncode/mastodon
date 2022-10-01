@@ -66,6 +66,8 @@ defaults: &defaults
   content_font_size: 15
   info_font_size: 15
   content_emoji_reaction_size: 16
+  emoji_scale: 1,
+  picker_emoji_size: 22,
   notification_emails:
     follow: false
     reblog: false

@@ -28,26 +28,10 @@
 
   .fields-group
     = f.input :setting_content_font_size, as: :range, input_html: { min: 10, max: 20, list: 'content_font_size_label' },  wrapper: :with_label, hint: false, fedibird_features: true
+    = f.input :setting_emoji_scale, as: :range, input_html: { min: 1, max: 4, step: 0.1, list: 'emoji_scale_label' }, wrapper: :with_label, false: true, fedibird_features: true
     = f.input :setting_info_font_size, as: :range, input_html: { min: 10, max: 20, list: 'info_font_size_label' },  wrapper: :with_label, hint: false, fedibird_features: true
     = f.input :setting_content_emoji_reaction_size, as: :range, input_html: { min: 10, max: 48, list: 'emoji_reaction_size_label' }, wrapper: :with_label, false: true, fedibird_features: true
-
-  -# %h5= t 'appearance.custom_size.multi_column'
-
-  -# .fields-group
-  -#   = f.input :setting_multi_column_customize, as: :boolean, wrapper: :with_label, hint: true, fedibird_features: true
-
-  -# .fields-group.multi-column-customize
-  -#   = f.input :setting_multi_column_content_font_size, as: :range, input_html: { min: 10, max: 24, list: 'content_font_size_label' },  wrapper: :with_label, hint: false, fedibird_features: true
-  -#   = f.input :setting_multi_column_content_emoji_reaction_size, as: :range, input_html: { min: 10, max: 48 }, wrapper: :with_label, false: true, fedibird_features: true
-
-  -# %h5= t 'appearance.custom_size.mobile'
-
-  -# .fields-group
-  -#   = f.input :setting_mobile_customize, as: :boolean, wrapper: :with_label, hint: true, fedibird_features: true
-
-  -# .fields-group.mobile-customize
-  -#   = f.input :setting_mobile_content_font_size, as: :range, input_html: { min: 10, max: 24, list: 'content_font_size_label' },  wrapper: :with_label, hint: false, fedibird_features: true
-  -#   = f.input :setting_mobile_content_emoji_reaction_size, as: :range, input_html: { min: 10, max: 48 }, wrapper: :with_label, false: true, fedibird_features: true
+    = f.input :setting_picker_emoji_size, as: :range, input_html: { min: 22, max: 48, list: 'picker_emoji_size_label' }, wrapper: :with_label, false: true, fedibird_features: true
 
   .fields-group
     = f.input :setting_theme_public, as: :boolean, wrapper: :with_label, hint: true, fedibird_features: true

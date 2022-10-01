@@ -3,30 +3,29 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import IconButton from './icon_button';
 import Overlay from 'react-overlays/lib/Overlay';
-import Motion from '../features/ui/util/optional_motion';
-import spring from 'react-motion/lib/spring';
 import { supportsPassiveEvents } from 'detect-passive-events';
 
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { EmojiPicker as EmojiPickerAsync } from '../features/ui/util/async-components';
 import { buildCustomEmojis, categoriesFromEmojis } from '../features/emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
+import { pickerEmojiSize } from 'mastodon/initial_state';
 
 const messages = defineMessages({
-    emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
-    emoji_search: { id: 'emoji_button.search', defaultMessage: 'Search...' },
-    emoji_not_found: { id: 'emoji_button.not_found', defaultMessage: 'No emojos!! (╯°□°）╯︵ ┻━┻' },
-    custom: { id: 'emoji_button.custom', defaultMessage: 'Custom' },
-    recent: { id: 'emoji_button.recent', defaultMessage: 'Frequently used' },
-    search_results: { id: 'emoji_button.search_results', defaultMessage: 'Search results' },
-    people: { id: 'emoji_button.people', defaultMessage: 'People' },
-    nature: { id: 'emoji_button.nature', defaultMessage: 'Nature' },
-    food: { id: 'emoji_button.food', defaultMessage: 'Food & Drink' },
-    activity: { id: 'emoji_button.activity', defaultMessage: 'Activity' },
-    travel: { id: 'emoji_button.travel', defaultMessage: 'Travel & Places' },
-    objects: { id: 'emoji_button.objects', defaultMessage: 'Objects' },
-    symbols: { id: 'emoji_button.symbols', defaultMessage: 'Symbols' },
-    flags: { id: 'emoji_button.flags', defaultMessage: 'Flags' },
+  emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
+  emoji_search: { id: 'emoji_button.search', defaultMessage: 'Search...' },
+  emoji_not_found: { id: 'emoji_button.not_found', defaultMessage: 'No emojos!! (╯°□°）╯︵ ┻━┻' },
+  custom: { id: 'emoji_button.custom', defaultMessage: 'Custom' },
+  recent: { id: 'emoji_button.recent', defaultMessage: 'Frequently used' },
+  search_results: { id: 'emoji_button.search_results', defaultMessage: 'Search results' },
+  people: { id: 'emoji_button.people', defaultMessage: 'People' },
+  nature: { id: 'emoji_button.nature', defaultMessage: 'Nature' },
+  food: { id: 'emoji_button.food', defaultMessage: 'Food & Drink' },
+  activity: { id: 'emoji_button.activity', defaultMessage: 'Activity' },
+  travel: { id: 'emoji_button.travel', defaultMessage: 'Travel & Places' },
+  objects: { id: 'emoji_button.objects', defaultMessage: 'Objects' },
+  symbols: { id: 'emoji_button.symbols', defaultMessage: 'Symbols' },
+  flags: { id: 'emoji_button.flags', defaultMessage: 'Flags' },
 });
 
 const listenerOptions = supportsPassiveEvents ? { passive: true } : false;
@@ -77,7 +76,6 @@ class ReactionPicker extends React.PureComponent {
   };
 
   state = {
-    modifierOpen: false,
     placement: null,
   };
 
@@ -133,28 +131,14 @@ class ReactionPicker extends React.PureComponent {
     this.props.onPickEmoji(emoji);
   }
 
-  handleModifierOpen = () => {
-    this.setState({ modifierOpen: true });
-  }
-
-  handleModifierClose = () => {
-    this.setState({ modifierOpen: false });
-  }
-
-  handleModifierChange = modifier => {
-    this.props.onSkinTone(modifier);
-  }
-
   render () {
-    const { loading, style, intl, custom_emojis, skinTone, frequentlyUsedEmojis } = this.props;
+    const { loading, intl, custom_emojis, skinTone, frequentlyUsedEmojis } = this.props;
 
     if (loading) {
-      return <div style={{height: 349,width: 299}} />;
+      return <div style={{ height: 349,width: 299 }} />;
     }
 
     const title = intl.formatMessage(messages.emoji);
-
-    const { modifierOpen } = this.state;
 
     const categoriesSort = [
       'recent',
@@ -169,28 +153,29 @@ class ReactionPicker extends React.PureComponent {
     ];
 
     categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
+    const emojiSize = Number(pickerEmojiSize) || 22;
 
     return (
-        <EmojiPicker
-          perLine={8}
-          emojiSize={22}
-          sheetSize={32}
-          custom={buildCustomEmojis(custom_emojis)}
-          color=''
-          emoji=''
-          set='twitter'
-          title={title}
-          i18n={this.getI18n()}
-          onClick={this.handleClick}
-          include={categoriesSort}
-          recent={frequentlyUsedEmojis}
-          skin={skinTone}
-          showPreview={false}
-          showSkinTones={false}
-          notFound={notFoundFn}
-          autoFocus
-          emojiTooltip
-        />
+      <EmojiPicker
+        perLine={Math.floor(24 / emojiSize * 8)}
+        emojiSize={emojiSize}
+        sheetSize={32}
+        custom={buildCustomEmojis(custom_emojis)}
+        color=''
+        emoji=''
+        set='twitter'
+        title={title}
+        i18n={this.getI18n()}
+        onClick={this.handleClick}
+        include={categoriesSort}
+        recent={frequentlyUsedEmojis}
+        skin={skinTone}
+        showPreview={false}
+        showSkinTones={false}
+        notFound={notFoundFn}
+        autoFocus
+        emojiTooltip
+      />
     );
   }
 }
@@ -214,7 +199,6 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
     onClose: PropTypes.func.isRequired,
     skinTone: PropTypes.number.isRequired,
     frequentlyUsedEmojis: PropTypes.arrayOf(PropTypes.string),
-
   };
 
   static defaultProps = {
@@ -223,7 +207,6 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
   };
 
   state = {
-    mounted: false,
     loading: true,
   };
 
@@ -237,7 +220,6 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
     document.addEventListener('click', this.handleDocumentClick, false);
     document.addEventListener('keydown', this.handleKeyDown, false);
     document.addEventListener('touchend', this.handleDocumentClick, listenerOptions);
-    this.setState({ mounted: true });
     this.setState({ loading: true });
     EmojiPickerAsync().then(EmojiMart => {
       EmojiPicker = EmojiMart.Picker;
@@ -261,28 +243,21 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
   render () {
     const { onClose, style, placement, arrowOffsetLeft, arrowOffsetTop } = this.props;
     const { custom_emojis, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
-    const { mounted, loading } = this.state;
+    const { loading } = this.state;
 
     return (
-      <Motion defaultStyle={{ opacity: 0, scaleX: 0.85, scaleY: 0.75 }} style={{ opacity: spring(1, { damping: 35, stiffness: 400 }), scaleX: spring(1, { damping: 35, stiffness: 400 }), scaleY: spring(1, { damping: 35, stiffness: 400 }) }}>
-        {({ opacity, scaleX, scaleY }) => (
-          // It should not be transformed when mounting because the resulting
-          // size will be used to determine the coordinate of the menu by
-          // react-overlays
-          <div className={`dropdown-menu dropdown-menu-reaction ${placement}`} style={{ ...style, opacity: opacity, transform: mounted ? `scale(${scaleX}, ${scaleY})` : null }} ref={this.setRef}>
-            <div className={`dropdown-menu__arrow ${placement}`} style={{ left: arrowOffsetLeft, top: arrowOffsetTop }} />
-            <ReactionPicker
-              custom_emojis={custom_emojis}
-              loading={loading}
-              onClose={onClose}
-              onPickEmoji={onPickEmoji}
-              onSkinTone={onSkinTone}
-              skinTone={skinTone}
-              frequentlyUsedEmojis={frequentlyUsedEmojis}
-            />
-          </div>
-        )}
-      </Motion>
+      <div className={`dropdown-menu dropdown-menu-reaction ${placement}`} style={style} ref={this.setRef}>
+        <div className={`dropdown-menu__arrow ${placement}`} style={{ left: arrowOffsetLeft, top: arrowOffsetTop }} />
+        <ReactionPicker
+          custom_emojis={custom_emojis}
+          loading={loading}
+          onClose={onClose}
+          onPickEmoji={onPickEmoji}
+          onSkinTone={onSkinTone}
+          skinTone={skinTone}
+          frequentlyUsedEmojis={frequentlyUsedEmojis}
+        />
+      </div>
     );
   }
 
@@ -333,7 +308,7 @@ export default class ReactionPickerDropdown extends React.PureComponent {
     if (this.props.pressed) {
       this.props.onRemoveEmoji();
     } else if (this.state.id === this.props.openDropdownId) {
-        this.handleClose();
+      this.handleClose();
     } else {
       const { top } = target.getBoundingClientRect();
       const placement = top * 2 < innerHeight ? 'bottom' : 'top';

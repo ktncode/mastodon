@@ -8,6 +8,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
+import { pickerEmojiSize } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -260,12 +261,13 @@ class EmojiPickerMenu extends React.PureComponent {
     ];
 
     categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
+    const emojiSize = Number(pickerEmojiSize) || 22;
 
     return (
       <div className={classNames('emoji-picker-dropdown__menu', { selecting: modifierOpen })} style={style} ref={this.setRef}>
         <EmojiPicker
-          perLine={8}
-          emojiSize={22}
+          perLine={Math.floor(24 / emojiSize * 8)}
+          emojiSize={emojiSize}
           sheetSize={32}
           custom={buildCustomEmojis(custom_emojis)}
           color=''

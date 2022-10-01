@@ -127,6 +127,7 @@ module AccountsHelper
       --content-font-size: #{h(user.setting_content_font_size)}px;
       --info-font-size: #{h(user.setting_info_font_size)}px;
       --content-emoji-reaction-size: #{h(user.setting_content_emoji_reaction_size)}px;
+      --emoji-scale: #{h(user.setting_emoji_scale)};
     }"
   end
 

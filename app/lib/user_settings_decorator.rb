@@ -86,6 +86,8 @@ class UserSettingsDecorator
     user.settings['content_font_size']                 = content_font_size_preference if change?('setting_content_font_size')
     user.settings['info_font_size']                    = info_font_size_preference if change?('setting_info_font_size')
     user.settings['content_emoji_reaction_size']       = content_emoji_reaction_size_preference if change?('setting_content_emoji_reaction_size')
+    user.settings['emoji_scale']                       = emoji_scale_preference if change?('setting_emoji_scale')
+    user.settings['picker_emoji_size']                 = picker_emoji_size_preference if change?('setting_picker_emoji_size')
     user.settings['hide_bot_on_public_timeline']       = hide_bot_on_public_timeline_preference if change?('setting_hide_bot_on_public_timeline')
     user.settings['confirm_follow_from_bot']           = confirm_follow_from_bot_preference if change?('setting_confirm_follow_from_bot')
     user.settings['default_search_searchability']      = default_search_searchability_preference if change?('setting_default_search_searchability')
@@ -321,6 +323,14 @@ end
 
   def content_emoji_reaction_size_preference
     settings['setting_content_emoji_reaction_size']
+  end
+
+  def emoji_scale_preference
+    settings['setting_emoji_scale']
+  end
+
+  def picker_emoji_size_preference
+    settings['setting_picker_emoji_size']
   end
 
   def hide_bot_on_public_timeline_preference

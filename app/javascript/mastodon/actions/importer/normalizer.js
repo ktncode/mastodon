@@ -83,9 +83,44 @@ export function normalizeStatus(status, normalOldStatus) {
     docContentElem.querySelector('.quote-inline')?.remove();
     docContentElem.querySelector('.reference-link-inline')?.remove();
 
+    const flagment = domParser.parseFromString(emojify(normalStatus.content, emojiMap), 'text/html').documentElement;
+
+    flagment.querySelectorAll('body>p').forEach(p => {
+      let imgCount = 0;
+      let scale = true;
+      let mix = true;
+
+      function emojiScaleCheck(nodes) {
+        for (let i = 0; i < nodes.length; i++) {
+          let node = nodes[i];
+
+          if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'IMG' && node.classList.contains('emojione')) {
+            imgCount++;
+          } else if (node.nodeType === Node.TEXT_NODE && /[^ \t\u200B\u200C\u3000]/.test(node.textContent)) {
+            scale = false;
+            mix = false;
+          } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'A') {
+            scale = false;
+          } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN') {
+            emojiScaleCheck(node.childNodes);
+          }
+        }
+      }
+
+      emojiScaleCheck(p.childNodes);
+
+      if (scale && imgCount === 1) {
+        p.classList.add('emoji-single');
+      } else if (scale && imgCount > 1) {
+        p.classList.add('emoji-multi');
+      } else if (mix && imgCount > 0) {
+        p.classList.add('emoji-mix');
+      }
+    });
+
     normalStatus.search_index = docContentElem.textContent;
     normalStatus.shortHtml    = '<p>'+emojify(normalStatus.search_index.substr(0, 150), emojiMap) + (normalStatus.search_index.substr(150) ? '...' : '')+'</p>';
-    normalStatus.contentHtml  = emojify(normalStatus.content, emojiMap);
+    normalStatus.contentHtml  = flagment.innerHTML;
     normalStatus.spoilerHtml  = emojify(escapeTextContentForBrowser(spoilerText), emojiMap);
     normalStatus.hidden       = expandSpoilers ? false : spoilerText.length > 0 || normalStatus.sensitive;
     normalStatus.visibility   = normalStatus.visibility_ex ? normalStatus.visibility_ex : normalStatus.visibility;

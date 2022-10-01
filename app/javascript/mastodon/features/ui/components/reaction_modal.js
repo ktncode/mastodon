@@ -12,6 +12,7 @@ import { supportsPassiveEvents } from 'detect-passive-events';
 import { EmojiPicker as EmojiPickerAsync } from '../util/async-components';
 import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
+import { pickerEmojiSize } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -169,28 +170,29 @@ class ReactionPicker extends React.PureComponent {
     ];
 
     categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
+    const emojiSize = Number(pickerEmojiSize) || 22;
 
     return (
-        <EmojiPicker
-          perLine={8}
-          emojiSize={22}
-          sheetSize={32}
-          custom={buildCustomEmojis(custom_emojis)}
-          color=''
-          emoji=''
-          set='twitter'
-          title={title}
-          i18n={this.getI18n()}
-          onClick={this.handleClick}
-          include={categoriesSort}
-          recent={frequentlyUsedEmojis}
-          skin={skinTone}
-          showPreview={false}
-          showSkinTones={false}
-          notFound={notFoundFn}
-          emojiTooltip
-          style={{width: '100%'}}
-        />
+      <EmojiPicker
+        perLine={Math.floor(24 / emojiSize * 8)}
+        emojiSize={emojiSize}
+        sheetSize={32}
+        custom={buildCustomEmojis(custom_emojis)}
+        color=''
+        emoji=''
+        set='twitter'
+        title={title}
+        i18n={this.getI18n()}
+        onClick={this.handleClick}
+        include={categoriesSort}
+        recent={frequentlyUsedEmojis}
+        skin={skinTone}
+        showPreview={false}
+        showSkinTones={false}
+        notFound={notFoundFn}
+        emojiTooltip
+        style={{width: '100%'}}
+      />
     );
   }
 }
@@ -205,23 +207,23 @@ export default class ReactionModal extends ImmutablePureComponent {
     onClose: PropTypes.func.isRequired,
     skinTone: PropTypes.number.isRequired,
     frequentlyUsedEmojis: PropTypes.arrayOf(PropTypes.string),
-    };
+  };
 
-    state = {
-      loading: true,
-    };
+  state = {
+    loading: true,
+  };
 
 
-    componentDidMount() {
-        this.setState({ loading: true });
-        EmojiPickerAsync().then(EmojiMart => {
-          EmojiPicker = EmojiMart.Picker;
-          Emoji       = EmojiMart.Emoji;
-          this.setState({ loading: false });
-        }).catch(() => {
-          this.setState({ loading: false });
-        });
-    }
+  componentDidMount() {
+    this.setState({ loading: true });
+    EmojiPickerAsync().then(EmojiMart => {
+      EmojiPicker = EmojiMart.Picker;
+      Emoji       = EmojiMart.Emoji;
+      this.setState({ loading: false });
+    }).catch(() => {
+      this.setState({ loading: false });
+    });
+  }
 
   render () {
     const { custom_emojis, onPickEmoji, onSkinTone, onClose, skinTone, frequentlyUsedEmojis } = this.props;

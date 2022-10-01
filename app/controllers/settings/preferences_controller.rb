@@ -91,6 +91,8 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_content_font_size,
       :setting_info_font_size,
       :setting_content_emoji_reaction_size,
+      :setting_emoji_scale,
+      :setting_picker_emoji_size,
       :setting_hide_bot_on_public_timeline,
       :setting_confirm_follow_from_bot,
       :setting_default_search_searchability,
