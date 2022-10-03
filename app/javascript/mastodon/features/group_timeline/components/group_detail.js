@@ -16,6 +16,8 @@ import {
   unsubscribeModal,
   show_followed_by,
   follow_button_to_list_adder,
+  disableFollow,
+  disableUnfollow,
 } from 'mastodon/initial_state';
 import ShortNumber from 'mastodon/components/short_number';
 import {
@@ -260,9 +262,7 @@ class GroupDetail extends ImmutablePureComponent {
           subscribing_buttons = (
             <IconButton
               icon='rss-square'
-              title={intl.formatMessage(
-                subscribing ? messages.unsubscribe : messages.subscribe
-              )}
+              title={intl.formatMessage(subscribing ? messages.unsubscribe : messages.subscribe)}
               onClick={this.handleSubscribe}
               active={subscribing}
               no_delivery={subscribing && !subscribing_home}
@@ -272,10 +272,9 @@ class GroupDetail extends ImmutablePureComponent {
         if(!account.get('moved') || following) {
           following_buttons = (
             <IconButton
+              disabled={following ? disableUnfollow : disableFollow}
               icon={following ? 'user-times' : 'user-plus'}
-              title={intl.formatMessage(
-                following ? messages.unfollow : messages.follow
-              )}
+              title={intl.formatMessage(following ? messages.unfollow : messages.follow)}
               onClick={this.handleFollow}
               active={following}
               passive={followed_by}

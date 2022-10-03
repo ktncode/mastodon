@@ -19,6 +19,8 @@ class Api::V1::NotificationsController < Api::BaseController
   end
 
   def clear
+    raise Mastodon::NotPermittedError if current_user.setting_disable_clear_all_notifications
+
     current_account.notifications.delete_all
     render_empty
   end

@@ -38,7 +38,9 @@ class PostStatusService < BaseService
 
     validate_media!
     validate_expires!
+    validate_prohibited_words!
     preprocess_attributes!
+    validate_prohibited_visibilities!
     preprocess_quote!
 
     if scheduled?
@@ -150,6 +152,19 @@ class PostStatusService < BaseService
   def expires_soon?
     expires_at = @status&.status_expire&.expires_at
     expires_at.present? && expires_at <= Time.now.utc + MIN_SCHEDULE_OFFSET
+  end
+
+  def validate_prohibited_words!
+    return if @options[:spoiler_text].blank? && @options[:text].blank?
+
+    text = [@options[:spoiler_text], @options[:text]].join(' ')
+    words = (@account&.user&.setting_prohibited_words || '').split(',').map(&:strip).filter(&:present?)
+
+    raise Mastodon::ValidationError, I18n.t('status_prohibit.validations.prohibited_words') if words.any? { |word| text.include? word }
+  end
+
+  def validate_prohibited_visibilities!
+    raise Mastodon::ValidationError, I18n.t('status_prohibit.validations.prohibited_visibilities') if @account.user&.setting_prohibited_visibilities&.filter(&:present?)&.include?(@visibility.to_s)
   end
 
   def validate_media!

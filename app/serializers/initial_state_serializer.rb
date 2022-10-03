@@ -76,6 +76,14 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:confirm_follow_from_bot]           = object.current_account.user.setting_confirm_follow_from_bot
       store[:show_reload_button]                = object.current_account.user.setting_show_reload_button
       store[:default_column_width]              = object.current_account.user.setting_default_column_width
+      store[:disable_post]                      = object.current_account.user.setting_disable_post
+      store[:disable_reactions]                 = object.current_account.user.setting_disable_reactions
+      store[:disable_follow]                    = object.current_account.user.setting_disable_follow
+      store[:disable_unfollow]                  = object.current_account.user.setting_disable_unfollow
+      store[:disable_block]                     = object.current_account.user.setting_disable_block
+      store[:disable_domain_block]              = object.current_account.user.setting_disable_domain_block
+      store[:disable_clear_all_notifications]   = object.current_account.user.setting_disable_clear_all_notifications
+      store[:disable_account_delete]            = object.current_account.user.setting_disable_account_delete
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media
@@ -91,12 +99,14 @@ class InitialStateSerializer < ActiveModel::Serializer
     store = {}
 
     if object.current_account
-      store[:me]                     = object.current_account.id.to_s
-      store[:default_privacy]        = object.visibility || object.current_account.user.setting_default_privacy
-      store[:default_searchability]  = object.current_account.searchability
-      store[:default_sensitive]      = object.current_account.user.setting_default_sensitive
-      store[:default_expires_in]     = object.current_account.user.setting_default_expires_in
-      store[:default_expires_action] = object.current_account.user.setting_default_expires_action
+      store[:me]                      = object.current_account.id.to_s
+      store[:default_privacy]         = object.visibility || object.current_account.user.setting_default_privacy
+      store[:default_searchability]   = object.current_account.searchability
+      store[:default_sensitive]       = object.current_account.user.setting_default_sensitive
+      store[:default_expires_in]      = object.current_account.user.setting_default_expires_in
+      store[:default_expires_action]  = object.current_account.user.setting_default_expires_action
+      store[:prohibited_visibilities] = object.current_account.user.setting_prohibited_visibilities.filter(&:present?)
+      store[:prohibited_words]        = (object.current_account.user.setting_prohibited_words || '').split(',').map(&:strip).filter(&:present?)
     end
 
     store[:text] = object.text if object.text

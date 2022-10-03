@@ -134,6 +134,11 @@ a.table-action-link {
   &:first-child {
     padding-left: 0;
   }
+
+  &:disabled, &:disabled:hover {
+    color: darken($ui-primary-color, 30%);
+    cursor: default;
+  }
 }
 
 .batch-table {

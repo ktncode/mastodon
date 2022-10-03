@@ -1,3 +1,6 @@
+:ruby
+  disable = current_user.setting_disable_account_delete
+
 - content_for :page_title do
   = t('settings.delete')
 
@@ -26,4 +29,4 @@
     = f.input :username, wrapper: :with_block_label, input_html: { :autocomplete => 'off' }, hint: t('deletes.confirm_username')
 
   .actions
-    = f.button :button, t('deletes.proceed'), type: :submit, class: 'negative'
+    = f.button :button, t('deletes.proceed'), type: :submit, class: disable ? 'button disabled' : 'negative', disabled: disable

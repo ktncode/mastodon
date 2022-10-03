@@ -8,6 +8,8 @@ class Api::V1::Statuses::FavouritesController < Api::BaseController
   before_action :set_status, only: [:create]
 
   def create
+    raise Mastodon::NotPermittedError if current_user.setting_disable_reactions
+
     FavouriteService.new.call(current_account, @status)
     render json: @status, serializer: REST::StatusSerializer
   end

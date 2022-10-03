@@ -8,6 +8,8 @@ class Api::V1::Statuses::EmojiReactionsController < Api::BaseController
   before_action :set_status
 
   def update
+    raise Mastodon::NotPermittedError if current_user.setting_disable_reactions
+
     if EmojiReactionService.new.call(current_account, @status, params[:id]).present?
       @status = Status.include_expired.find(params[:status_id])
     end

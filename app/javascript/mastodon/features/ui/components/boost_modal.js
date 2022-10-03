@@ -29,6 +29,7 @@ const messages = defineMessages({
 const mapStateToProps = state => {
   return {
     privacy: state.getIn(['boosts', 'new', 'privacy']),
+    prohibitedVisibilities: state.getIn(['compose', 'prohibited_visibilities']),
   };
 };
 
@@ -40,7 +41,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default @connect(mapStateToProps, mapDispatchToProps)
+export default @connect(mapStateToProps, mapDispatchToProps, null, { forwardRef: true })
 @injectIntl
 class BoostModal extends ImmutablePureComponent {
 
@@ -88,7 +89,7 @@ class BoostModal extends ImmutablePureComponent {
   }
 
   render () {
-    const { status, privacy, intl } = this.props;
+    const { status, privacy, prohibitedVisibilities, intl } = this.props;
     const buttonText = status.get('reblogged') ? messages.cancel_reblog : messages.reblog;
 
     const visibilityIconInfo = {
@@ -138,11 +139,12 @@ class BoostModal extends ImmutablePureComponent {
             <PrivacyDropdown
               noDirect
               value={privacy}
+              prohibitedVisibilities={prohibitedVisibilities}
               container={this._findContainer}
               onChange={this.props.onChangeBoostPrivacy}
             />
           )}
-          <Button text={intl.formatMessage(buttonText)} onClick={this.handleReblog} ref={this.setRef} />
+          <Button disabled={prohibitedVisibilities?.includes(privacy)} text={intl.formatMessage(buttonText)} onClick={this.handleReblog} ref={this.setRef} />
         </div>
       </div>
     );

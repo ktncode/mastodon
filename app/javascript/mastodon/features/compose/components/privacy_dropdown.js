@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { injectIntl, defineMessages } from 'react-intl';
 import IconButton from '../../../components/icon_button';
 import Overlay from 'react-overlays/lib/Overlay';
@@ -22,6 +23,8 @@ const messages = defineMessages({
   direct_long: { id: 'privacy.direct.long', defaultMessage: 'Visible for mentioned users only' },
   limited_short: { id: 'privacy.limited.short', defaultMessage: 'Circle' },
   limited_long: { id: 'privacy.limited.long', defaultMessage: 'Visible for circle users only' },
+  none_short: { id: 'privacy.none.short', defaultMessage: 'None' },
+  none_long: { id: 'privacy.none.long', defaultMessage: 'No visibility allowed' },
   change_privacy: { id: 'privacy.change', defaultMessage: 'Adjust status privacy' },
 });
 
@@ -160,6 +163,7 @@ class PrivacyDropdown extends React.PureComponent {
     onModalOpen: PropTypes.func,
     onModalClose: PropTypes.func,
     value: PropTypes.string.isRequired,
+    prohibitedVisibilities: ImmutablePropTypes.set,
     onChange: PropTypes.func.isRequired,
     noDirect: PropTypes.bool,
     container: PropTypes.func,
@@ -235,28 +239,25 @@ class PrivacyDropdown extends React.PureComponent {
   }
 
   componentWillMount () {
-    const { intl: { formatMessage } } = this.props;
+    const { intl: { formatMessage }, prohibitedVisibilities } = this.props;
 
     this.options = [
       { icon: 'globe', value: 'public', text: formatMessage(messages.public_short), meta: formatMessage(messages.public_long) },
       { icon: 'unlock', value: 'unlisted', text: formatMessage(messages.unlisted_short), meta: formatMessage(messages.unlisted_long) },
       { icon: 'lock', value: 'private', text: formatMessage(messages.private_short), meta: formatMessage(messages.private_long) },
       { icon: 'exchange', value: 'mutual', text: formatMessage(messages.mutual_short), meta: formatMessage(messages.mutual_long) },
-    ];
-
-    if (!this.props.noDirect) {
-      this.options.push(
+      ...!this.props.noDirect && [
         { icon: 'user-circle', value: 'limited', text: formatMessage(messages.limited_short), meta: formatMessage(messages.limited_long) },
         { icon: 'envelope', value: 'direct', text: formatMessage(messages.direct_short), meta: formatMessage(messages.direct_long) },
-      );
-    }
+      ],
+    ].filter(option => !prohibitedVisibilities?.includes(option.value));
   }
 
   render () {
     const { value, container, intl } = this.props;
     const { open, placement } = this.state;
 
-    const valueOption = this.options.find(item => item.value === value);
+    const valueOption = this.options.find(item => item.value === value) || { icon: 'ban', value: 'none', text: intl.formatMessage(messages.none_short), meta: intl.formatMessage(messages.none_long) };
 
     return (
       <div className={classNames('privacy-dropdown', placement, { active: open })} onKeyDown={this.handleKeyDown}>

@@ -141,6 +141,8 @@ class User < ApplicationRecord
            :hide_bot_on_public_timeline, :confirm_follow_from_bot,
            :default_search_searchability, :default_expires_in, :default_expires_action,
            :show_reload_button, :default_column_width,
+           :disable_post, :disable_reactions, :disable_follow, :disable_unfollow, :disable_block, :disable_domain_block, :disable_clear_all_notifications, :disable_account_delete,
+           :prohibited_visibilities, :prohibited_words,
 
            to: :settings, prefix: :setting, allow_nil: false
 

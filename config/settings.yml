@@ -116,6 +116,16 @@ defaults: &defaults
   default_column_width: 'x100'
   default_expires_in: ''
   default_expires_action: 'mark'
+  disable_post: false
+  disable_reactions: false
+  disable_follow: false
+  disable_unfollow: false
+  disable_block: false
+  disable_domain_block: false
+  disable_clear_all_notifications: false
+  disable_account_delete: false
+  prohibited_visibilities: []
+  prohibited_words: ''
 
 development:
   <<: *defaults

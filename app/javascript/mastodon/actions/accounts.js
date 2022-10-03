@@ -204,7 +204,7 @@ export function followAccount(id, options = { reblogs: true, delivery: true }) {
     api(getState).post(`/api/v1/accounts/${id}/follow`, options).then(response => {
       dispatch(followAccountSuccess(response.data, alreadyFollowing));
     }).catch(error => {
-      dispatch(followAccountFail(error, locked));
+      dispatch(followAccountFail(id, error, locked));
     });
   };
 };
@@ -216,7 +216,7 @@ export function unfollowAccount(id) {
     api(getState).post(`/api/v1/accounts/${id}/unfollow`).then(response => {
       dispatch(unfollowAccountSuccess(response.data, getState().get('statuses')));
     }).catch(error => {
-      dispatch(unfollowAccountFail(error));
+      dispatch(unfollowAccountFail(id, error));
     });
   };
 };
@@ -239,9 +239,10 @@ export function followAccountSuccess(relationship, alreadyFollowing) {
   };
 };
 
-export function followAccountFail(error, locked) {
+export function followAccountFail(id, error, locked) {
   return {
     type: ACCOUNT_FOLLOW_FAIL,
+    id,
     error,
     locked,
     skipLoading: true,
@@ -265,9 +266,10 @@ export function unfollowAccountSuccess(relationship, statuses) {
   };
 };
 
-export function unfollowAccountFail(error) {
+export function unfollowAccountFail(id, error) {
   return {
     type: ACCOUNT_UNFOLLOW_FAIL,
+    id,
     error,
     skipLoading: true,
   };
@@ -283,7 +285,7 @@ export function subscribeAccount(id, reblogs = true, list_id = null) {
     api(getState).post(`/api/v1/accounts/${id}/subscribe`, { reblogs, list_id }).then(response => {
       dispatch(subscribeAccountSuccess(response.data, alreadySubscribe));
     }).catch(error => {
-      dispatch(subscribeAccountFail(error, locked));
+      dispatch(subscribeAccountFail(id, error, locked));
     });
   };
 };
@@ -295,7 +297,7 @@ export function unsubscribeAccount(id, list_id = null) {
     api(getState).post(`/api/v1/accounts/${id}/unsubscribe`, { list_id }).then(response => {
       dispatch(unsubscribeAccountSuccess(response.data, getState().get('statuses')));
     }).catch(error => {
-      dispatch(unsubscribeAccountFail(error));
+      dispatch(unsubscribeAccountFail(id, error));
     });
   };
 };
@@ -318,9 +320,10 @@ export function subscribeAccountSuccess(relationship, alreadySubscribe) {
   };
 };
 
-export function subscribeAccountFail(error, locked) {
+export function subscribeAccountFail(id, error, locked) {
   return {
     type: ACCOUNT_SUBSCRIBE_FAIL,
+    id,
     error,
     locked,
     skipLoading: true,
@@ -344,9 +347,10 @@ export function unsubscribeAccountSuccess(relationship, statuses) {
   };
 };
 
-export function unsubscribeAccountFail(error) {
+export function unsubscribeAccountFail(id, error) {
   return {
     type: ACCOUNT_UNSUBSCRIBE_FAIL,
+    id,
     error,
     skipLoading: true,
   };
@@ -392,9 +396,10 @@ export function blockAccountSuccess(relationship, statuses) {
   };
 };
 
-export function blockAccountFail(error) {
+export function blockAccountFail(id, error) {
   return {
     type: ACCOUNT_BLOCK_FAIL,
+    id,
     error,
   };
 };
@@ -413,9 +418,10 @@ export function unblockAccountSuccess(relationship) {
   };
 };
 
-export function unblockAccountFail(error) {
+export function unblockAccountFail(id, error) {
   return {
     type: ACCOUNT_UNBLOCK_FAIL,
+    id,
     error,
   };
 };

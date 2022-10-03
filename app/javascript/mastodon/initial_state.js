@@ -55,5 +55,13 @@ export const enableEmptyColumn = getMeta('enable_empty_column');
 export const showReloadButton = getMeta('show_reload_button');
 export const defaultColumnWidth = getMeta('default_column_width');
 export const pickerEmojiSize = getMeta('picker_emoji_size');
+export const disablePost = getMeta('disable_post');
+export const disableReactions = getMeta('disable_reactions');
+export const disableFollow = getMeta('disable_follow');
+export const disableUnfollow = getMeta('disable_unfollow');
+export const disableBlock = getMeta('disable_block');
+export const disableDomainBlock = getMeta('disable_domain_block');
+export const disableClearAllNotifications = getMeta('disable_clear_all_notifications');
+export const disableAccountDelete = getMeta('disable_account_delete');
 
 export default initialState;

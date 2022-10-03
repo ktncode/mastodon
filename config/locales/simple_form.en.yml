@@ -70,7 +70,15 @@ en:
           The format is 1y2mo3d4h5m (1 year, 2 months, 3 days, 4 hours, 5 minutes later).
         setting_default_search_searchability: For clients that do not support advanced range settings, switch the settings here. Mastodon's standard behavior is "Reacted-users-only". Targeting "Public" makes it easier to discover unknown information, but if the results are noisy, narrowing the search range is effective.
         setting_default_sensitive: Sensitive media is hidden by default and can be revealed with a click
+        setting_disable_account_delete: Restrict account deletion due to temporary hesitation
+        setting_disable_block: Restricts you from accidentally blocking
+        setting_disable_clear_all_notifications: Restrict clearing all notifications
+        setting_disable_domain_block: Restrict domain blocking
+        setting_disable_follow: Restricts you from accidentally following
         setting_disable_joke_appearance: Disable April Fools' Day and other joke functions
+        setting_disable_post: Restricts you from accidentally posting
+        setting_disable_reactions: Restrict reactions for favorites, boosts ,emoji reactions and polls
+        setting_disable_unfollow: Restricts you from accidentally unfollowing
         setting_display_media_default: Hide media marked as sensitive
         setting_display_media_hide_all: Always hide media
         setting_display_media_show_all: Always show media
@@ -89,6 +97,8 @@ en:
         setting_new_features_policy: Set the acceptance policy when new features are added to Fedibird. The recommended setting will enable many new features, so set it to disabled if it is not desirable
         setting_noindex: Affects your public profile and post pages
         setting_place_tab_bar_at_bottom: When using a touch device, you can operate tabs within the reach of your fingers.
+        setting_prohibited_visibilities: Prohibited visibilities
+        setting_prohibited_words: Prohibited words
         setting_show_application: The application you use to post will be displayed in the detailed view of your posts
         setting_show_bookmark_button: When turned off, the bookmark call will be in Mastodon's standard position (in the menu on the action bar)
         setting_show_follow_button_on_timeline: You can easily check the follow status and build a follow list quickly
@@ -241,8 +251,16 @@ en:
         setting_default_search_searchability: Search range
         setting_default_sensitive: Always mark media as sensitive
         setting_delete_modal: Show confirmation dialog before deleting a post
+        setting_disable_account_delete: Disable account delete
+        setting_disable_block: Disable block
+        setting_disable_clear_all_notifications: Disable clear all notifications
+        setting_disable_domain_block: Disable domain block
+        setting_disable_follow: Disable follow
         setting_disable_joke_appearance: Disable joke feature to change appearance
+        setting_disable_post: Disable post
+        setting_disable_reactions: Disable reactions
         setting_disable_swiping: Disable swiping motions
+        setting_disable_unfollow: Disable unfollow
         setting_display_media: Media display
         setting_display_media_default: Default
         setting_display_media_hide_all: Hide all
@@ -270,6 +288,8 @@ en:
         setting_picker_emoji_size: Emoji size in picker
         setting_place_tab_bar_at_bottom: Place the tab bar at the bottom
         setting_post_reference_modal: Show a confirmation dialog before making a post containing references
+        setting_prohibited_visibilities: Prohibited visibility
+        setting_prohibited_words: Prohibited words
         setting_reduce_motion: Reduce motion in animations
         setting_unselect_reference_modal: Show confirmation dialog before removing a reference
         setting_show_application: Disclose application used to send posts

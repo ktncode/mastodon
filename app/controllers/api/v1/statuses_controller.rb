@@ -54,6 +54,8 @@ class Api::V1::StatusesController < Api::BaseController
   end
 
   def create
+    raise Mastodon::NotPermittedError if current_user.setting_disable_post
+
     @status = PostStatusService.new.call(current_user.account,
                                          text: status_params[:status],
                                          thread: @thread,

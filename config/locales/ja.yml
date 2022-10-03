@@ -1191,10 +1191,14 @@ ja:
       too_many_options: は%{max}個までです
   preferences:
     beta_features: ベータ機能
+    disable_actions: 操作の無効化
+    disable_actions_hint: 誤操作による事故を防いだり、用途を限定したアカウント向けに、特定の操作を無効化するための設定です。クライアントアプリに対しても有効です。
     fedibird_features: Fedibirdの機能
     other: その他
+    post_prohibite: 投稿の禁止
     posting_defaults: デフォルトの投稿設定
     public_timelines: 公開タイムライン
+    safety: 安全とプライバシー
     searching_defaults: デフォルトの検索設定
   reactions:
     errors:
@@ -1316,6 +1320,7 @@ ja:
     preferences: ユーザー設定
     profile: プロフィール
     relationships: フォロー・フォロワー
+    safety: 安全とプライバシー
     two_factor_authentication: 二段階認証
     webauthn_authentication: セキュリティキー
   statuses:
@@ -1385,6 +1390,10 @@ ja:
       public_long: 誰でも見ることができ、かつ公開タイムラインに表示されます
       unlisted: 未収載
       unlisted_long: 誰でも見ることができますが、公開タイムラインには表示されません
+  status_prohibit:
+    validations:
+      prohibited_visibilities: 禁止された公開範囲を指定しています
+      prohibited_words: 禁止された単語を含んでいます
   status_expire:
     validations:
       expire_in_the_past: 既に公開期限を過ぎています。投稿時間より前の公開期限は指定できません

@@ -6,7 +6,7 @@ import IconButton from './icon_button';
 import DropdownMenuContainer from '../containers/dropdown_menu_container';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, isStaff, show_bookmark_button, show_quote_button, enableReaction, compactReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal } from '../initial_state';
+import { me, isStaff, show_bookmark_button, show_quote_button, enableReaction, compactReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock } from '../initial_state';
 import classNames from 'classnames';
 import { openModal } from '../actions/modal';
 
@@ -404,11 +404,15 @@ class StatusActionBar extends ImmutablePureComponent {
 
     if (writtenByMe) {
       menu.push({ text: intl.formatMessage(messages.delete), action: this.handleDeleteClick });
-      menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick });
+      if (!disablePost) {
+        menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick });
+      }
     } else {
-      menu.push({ text: intl.formatMessage(messages.mention, { name: account.get('username') }), action: this.handleMentionClick });
-      menu.push({ text: intl.formatMessage(messages.direct, { name: account.get('username') }), action: this.handleDirectClick });
-      menu.push(null);
+      if (!disablePost) {
+        menu.push({ text: intl.formatMessage(messages.mention, { name: account.get('username') }), action: this.handleMentionClick });
+        menu.push({ text: intl.formatMessage(messages.direct, { name: account.get('username') }), action: this.handleDirectClick });
+        menu.push(null);
+      }
 
       if (relationship && relationship.get('muting')) {
         menu.push({ text: intl.formatMessage(messages.unmute, { name: account.get('username') }), action: this.handleMuteClick });
@@ -418,18 +422,18 @@ class StatusActionBar extends ImmutablePureComponent {
 
       if (relationship && relationship.get('blocking')) {
         menu.push({ text: intl.formatMessage(messages.unblock, { name: account.get('username') }), action: this.handleBlockClick });
-      } else {
+      } else if (!disableBlock) {
         menu.push({ text: intl.formatMessage(messages.block, { name: account.get('username') }), action: this.handleBlockClick });
       }
 
       menu.push({ text: intl.formatMessage(messages.report, { name: account.get('username') }), action: this.handleReport });
 
       if (domain) {
-        menu.push(null);
-
         if (relationship && relationship.get('domain_blocking')) {
+          menu.push(null);
           menu.push({ text: intl.formatMessage(messages.unblockDomain, { domain }), action: this.handleUnblockDomain });
-        } else {
+        } else if (!disableDomainBlock) {
+          menu.push(null);
           menu.push({ text: intl.formatMessage(messages.blockDomain, { domain }), action: this.handleBlockDomain });
         }
       }
@@ -474,22 +478,21 @@ class StatusActionBar extends ImmutablePureComponent {
 
     return (
       <div className='status__action-bar'>
-        <IconButton className='status__action-bar-button' disabled={expired} title={replyTitle} icon={status.get('in_reply_to_account_id') === status.getIn(['account', 'id']) ? 'reply' : replyIcon} onClick={this.handleReplyClick} counter={status.get('replies_count')} obfuscateCount />
-        {enableStatusReference && me && <IconButton className={classNames('status__action-bar-button link-icon', {referenced, 'context-referenced': contextReferenced})} animate disabled={referenceDisabled} active={referenced} pressed={referenced} title={intl.formatMessage(messages.reference)} icon='link' onClick={this.handleReferenceClick} />}
-        <IconButton className={classNames('status__action-bar-button', { reblogPrivate })} disabled={!publicStatus && !reblogPrivate || expired}  active={reblogged} pressed={reblogged} title={reblogTitle} icon='retweet' onClick={this.handleReblogClick} />
-        <IconButton className='status__action-bar-button star-icon' animate disabled={!favourited && expired} active={favourited} pressed={favourited} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} />
-        {show_quote_button && <IconButton className='status__action-bar-button' disabled={anonymousAccess || !publicStatus || expired} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} />}
+        <IconButton className='status__action-bar-button' disabled={disablePost || expired} title={replyTitle} icon={status.get('in_reply_to_account_id') === status.getIn(['account', 'id']) ? 'reply' : replyIcon} onClick={this.handleReplyClick} counter={status.get('replies_count')} obfuscateCount />
+        {enableStatusReference && me && <IconButton className={classNames('status__action-bar-button link-icon', {referenced, 'context-referenced': contextReferenced})} animate disabled={disablePost || referenceDisabled} active={referenced} pressed={referenced} title={intl.formatMessage(messages.reference)} icon='link' onClick={this.handleReferenceClick} />}
+        <IconButton className={classNames('status__action-bar-button', { reblogPrivate })} disabled={disableReactions || !publicStatus && !reblogPrivate || expired}  active={reblogged} pressed={reblogged} title={reblogTitle} icon='retweet' onClick={this.handleReblogClick} />
+        <IconButton className='status__action-bar-button star-icon' animate disabled={disableReactions || !favourited && expired} active={favourited} pressed={favourited} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} />
+        {show_quote_button && <IconButton className='status__action-bar-button' disabled={disablePost || anonymousAccess || !publicStatus || expired} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} />}
         {shareButton}
         {show_bookmark_button && <IconButton className='status__action-bar-button bookmark-icon' disabled={!bookmarked && expired} active={bookmarked} pressed={bookmarked} title={intl.formatMessage(bookmarked ? messages.removeBookmark : messages.bookmark)} icon='bookmark' onClick={this.handleBookmarkClick} />}
 
-        {enableReaction && <div className={classNames('status__action-bar-dropdown', {'icon-button--with-counter': reactionsCounter})}>
+        {enableReaction && <div className={classNames('status__action-bar-dropdown', { 'icon-button--with-counter': reactionsCounter })}>
           <ReactionPickerDropdownContainer
             scrollKey={scrollKey}
-            disabled={expired}
+            disabled={disableReactions || expired || anonymousAccess}
             active={emoji_reactioned}
             pressed={emoji_reactioned}
             className='status__action-bar-button'
-            disabled={anonymousAccess}
             status={status}
             title={intl.formatMessage(messages.emoji_reaction)}
             icon='smile-o'

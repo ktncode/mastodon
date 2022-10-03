@@ -114,6 +114,7 @@ Rails.application.routes.draw do
     namespace :preferences do
       resource :appearance, only: [:show, :update], controller: :appearance
       resource :notifications, only: [:show, :update]
+      resource :safety, only: [:show, :update], controller: :safety
       resource :other, only: [:show, :update], controller: :other
     end
 

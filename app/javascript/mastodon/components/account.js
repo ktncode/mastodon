@@ -7,7 +7,7 @@ import Permalink from './permalink';
 import IconButton from './icon_button';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, show_followed_by, follow_button_to_list_adder } from '../initial_state';
+import { me, show_followed_by, follow_button_to_list_adder, disableFollow, disableUnfollow } from '../initial_state';
 import RelativeTimestamp from './relative_timestamp';
 
 const messages = defineMessages({
@@ -132,9 +132,7 @@ class Account extends ImmutablePureComponent {
           subscribing_buttons = (
             <IconButton
               icon='rss-square'
-              title={intl.formatMessage(
-                subscribing ? messages.unsubscribe : messages.subscribe
-              )}
+              title={intl.formatMessage(subscribing ? messages.unsubscribe : messages.subscribe)}
               onClick={this.handleSubscribe}
               active={subscribing}
               no_delivery={subscribing && !subscribing_home}
@@ -144,10 +142,9 @@ class Account extends ImmutablePureComponent {
         if (!account.get('moved') || following) {
           following_buttons = (
             <IconButton
+              disabled={following ? disableUnfollow : disableFollow}
               icon={following ? 'user-times' : 'user-plus'}
-              title={intl.formatMessage(
-                following ? messages.unfollow : messages.follow
-              )}
+              title={intl.formatMessage(following ? messages.unfollow : messages.follow)}
               onClick={this.handleFollow}
               active={following}
               passive={followed_by}

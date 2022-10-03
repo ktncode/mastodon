@@ -5,7 +5,7 @@ import IconButton from '../../../components/icon_button';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
 import { defineMessages, injectIntl } from 'react-intl';
-import { me, isStaff, show_quote_button, enableReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal } from '../../../initial_state';
+import { me, isStaff, show_quote_button, enableReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock } from '../../../initial_state';
 import classNames from 'classnames';
 import ReactionPickerDropdownContainer from 'mastodon/containers/reaction_picker_dropdown_container';
 import { openModal } from '../../../actions/modal';
@@ -295,11 +295,11 @@ class ActionBar extends React.PureComponent {
     const reblogsCount       = status.get('reblogs_count');
     const referredByCount    = status.get('status_referred_by_count');
     const favouritesCount    = status.get('favourites_count');
-    const [ _, domain ]      = account.get('acct').split('@');
+    const [ , domain ]       = account.get('acct').split('@');
 
-    const expires_at = status.get('expires_at')
-    const expires_date = expires_at && new Date(expires_at)
-    const expired = expires_date && expires_date.getTime() < intl.now()
+    const expires_at = status.get('expires_at');
+    const expires_date = expires_at && new Date(expires_at);
+    const expired = expires_date && expires_date.getTime() < intl.now();
 
     let menu = [];
 
@@ -350,12 +350,18 @@ class ActionBar extends React.PureComponent {
         menu.push({ text: intl.formatMessage(mutingConversation ? messages.unmuteConversation : messages.muteConversation), action: this.handleConversationMuteClick });
         menu.push(null);
       }
+
       menu.push({ text: intl.formatMessage(messages.delete), action: this.handleDeleteClick });
-      menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick });
+
+      if (!disablePost) {
+        menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick });
+      }
     } else {
-      menu.push({ text: intl.formatMessage(messages.mention, { name: status.getIn(['account', 'username']) }), action: this.handleMentionClick });
-      menu.push({ text: intl.formatMessage(messages.direct, { name: status.getIn(['account', 'username']) }), action: this.handleDirectClick });
-      menu.push(null);
+      if (!disablePost) {
+        menu.push({ text: intl.formatMessage(messages.mention, { name: status.getIn(['account', 'username']) }), action: this.handleMentionClick });
+        menu.push({ text: intl.formatMessage(messages.direct, { name: status.getIn(['account', 'username']) }), action: this.handleDirectClick });
+        menu.push(null);
+      }
 
       if (relationship && relationship.get('muting')) {
         menu.push({ text: intl.formatMessage(messages.unmute, { name: account.get('username') }), action: this.handleMuteClick });
@@ -365,18 +371,18 @@ class ActionBar extends React.PureComponent {
 
       if (relationship && relationship.get('blocking')) {
         menu.push({ text: intl.formatMessage(messages.unblock, { name: account.get('username') }), action: this.handleBlockClick });
-      } else {
+      } else if (!disableBlock) {
         menu.push({ text: intl.formatMessage(messages.block, { name: account.get('username') }), action: this.handleBlockClick });
       }
 
       menu.push({ text: intl.formatMessage(messages.report, { name: status.getIn(['account', 'username']) }), action: this.handleReport });
 
       if (domain) {
-        menu.push(null);
-
         if (relationship && relationship.get('domain_blocking')) {
+          menu.push(null);
           menu.push({ text: intl.formatMessage(messages.unblockDomain, { domain }), action: this.handleUnblockDomain });
-        } else {
+        } else if (!disableDomainBlock) {
+          menu.push(null);
           menu.push({ text: intl.formatMessage(messages.blockDomain, { domain }), action: this.handleBlockDomain });
         }
       }
@@ -416,17 +422,17 @@ class ActionBar extends React.PureComponent {
 
     return (
       <div className='detailed-status__action-bar'>
-        <div className='detailed-status__button'><IconButton disabled={expired} title={intl.formatMessage(messages.reply)} icon={status.get('in_reply_to_account_id') === status.getIn(['account', 'id']) ? 'reply' : replyIcon} onClick={this.handleReplyClick} /></div>
-        {enableStatusReference && me && <div className='detailed-status__button'><IconButton className={classNames('link-icon', {referenced, 'context-referenced': contextReferenced})} animate disabled={referenceDisabled} active={referenced} pressed={referenced} title={intl.formatMessage(messages.reference)} icon='link' onClick={this.handleReferenceClick} /></div>}
-        <div className='detailed-status__button'><IconButton className={classNames({ reblogPrivate })} disabled={!publicStatus && !reblogPrivate || expired} active={reblogged} title={reblogTitle} icon='retweet' onClick={this.handleReblogClick} /></div>
-        <div className='detailed-status__button'><IconButton className='star-icon' animate active={favourited} disabled={!favourited && expired} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} /></div>
-        {show_quote_button && <div className='detailed-status__button'><IconButton disabled={!publicStatus || expired} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} /></div>}
+        <div className='detailed-status__button'><IconButton disabled={disablePost || expired} title={intl.formatMessage(messages.reply)} icon={status.get('in_reply_to_account_id') === status.getIn(['account', 'id']) ? 'reply' : replyIcon} onClick={this.handleReplyClick} /></div>
+        {enableStatusReference && me && <div className='detailed-status__button'><IconButton className={classNames('link-icon', {referenced, 'context-referenced': contextReferenced})} animate disabled={disablePost || referenceDisabled} active={referenced} pressed={referenced} title={intl.formatMessage(messages.reference)} icon='link' onClick={this.handleReferenceClick} /></div>}
+        <div className='detailed-status__button'><IconButton className={classNames({ reblogPrivate })} disabled={disableReactions || !publicStatus && !reblogPrivate || expired} active={reblogged} title={reblogTitle} icon='retweet' onClick={this.handleReblogClick} /></div>
+        <div className='detailed-status__button'><IconButton className='star-icon' animate active={favourited} disabled={disableReactions || !favourited && expired} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} /></div>
+        {show_quote_button && <div className='detailed-status__button'><IconButton disabled={disablePost || !publicStatus || expired} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} /></div>}
         {shareButton}
         <div className='detailed-status__button'><IconButton className='bookmark-icon' active={bookmarked} disabled={!bookmarked && expired} title={intl.formatMessage(messages.bookmark)} icon='bookmark' onClick={this.handleBookmarkClick} /></div>
 
         {enableReaction && <div className='detailed-status__action-bar-dropdown'>
           <ReactionPickerDropdownContainer
-            disabled={expired}
+            disabled={disableReactions || expired}
             active={emoji_reactioned}
             pressed={emoji_reactioned}
             className='status__action-bar-button'

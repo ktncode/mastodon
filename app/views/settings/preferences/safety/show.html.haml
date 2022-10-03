@@ -1,0 +1,45 @@
+- content_for :page_title do
+  = t('settings.safety')
+
+- content_for :heading_actions do
+  = button_tag t('generic.save_changes'), class: 'button', form: 'edit_preferences'
+
+= simple_form_for current_user, url: settings_preferences_safety_path, html: { method: :put, id: 'edit_preferences' } do |f|
+  = render 'shared/error_messages', object: current_user
+
+  %h4= t 'preferences.disable_actions'
+
+  %p.hint= t 'preferences.disable_actions_hint'
+
+  .fields-group
+    = f.input :setting_disable_reactions, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_follow, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_unfollow, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_block, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_domain_block, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_clear_all_notifications, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_account_delete, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_disable_post, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  %h4= t 'preferences.post_prohibite'
+
+  .fields-group
+    = f.input :setting_prohibited_visibilities, collection: Status.visibilities.keys, wrapper: :with_label, include_blank: false, label_method: lambda { |visibility| t("statuses.visibilities.#{visibility}") }, required: false, as: :check_boxes, collection_wrapper_tag: 'ul', item_wrapper_tag: 'li', fedibird_features: true
+
+  .fields-group
+    = f.input :setting_prohibited_words, wrapper: :with_label, fedibird_features: true
+

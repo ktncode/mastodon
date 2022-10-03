@@ -6,7 +6,7 @@ import Permalink from './permalink';
 import classnames from 'classnames';
 import PollContainer from 'mastodon/containers/poll_container';
 import Icon from 'mastodon/components/icon';
-import { autoPlayGif } from 'mastodon/initial_state';
+import { autoPlayGif, disableReactions } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   linkToAcct: { id: 'status.link_to_acct', defaultMessage: 'Link to @{acct}' },
@@ -268,7 +268,7 @@ export default class StatusContent extends React.PureComponent {
     );
 
     const pollContainer = (
-      <PollContainer pollId={status.get('poll')} />
+      <PollContainer pollId={status.get('poll')} disabled={disableReactions} />
     );
 
     if (status.get('spoiler_text').length > 0) {

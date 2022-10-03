@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import ClearColumnButton from './clear_column_button';
 import GrantPermissionButton from './grant_permission_button';
 import SettingToggle from './setting_toggle';
-import { enableReaction, enableStatusReference } from 'mastodon/initial_state';
+import { enableReaction, enableStatusReference, disableClearAllNotifications } from 'mastodon/initial_state';
 
 export default class ColumnSettings extends React.PureComponent {
 
@@ -52,9 +52,9 @@ export default class ColumnSettings extends React.PureComponent {
           </div>
         )}
 
-        <div className='column-settings__row'>
+        {!disableClearAllNotifications && <div className='column-settings__row'>
           <ClearColumnButton onClick={onClear} />
-        </div>
+        </div>}
 
         <div role='group' aria-labelledby='notifications-unread-markers'>
           <span id='notifications-unread-markers' className='column-settings__section'>

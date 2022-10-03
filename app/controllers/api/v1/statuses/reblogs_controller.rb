@@ -11,6 +11,8 @@ class Api::V1::Statuses::ReblogsController < Api::BaseController
   override_rate_limit_headers :create, family: :statuses
 
   def create
+    raise Mastodon::NotPermittedError if current_user.setting_disable_reactions
+
     @status = ReblogService.new.call(current_account, @reblog, reblog_params)
 
     render json: @status, serializer: REST::StatusSerializer

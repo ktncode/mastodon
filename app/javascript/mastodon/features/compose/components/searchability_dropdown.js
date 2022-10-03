@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { injectIntl, defineMessages } from 'react-intl';
 import IconButton from '../../../components/icon_button';
 import Overlay from 'react-overlays/lib/Overlay';
@@ -155,6 +156,7 @@ class SearchabilityDropdown extends React.PureComponent {
     onModalOpen: PropTypes.func,
     onModalClose: PropTypes.func,
     value: PropTypes.string.isRequired,
+    prohibitedVisibilities: ImmutablePropTypes.set,
     onChange: PropTypes.func.isRequired,
     noDirect: PropTypes.bool,
     container: PropTypes.func,
@@ -230,13 +232,13 @@ class SearchabilityDropdown extends React.PureComponent {
   }
 
   componentWillMount () {
-    const { intl: { formatMessage } } = this.props;
+    const { intl: { formatMessage }, prohibitedVisibilities } = this.props;
 
     this.options = [
       { icon: 'globe', value: 'public', text: formatMessage(messages.public_short), meta: formatMessage(messages.public_long) },
       { icon: 'lock', value: 'private', text: formatMessage(messages.private_short), meta: formatMessage(messages.private_long) },
       { icon: 'at', value: 'direct', text: formatMessage(messages.direct_short), meta: formatMessage(messages.direct_long) },
-    ];
+    ].filter(option => !prohibitedVisibilities?.includes(option.value));
   }
 
   render () {

@@ -101,6 +101,16 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_confirm_domain_block,
       :setting_default_expires_in,
       :setting_default_expires_action,
+      :setting_disable_post,
+      :setting_disable_reactions,
+      :setting_disable_follow,
+      :setting_disable_unfollow,
+      :setting_disable_block,
+      :setting_disable_domain_block,
+      :setting_disable_clear_all_notifications,
+      :setting_disable_account_delete,
+      :setting_prohibited_words,
+      setting_prohibited_visibilities: [],
       notification_emails: %i(follow follow_request reblog favourite emoji_reaction status_reference mention digest report pending_account trending_tag),
       interactions: %i(must_be_follower must_be_following must_be_following_dm must_be_dm_to_send_email must_be_following_reference)
     )

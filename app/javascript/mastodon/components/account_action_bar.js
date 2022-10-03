@@ -10,6 +10,8 @@ import {
   show_subscribe_button_on_timeline,
   show_followed_by,
   follow_button_to_list_adder,
+  disableFollow,
+  disableUnfollow,
 } from '../initial_state';
 
 const messages = defineMessages({
@@ -75,10 +77,10 @@ class AccountActionBar extends ImmutablePureComponent {
         if (requested) {
           following_buttons = <IconButton disabled icon='hourglass' title={intl.formatMessage(messages.requested)} active={followed_by} />;
         } else {
-          following_buttons = <IconButton icon={following ? 'user-times' : 'user-plus'} title={intl.formatMessage(following ? messages.unfollow : messages.follow)} onClick={this.handleFollow} active={following} passive={followed_by} no_delivery={following && !delivery} />;
+          following_buttons = <IconButton disabled={following ? disableUnfollow : disableFollow} icon={following ? 'user-times' : 'user-plus'} title={intl.formatMessage(following ? messages.unfollow : messages.follow)} onClick={this.handleFollow} active={following} passive={followed_by} no_delivery={following && !delivery} />;
         }
       }
-      buttons = <span>{subscribing_buttons}{following_buttons}</span>
+      buttons = <span>{subscribing_buttons}{following_buttons}</span>;
     }
 
     return (

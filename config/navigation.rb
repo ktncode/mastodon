@@ -15,6 +15,7 @@ SimpleNavigation::Configuration.run do |navigation|
       s.item :notifications, safe_join([fa_icon('bell fw'), t('settings.notifications')]), settings_preferences_notifications_url
       s.item :favourite_domains, safe_join([fa_icon('users fw'), t('settings.favourite_domains')]), settings_favourite_domains_url
       s.item :favourite_tags, safe_join([fa_icon('hashtag fw'), t('settings.favourite_tags')]), settings_favourite_tags_url
+      s.item :safety, safe_join([fa_icon('shield fw'), t('preferences.safety')]), settings_preferences_safety_url
       s.item :other, safe_join([fa_icon('cog fw'), t('preferences.other')]), settings_preferences_other_url
     end
 

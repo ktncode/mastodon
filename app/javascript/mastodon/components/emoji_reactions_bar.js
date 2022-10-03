@@ -9,7 +9,7 @@ import Emoji from './emoji';
 import unicodeMapping from 'mastodon/features/emoji/emoji_unicode_mapping_light';
 import TransitionMotion from 'react-motion/lib/TransitionMotion';
 import AnimatedNumber from 'mastodon/components/animated_number';
-import { reduceMotion, me } from 'mastodon/initial_state';
+import { reduceMotion, me, disableReactions } from 'mastodon/initial_state';
 import spring from 'react-motion/lib/spring';
 import Overlay from 'react-overlays/lib/Overlay';
 import { isUserTouching } from 'mastodon/is_mobile';
@@ -110,7 +110,7 @@ class EmojiReaction extends ImmutablePureComponent {
     const { emojiReaction, status, myReaction } = this.props;
 
     if (!emojiReaction) {
-      return <Fragment></Fragment>;
+      return <Fragment />;
     }
 
     let shortCode = emojiReaction.get('name');
@@ -122,7 +122,7 @@ class EmojiReaction extends ImmutablePureComponent {
     return (
       <Fragment>
         <div className='reactions-bar__item-wrapper' ref={this.setTargetRef}>
-          <button className={classNames('reactions-bar__item', { active: myReaction })} disabled={status.get('emoji_reactioned') && !myReaction} onClick={this.handleClick} title={`:${shortCode}:`} style={this.props.style}>
+          <button className={classNames('reactions-bar__item', { active: myReaction })} disabled={disableReactions || status.get('emoji_reactioned') && !myReaction} onClick={this.handleClick} title={`:${shortCode}:`} style={this.props.style}>
             <span className='reactions-bar__item__emoji'><Emoji hovered={this.state.hovered} emoji={emojiReaction.get('name')} emojiMap={this.props.emojiMap} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} /></span>
             <span className='reactions-bar__item__count'><AnimatedNumber value={emojiReaction.get('count')} /></span>
           </button>
@@ -157,11 +157,11 @@ export default class EmojiReactionsBar extends ImmutablePureComponent {
 
   render () {
     const { status } = this.props;
-    const emoji_reactions = status.get("emoji_reactions");
+    const emoji_reactions = status.get('emoji_reactions');
     const visibleReactions = emoji_reactions.filter(x => x.get('count') > 0);
 
     if (visibleReactions.isEmpty() ) {
-      return <Fragment></Fragment>;
+      return <Fragment />;
     }
 
     const styles = visibleReactions.map(emoji_reaction => {

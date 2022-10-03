@@ -66,7 +66,15 @@ ja:
         setting_default_expires_in: 投稿日時を起点とする終了日時を指定します。書式は1y2mo3d4h5m（1年2ヶ月3日4時間5分後）です。
         setting_default_search_searchability: 範囲の詳細設定に対応していないクライアントでは、ここで設定を切り替えてください。Mastodonの標準動作は『リアクション限定』です。『公開』を対象にすると未知の情報を発見しやすくなりますが、結果にノイズが多い場合は検索範囲を狭めると効果的です。
         setting_default_sensitive: 閲覧注意状態のメディアはデフォルトでは内容が伏せられ、クリックして初めて閲覧できるようになります
+        setting_disable_account_delete: 一時的な迷いでアカウント削除することを防ぎます
+        setting_disable_block: 誤ってブロックすることを防ぎます
+        setting_disable_clear_all_notifications: 通知の全消去を防ぎます
+        setting_disable_domain_block: 誤ってドメインブロックを実行することを防ぎます
+        setting_disable_follow: 誤ってフォローすることを防ぎます
         setting_disable_joke_appearance: エイプリルフール等のジョーク機能を無効にします
+        setting_disable_post: 誤って投稿することを防ぎます
+        setting_disable_reactions: 誤ってお気に入り・ブースト・絵文字リアクション・投票することを防ぎます
+        setting_disable_unfollow: 誤ってフォロー解除することを防ぎます
         setting_display_media_default: 閲覧注意としてマークされたメディアは隠す
         setting_display_media_hide_all: メディアを常に隠す
         setting_display_media_show_all: メディアを常に表示する
@@ -85,6 +93,8 @@ ja:
         setting_new_features_policy: Fedibirdに新しい機能が追加された時の受け入れポリシーを設定します。推奨設定は多くの新機能を有効にするので、望ましくない場合は無効に設定してください
         setting_noindex: 公開プロフィールおよび各投稿ページに影響します
         setting_place_tab_bar_at_bottom: タッチデバイス使用時に、タブの操作を指の届く範囲で行えます
+        setting_prohibited_visibilities: 指定した公開範囲で投稿することを禁止します
+        setting_prohibited_words: 投稿で使用禁止する単語をカンマ区切りで指定します
         setting_show_application: 投稿するのに使用したアプリが投稿の詳細ビューに表示されるようになります
         setting_show_bookmark_button: オフにした場合、ブックマークの呼び出しはMastodon標準の位置となります（アクションバーのメニューの中）
         setting_show_follow_button_on_timeline: フォロー状態を確認し易くなり、素早くフォローリストを構築できます
@@ -237,8 +247,16 @@ ja:
         setting_default_search_searchability: 検索の対象とする範囲
         setting_default_sensitive: メディアを常に閲覧注意としてマークする
         setting_delete_modal: 投稿を削除する前に確認ダイアログを表示する
+        setting_disable_account_delete: アカウント削除を無効にする
+        setting_disable_block: ブロックを無効にする
+        setting_disable_clear_all_notifications: 通知の全消去を無効にする
+        setting_disable_domain_block: ドメインブロックを無効にする
+        setting_disable_follow: フォローを無効にする
         setting_disable_joke_appearance: ジョーク機能による見た目の変更を無効にする
+        setting_disable_post: 投稿を無効にする
+        setting_disable_reactions: リアクションを無効にする
         setting_disable_swiping: スワイプでの切り替えを無効にする
+        setting_disable_unfollow: フォロー解除を無効にする
         setting_display_media: メディアの表示
         setting_display_media_default: 標準
         setting_display_media_hide_all: 非表示
@@ -266,6 +284,8 @@ ja:
         setting_picker_emoji_size: 絵文字ピッカーの表示サイズ
         setting_place_tab_bar_at_bottom: タブバーを下に配置する
         setting_post_reference_modal: 参照を含む投稿をする前に確認ダイアログを表示する
+        setting_prohibited_visibilities: 投稿禁止する公開範囲
+        setting_prohibited_words: 投稿禁止する単語
         setting_reduce_motion: アニメーションの動きを減らす
         setting_unselect_reference_modal: 参照を解除する前に確認ダイアログを表示する
         setting_show_application: 送信したアプリを開示する

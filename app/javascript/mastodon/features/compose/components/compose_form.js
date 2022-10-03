@@ -26,6 +26,7 @@ import ImmutablePureComponent from 'react-immutable-pure-component';
 import { length } from 'stringz';
 import { countableText } from '../util/counter';
 import Icon from 'mastodon/components/icon';
+import { disablePost } from '../../../initial_state';
 
 const allowedAroundShortCode = '><\u0085\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029\u0009\u000a\u000b\u000c\u000d';
 
@@ -57,6 +58,8 @@ class ComposeForm extends ImmutablePureComponent {
     isChangingUpload: PropTypes.bool,
     isUploading: PropTypes.bool,
     isCircleUnselected: PropTypes.bool,
+    prohibitedVisibilities: ImmutablePropTypes.set,
+    prohibitedWords: ImmutablePropTypes.set,
     onChange: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onClearSuggestions: PropTypes.func.isRequired,
@@ -89,11 +92,13 @@ class ComposeForm extends ImmutablePureComponent {
   }
 
   canSubmit = () => {
-    const { isSubmitting, isChangingUpload, isUploading, isCircleUnselected, anyMedia } = this.props;
+    const { isSubmitting, isChangingUpload, isUploading, isCircleUnselected, anyMedia, prohibitedVisibilities, privacy, prohibitedWords, text, spoilerText } = this.props;
     const fulltext = this.getFulltextForCharacterCounting();
     const isOnlyWhitespace = fulltext.length !== 0 && fulltext.trim().length === 0;
+    const noVisibility = prohibitedVisibilities?.includes(privacy);
+    const ngWords = prohibitedWords.some( word => text.includes(word) || spoilerText?.includes(word) );
 
-    return !(isSubmitting || isUploading || isChangingUpload || isCircleUnselected || length(fulltext) > 500 || (isOnlyWhitespace && !anyMedia));
+    return !(isSubmitting || isUploading || isChangingUpload || isCircleUnselected || length(fulltext) > 500 || (isOnlyWhitespace && !anyMedia) || noVisibility || ngWords);
   }
 
   handleSubmit = () => {
@@ -274,7 +279,7 @@ class ComposeForm extends ImmutablePureComponent {
         <CircleDropdownContainer />
 
         <div className='compose-form__publish'>
-          <div className='compose-form__publish-button-wrapper'><Button text={publishText} onClick={this.handleSubmit} disabled={!this.canSubmit()} block /></div>
+          <div className='compose-form__publish-button-wrapper'><Button text={publishText} onClick={this.handleSubmit} disabled={disablePost || !this.canSubmit()} block /></div>
         </div>
 
         <ReferenceStack />

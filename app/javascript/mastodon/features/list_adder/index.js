@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { injectIntl } from 'react-intl';
 import { setupListAdder, resetListAdder } from '../../actions/lists';
 import { createSelector } from 'reselect';
 import { makeGetAccount } from '../../selectors';
@@ -34,7 +33,6 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default @connect(mapStateToProps, mapDispatchToProps)
-@injectIntl
 class ListAdder extends ImmutablePureComponent {
 
   static propTypes = {
@@ -57,21 +55,21 @@ class ListAdder extends ImmutablePureComponent {
   }
 
   render () {
-    const { account, listIds, intl } = this.props;
+    const { account, listIds } = this.props;
 
     const following = account.getIn(['relationship', 'following']);
 
     return (
       <div className='modal-root__modal list-adder'>
         <div className='list-adder__account'>
-          <Account account={account} intl={intl} />
+          <Account account={account} />
         </div>
 
         <NewListForm />
 
         <div className='list-adder__lists'>
-          <Home account={account} disabled={following} intl={intl} />
-          {listIds.map(ListId => <List key={ListId} account={account} listId={ListId} disabled={following} intl={intl} />)}
+          <Home account={account} disabled={following} />
+          {listIds.map(ListId => <List key={ListId} account={account} listId={ListId} disabled={following} />)}
         </div>
       </div>
     );

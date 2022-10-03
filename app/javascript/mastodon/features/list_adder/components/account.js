@@ -7,7 +7,7 @@ import Avatar from '../../../components/avatar';
 import DisplayName from '../../../components/display_name';
 import IconButton from '../../../components/icon_button';
 import { unfollowAccount, followAccount } from '../../../actions/accounts';
-import { me, show_followed_by, unfollowModal } from '../../../initial_state';
+import { me, show_followed_by, unfollowModal, disableFollow, disableUnfollow } from '../../../initial_state';
 import { openModal } from '../../../actions/modal';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
@@ -18,7 +18,7 @@ const messages = defineMessages({
   unfollowConfirm: { id: 'confirmations.unfollow.confirm', defaultMessage: 'Unfollow' },
 });
 
-const MapStateToProps = (state) => ({
+const MapStateToProps = () => ({
 });
 
 const mapDispatchToProps = (dispatch, { intl }) => ({
@@ -68,7 +68,7 @@ class Account extends ImmutablePureComponent {
         if (requested) {
           buttons = <IconButton icon='hourglass' title={intl.formatMessage(messages.requested)} active={followed_by} onClick={this.handleFollow} />;
         } else {
-          buttons = <IconButton icon={following ? 'user-times' : 'user-plus'} title={intl.formatMessage(following ? messages.unfollow : messages.follow)} onClick={this.handleFollow} active={following} passive={followed_by} no_delivery={following && !delivery} />;
+          buttons = <IconButton disabled={following ? disableUnfollow : disableFollow} icon={following ? 'user-times' : 'user-plus'} title={intl.formatMessage(following ? messages.unfollow : messages.follow)} onClick={this.handleFollow} active={following} passive={followed_by} no_delivery={following && !delivery} />;
         }
       }
     }

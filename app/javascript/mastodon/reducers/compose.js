@@ -111,6 +111,8 @@ const initialState = ImmutableMap({
   expires_action: 'mark',
   references: ImmutableSet(),
   context_references: ImmutableSet(),
+  prohibited_visibilities: ImmutableSet(),
+  prohibited_words: ImmutableSet(),
 });
 
 const initialPoll = ImmutableMap({
@@ -264,6 +266,14 @@ const hydrate = (state, hydratedState) => {
 
   if (hydratedState.has('text')) {
     state = state.set('text', hydratedState.get('text'));
+  }
+
+  if (hydratedState.has('prohibited_visibilities')) {
+    state = state.set('prohibited_visibilities', hydratedState.get('prohibited_visibilities').toSet());
+  }
+
+  if (hydratedState.has('prohibited_words')) {
+    state = state.set('prohibited_words', hydratedState.get('prohibited_words').toSet());
   }
 
   return state;

@@ -1245,10 +1245,14 @@ en:
       too_many_options: can't contain more than %{max} items
   preferences:
     beta_features: Beta features
+    disable_actions: Disable actions
+    disable_actions_hint: This setting is used to prevent accidents due to mishandling or to disable certain actions in accounts with limited use. It also applies to client applications.
     fedibird_features: Fedibird features
     other: Other
+    post_prohibite: Post prohibite
     posting_defaults: Posting defaults
     public_timelines: Public timelines
+    safety: Safety & Privacy
     searching_defaults: Searching default
   reactions:
     errors:
@@ -1371,6 +1375,7 @@ en:
     preferences: Preferences
     profile: Profile
     relationships: Follows and followers
+    safety: Safety & Privacy
     statuses_cleanup: Automated post deletion
     two_factor_authentication: Two-factor Auth
     webauthn_authentication: Security keys
@@ -1487,6 +1492,10 @@ en:
       expire_in_the_past: It is already past expires. You cannot specify expires before the posting time.
       invalid_expire_at: Invalid expires are specified.
       invalid_expire_action: Invalid expires_action are specified.
+  status_prohibit:
+    validations:
+      prohibited_visibilities: Prohibited visibility is specified.
+      prohibited_words: Prohibited words is specified.
   status_references:
     errors:
       limit: You have already reached your reference limit
