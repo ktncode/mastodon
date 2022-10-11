@@ -106,6 +106,7 @@ const initialState = ImmutableMap({
     dirty: false,
   }),
   datetime_form: null,
+  default_expires: null,
   scheduled: null,
   expires: null,
   expires_action: 'mark',
@@ -162,7 +163,8 @@ const clearAll = state => {
     map.update('media_attachments', list => list.clear());
     map.set('poll', null);
     map.set('idempotencyKey', uuid());
-    map.set('datetime_form', state.get('default_expires_in') ? true : null);
+    map.set('datetime_form', null);
+    map.set('default_expires', state.get('default_expires_in') ? true : null);
     map.set('scheduled', null);
     map.set('expires', state.get('default_expires_in', null));
     map.set('expires_action', state.get('default_expires_action', 'mark'));
@@ -420,7 +422,8 @@ export default function compose(state = initialState, action) {
       map.set('caretPosition', null);
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
-      map.set('datetime_form', state.get('default_expires_in') ? true : null);
+      map.set('datetime_form', null);
+      map.set('default_expires', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
       map.set('expires', state.get('default_expires_in', null));
       map.set('expires_action', state.get('default_expires_action', 'mark'));
@@ -448,7 +451,8 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
-      map.set('datetime_form', state.get('default_expires_in') ? true : null);
+      map.set('datetime_form', null);
+      map.set('default_expires', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
       map.set('expires', state.get('default_expires_in', null));
       map.set('expires_action', state.get('default_expires_action', 'mark'));
@@ -478,7 +482,8 @@ export default function compose(state = initialState, action) {
       map.set('circle_id', null);
       map.set('poll', null);
       map.set('idempotencyKey', uuid());
-      map.set('datetime_form', state.get('default_expires_in') ? true : null);
+      map.set('datetime_form', null);
+      map.set('default_expires', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
       map.set('expires', state.get('default_expires_in', null));
       map.set('expires_action', state.get('default_expires_action', 'mark'));
@@ -585,7 +590,7 @@ export default function compose(state = initialState, action) {
       }));
   case REDRAFT:
     return state.withMutations(map => {
-      const default_expires_in_exist = state.get('default_expires_in') ? true : null;
+      const datetime_form = !!action.status.get('scheduled_at') || !!action.status.get('expires_at') ? true : null;
 
       map.set('text', action.raw_text || unescapeHTML(rejectQuoteAltText(expandMentions(action.status))));
       map.set('in_reply_to', action.status.get('in_reply_to_id'));
@@ -600,7 +605,8 @@ export default function compose(state = initialState, action) {
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
       map.set('sensitive', action.status.get('sensitive'));
-      map.set('datetime_form', !!action.status.get('scheduled_at') || !!action.status.get('expires_at') ? true : default_expires_in_exist);
+      map.set('datetime_form', datetime_form);
+      map.set('default_expires', !datetime_form && state.get('default_expires_in') ? true : null);
       map.set('scheduled', action.status.get('scheduled_at'));
       map.set('expires', action.status.get('expires_at') ? format(parseISO(action.status.get('expires_at')), 'yyyy-MM-dd HH:mm') : state.get('default_expires_in', null));
       map.set('expires_action', action.status.get('expires_action') ?? state.get('default_expires_action', 'mark'));
@@ -636,10 +642,14 @@ export default function compose(state = initialState, action) {
   case COMPOSE_POLL_SETTINGS_CHANGE:
     return state.update('poll', poll => poll.set('expires_in', action.expiresIn).set('multiple', action.isMultiple));
   case COMPOSE_DATETIME_FORM_OPEN:
-    return state.set('datetime_form', true);
+    return state.withMutations(map => {
+      map.set('datetime_form', true);
+      map.set('default_expires', null);
+    });
   case COMPOSE_DATETIME_FORM_CLOSE:
     return state.withMutations(map => {
       map.set('datetime_form', null);
+      map.set('default_expires', null);
       map.set('scheduled', null);
       map.set('expires', null);
       map.set('expires_action', 'mark');

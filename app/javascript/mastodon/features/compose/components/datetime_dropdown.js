@@ -8,10 +8,10 @@ import { getDateTimeFromText } from 'mastodon/actions/compose';
 import { layoutFromWindow } from 'mastodon/is_mobile';
 import { openModal } from '../../../actions/modal';
 import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
-import classNames from 'classnames'
-import { format, minTime, maxTime, max } from 'date-fns'
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import classNames from 'classnames';
+import { format, minTime, maxTime, max } from 'date-fns';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const messages = defineMessages({
   datetime_open_calendar: { id: 'datetime.open_calendar', defaultMessage: 'Open calendar' },
@@ -50,7 +50,6 @@ class DateTimeDropdown extends React.PureComponent {
   };
 
   static propTypes = {
-    presets: ImmutablePropTypes.list,
     value: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.instanceOf(Date),
@@ -67,7 +66,9 @@ class DateTimeDropdown extends React.PureComponent {
     id: PropTypes.string,
     valueKey: PropTypes.arrayOf(PropTypes.string).isRequired,
     onChange: PropTypes.func.isRequired,
+    datetimePresets: ImmutablePropTypes.list,
     intl: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -85,7 +86,7 @@ class DateTimeDropdown extends React.PureComponent {
 
   getDateTimePresets = () => {
     const { datetimePresets, intl } = this.props;
-  
+
     if (!datetimePresets) {
       return ImmutableList([
         ImmutableMap({ id: '5m',  title: intl.formatMessage(messages.minutes, { number: 5 }) }),
@@ -101,12 +102,12 @@ class DateTimeDropdown extends React.PureComponent {
         ImmutableMap({ id: '1y1mo',  title: intl.formatMessage(messages.years_months, { year: 1, month: 1 }) }),
       ]);
     }
-  
+
     return datetimePresets.toList();
   };
 
   onOpenCalendar = () => {
-    const { valueKey, onChange, minDate, maxDate, openToDate, dispatch } = this.props
+    const { valueKey, onChange, minDate, maxDate, openToDate, dispatch } = this.props;
 
     dispatch(openModal('CALENDAR', {
       valueKey: valueKey,
@@ -121,15 +122,13 @@ class DateTimeDropdown extends React.PureComponent {
     const { dateValue, stringValue, invalid, minDate, maxDate, openToDate, placeholder, id, className, onChange, intl } = this.props;
     const layout = layoutFromWindow();
 
-    const CalendarIconButton = forwardRef(({ value, onClick }, ref) => (
-      <IconButton icon='calendar' className='datetime-dropdown__calendar-icon' title={intl.formatMessage(messages.datetime_open_calendar)} style={{ width: 'auto', height: 'auto' }} onClick={onClick} ref={ref} />
+    const CalendarIconButton = forwardRef((props, ref) => (
+      <IconButton icon='calendar' className='datetime-dropdown__calendar-icon' title={intl.formatMessage(messages.datetime_open_calendar)} style={{ width: 'auto', height: 'auto' }} onClick={props.onClick} ref={ref} />
     ));
 
     return (
       <div className='datetime-dropdown'>
-        {layout === 'mobile' ?
-          <IconButton icon='calendar' className='datetime-dropdown__calendar-icon' title={intl.formatMessage(messages.datetime_open_calendar)} style={{ width: 'auto', height: 'auto' }} onClick={this.onOpenCalendar} />
-          :
+        {layout === 'mobile' ? <CalendarIconButton onClick={this.onOpenCalendar} /> : (
           <DatePicker
             selected={max([dateValue ?? openToDate, minDate ?? minTime])}
             onChange={onChange}
@@ -140,7 +139,7 @@ class DateTimeDropdown extends React.PureComponent {
             showTimeInput
             portalId='modal-root'
           />
-        }
+        )}
 
         <input
           type='text'
@@ -155,7 +154,7 @@ class DateTimeDropdown extends React.PureComponent {
         />
 
         <select className='datetime-dropdown__menu' title={intl.formatMessage(messages.datetime_select)} value={stringValue} onChange={this.handleChange}>
-          <option value={stringValue} key='default'></option>
+          <option value={stringValue} key='default' />
           <option value='' key='unset'>{intl.formatMessage(messages.datetime_unset)}</option>
           {this.getDateTimePresets().map(item =>
             <option value={item.get('id')} key={item.get('id')}>{item.get('title')}</option>,

@@ -4,11 +4,9 @@ import PropTypes from 'prop-types';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { injectIntl, defineMessages } from 'react-intl';
 import { getDateTimeFromText } from 'mastodon/actions/compose';
-import { minTime, max } from 'date-fns'
-
-import DatePicker from "react-datepicker";
-
-import "react-datepicker/dist/react-datepicker.css";
+import { minTime, max } from 'date-fns';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const messages = defineMessages({
   datetime_time_subheading: { id: 'datetime.time_subheading', defaultMessage: 'Time' },

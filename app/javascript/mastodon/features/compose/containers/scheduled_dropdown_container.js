@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import DateTimeDropdown from '../components/datetime_dropdown';
 import { changeScheduled } from '../../../actions/compose';
-import { addDays, addSeconds, set } from 'date-fns'
+import { addDays, addSeconds, set } from 'date-fns';
 
 const mapStateToProps = state => {
   const valueKey = ['compose', 'scheduled'];

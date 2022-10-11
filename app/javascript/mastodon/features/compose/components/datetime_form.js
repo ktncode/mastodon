@@ -24,7 +24,7 @@ class DateTimeForm extends ImmutablePureComponent {
     return (
       <div className='compose-form__datetime-wrapper'>
         <div className='datetime__schedule'>
-        <div className='datetime__category'><FormattedMessage id='datetime.scheduled' defaultMessage='Scheduled' /></div>
+          <div className='datetime__category'><FormattedMessage id='datetime.scheduled' defaultMessage='Scheduled' /></div>
           <ScheduledDropDownContainer />
         </div>
         <div className='datetime__expire'>

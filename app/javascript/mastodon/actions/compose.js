@@ -12,7 +12,7 @@ import { showAlertForError } from './alerts';
 import { showAlert } from './alerts';
 import { openModal } from './modal';
 import { defineMessages } from 'react-intl';
-import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, parseISO, formatISO } from 'date-fns';
+import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, parseISO, formatISO, format } from 'date-fns';
 import { Set as ImmutableSet } from 'immutable';
 import { postReferenceModal } from '../initial_state';
 
@@ -187,10 +187,10 @@ const parseSimpleDurationFormat = (value, origin = new Date()) => {
     return null;
   }
 
-  const [_, year = 0, month = 0, day = 0, hour = 0, minite = 0] = value.match(/^(?:(\d+)y)?(?:(\d+)m(?=[\do])o?)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?$/) ?? [];
-  const duration = millisecondsToSeconds(addMinutes(addHours(addDays(addMonths(addYears(origin, year), month), day), hour), minite) - origin);
+  const [, year = 0, month = 0, day = 0, hour = 0, minute = 0] = value.match(/^(?:(\d+)y)?(?:(\d+)m(?=[\do])o?)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?$/) ?? [];
+  const duration = millisecondsToSeconds(addMinutes(addHours(addDays(addMonths(addYears(origin, year), month), day), hour), minute) - origin);
 
-  return duration == 0 ? null : duration;
+  return duration === 0 ? null : duration;
 };
 
 export const getDateTimeFromText = (value, origin = new Date()) => {
@@ -843,16 +843,20 @@ export function removeDateTime() {
 };
 
 export function changeScheduled(value) {
+  const date = value instanceof Date ? format(value, 'yyyy-MM-dd HH:mm') : value;
+
   return {
     type: COMPOSE_SCHEDULED_CHANGE,
-    value: value,
+    value: date,
   };
 };
 
 export function changeExpires(value) {
+  const date = value instanceof Date ? format(value, 'yyyy-MM-dd HH:mm') : value;
+
   return {
     type: COMPOSE_EXPIRES_CHANGE,
-    value: value,
+    value: date,
   };
 };
 

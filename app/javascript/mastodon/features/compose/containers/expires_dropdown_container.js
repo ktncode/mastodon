@@ -2,9 +2,9 @@ import { connect } from 'react-redux';
 import DateTimeDropdown from '../components/datetime_dropdown';
 import { changeExpires } from '../../../actions/compose';
 import { getDateTimeFromText } from '../../../actions/compose';
-import { addDays, addSeconds, set } from 'date-fns'
+import { addDays, addSeconds, set } from 'date-fns';
 
-const mapStateToProps = (state, { intl }) => {
+const mapStateToProps = (state) => {
   const valueKey = ['compose', 'expires'];
   const value = state.getIn(valueKey) ?? '';
   const scheduledAt = getDateTimeFromText(state.getIn(['compose', 'scheduled']), new Date()).at ?? new Date();

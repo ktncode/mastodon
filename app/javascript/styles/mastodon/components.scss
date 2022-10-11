@@ -813,9 +813,14 @@
 }
 
 .reply-indicator__cancel,
-.quote-indicator__cancel {
+.quote-indicator__cancel,
+.expires-indicator__cancel {
   float: right;
   line-height: 24px;
+}
+
+.expires-indicator__cancel {
+  margin-top: -4px;
 }
 
 .reply-indicator__display-name,
