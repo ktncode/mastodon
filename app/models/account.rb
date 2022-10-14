@@ -50,6 +50,7 @@
 #  settings                      :jsonb            default("{}"), not null
 #  silence_mode                  :integer          default(0), not null
 #  searchability                 :integer          default(3), not null
+#  featured_tags_collection_url  :string
 #
 
 class Account < ApplicationRecord

@@ -57,6 +57,10 @@ class REST::InstanceSerializer < ActiveModel::Serializer
 
   def configuration
     {
+      accounts: {
+        max_featured_tags: FeaturedTag::LIMIT,
+      },
+
       statuses: {
         max_characters: StatusLengthValidator::MAX_CHARS,
         max_media_attachments: 4,

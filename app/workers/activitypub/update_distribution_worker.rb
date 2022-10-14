@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-class ActivityPub::UpdateDistributionWorker
-  include Sidekiq::Worker
+class ActivityPub::UpdateDistributionWorker < ActivityPub::RawDistributionWorker
   include Payloadable
 
-  sidekiq_options queue: 'push'
+  sidekiq_options queue: 'push', lock: :until_executed
 
+  # Distribute an profile update to servers that might have a copy
+  # of the account in question
   def perform(account_id, options = {})
     @options = options.with_indifferent_access
     @account = Account.find(account_id)
