@@ -925,6 +925,7 @@ en:
       title: Add new domain subscription
   domain_validator:
     invalid_domain: is not a valid domain name
+    local_domain: cannot specify a local domain
   errors:
     '400': The request you submitted was invalid or malformed.
     '403': You don't have permission to view this page.
