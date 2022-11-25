@@ -39,8 +39,8 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
   },
 });
 
-export default @connect(MapStateToProps, mapDispatchToProps)
-@injectIntl
+export default @injectIntl
+@connect(MapStateToProps, mapDispatchToProps)
 class Account extends ImmutablePureComponent {
 
   static propTypes = {

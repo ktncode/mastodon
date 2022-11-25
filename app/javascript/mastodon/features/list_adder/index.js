@@ -38,7 +38,6 @@ class ListAdder extends ImmutablePureComponent {
   static propTypes = {
     account: ImmutablePropTypes.map.isRequired,
     onClose: PropTypes.func.isRequired,
-    intl: PropTypes.object.isRequired,
     onInitialize: PropTypes.func.isRequired,
     onReset: PropTypes.func.isRequired,
     listIds: ImmutablePropTypes.list.isRequired,
