@@ -64,4 +64,6 @@ export const disableDomainBlock = getMeta('disable_domain_block');
 export const disableClearAllNotifications = getMeta('disable_clear_all_notifications');
 export const disableAccountDelete = getMeta('disable_account_delete');
 
+export const maxChars = initialState?.max_toot_chars ?? 500;
+
 export default initialState;

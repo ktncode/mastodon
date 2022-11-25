@@ -4,7 +4,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
   include RoutingHelper
 
   attributes :uri, :title, :short_description, :description, :email,
-             :version, :urls, :stats, :thumbnail,
+             :version, :urls, :stats, :thumbnail, :max_toot_chars,
              :languages, :registrations, :approval_required, :invites_enabled,
              :configuration,
              :feature_quote, :fedibird_capabilities
@@ -17,6 +17,10 @@ class REST::InstanceSerializer < ActiveModel::Serializer
 
   def uri
     Rails.configuration.x.local_domain
+  end
+
+  def max_toot_chars
+    StatusLengthValidator::MAX_CHARS
   end
 
   def title
