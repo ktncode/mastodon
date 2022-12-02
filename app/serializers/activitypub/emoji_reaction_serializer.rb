@@ -11,7 +11,7 @@ class ActivityPub::EmojiReactionSerializer < ActivityPub::Serializer
   end
 
   def type
-    object.custom_emoji.nil? ? 'EmojiReact' : 'Like'
+    'Like'
   end
 
   def actor
@@ -25,6 +25,7 @@ class ActivityPub::EmojiReactionSerializer < ActivityPub::Serializer
   def content
     object.custom_emoji.nil? ? object.name : ":#{object.name}:"
   end
+
   def virtual_tags
     [object.custom_emoji]
   end
