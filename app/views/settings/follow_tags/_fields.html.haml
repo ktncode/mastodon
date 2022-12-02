@@ -2,10 +2,11 @@
   = f.input :name, wrapper: :with_label
 
 .fields-group
-  = f.input :media_only, as: :boolean, wrapper: :with_label
+  = f.input :media_only, as: :boolean, wrapper: :with_label, fedibird_features: true
 
 .fields-group
   = f.label :list_id
+  %span.fedibird_features Fedibird
   = f.collection_select :list_id, home_list_new(@lists), :first, :last
 
 %hr.spacer/

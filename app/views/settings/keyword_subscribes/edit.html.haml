@@ -1,6 +1,5 @@
 - content_for :page_title do
   = t('keyword_subscribes.edit.title')
-  %span.fedibird_features Fedibird
 
 = simple_form_for @keyword_subscribe, url: settings_keyword_subscribe_path(@keyword_subscribe), method: :put do |f|
   = render 'shared/error_messages', object: @keyword_subscribe

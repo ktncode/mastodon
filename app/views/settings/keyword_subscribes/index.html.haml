@@ -1,8 +1,9 @@
 - content_for :page_title do
   = t('keyword_subscribes.index.title')
-  %span.fedibird_features Fedibird
 
-%p= t('keyword_subscribes.hint_html')
+%p
+  = t('keyword_subscribes.hint_html')
+  %span.fedibird_features Fedibird
 
 = link_to t('keyword_subscribes.new.title'), new_settings_keyword_subscribe_path, class: 'button'
 
