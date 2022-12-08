@@ -229,9 +229,10 @@ class GroupDetail extends ImmutablePureComponent {
       if (requested) {
         buttons = (
           <IconButton
-            disabled
+            active
             icon='hourglass'
             title={intl.formatMessage(messages.requested)}
+            onClick={this.handleFollow}
           />
         );
       } else if (blocking) {
