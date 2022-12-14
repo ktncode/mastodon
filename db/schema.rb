@@ -1246,7 +1246,7 @@ ActiveRecord::Schema.define(version: 2023_01_29_193248) do
   add_foreign_key "scheduled_statuses", "accounts", on_delete: :cascade
   add_foreign_key "session_activations", "oauth_access_tokens", column: "access_token_id", name: "fk_957e5bda89", on_delete: :cascade
   add_foreign_key "session_activations", "users", name: "fk_e5fda67334", on_delete: :cascade
-  add_foreign_key "status_capability_tokens", "statuses"
+  add_foreign_key "status_capability_tokens", "statuses", on_delete: :cascade
   add_foreign_key "status_expires", "statuses", on_delete: :cascade
   add_foreign_key "status_pins", "accounts", name: "fk_d4cb435b62", on_delete: :cascade
   add_foreign_key "status_pins", "statuses", on_delete: :cascade
