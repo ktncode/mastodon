@@ -111,7 +111,7 @@ class ActivityPub::TagManager
   def cc(status)
     cc = []
 
-    cc << uri_for(status.reblog.account) if status.reblog?
+    cc << uri_for(Status.include_expired.with_discarded.find(status.reblog_of_id).account) if status.reblog?
 
     case status.visibility
     when 'public'

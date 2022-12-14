@@ -240,7 +240,7 @@ class Status < ApplicationRecord
   end
 
   def proper
-    reblog? ? reblog : self
+    reblog? ? Status.include_expired.with_discarded.find(reblog_of_id) : self
   end
 
   def content
