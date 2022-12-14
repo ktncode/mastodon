@@ -141,7 +141,7 @@ class FeedManager
 
     if redis.zcard(timeline_key) >= FeedManager::MAX_ITEMS / 4
       oldest_home_score = redis.zrange(timeline_key, 0, 0).first.to_i
-      query = query.where('id >= ?', oldest_home_score)
+      query = query.where('statuses.id >= ?', oldest_home_score)
     end
 
     statuses = query.to_a
