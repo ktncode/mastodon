@@ -379,8 +379,16 @@ class Formatter
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
+  def normalize_url_without_fragment(url)
+    return if url.nil?
+
+    uri = Addressable::URI.parse(url).normalize
+    uri.fragment = nil
+    uri.to_s
+  end
+
   def url_to_holding_account(url)
-    url = url.split('#').first
+    url = normalize_url_without_fragment(url)
 
     return if url.nil?
 
@@ -388,7 +396,7 @@ class Formatter
   end
 
   def url_to_holding_status(url)
-    url = url.split('#').first
+    url = normalize_url_without_fragment(url)
 
     return if url.nil?
 
