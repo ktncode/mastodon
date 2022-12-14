@@ -27,7 +27,7 @@ class ActivityPub::FetchFeaturedTagsCollectionService < BaseService
   def fetch_public_html(url)
     return @html if defined?(@html)
 
-    Request.new(:get, url).add_headers('Accept' => 'text/html', 'User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
+    Request.new(:get, url).add_headers('Accept' => 'text/html', 'User-Agent' => "#{Mastodon::Version.user_agent} Bot").perform do |res|
       if res.code == 200 && res.mime_type == 'text/html'
         @html = res.body_with_limit
       else
@@ -36,6 +36,9 @@ class ActivityPub::FetchFeaturedTagsCollectionService < BaseService
     end
 
     @html
+
+  rescue Mastodon::LengthValidationError
+    nil
   end
 
   def collection_items_from_html(html)
