@@ -20,6 +20,8 @@ class FavouriteTag < ApplicationRecord
   validates :name, presence: true, on: :create
   validate :validate_favourite_tags_limit, on: :create
 
+  LIMIT = 10
+
   def name=(str)
     self.tag = Tag.find_or_create_by_names(str.strip)&.first
   end
@@ -27,6 +29,6 @@ class FavouriteTag < ApplicationRecord
   private
 
   def validate_favourite_tags_limit
-    errors.add(:base, I18n.t('favourite_tags.errors.limit')) if account.favourite_tags.count >= 10
+    errors.add(:base, I18n.t('favourite_tags.errors.limit')) if account.favourite_tags.count >= LIMIT
   end
 end

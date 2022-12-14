@@ -62,6 +62,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
   def configuration
     {
       accounts: {
+        max_favourite_tags: FavouriteTag::LIMIT,
         max_featured_tags: FeaturedTag::LIMIT,
       },
 
