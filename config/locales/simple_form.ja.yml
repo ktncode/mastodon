@@ -390,6 +390,9 @@ ja:
         report: 通報を受けた時
         status_reference: 投稿が参照された時
         trending_tag: 未審査のハッシュタグが人気の時
+      push_subscription_block:
+        endpoint: エンドポイント
+        name: 名前
       rule:
         text: ルール
       tag:

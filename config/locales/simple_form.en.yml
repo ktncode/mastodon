@@ -390,6 +390,9 @@ en:
         report: New report is submitted
         status_reference: Someone referenced your post
         trending_tag: An unreviewed hashtag is trending
+      push_subscription_blocks:
+        endpoint: End point
+        name: Name
       rule:
         text: Rule
       tag:
