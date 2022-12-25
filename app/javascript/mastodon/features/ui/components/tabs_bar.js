@@ -6,7 +6,7 @@ import { debounce, memoize } from 'lodash';
 import { isUserTouching } from '../../../is_mobile';
 import Icon from 'mastodon/components/icon';
 import NotificationsCounterIcon from './notifications_counter_icon';
-import { place_tab_bar_at_bottom, show_tab_bar_label, enable_limited_timeline } from 'mastodon/initial_state';
+import { place_tab_bar_at_bottom, show_tab_bar_label, enableLimitedTimeline, enableFederatedTimeline, enableLocalTimeline } from 'mastodon/initial_state';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -15,6 +15,7 @@ import classNames from 'classnames';
 const link_home = <NavLink className='tabs-bar__link' to='/timelines/home' data-preview-title-id='column.home' data-preview-icon='home' ><Icon id='home' fixedWidth /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.home' defaultMessage='Home' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.home' defaultMessage='Home' children={msg=> <>{msg}</>} /></span></NavLink>;
 const link_limited = <NavLink className='tabs-bar__link tabs-bar__limited' to='/timelines/limited' data-preview-title-id='column.limited' data-preview-icon='lock' ><Icon id='lock' fixedWidth /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.limited_timeline' defaultMessage='Limited' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.limited_timeline' defaultMessage='Ltd.' children={msg=> <>{msg}</>} /></span></NavLink>;
 const link_notifications = <NavLink className='tabs-bar__link' to='/notifications' data-preview-title-id='column.notifications' data-preview-icon='bell' ><NotificationsCounterIcon /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.notifications' defaultMessage='Notifications' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.notifications' defaultMessage='Notif.' children={msg=> <>{msg}</>} /></span></NavLink>;
+const link_local = <NavLink className='tabs-bar__link' exact to='/timelines/public/local' data-preview-title-id='column.community' data-preview-icon='users' ><Icon id='users' fixedWidth /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.local_timeline' defaultMessage='Local' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.local_timeline' defaultMessage='LTL' children={msg=> <>{msg}</>} /></span></NavLink>;
 const link_public = <NavLink className='tabs-bar__link' exact to='/timelines/public' data-preview-title-id='column.public' data-preview-icon='globe' ><Icon id='globe' fixedWidth /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.federated_timeline' defaultMessage='Federated' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.public_timeline' defaultMessage='FTL' children={msg=> <>{msg}</>} /></span></NavLink>;
 // const link_lists = <NavLink className='tabs-bar__link' exact to='/lists' data-preview-title-id='column.lists' data-preview-icon='list-ul' ><Icon id='list-ul' fixedWidth /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.lists' defaultMessage='Lists' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.lists' defaultMessage='List' children={msg=> <>{msg}</>} /></span></NavLink>;
 const link_search = <NavLink className='tabs-bar__link optional' to='/search' data-preview-title-id='tabs_bar.search' data-preview-icon='bell' ><Icon id='search' fixedWidth /><span className='tabs-bar__link__full-label'><FormattedMessage id='tabs_bar.search' defaultMessage='Search' children={msg=> <>{msg}</>} /></span><span className='tabs-bar__link__short-label'><FormattedMessage id='navigation_bar.short.search' defaultMessage='Search' children={msg=> <>{msg}</>} /></span></NavLink>;
@@ -38,10 +39,11 @@ export const getLinks = memoize((favouriteLists = null) => {
 
   return [
     link_home,
-    enable_limited_timeline ? link_limited : null,
+    enableLimitedTimeline ? link_limited : null,
     link_favourite_lists,
     link_notifications,
-    link_public,
+    enableLocalTimeline ? link_local : null,
+    enableFederatedTimeline ? link_public : null,
     link_search,
     link_started,
   ].flat().filter(v => !!v);

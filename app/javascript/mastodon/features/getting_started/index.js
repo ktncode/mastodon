@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, profile_directory, showTrends, enable_limited_timeline, enableEmptyColumn, defaultColumnWidth } from '../../initial_state';
+import { me, profile_directory, showTrends, enableLimitedTimeline, enableFederatedTimeline, enableLocalTimeline, enableEmptyColumn, defaultColumnWidth } from '../../initial_state';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { fetchFavouriteDomains } from 'mastodon/actions/favourite_domains';
 import { fetchFavouriteTags } from 'mastodon/actions/favourite_tags';
@@ -25,6 +25,7 @@ const messages = defineMessages({
   home_timeline: { id: 'tabs_bar.home', defaultMessage: 'Home' },
   notifications: { id: 'tabs_bar.notifications', defaultMessage: 'Notifications' },
   public_timeline: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
+  community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
   settings_subheading: { id: 'column_subheading.settings', defaultMessage: 'Settings' },
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Direct messages' },
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
@@ -128,10 +129,25 @@ class GettingStarted extends ImmutablePureComponent {
     if (multiColumn) {
       navItems.push(
         <ColumnSubheading key='header-discover' text={intl.formatMessage(messages.discover)} />,
-        <ColumnLink key='public_timeline' icon='globe' text={intl.formatMessage(messages.public_timeline)} to='/timelines/public' />,
       );
 
-      height += 34 + 48;
+      height += 34;
+
+      if (enableLocalTimeline) {
+        navItems.push(
+          <ColumnLink key='community_timeline' icon='users' text={intl.formatMessage(messages.community_timeline)} to='timelines/public/local' />,
+        );
+
+        height += 48;
+      }
+
+      if (enableFederatedTimeline) {
+        navItems.push(
+          <ColumnLink key='public_timeline' icon='globe' text={intl.formatMessage(messages.public_timeline)} to='/timelines/public' />,
+        );
+
+        height += 48;
+      }
 
       navItems.push(
         <ColumnLink key='group_directory' icon='address-book' text={intl.formatMessage(messages.group_directory)} to='/group_directory' />,
@@ -203,7 +219,7 @@ class GettingStarted extends ImmutablePureComponent {
       height += 48;
     }
 
-    if (enable_limited_timeline && multiColumn && !columns.find(item => item.get('id') === 'LIMITED')) {
+    if (enableLimitedTimeline && multiColumn && !columns.find(item => item.get('id') === 'LIMITED')) {
       navItems.push(
         <ColumnLink key='limited_timeline' icon='lock' text={intl.formatMessage(messages.limited_timeline)} to='/timelines/limited' />,
       );

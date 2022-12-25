@@ -83,7 +83,9 @@ en:
         setting_display_media_hide_all: Always hide media
         setting_display_media_show_all: Always show media
         setting_enable_empty_column: The last column is initially hidden and can be closed at will
+        setting_enable_federated_timeline: 'Enable a federated timeline (default: enable)'
         setting_enable_limited_timeline: Enable a limited home to display private and circle and direct message
+        setting_enable_local_timeline: 'Enable a local timeline (default: enable)'
         setting_enable_reaction: Enable the reaction display on the timeline and display the reaction button
         setting_enable_status_reference: Enable the feature where a post references another post
         setting_follow_button_to_list_adder: Change the behavior of the Follow / Subscribe button, open a dialog where you can select a list to follow / subscribe, or opt out of receiving at home
@@ -267,7 +269,9 @@ en:
         setting_display_media_show_all: Show all
         setting_emoji_scale: Single emoji size
         setting_enable_empty_column: Enable last column to be closed
+        setting_enable_federated_timeline: Enable federated timeline
         setting_enable_limited_timeline: Enable limited timeline
+        setting_enable_local_timeline: Enable local timeline
         setting_enable_reaction: Enable reaction
         setting_enable_status_reference: Enable reference
         setting_expand_spoilers: Always expand posts marked with content warnings

@@ -14,7 +14,7 @@ import { openModal } from './modal';
 import { defineMessages } from 'react-intl';
 import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, parseISO, formatISO, format } from 'date-fns';
 import { Set as ImmutableSet } from 'immutable';
-import { postReferenceModal } from '../initial_state';
+import { postReferenceModal, enableFederatedTimeline } from '../initial_state';
 
 let cancelFetchComposeSuggestionsAccounts, cancelFetchComposeSuggestionsTags;
 
@@ -313,7 +313,9 @@ export function submitCompose(routerHistory) {
       }
 
       if (response.data.in_reply_to_id === null && response.data.visibility === 'public') {
-        insertIfOnline('public');
+        if (enableFederatedTimeline) {
+          insertIfOnline('public');
+        }
         insertIfOnline(`account:${response.data.account.id}`);
       }
     }).catch(function (error) {

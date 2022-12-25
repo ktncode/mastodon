@@ -294,7 +294,7 @@ const startWorker = (workerId) => {
         return;
       }
 
-      client.query('SELECT oauth_access_tokens.id, oauth_access_tokens.resource_owner_id, users.account_id, users.chosen_languages, oauth_access_tokens.scopes, devices.device_id, oauth_applications.name, oauth_applications.website, (select settings.value from settings where thing_type = \'User\' and thing_id=users.id and var = \'hide_bot_on_public_timeline\') as bot FROM oauth_access_tokens INNER JOIN oauth_applications ON oauth_access_tokens.application_id = oauth_applications.id INNER JOIN users ON oauth_access_tokens.resource_owner_id = users.id LEFT OUTER JOIN devices ON oauth_access_tokens.id = devices.access_token_id WHERE oauth_access_tokens.token = $1 AND oauth_access_tokens.revoked_at IS NULL LIMIT 1', [token], (err, result) => {
+      client.query('SELECT oauth_access_tokens.id, oauth_access_tokens.resource_owner_id, users.account_id, users.chosen_languages, oauth_access_tokens.scopes, devices.device_id, oauth_applications.name, oauth_applications.website, (select settings.value from settings where thing_type = \'User\' and thing_id=users.id and var = \'hide_bot_on_public_timeline\') as bot, (select exists (select settings.value from settings where thing_type = \'User\' and thing_id=users.id and var = \'enable_federated_timeline\' and value ilike \'%false%\')) as disable_federated_timeline FROM oauth_access_tokens INNER JOIN oauth_applications ON oauth_access_tokens.application_id = oauth_applications.id INNER JOIN users ON oauth_access_tokens.resource_owner_id = users.id LEFT OUTER JOIN devices ON oauth_access_tokens.id = devices.access_token_id WHERE oauth_access_tokens.token = $1 AND oauth_access_tokens.revoked_at IS NULL LIMIT 1', [token], (err, result) => {
         done();
 
         if (err) {
@@ -315,6 +315,7 @@ const startWorker = (workerId) => {
         req.accountId = result.rows[0].account_id;
         req.chosenLanguages = result.rows[0].chosen_languages;
         req.bot = result.rows[0].bot;
+        req.enableFederatedTimeline = !result.rows[0].disable_federated_timeline;
         req.allowNotifications = req.scopes.some(scope => ['read', 'read:notifications'].includes(scope));
         req.deviceId = result.rows[0].device_id;
         req.applicationName = result.rows[0].name;
@@ -826,6 +827,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote'] : ['timeline:public'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -833,6 +838,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:nobot':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nobot'] : ['timeline:public:nobot'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -872,6 +881,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:remote':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: ['timeline:public:remote'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -879,6 +892,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:remote:nobot':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: ['timeline:public:remote:nobot'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -919,6 +936,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:media':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:media'] : ['timeline:public:media'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -926,6 +947,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:nobot:media':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nobot:media'] : ['timeline:public:nobot:media'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -965,6 +990,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:remote:media':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: ['timeline:public:remote:media'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -972,6 +1001,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:remote:nobot:media':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: ['timeline:public:remote:nobot:media'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -1001,6 +1034,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:nomedia':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nomedia'] : ['timeline:public:nomedia'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -1008,6 +1045,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:nobot:nomedia':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nobot:nomedia'] : ['timeline:public:nobot:nomedia'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -1047,6 +1088,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:remote:nomedia':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: ['timeline:public:remote:nomedia'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -1054,6 +1099,10 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:remote:nobot:nomedia':
+      if (!isEnableFederatedTimeline(req)) {
+        reject('No local stream provided');
+      }
+
       resolve({
         channelIds: ['timeline:public:remote:nobot:nomedia'],
         options: { needsFiltering: true, notificationOnly: false },
@@ -1350,7 +1399,15 @@ const startWorker = (workerId) => {
  * @param {any} req
  * @return {boolean}
  */
- const isImast = (req) => {
+const isEnableFederatedTimeline = (req) => {
+  return req.enableFederatedTimeline;
+};
+
+/**
+ * @param {any} req
+ * @return {boolean}
+ */
+const isImast = (req) => {
   return req.website == 'https://cinderella-project.github.io/iMast/';
 };
 

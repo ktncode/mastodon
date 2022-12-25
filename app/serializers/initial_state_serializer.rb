@@ -53,7 +53,9 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:show_target]                       = object.current_account.user.setting_show_target
       store[:place_tab_bar_at_bottom]           = object.current_account.user.setting_place_tab_bar_at_bottom
       store[:show_tab_bar_label]                = object.current_account.user.setting_show_tab_bar_label
+      store[:enable_federated_timeline]         = object.current_account.user.setting_enable_federated_timeline
       store[:enable_limited_timeline]           = object.current_account.user.setting_enable_limited_timeline
+      store[:enable_local_timeline]             = false #object.current_account.user.setting_enable_local_timeline
       store[:enable_reaction]                   = object.current_account.user.setting_enable_reaction
       store[:compact_reaction]                  = object.current_account.user.setting_compact_reaction
       store[:show_reply_tree_button]            = object.current_account.user.setting_show_reply_tree_button

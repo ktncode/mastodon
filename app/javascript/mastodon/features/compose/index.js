@@ -14,7 +14,7 @@ import SearchResultsContainer from './containers/search_results_container';
 import { changeComposing } from '../../actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 import elephantUIPlane from '../../../images/elephant_ui_plane.svg';
-import { mascot, show_tab_bar_label, enable_limited_timeline } from '../../initial_state';
+import { mascot, show_tab_bar_label, enableLimitedTimeline, enableFederatedTimeline, enableLocalTimeline } from '../../initial_state';
 import Icon from 'mastodon/components/icon';
 import { logOut } from 'mastodon/utils/log_out';
 import NotificationsCounterIcon from '../ui/components/notifications_counter_icon';
@@ -35,6 +35,7 @@ const messages = defineMessages({
   limited_timeline: { id: 'tabs_bar.limited_timeline', defaultMessage: 'Limited home' },
   notifications: { id: 'tabs_bar.notifications', defaultMessage: 'Notifications' },
   public: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
+  community: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
   lists: { id: 'navigation_bar.lists', defaultMessage: 'Lists' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
   logout: { id: 'navigation_bar.logout', defaultMessage: 'Logout' },
@@ -110,7 +111,7 @@ class Compose extends React.PureComponent {
         'HOME':          { to: '/timelines/home',         title: formatMessage(messages.home_timeline),    label: formatMessage(messages.short_home_timeline),    icon_id: 'home' },
         'LIMITED':       { to: '/timelines/limited',      title: formatMessage(messages.limited_timeline), label: formatMessage(messages.short_limited_timeline), icon_id: 'lock' },
         'NOTIFICATIONS': { to: '/notifications',          title: formatMessage(messages.notifications),    label: formatMessage(messages.short_notifications),    icon_id: 'bell' },
-        // 'COMMUNITY':     { to: '/timelines/public/local', title: formatMessage(messages.community),     label: formatMessage(messages.short_community),     icon_id: 'users' },
+        'COMMUNITY':     { to: '/timelines/public/local', title: formatMessage(messages.community),        label: formatMessage(messages.short_community),        icon_id: 'users' },
         'PUBLIC':        { to: '/timelines/public',       title: formatMessage(messages.public),           label: formatMessage(messages.short_public),           icon_id: 'globe' },
         'LIST':          { to: '/lists',                  title: formatMessage(messages.lists),            label: formatMessage(messages.short_lists),            icon_id: 'list-ul' },
         'PREFERENCES':   { href: '/settings/preferences', title: formatMessage(messages.preferences),      label: formatMessage(messages.short_preferences),      icon_id: 'cog' },
@@ -140,8 +141,17 @@ class Compose extends React.PureComponent {
     let header = '';
 
     if (multiColumn) {
-      // const defaultTabIds = ['START', 'HOME', 'NOTIFICATIONS', 'COMMUNITY', 'PUBLIC', 'LIST', 'PREFERENCES', 'SIGN_OUT'];
-      const defaultTabIds = enable_limited_timeline ? ['START', 'HOME', 'LIMITED', 'NOTIFICATIONS', 'PUBLIC', 'LIST', 'PREFERENCES', 'SIGN_OUT'] : ['START', 'HOME', 'NOTIFICATIONS', 'PUBLIC', 'LIST', 'PREFERENCES', 'SIGN_OUT'];
+      const defaultTabIds = [
+        'START',
+        'HOME',
+        enableLimitedTimeline ? 'LIMITED' : null,
+        'NOTIFICATIONS',
+        enableLocalTimeline ? 'COMMUNITY' : null,
+        enableFederatedTimeline ? 'PUBLIC' : null,
+        'LIST',
+        'PREFERENCES',
+        'SIGN_OUT',
+      ].filter(x => !!x);
 
       let tabs = defaultTabIds;
 

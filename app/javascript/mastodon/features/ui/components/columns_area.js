@@ -8,7 +8,7 @@ import ReactSwipeableViews from 'react-swipeable-views';
 import TabsBar, { getSwipeableIndex, getSwipeableLink } from './tabs_bar';
 import { Link } from 'react-router-dom';
 
-import { disableSwiping, place_tab_bar_at_bottom, enable_limited_timeline } from 'mastodon/initial_state';
+import { disableSwiping, place_tab_bar_at_bottom, enableLimitedTimeline, enableFederatedTimeline, enableLocalTimeline } from 'mastodon/initial_state';
 
 import BundleContainer from '../containers/bundle_container';
 import ColumnLoading from './column_loading';
@@ -19,6 +19,7 @@ import {
   Notifications,
   HomeTimeline,
   GroupTimeline,
+  CommunityTimeline,
   PublicTimeline,
   DomainTimeline,
   HashtagTimeline,
@@ -49,6 +50,7 @@ const componentMap = {
   'NOTIFICATIONS': Notifications,
   'PUBLIC': PublicTimeline,
   'REMOTE': PublicTimeline,
+  'COMMUNITY': CommunityTimeline,
   'DOMAIN': DomainTimeline,
   'GROUP': GroupTimeline,
   'HASHTAG': HashtagTimeline,
@@ -122,13 +124,17 @@ class ColumnsArea extends ImmutablePureComponent {
 
     this.setState({ shouldAnimate: true });
 
-    if (!enable_limited_timeline) {
-      const limitedColumn = columns.find(item => item.get('id') === 'LIMITED')
+    const removeColumnById = id => {
+      const column = columns.find(item => item.get('id') === id)
 
-      if (limitedColumn) {
-        dispatch(removeColumn(limitedColumn.get('uuid')));
+      if (column) {
+        dispatch(removeColumn(column.get('uuid')));
       }
-    }
+    };
+
+    if (!enableFederatedTimeline) { removeColumnById('PUBLIC'); }
+    if (!enableLocalTimeline) { removeColumnById('COMMUNITY'); }
+    if (!enableLimitedTimeline) { removeColumnById('LIMITED'); }
   }
 
   componentWillUpdate(nextProps) {

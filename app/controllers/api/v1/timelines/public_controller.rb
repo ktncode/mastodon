@@ -22,7 +22,13 @@ class Api::V1::Timelines::PublicController < Api::BaseController
     !Setting.timeline_preview
   end
 
+  def disable_federated_timeline?
+    !(truthy_param?(:local) || params[:domain]) && (current_user && !current_user.setting_enable_federated_timeline)
+  end
+
   def load_statuses
+    return [] if disable_federated_timeline?
+    
     cached_public_statuses_page
   end
 

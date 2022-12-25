@@ -53,7 +53,9 @@ defaults: &defaults
   show_target: false
   place_tab_bar_at_bottom: false
   show_tab_bar_label: false
+  enable_federated_timeline: true
   enable_limited_timeline: false
+  enable_local_timeline: true
   enable_reaction: true
   compact_reaction: false
   show_reply_tree_button: true

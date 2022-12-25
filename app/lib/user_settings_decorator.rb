@@ -63,7 +63,9 @@ class UserSettingsDecorator
     show_target
     place_tab_bar_at_bottom
     show_tab_bar_label
+    enable_federated_timeline
     enable_limited_timeline
+    enable_local_timeline
     enable_reaction
     compact_reaction
     show_reply_tree_button

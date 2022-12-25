@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import SettingToggle from '../../notifications/components/setting_toggle';
-import { enable_limited_timeline } from 'mastodon/initial_state';
+import { enableLimitedTimeline } from 'mastodon/initial_state';
 
 export default @injectIntl
 class ColumnSettings extends React.PureComponent {
@@ -30,7 +30,7 @@ class ColumnSettings extends React.PureComponent {
           <SettingToggle prefix='home_timeline' settings={settings} settingPath={['shows', 'reply']} onChange={onChange} label={<FormattedMessage id='home.column_settings.show_replies' defaultMessage='Show replies' />} />
         </div>
 
-        {enable_limited_timeline && <Fragment>
+        {enableLimitedTimeline && <Fragment>
           <span className='column-settings__section'><FormattedMessage id='home.column_settings.visibility' defaultMessage='Visibility' /></span>
 
           <div className='column-settings__row'>

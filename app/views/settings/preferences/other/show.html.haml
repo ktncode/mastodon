@@ -86,6 +86,12 @@
   .fields-group
     = f.input :setting_show_tab_bar_label, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  -# .fields-group
+  -#   = f.input :setting_enable_local_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_enable_federated_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
+
   .fields-group
     = f.input :setting_enable_limited_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
 
