@@ -120,7 +120,7 @@ class PostStatusService < BaseService
     end
 
     ProcessHashtagsService.new.call(@status)
-    ProcessMentionsService.new.call(@status, @circle)
+    ProcessMentionsService.new.call(@status, @circle) unless @status.personal_visibility?
     ProcessStatusReferenceService.new.call(@status, status_reference_ids: (@options[:status_reference_ids] || []) + [@quote_id], urls: @options[:status_reference_urls])
   end
 
@@ -144,7 +144,7 @@ class PostStatusService < BaseService
   def postprocess_status!
     LinkCrawlWorker.perform_async(@status.id) unless @status.spoiler_text?
     DistributionWorker.perform_async(@status.id)
-    ActivityPub::DistributionWorker.perform_async(@status.id)
+    ActivityPub::DistributionWorker.perform_async(@status.id) unless @status.personal_visibility?
     PollExpirationNotifyWorker.perform_at(@status.poll.expires_at, @status.poll.id) if @status.poll
     @status.status_expire.queue_action if expires_soon?
   end

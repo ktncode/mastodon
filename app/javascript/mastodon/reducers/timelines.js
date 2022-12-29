@@ -69,7 +69,7 @@ const expandNormalizedTimeline = (state, timeline, statuses, next, isPartial, is
 const updateTimeline = (state, timeline, status, usePendingItems) => {
   const top = state.getIn([timeline, 'top']);
 
-  if (usePendingItems || !state.getIn([timeline, 'pendingItems']).isEmpty()) {
+  if (usePendingItems || !state.getIn([timeline, 'pendingItems'], ImmutableList()).isEmpty()) {
     if (state.getIn([timeline, 'pendingItems'], ImmutableList()).includes(status.get('id')) || state.getIn([timeline, 'items'], ImmutableList()).includes(status.get('id'))) {
       return state;
     }

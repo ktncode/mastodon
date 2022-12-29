@@ -63,13 +63,17 @@ export function updateTimeline(timeline, status, accept) {
     const limitedVisibilities = getLimitedVisibilities(getState());
 
     if (timeline === 'home') {
-      if (homeVisibilities.length == 0 || homeVisibilities.includes(visibility)) {
+      if (homeVisibilities.length || homeVisibilities.includes(visibility)) {
         insertTimeline('home');
         dispatch(submitMarkers());
       }
 
       if (limitedVisibilities.includes(visibility)) {
         insertTimeline('limited');
+      }
+
+      if (visibility === 'personal') {
+        insertTimeline('personal');
       }
     } else {
       insertTimeline(timeline);
@@ -177,8 +181,9 @@ export function expandTimeline(timelineId, path, params = {}, done = noOp) {
   };
 };
 
-export const expandHomeTimeline            = ({ maxId, visibilities } = {}, done = noOp) => expandTimeline('home', '/api/v1/timelines/home', { max_id: maxId, visibilities: visibilities}, done);
-export const expandLimitedTimeline         = ({ maxId, visibilities } = {}, done = noOp) => expandTimeline('limited', '/api/v1/timelines/home', { max_id: maxId, visibilities: visibilities}, done);
+export const expandHomeTimeline            = ({ maxId, visibilities } = {}, done = noOp) => expandTimeline('home', '/api/v1/timelines/home', { max_id: maxId, visibilities: visibilities }, done);
+export const expandLimitedTimeline         = ({ maxId, visibilities } = {}, done = noOp) => expandTimeline('limited', '/api/v1/timelines/home', { max_id: maxId, visibilities: visibilities }, done);
+export const expandPersonalTimeline        = ({ maxId } = {}, done = noOp) => expandTimeline('personal', '/api/v1/timelines/personal', { max_id: maxId}, done);
 export const expandPublicTimeline          = ({ maxId, onlyMedia, withoutMedia, withoutBot, onlyRemote } = {}, done = noOp) => expandTimeline(`public${onlyRemote ? ':remote' : ''}${withoutBot ? ':nobot' : ':bot'}${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}`, '/api/v1/timelines/public', { remote: !!onlyRemote, max_id: maxId, only_media: !!onlyMedia, without_media: !!withoutMedia, without_bot: !!withoutBot }, done);
 export const expandDomainTimeline          = (domain, { maxId, onlyMedia, withoutMedia, withoutBot } = {}, done = noOp) => expandTimeline(`domain${withoutBot ? ':nobot' : ':bot'}${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}:${domain}`, '/api/v1/timelines/public', { local: false, domain: domain, max_id: maxId, only_media: !!onlyMedia, without_media: !!withoutMedia, without_bot: !!withoutBot }, done);
 export const expandGroupTimeline           = (id, { maxId, onlyMedia, withoutMedia, tagged } = {}, done = noOp) => expandTimeline(`group:${id}${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}${tagged ? `:${tagged}` : ''}`, `/api/v1/timelines/group/${id}`, { max_id: maxId, only_media: !!onlyMedia, without_media: !!withoutMedia, tagged: tagged }, done);

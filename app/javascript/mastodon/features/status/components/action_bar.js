@@ -419,7 +419,7 @@ class ActionBar extends React.PureComponent {
       reblogTitle = intl.formatMessage(messages.cannot_reblog);
     }
 
-    const referenceDisabled = expired || !referenced && referenceCountLimit || ['limited', 'direct'].includes(status.get('visibility'));
+    const referenceDisabled = expired || !referenced && referenceCountLimit || ['limited', 'direct', 'personal'].includes(status.get('visibility'));
 
     return (
       <div className='detailed-status__action-bar'>

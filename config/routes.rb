@@ -379,6 +379,7 @@ Rails.application.routes.draw do
         resources :tag, only: :show
         resources :list, only: :show
         resources :group, only: :show
+        resource :personal, only: :show, controller: :personal
       end
 
       resources :streaming, only: [:index]

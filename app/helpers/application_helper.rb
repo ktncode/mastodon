@@ -106,6 +106,8 @@ module ApplicationHelper
       fa_icon('user-circle', title: I18n.t('statuses.visibilities.limited'))
     elsif status.direct_visibility?
       fa_icon('envelope', title: I18n.t('statuses.visibilities.direct'))
+    elsif status.personal_visibility?
+      fa_icon('book', title: I18n.t('statuses.visibilities.personal'))
     end
   end
 
@@ -205,7 +207,7 @@ module ApplicationHelper
       text: [params[:title], params[:text], params[:url]].compact.join(' '),
     }
 
-    permit_visibilities = %w(public unlisted private mutual direct)
+    permit_visibilities = %w(public unlisted private mutual direct personal)
     default_privacy     = current_account&.user&.setting_default_privacy
     permit_visibilities.shift(permit_visibilities.index(default_privacy) + 1) if default_privacy.present?
     state_params[:visibility] = params[:visibility] if permit_visibilities.include? params[:visibility]

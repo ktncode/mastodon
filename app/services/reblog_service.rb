@@ -37,7 +37,7 @@ class ReblogService < BaseService
       end
     end
 
-    raise Mastodon::ValidationError, I18n.t('status_prohibit.validations.prohibited_visibilities') if account.user&.setting_prohibited_visibilities&.filter(&:present?)&.include?(visibility)
+    raise Mastodon::ValidationError, I18n.t('status_prohibit.validations.prohibited_visibilities') if account.user&.setting_prohibited_visibilities&.filter(&:present?)&.include?(visibility) || visibility == 'personal'
 
     ApplicationRecord.transaction do
       reblog = account.statuses.create!(reblog: reblogged_status, text: '', visibility: visibility, rate_limit: options[:with_rate_limit])

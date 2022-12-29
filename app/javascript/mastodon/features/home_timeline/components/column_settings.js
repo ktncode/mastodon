@@ -44,6 +44,10 @@ class ColumnSettings extends React.PureComponent {
           <div className='column-settings__row'>
             <SettingToggle prefix='home_timeline' settings={settings} settingPath={['shows', 'direct']} onChange={onChangeClear} label={<FormattedMessage id='home.column_settings.show_direct' defaultMessage='Show direct' />} />
           </div>
+
+          <div className='column-settings__row'>
+            <SettingToggle prefix='home_timeline' settings={settings} settingPath={['shows', 'personal']} onChange={onChangeClear} label={<FormattedMessage id='home.column_settings.show_personal' defaultMessage='Show personal' />} />
+          </div>
         </Fragment>}
       </div>
     );

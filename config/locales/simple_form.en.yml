@@ -87,14 +87,18 @@ en:
         setting_enable_federated_timeline: 'Enable a federated timeline (default: enable)'
         setting_enable_limited_timeline: Enable a limited home to display private and circle and direct message
         setting_enable_local_timeline: 'Enable a local timeline (default: enable)'
+        setting_enable_personal_timeline: Enable a personal home to display personal post
         setting_enable_reaction: Enable the reaction display on the timeline and display the reaction button
         setting_enable_status_reference: Enable the feature where a post references another post
         setting_follow_button_to_list_adder: Change the behavior of the Follow / Subscribe button, open a dialog where you can select a list to follow / subscribe, or opt out of receiving at home
         setting_hexagon_avatar: Display everyone's avatar icon as a hollowed out hexagon (joke feature)
         setting_hide_bot_on_public_timeline: Disable Bot accounts from appearing on federation & hashtag & domain & group timelines (overridden by column setting)
+        setting_hide_direct_from_timeline: Hide direct messages from the home and list timelines
         setting_hide_followers_count: The number of followers will be hidden in your profile
         setting_hide_following_count: The number of following will be hidden in your profile
         setting_hide_network: Who you follow and who follows you will be hidden on your profile
+        setting_hide_personal_from_account: Hide personal posts from the account post lists
+        setting_hide_personal_from_timeline: Hide personal posts from the home and list timelines
         setting_hide_statuses_count: The number of post will be hidden in your profile
         setting_match_visibility_of_references: If the referenced post is private, default the visibility of the post to private behavior accordingly
         setting_new_features_policy: Set the acceptance policy when new features are added to Fedibird. The recommended setting will enable many new features, so set it to disabled if it is not desirable
@@ -274,15 +278,19 @@ en:
         setting_enable_federated_timeline: Enable federated timeline
         setting_enable_limited_timeline: Enable limited timeline
         setting_enable_local_timeline: Enable local timeline
+        setting_enable_personal_timeline: Enable personal timeline
         setting_enable_reaction: Enable reaction
         setting_enable_status_reference: Enable reference
         setting_expand_spoilers: Always expand posts marked with content warnings
         setting_follow_button_to_list_adder: Open list add dialog with follow button
         setting_hexagon_avatar: Experience NFT Avatar
         setting_hide_bot_on_public_timeline: Hide bot account on public timeline
+        setting_hide_direct_from_timeline: Hide direct messages from the timeline
         setting_hide_followers_count: Hide your followers count
         setting_hide_following_count: Hide your following count
         setting_hide_network: Hide your social graph
+        setting_hide_personal_from_account: Hide personal posts from account posts
+        setting_hide_personal_from_timeline: Hide personal posts from the timeline
         setting_hide_statuses_count: Hide your post count
         setting_info_font_size: Information header font size
         setting_match_visibility_of_references: Match the visibility of the post to the references

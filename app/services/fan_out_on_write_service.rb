@@ -6,9 +6,12 @@ class FanOutOnWriteService < BaseService
   def call(status)
     raise Mastodon::RaceConditionError if status.visibility.nil?
 
-    deliver_to_self(status) if status.account.local?
+    deliver_to_self(status) if status.account.local? && !(status.direct_visibility? && status.account.user.setting_hide_direct_from_timeline)
 
-    if status.direct_visibility?
+    if status.personal_visibility?
+      deliver_to_self_included_lists(status) if status.account.local? && !status.account.user.setting_hide_personal_from_timeline
+      return
+    elsif status.direct_visibility?
       deliver_to_mentioned_followers(status)
       deliver_to_own_conversation(status)
     elsif status.limited_visibility?
@@ -282,5 +285,11 @@ class FanOutOnWriteService < BaseService
 
   def deliver_to_own_conversation(status)
     AccountConversation.add_status(status.account, status)
+  end
+
+  def deliver_to_self_included_lists(status)
+    FeedInsertWorker.push_bulk(status.account.self_included_lists.pluck(:id)) do |list_id|
+      [status.id, list_id, :list]
+    end
   end
 end

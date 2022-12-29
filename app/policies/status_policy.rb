@@ -18,7 +18,9 @@ class StatusPolicy < ApplicationPolicy
     return false if author.suspended?
     return false unless expired_show?
 
-    if requires_mention?
+    if personal?
+      owned?
+    elsif requires_mention?
       owned? || mention_exists?
     elsif private?
       owned? || following_author? || mention_exists?
@@ -83,6 +85,10 @@ class StatusPolicy < ApplicationPolicy
 
   def limited?
     record.limited_visibility?
+  end
+
+  def personal?
+    record.personal_visibility?
   end
 
   def mention_exists?

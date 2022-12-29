@@ -48,8 +48,13 @@ class Status < ApplicationRecord
 
   update_index('statuses', :proper)
 
-  enum visibility: [:public, :unlisted, :private, :direct, :limited, :mutual], _suffix: :visibility
-  enum searchability: [:public, :unlisted, :private, :direct, :limited, :mutual], _suffix: :searchability
+  enum visibility: { public: 0, unlisted: 1, private: 2, direct: 3, limited: 4, mutual: 100, personal: 200 }, _suffix: :visibility
+  enum searchability: { public: 0, unlisted: 1, private: 2, direct: 3, limited: 4, mutual: 100, personal: 200 }, _suffix: :searchability
+
+  STANDARD_VISIBILITY = %w(public unlisted private direct)
+  EXTRA_VISIBILITY    = %w(limited personal)
+  PSEUDO_VISIBILITY   = %w(mutual)
+  UNCOUNT_VISIBILITY  = %w(direct personal)
 
   belongs_to :application, class_name: 'Doorkeeper::Application', optional: true
 
@@ -111,6 +116,8 @@ class Status < ApplicationRecord
   scope :without_replies, -> { where('statuses.reply = FALSE OR statuses.in_reply_to_account_id = statuses.account_id') }
   scope :without_reblogs, -> { where('statuses.reblog_of_id IS NULL') }
   scope :with_public_visibility, -> { where(visibility: :public) }
+  scope :with_personal_visibility, -> { where(visibility: :personal) }
+  scope :without_personal_visibility, -> { where.not(visibility: :personal) }
   scope :tagged_with, ->(tag_ids) { joins(:statuses_tags).where(statuses_tags: { tag_id: tag_ids }) }
   scope :in_chosen_languages, ->(account) { where(language: nil).or where(language: account.chosen_languages) }
   scope :mentioned_with, ->(account) { joins(:mentions).where(mentions: { account_id: account }) }
@@ -187,6 +194,22 @@ class Status < ApplicationRecord
 
   def compute_searchability
     searchability || Status.searchabilities.invert.fetch([Account.searchabilities[account.searchability], Status.visibilities[visibility] || 0].max, nil) || 'direct'
+  end
+
+  def standard_visibility?
+    STANDARD_VISIBILITY.include?(visibility)
+  end
+  
+  def extra_visibility?
+    EXTRA_VISIBILITY.include?(visibility)
+  end
+  
+  def pseudo_visibility?
+    PSEUDO_VISIBILITY.include?(visibility)
+  end
+  
+  def uncount_visibility?
+    UNCOUNT_VISIBILITY.include?(visibility)
   end
 
   def reply?
@@ -412,7 +435,7 @@ class Status < ApplicationRecord
     end
 
     def selectable_searchabilities
-      searchabilities.keys - %w(unlisted limited mutual)
+      searchabilities.keys - %w(unlisted limited mutual personal)
     end
 
     def favourites_map(status_ids, account_id)
@@ -628,7 +651,7 @@ class Status < ApplicationRecord
   end
 
   def increment_counter_caches
-    return if direct_visibility?
+    return if uncount_visibility?
 
     account&.increment_count!(:statuses_count)
     reblog&.increment_count!(:reblogs_count) if reblog?
@@ -636,7 +659,7 @@ class Status < ApplicationRecord
   end
 
   def decrement_counter_caches
-    return if direct_visibility?
+    return if uncount_visibility?
 
     account&.decrement_count!(:statuses_count)
     reblog&.decrement_count!(:reblogs_count) if reblog?
@@ -644,7 +667,7 @@ class Status < ApplicationRecord
   end
 
   def unlink_from_conversations
-    return unless direct_visibility?
+    return if uncount_visibility?
 
     mentioned_accounts = (association(:mentions).loaded? ? mentions : mentions.includes(:account)).map(&:account)
     inbox_owners       = mentioned_accounts.select(&:local?) + (account.local? ? [account] : [])

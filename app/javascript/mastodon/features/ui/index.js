@@ -46,6 +46,7 @@ import {
   Mentions,
   DirectTimeline,
   LimitedTimeline,
+  PersonalTimeline,
   HashtagTimeline,
   Notifications,
   FollowRequests,
@@ -182,6 +183,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/timelines/groups/:id/:tagged?' exact component={GroupTimeline} content={children} />
           <WrappedRoute path='/timelines/direct' component={DirectTimeline} content={children} />
           <WrappedRoute path='/timelines/limited' component={LimitedTimeline} content={children} />
+          <WrappedRoute path='/timelines/personal' component={PersonalTimeline} content={children} />
           <WrappedRoute path='/timelines/tag/:id' component={HashtagTimeline} content={children} />
           <WrappedRoute path='/timelines/list/:id' component={ListTimeline} content={children} />
 

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, profile_directory, showTrends, enableLimitedTimeline, enableFederatedTimeline, enableLocalTimeline, enableEmptyColumn, defaultColumnWidth } from '../../initial_state';
+import { me, profile_directory, showTrends, enableLimitedTimeline, enablePersonalTimeline, enableFederatedTimeline, enableLocalTimeline, enableEmptyColumn, defaultColumnWidth } from '../../initial_state';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { fetchFavouriteDomains } from 'mastodon/actions/favourite_domains';
 import { fetchFavouriteTags } from 'mastodon/actions/favourite_tags';
@@ -38,6 +38,7 @@ const messages = defineMessages({
   mutes: { id: 'navigation_bar.mutes', defaultMessage: 'Muted users' },
   pins: { id: 'navigation_bar.pins', defaultMessage: 'Pinned toots' },
   limited_timeline: { id: 'navigation_bar.limited_timeline', defaultMessage: 'Limited home' },
+  personal_timeline: { id: 'navigation_bar.personal_timeline', defaultMessage: 'Personal' },
   lists: { id: 'navigation_bar.lists', defaultMessage: 'Lists' },
   circles: { id: 'navigation_bar.circles', defaultMessage: 'Circles' },
   discover: { id: 'navigation_bar.discover', defaultMessage: 'Discover' },
@@ -122,7 +123,7 @@ class GettingStarted extends ImmutablePureComponent {
 
   render () {
     const { intl, myAccount, columns, multiColumn, unreadFollowRequests, lists, favourite_domains, favourite_tags, columnWidth } = this.props;
-  
+
     const navItems = [];
     let height = (multiColumn) ? 0 : 60;
 
@@ -178,7 +179,7 @@ class GettingStarted extends ImmutablePureComponent {
       height += 34 + 48*2;
 
       navItems.push(
-        <ColumnSubheading key='header-personal' text={intl.formatMessage(messages.personal)} />
+        <ColumnSubheading key='header-personal' text={intl.formatMessage(messages.personal)} />,
       );
 
       height += 34;
@@ -222,6 +223,13 @@ class GettingStarted extends ImmutablePureComponent {
     if (enableLimitedTimeline && multiColumn && !columns.find(item => item.get('id') === 'LIMITED')) {
       navItems.push(
         <ColumnLink key='limited_timeline' icon='lock' text={intl.formatMessage(messages.limited_timeline)} to='/timelines/limited' />,
+      );
+      height += 48;
+    }
+
+    if (enablePersonalTimeline && multiColumn && !columns.find(item => item.get('id') === 'PERSONAL')) {
+      navItems.push(
+        <ColumnLink key='personal_timeline' icon='lock' text={intl.formatMessage(messages.personal_timeline)} to='/timelines/personal' />,
       );
       height += 48;
     }

@@ -1401,6 +1401,8 @@ ja:
       limited_long: サークルで指定したユーザーのみ閲覧可
       mutual: 相互フォロー限定
       mutual_long: 相互フォロー相手にのみ表示されます
+      personal: 自分限定
+      personal_long: 自分にのみ表示されます
       private: フォロワー限定
       private_long: フォロワーにのみ表示されます
       public: 公開

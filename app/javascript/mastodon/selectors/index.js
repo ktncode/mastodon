@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { List as ImmutableList, Map as ImmutableMap, is } from 'immutable';
-import { me, enableLimitedTimeline } from '../initial_state';
+import { me, enableLimitedTimeline, hideDirectFromTimeline, hidePersonalFromTimeline, enablePersonalTimeline } from '../initial_state';
 
 const getAccountBase         = (state, id) => state.getIn(['accounts', id], null);
 const getAccountCounters     = (state, id) => state.getIn(['accounts_counters', id], null);
@@ -249,13 +249,21 @@ export const getAccountGallery = createSelector([
 
 export const getHomeVisibilities = createSelector(
   state => state.getIn(['settings', 'home', 'shows']),
-  shows => !enableLimitedTimeline ? [] : [
+  shows => (!enableLimitedTimeline ? [
+    'public',
+    'unlisted',
+    'private',
+    'limited',
+    !hideDirectFromTimeline ? 'direct'  : null,
+    !hidePersonalFromTimeline ? 'personal' : null,
+  ] : [
     'public',
     'unlisted',
     shows.get('private') ? 'private' : null,
     shows.get('limited') ? 'limited' : null,
-    shows.get('direct')  ? 'direct'  : null,
-  ].filter(x => !!x),
+    shows.get('direct') && !hideDirectFromTimeline ? 'direct'  : null,
+    shows.get('personal') && !hidePersonalFromTimeline ? 'personal' : null,
+  ]).filter(x => !!x),
 );
 
 export const getLimitedVisibilities = createSelector(
@@ -264,5 +272,10 @@ export const getLimitedVisibilities = createSelector(
     shows.get('private') ? 'private' : null,
     shows.get('limited') ? 'limited' : null,
     shows.get('direct')  ? 'direct'  : null,
+    shows.get('personal') ? 'personal' : null,
   ].filter(x => !!x),
+);
+
+export const getPersonalVisibilities = createSelector(
+  state => state.getIn(['settings', 'personal', 'shows']),
 );

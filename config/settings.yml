@@ -55,6 +55,8 @@ defaults: &defaults
   show_tab_bar_label: false
   enable_federated_timeline: true
   enable_limited_timeline: false
+  enable_personal_timeline: false
+  enable_personal_account: false
   enable_local_timeline: true
   enable_reaction: true
   compact_reaction: false
@@ -129,6 +131,8 @@ defaults: &defaults
   prohibited_visibilities: []
   prohibited_words: ''
   disable_relative_time: false
+  hide_direct_from_timeline: false
+  hide_personal_from_timeline: false
 
 development:
   <<: *defaults

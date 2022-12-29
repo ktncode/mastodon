@@ -207,14 +207,14 @@ export const getDateTimeFromText = (value, origin = new Date()) => {
     if (value.length >= 7) {
       const isoDateTime = parseISO(value);
 
-      if (isoDateTime.toString() === "Invalid Date") {
+      if (isoDateTime.toString() === 'Invalid Date') {
         return null;
       } else {
         return isoDateTime;
       }
     }
 
-    return null
+    return null;
   })();
 
   return {
@@ -304,12 +304,16 @@ export function submitCompose(routerHistory) {
         }
       };
 
-      if (homeVisibilities.length == 0 || homeVisibilities.includes(response.data.visibility)) {
+      if (homeVisibilities.length || homeVisibilities.includes(response.data.visibility)) {
         insertIfOnline('home');
       }
 
       if (limitedVisibilities.includes(response.data.visibility)) {
         insertIfOnline('limited');
+      }
+
+      if (['personal'].includes(response.data.visibility)) {
+        insertIfOnline('personal');
       }
 
       if (response.data.in_reply_to_id === null && response.data.visibility === 'public') {

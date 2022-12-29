@@ -31,10 +31,11 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   def cached_account_statuses
     statuses = truthy_param?(:pinned) ? pinned_scope : permitted_account_statuses
 
-    statuses.merge!(only_media_scope) if truthy_param?(:only_media)
-    statuses.merge!(no_replies_scope) if truthy_param?(:exclude_replies)
-    statuses.merge!(no_reblogs_scope) if truthy_param?(:exclude_reblogs)
-    statuses.merge!(hashtag_scope)    if params[:tagged].present?
+    statuses.merge!(only_media_scope)  if truthy_param?(:only_media)
+    statuses.merge!(no_replies_scope)  if truthy_param?(:exclude_replies)
+    statuses.merge!(no_reblogs_scope)  if truthy_param?(:exclude_reblogs)
+    statuses.merge!(hashtag_scope)     if params[:tagged].present?
+    statuses.merge!(no_personal_scope) if current_user&.setting_hide_personal_from_account
 
     cache_collection_paginated_by_id(
       statuses,
@@ -76,6 +77,10 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
     else
       Status.none
     end
+  end
+
+  def no_personal_scope
+    Status.without_personal_visibility
   end
 
   def pagination_params(core_params)

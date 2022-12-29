@@ -55,6 +55,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:show_tab_bar_label]                = object.current_account.user.setting_show_tab_bar_label
       store[:enable_federated_timeline]         = object.current_account.user.setting_enable_federated_timeline
       store[:enable_limited_timeline]           = object.current_account.user.setting_enable_limited_timeline
+      store[:enable_personal_timeline]          = object.current_account.user.setting_enable_personal_timeline
       store[:enable_local_timeline]             = false #object.current_account.user.setting_enable_local_timeline
       store[:enable_reaction]                   = object.current_account.user.setting_enable_reaction
       store[:compact_reaction]                  = object.current_account.user.setting_compact_reaction
@@ -87,6 +88,9 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:disable_clear_all_notifications]   = object.current_account.user.setting_disable_clear_all_notifications
       store[:disable_account_delete]            = object.current_account.user.setting_disable_account_delete
       store[:disable_relative_time]             = object.current_account.user.setting_disable_relative_time
+      store[:hide_direct_from_timeline]         = object.current_account.user.setting_hide_direct_from_timeline
+      store[:hide_personal_from_timeline]       = object.current_account.user.setting_hide_personal_from_timeline
+      store[:hide_personal_from_account]        = object.current_account.user.setting_hide_personal_from_account
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

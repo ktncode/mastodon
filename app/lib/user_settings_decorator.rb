@@ -65,6 +65,7 @@ class UserSettingsDecorator
     show_tab_bar_label
     enable_federated_timeline
     enable_limited_timeline
+    enable_personal_timeline
     enable_local_timeline
     enable_reaction
     compact_reaction
@@ -90,6 +91,9 @@ class UserSettingsDecorator
     disable_clear_all_notifications
     disable_account_delete
     disable_relative_time
+    hide_direct_from_timeline
+    hide_personal_from_timeline
+    hide_personal_from_account
   ).freeze
 
   STRING_KEYS = %w(

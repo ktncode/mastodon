@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -25,6 +25,7 @@ import {
   HashtagTimeline,
   DirectTimeline,
   LimitedTimeline,
+  PersonalTimeline,
   FavouritedStatuses,
   BookmarkedStatuses,
   ListTimeline,
@@ -56,6 +57,7 @@ const componentMap = {
   'HASHTAG': HashtagTimeline,
   'DIRECT': DirectTimeline,
   'LIMITED': LimitedTimeline,
+  'PERSONAL': PersonalTimeline,
   'FAVOURITES': FavouritedStatuses,
   'BOOKMARKS': BookmarkedStatuses,
   'LIST': ListTimeline,

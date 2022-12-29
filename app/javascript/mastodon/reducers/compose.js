@@ -248,18 +248,18 @@ const insertEmoji = (state, position, emojiData, needsSpace) => {
 };
 
 const privacyExpand = (a, b) => {
-  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct'];
+  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct', 'personal'];
   return order[Math.min(order.indexOf(a), order.indexOf(b), order.length - 1)];
 };
 
 const privacyCap = (a, b) => {
-  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct'];
+  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct', 'personal'];
   return order[Math.max(order.indexOf(a), order.indexOf(b), 0)];
 };
 
 const searchabilityCap = (a, b) => {
-  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct'];
-  const to    = ['public', 'private',  'private', 'direct', 'direct',  'direct'];
+  const order = ['public', 'unlisted', 'private', 'mutual', 'limited', 'direct', 'personal'];
+  const to    = ['public', 'private',  'private', 'direct', 'direct',  'direct', 'direct'];
   return to[Math.max(order.indexOf(a), order.indexOf(b), 0)];
 };
 

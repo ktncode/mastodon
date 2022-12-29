@@ -19,6 +19,8 @@ const messages = defineMessages({
   private_long: { id: 'privacy.private.long', defaultMessage: 'Visible for followers only' },
   mutual_short: { id: 'privacy.mutual.short', defaultMessage: 'Mutuals-followers-only' },
   mutual_long: { id: 'privacy.mutual.long', defaultMessage: 'Visible for mutual followers only (Supported servers only)' },
+  personal_short: { id: 'privacy.personal.short', defaultMessage: 'Personal' },
+  personal_long: { id: 'privacy.personal.long', defaultMessage: 'Visible for personal only' },
   direct_short: { id: 'privacy.direct.short', defaultMessage: 'Direct' },
   direct_long: { id: 'privacy.direct.long', defaultMessage: 'Visible for mentioned users only' },
   limited_short: { id: 'privacy.limited.short', defaultMessage: 'Circle' },
@@ -249,8 +251,9 @@ class PrivacyDropdown extends React.PureComponent {
       ...!this.props.noDirect && [
         { icon: 'user-circle', value: 'limited', text: formatMessage(messages.limited_short), meta: formatMessage(messages.limited_long) },
         { icon: 'envelope', value: 'direct', text: formatMessage(messages.direct_short), meta: formatMessage(messages.direct_long) },
+        { icon: 'book', value: 'personal', text: formatMessage(messages.personal_short), meta: formatMessage(messages.personal_long) },
       ],
-    ].filter(option => !prohibitedVisibilities?.includes(option.value));
+    ].filter(option => option && !prohibitedVisibilities?.includes(option.value));
   }
 
   render () {

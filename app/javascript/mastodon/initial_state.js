@@ -43,6 +43,7 @@ export const show_target = getMeta('show_target');
 export const place_tab_bar_at_bottom = getMeta('place_tab_bar_at_bottom');
 export const show_tab_bar_label = getMeta('show_tab_bar_label');
 export const enableLimitedTimeline = getMeta('enable_limited_timeline');
+export const enablePersonalTimeline = getMeta('enable_personal_timeline');
 export const enableFederatedTimeline = getMeta('enable_federated_timeline') ?? true;
 export const enableLocalTimeline = getMeta('enable_local_timeline') ?? true;
 export const enableReaction = getMeta('enable_reaction');
@@ -66,6 +67,9 @@ export const disableDomainBlock = getMeta('disable_domain_block');
 export const disableClearAllNotifications = getMeta('disable_clear_all_notifications');
 export const disableAccountDelete = getMeta('disable_account_delete');
 export const disableRelativeTime = getMeta('disable_relative_time');
+export const hideDirectFromTimeline = getMeta('hide_direct_from_timeline');
+export const hidePersonalFromTimeline = getMeta('hide_personal_from_timeline');
+export const hidePersonalFromAccount = getMeta('hide_personal_from_account');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

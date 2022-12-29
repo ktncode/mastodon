@@ -7,9 +7,19 @@ import { createSelector } from 'reselect';
 import { debounce } from 'lodash';
 import { me } from '../../../initial_state';
 
+const visibilitiesByType = (state, type) => {
+  if (type === 'home') {
+    return getHomeVisibilities(state);
+  } else if (type === 'limited') {
+    return getLimitedVisibilities(state);
+  } else {
+    return [];
+  }
+};
+
 const makeGetStatusIds = (pending = false) => createSelector([
   (state, { type }) => state.getIn(['settings', type], ImmutableMap()),
-  (state, { type }) => type === 'home' ? getHomeVisibilities(state) : type === 'limited' ? getLimitedVisibilities(state) : [],
+  (state, { type }) => visibilitiesByType(state, type),
   (state, { type }) => state.getIn(['timelines', type, pending ? 'pendingItems' : 'items'], ImmutableList()),
   (state)           => state.get('statuses'),
 ], (columnSettings, visibilities, statusIds, statuses) => {

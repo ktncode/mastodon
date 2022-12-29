@@ -243,6 +243,10 @@ module AccountInteractions
                     .where('users.current_sign_in_at > ?', User::ACTIVE_DURATION.ago)
   end
 
+  def self_included_lists
+    owned_lists.joins(:list_accounts).where(list_accounts: {account_id: id})
+  end
+
   def remote_followers_hash(url)
     url_prefix = url[Account::URL_PREFIX_RE]
     return if url_prefix.blank?

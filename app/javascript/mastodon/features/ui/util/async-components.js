@@ -42,6 +42,10 @@ export function LimitedTimeline() {
   return import(/* webpackChunkName: "features/limited_timeline" */'../../limited_timeline');
 }
 
+export function PersonalTimeline() {
+  return import(/* webpackChunkName: "features/personal_timeline" */'../../personal_timeline');
+}
+
 export function ListTimeline () {
   return import(/* webpackChunkName: "features/list_timeline" */'../../list_timeline');
 }

@@ -102,7 +102,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def visibility_ex?
-    object.limited_visibility?
+    !object.standard_visibility?
   end
 
   def visibility
@@ -111,6 +111,8 @@ class REST::StatusSerializer < ActiveModel::Serializer
     # UX differences
     if object.limited_visibility?
       'private'
+    elsif object.personal_visibility?
+      'direct'
     else
       object.visibility
     end

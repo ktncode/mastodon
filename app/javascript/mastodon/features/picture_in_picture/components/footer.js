@@ -247,7 +247,7 @@ class Footer extends ImmutablePureComponent {
       reblogTitle = intl.formatMessage(messages.cannot_reblog);
     }
 
-    const referenceDisabled = expired || !referenced && referenceCountLimit || ['limited', 'direct'].includes(status.get('visibility'));
+    const referenceDisabled = expired || !referenced && referenceCountLimit || ['limited', 'direct', 'personal'].includes(status.get('visibility'));
 
     return (
       <div className='picture-in-picture__footer'>

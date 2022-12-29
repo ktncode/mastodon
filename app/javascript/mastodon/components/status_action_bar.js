@@ -473,9 +473,9 @@ class StatusActionBar extends ImmutablePureComponent {
       <IconButton className='status__action-bar-button' disabled={expired} title={intl.formatMessage(messages.share)} icon='share-alt' onClick={this.handleShareClick} />
     );
 
-    const referenceDisabled = expired || !referenced && referenceCountLimit || ['limited', 'direct'].includes(status.get('visibility'));
+    const referenceDisabled = expired || !referenced && referenceCountLimit || ['limited', 'direct', 'personal'].includes(status.get('visibility'));
 
-    const reactionsCounter = compactReaction && contextType != 'thread' && status.get('emoji_reactions_count') > 0 ? status.get('emoji_reactions_count') : undefined;
+    const reactionsCounter = compactReaction && contextType !== 'thread' && status.get('emoji_reactions_count') > 0 ? status.get('emoji_reactions_count') : undefined;
 
     return (
       <div className='status__action-bar'>

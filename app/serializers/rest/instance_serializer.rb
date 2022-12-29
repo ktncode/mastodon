@@ -139,6 +139,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       :timeline_group_directory,
       :visibility_mutual,
       :visibility_limited,
+      :visibility_personal,
       :emoji_reaction,
       :misskey_birthday,
       :misskey_location,

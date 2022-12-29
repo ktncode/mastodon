@@ -83,14 +83,18 @@ ja:
         setting_enable_federated_timeline: 連合タイムラインを有効にします（デフォルト）
         setting_enable_limited_timeline: フォロワー限定・サークル・ダイレクトメッセージを表示する限定ホームを有効にします
         setting_enable_local_timeline: ローカルタイムラインを有効にします（デフォルト）
+        setting_enable_personal_timeline: 自分限定を表示する自分限定ホームを有効にします
         setting_enable_reaction: タイムラインでリアクションの表示を有効にし、リアクションボタンを表示する
         setting_enable_status_reference: 投稿が別の投稿を参照する機能を有効にします
         setting_follow_button_to_list_adder: フォロー・購読ボタンの動作を変更し、フォロー・購読するリストを選択したり、ホームで受け取らないよう設定するダイアログを開きます
         setting_hexagon_avatar: 全員のアバターアイコンを6角形にくりぬいて表示します（ジョーク機能）
         setting_hide_bot_on_public_timeline: 連合・ハッシュタグ・ドメイン・グループタイムライン上にBotアカウントが表示されないようにします（※カラム設定を優先）
+        setting_hide_direct_from_timeline: ホームとリストタイムラインからダイレクトメッセージを隠します
         setting_hide_followers_count: フォロワー数をプロフィールページで見られないようにします
         setting_hide_following_count: フォロー数をプロフィールページで見られないようにします
         setting_hide_network: フォローとフォロワーの情報がプロフィールページで見られないようにします
+        setting_hide_personal_from_account: アカウントの投稿一覧から個人限定投稿を隠します
+        setting_hide_personal_from_timeline: ホームとリストタイムラインから個人限定投稿を隠します
         setting_hide_statuses_count: 投稿数をプロフィールページで見られないようにします
         setting_match_visibility_of_references: 参照先の投稿がフォロワー限定の場合、投稿の公開範囲をそれに合わせてフォロワー限定とする動作をデフォルトにします
         setting_new_features_policy: Fedibirdに新しい機能が追加された時の受け入れポリシーを設定します。推奨設定は多くの新機能を有効にするので、望ましくない場合は無効に設定してください
@@ -270,15 +274,19 @@ ja:
         setting_enable_federated_timeline: 連合タイムラインを有効にする
         setting_enable_limited_timeline: 限定ホームを有効にする
         setting_enable_local_timeline: ローカルタイムラインを有効にする
+        setting_enable_personal_timeline: 自分限定ホームを有効にする
         setting_enable_reaction: リアクションを有効にする
         setting_enable_status_reference: 参照を有効にする
         setting_expand_spoilers: 閲覧注意としてマークされた投稿を常に展開する
         setting_follow_button_to_list_adder: フォローボタンでリスト追加ダイアログを開く
         setting_hexagon_avatar: NFTアイコンを体験する
         setting_hide_bot_on_public_timeline: 公開タイムラインのBotアカウントを非表示
+        setting_hide_direct_from_timeline: ダイレクトメッセージをタイムラインから隠す
         setting_hide_followers_count: フォロワー数を隠す
         setting_hide_following_count: フォロー数を隠す
         setting_hide_network: 繋がりを隠す
+        setting_hide_personal_from_account: 自分限定投稿をアカウントの投稿一覧から隠す
+        setting_hide_personal_from_timeline: 自分限定投稿をタイムラインから隠す
         setting_hide_statuses_count: 投稿数を隠す
         setting_info_font_size: 情報ヘッダのフォントサイズ
         setting_match_visibility_of_references: 投稿の公開範囲を参照先に合わせる

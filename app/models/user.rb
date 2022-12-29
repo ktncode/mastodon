@@ -130,7 +130,7 @@ class User < ApplicationRecord
            :show_follow_button_on_timeline, :show_subscribe_button_on_timeline, :show_followed_by, :show_target,
            :follow_button_to_list_adder, :show_navigation_panel, :show_quote_button, :show_bookmark_button,
            :place_tab_bar_at_bottom,:show_tab_bar_label,
-           :enable_local_timeline, :enable_federated_timeline, :enable_limited_timeline,
+           :enable_local_timeline, :enable_federated_timeline, :enable_limited_timeline, :enable_personal_timeline,
            :enable_reaction, :compact_reaction,
            :show_reply_tree_button,
            :hide_statuses_count, :hide_following_count, :hide_followers_count, :disable_joke_appearance,
@@ -145,7 +145,7 @@ class User < ApplicationRecord
            :show_reload_button, :default_column_width,
            :disable_post, :disable_reactions, :disable_follow, :disable_unfollow, :disable_block, :disable_domain_block, :disable_clear_all_notifications, :disable_account_delete,
            :prohibited_visibilities, :prohibited_words,
-           :disable_relative_time,
+           :disable_relative_time, :hide_direct_from_timeline, :hide_personal_from_timeline, :hide_personal_from_account,
 
            to: :settings, prefix: :setting, allow_nil: false
 
