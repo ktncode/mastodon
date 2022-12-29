@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import Avatar from './avatar';
 import AvatarOverlay from './avatar_overlay';
 import AvatarComposite from './avatar_composite';
+import AbsoluteTimestamp from './absolute_timestamp';
 import RelativeTimestamp from './relative_timestamp';
 import DisplayName from './display_name';
 import StatusContent from './status_content';
@@ -19,7 +20,7 @@ import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import EmojiReactionsBar from 'mastodon/components/emoji_reactions_bar';
 import PictureInPicturePlaceholder from 'mastodon/components/picture_in_picture_placeholder';
-import { displayMedia, enableReaction, compactReaction, show_reply_tree_button, enableStatusReference  } from 'mastodon/initial_state';
+import { displayMedia, enableReaction, compactReaction, show_reply_tree_button, enableStatusReference, disableRelativeTime } from 'mastodon/initial_state';
 import { List as ImmutableList } from 'immutable';
 
 // We use the component (and not the container) since we do not want
@@ -755,7 +756,7 @@ class Status extends ImmutablePureComponent {
               {status.get('expires_at') && <span className='status__expiration-time'><time dateTime={expires_at} title={intl.formatDate(expires_date, dateFormatOptions)}><i className="fa fa-clock-o" aria-hidden="true"></i></time></span>}
               <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
                 {threadMark}
-                <RelativeTimestamp timestamp={status.get('created_at')} />
+                {disableRelativeTime ? <AbsoluteTimestamp timestamp={status.get('created_at')} /> : <RelativeTimestamp timestamp={status.get('created_at')} /> }
               </a>
               <span className='status__visibility-icon'>{visibilityLink}</span>
 

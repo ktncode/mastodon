@@ -74,6 +74,7 @@ ja:
         setting_disable_joke_appearance: エイプリルフール等のジョーク機能を無効にします
         setting_disable_post: 誤って投稿することを防ぎます
         setting_disable_reactions: 誤ってお気に入り・ブースト・絵文字リアクション・投票することを防ぎます
+        setting_disable_relative_time: 投稿日時を相対表示する機能を無効にし、日時をそのまま表示します
         setting_disable_unfollow: 誤ってフォロー解除することを防ぎます
         setting_display_media_default: 閲覧注意としてマークされたメディアは隠す
         setting_display_media_hide_all: メディアを常に隠す
@@ -257,6 +258,7 @@ ja:
         setting_disable_joke_appearance: ジョーク機能による見た目の変更を無効にする
         setting_disable_post: 投稿を無効にする
         setting_disable_reactions: リアクションを無効にする
+        setting_disable_relative_time: 投稿の相対日時を無効にする
         setting_disable_swiping: スワイプでの切り替えを無効にする
         setting_disable_unfollow: フォロー解除を無効にする
         setting_display_media: メディアの表示

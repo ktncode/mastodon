@@ -86,6 +86,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:disable_domain_block]              = object.current_account.user.setting_disable_domain_block
       store[:disable_clear_all_notifications]   = object.current_account.user.setting_disable_clear_all_notifications
       store[:disable_account_delete]            = object.current_account.user.setting_disable_account_delete
+      store[:disable_relative_time]             = object.current_account.user.setting_disable_relative_time
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

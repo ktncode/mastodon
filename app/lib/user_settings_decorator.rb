@@ -89,6 +89,7 @@ class UserSettingsDecorator
     disable_domain_block
     disable_clear_all_notifications
     disable_account_delete
+    disable_relative_time
   ).freeze
 
   STRING_KEYS = %w(

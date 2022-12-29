@@ -128,6 +128,7 @@ defaults: &defaults
   disable_account_delete: false
   prohibited_visibilities: []
   prohibited_words: ''
+  disable_relative_time: false
 
 development:
   <<: *defaults

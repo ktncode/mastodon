@@ -6,6 +6,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import Button from '../../../components/button';
 import StatusContent from '../../../components/status_content';
 import Avatar from '../../../components/avatar';
+import AbsoluteTimestamp from '../../../components/absolute_timestamp';
 import RelativeTimestamp from '../../../components/relative_timestamp';
 import DisplayName from '../../../components/display_name';
 import ImmutablePureComponent from 'react-immutable-pure-component';
@@ -14,6 +15,7 @@ import AttachmentList from 'mastodon/components/attachment_list';
 import PrivacyDropdown from 'mastodon/features/compose/components/privacy_dropdown';
 import classNames from 'classnames';
 import { changeBoostPrivacy } from 'mastodon/actions/boosts';
+import { disableRelativeTime } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   cancel_reblog: { id: 'status.cancel_reblog_private', defaultMessage: 'Unboost' },
@@ -109,7 +111,9 @@ class BoostModal extends ImmutablePureComponent {
           <div className={classNames('status', `status-${status.get('visibility')}`, 'light')}>
             <div className='boost-modal__status-header'>
               <div className='boost-modal__status-time'>
-                <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'><RelativeTimestamp timestamp={status.get('created_at')} /></a>
+                <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
+                  {disableRelativeTime ? <AbsoluteTimestamp timestamp={status.get('created_at')} /> : <RelativeTimestamp timestamp={status.get('created_at')} /> }
+                </a>
               </div>
               <span className='status__visibility-icon'><Icon id={visibilityIcon.icon} title={visibilityIcon.text} /></span>
 

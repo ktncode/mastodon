@@ -4,6 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import StatusContent from '../../../components/status_content';
 import Avatar from '../../../components/avatar';
+import AbsoluteTimestamp from '../../../components/absolute_timestamp';
 import RelativeTimestamp from '../../../components/relative_timestamp';
 import DisplayName from '../../../components/display_name';
 
@@ -12,7 +13,7 @@ import { supportsPassiveEvents } from 'detect-passive-events';
 import { EmojiPicker as EmojiPickerAsync } from '../util/async-components';
 import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
-import { pickerEmojiSize } from 'mastodon/initial_state';
+import { pickerEmojiSize, disableRelativeTime } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -233,7 +234,7 @@ export default class ReactionModal extends ImmutablePureComponent {
         <div className='boost-modal__status-header'>
           <div className='boost-modal__status-time'>
             <a href={this.props.status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
-              <RelativeTimestamp timestamp={this.props.status.get('created_at')} />
+              {disableRelativeTime ? <AbsoluteTimestamp timestamp={this.props.status.get('created_at')} /> : <RelativeTimestamp timestamp={this.props.status.get('created_at')} /> }
             </a>
           </div>
 

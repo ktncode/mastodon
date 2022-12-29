@@ -145,6 +145,7 @@ class User < ApplicationRecord
            :show_reload_button, :default_column_width,
            :disable_post, :disable_reactions, :disable_follow, :disable_unfollow, :disable_block, :disable_domain_block, :disable_clear_all_notifications, :disable_account_delete,
            :prohibited_visibilities, :prohibited_words,
+           :disable_relative_time,
 
            to: :settings, prefix: :setting, allow_nil: false
 

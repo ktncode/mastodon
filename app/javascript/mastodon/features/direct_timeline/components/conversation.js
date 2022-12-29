@@ -9,9 +9,10 @@ import DropdownMenuContainer from 'mastodon/containers/dropdown_menu_container';
 import AvatarComposite from 'mastodon/components/avatar_composite';
 import Permalink from 'mastodon/components/permalink';
 import IconButton from 'mastodon/components/icon_button';
+import AbsoluteTimestamp from 'mastodon/components/absolute_timestamp';
 import RelativeTimestamp from 'mastodon/components/relative_timestamp';
 import { HotKeys } from 'react-hotkeys';
-import { autoPlayGif } from 'mastodon/initial_state';
+import { autoPlayGif, disableRelativeTime } from 'mastodon/initial_state';
 import classNames from 'classnames';
 
 const messages = defineMessages({
@@ -153,7 +154,8 @@ class Conversation extends ImmutablePureComponent {
           <div className='conversation__content'>
             <div className='conversation__content__info'>
               <div className='conversation__content__relative-time'>
-                {unread && <span className='conversation__unread' />} <RelativeTimestamp timestamp={lastStatus.get('created_at')} />
+                {unread && <span className='conversation__unread' />}
+                {disableRelativeTime ? <AbsoluteTimestamp timestamp={lastStatus.get('created_at')} /> : <RelativeTimestamp timestamp={lastStatus.get('created_at')} /> }
               </div>
 
               <div className='conversation__content__names' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
