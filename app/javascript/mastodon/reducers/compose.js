@@ -610,7 +610,7 @@ export default function compose(state = initialState, action) {
       map.set('scheduled', action.status.get('scheduled_at'));
       map.set('expires', action.status.get('expires_at') ? format(parseISO(action.status.get('expires_at')), 'yyyy-MM-dd HH:mm') : state.get('default_expires_in', null));
       map.set('expires_action', action.status.get('expires_action') ?? state.get('default_expires_action', 'mark'));
-      map.update('references', set => set.clear().concat(action.status.get('status_reference_ids')));
+      map.update('references', set => set.clear().concat(action.status.get('status_reference_ids')).delete(action.status.getIn(['quote', 'id'])));
       map.update('context_references', set => set.clear().concat(action.context_references));
 
       if (action.status.get('spoiler_text').length > 0) {
