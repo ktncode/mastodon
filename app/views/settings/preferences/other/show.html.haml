@@ -131,6 +131,9 @@
   .fields-group
     = f.input :setting_hide_personal_from_account, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  .fields-group
+    = f.input :setting_hide_privacy_meta, as: :boolean, wrapper: :with_label, fedibird_features: true
+
   %h4= t 'preferences.public_timelines'
 
   .fields-group

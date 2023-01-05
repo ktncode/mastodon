@@ -95,6 +95,7 @@ ja:
         setting_hide_network: フォローとフォロワーの情報がプロフィールページで見られないようにします
         setting_hide_personal_from_account: アカウントの投稿一覧から個人限定投稿を隠します
         setting_hide_personal_from_timeline: ホームとリストタイムラインから個人限定投稿を隠します
+        setting_hide_privacy_meta: 公開範囲を選択するドロップダウンメニューから説明を隠し、名称のみ表示します
         setting_hide_statuses_count: 投稿数をプロフィールページで見られないようにします
         setting_match_visibility_of_references: 参照先の投稿がフォロワー限定の場合、投稿の公開範囲をそれに合わせてフォロワー限定とする動作をデフォルトにします
         setting_new_features_policy: Fedibirdに新しい機能が追加された時の受け入れポリシーを設定します。推奨設定は多くの新機能を有効にするので、望ましくない場合は無効に設定してください
@@ -287,6 +288,7 @@ ja:
         setting_hide_network: 繋がりを隠す
         setting_hide_personal_from_account: 自分限定投稿をアカウントの投稿一覧から隠す
         setting_hide_personal_from_timeline: 自分限定投稿をタイムラインから隠す
+        setting_hide_privacy_meta: 公開範囲の説明を隠す
         setting_hide_statuses_count: 投稿数を隠す
         setting_info_font_size: 情報ヘッダのフォントサイズ
         setting_match_visibility_of_references: 投稿の公開範囲を参照先に合わせる

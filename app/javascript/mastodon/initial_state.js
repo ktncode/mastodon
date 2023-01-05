@@ -70,6 +70,7 @@ export const disableRelativeTime = getMeta('disable_relative_time');
 export const hideDirectFromTimeline = getMeta('hide_direct_from_timeline');
 export const hidePersonalFromTimeline = getMeta('hide_personal_from_timeline');
 export const hidePersonalFromAccount = getMeta('hide_personal_from_account');
+export const hidePrivacyMeta = getMeta('hide_privacy_meta');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

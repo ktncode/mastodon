@@ -9,6 +9,7 @@ import spring from 'react-motion/lib/spring';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
+import { hidePrivacyMeta } from '../../../initial_state';
 
 const messages = defineMessages({
   public_short: { id: 'privacy.public.short', defaultMessage: 'Public' },
@@ -145,7 +146,7 @@ class PrivacyDropdownMenu extends React.PureComponent {
 
                 <div className='privacy-dropdown__option__content'>
                   <strong>{item.text}</strong>
-                  {item.meta}
+                  {!hidePrivacyMeta && item.meta}
                 </div>
               </div>
             ))}

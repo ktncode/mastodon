@@ -99,6 +99,7 @@ en:
         setting_hide_network: Who you follow and who follows you will be hidden on your profile
         setting_hide_personal_from_account: Hide personal posts from the account post lists
         setting_hide_personal_from_timeline: Hide personal posts from the home and list timelines
+        setting_hide_privacy_meta: Hide the description from the drop-down menu for selecting visibility, showing only the name
         setting_hide_statuses_count: The number of post will be hidden in your profile
         setting_match_visibility_of_references: If the referenced post is private, default the visibility of the post to private behavior accordingly
         setting_new_features_policy: Set the acceptance policy when new features are added to Fedibird. The recommended setting will enable many new features, so set it to disabled if it is not desirable
@@ -291,6 +292,7 @@ en:
         setting_hide_network: Hide your social graph
         setting_hide_personal_from_account: Hide personal posts from account posts
         setting_hide_personal_from_timeline: Hide personal posts from the timeline
+        setting_hide_privacy_meta: Hide visibility description
         setting_hide_statuses_count: Hide your post count
         setting_info_font_size: Information header font size
         setting_match_visibility_of_references: Match the visibility of the post to the references
