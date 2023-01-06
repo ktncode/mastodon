@@ -22,14 +22,17 @@ $search-bar-hover: false;
 
 
 // Status font size in timeline
-$status-font-size: 15px;  // mastodon default
+$status-font-size: var(--content-font-size, 15px);  // mastodon default
 //$status-font-size: 16px;  // compatible with material design
 
 
 // Name font size in timeline status
-$name-font-size: 15px;  // mastodon default
+$name-font-size: var(--info-font-size, 15px);  // mastodon default
 //$name-font-size: 16px;  // compatible with material design
 
+// Chip settings
+$chip-size: var(--content-emoji-reaction-size, 16px);  // Chip height: 24px, Icon size: 16px(Mastodon default)
+$chip-radius: calc(var(--content-emoji-reaction-size, 16px) + 1px);  // Oval
 
 // Background image
 // If you want to use the local image, please put it in "../"
