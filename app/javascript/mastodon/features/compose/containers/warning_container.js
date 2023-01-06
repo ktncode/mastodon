@@ -35,9 +35,11 @@ const mapStateToProps = state => ({
   hashtagWarning: state.getIn(['compose', 'privacy']) !== 'public' && APPROX_HASHTAG_RE.test(state.getIn(['compose', 'text'])),
   directMessageWarning: state.getIn(['compose', 'privacy']) === 'direct',
   limitedMessageWarning: state.getIn(['compose', 'privacy']) === 'limited',
+  mutualMessageWarning: state.getIn(['compose', 'privacy']) === 'mutual',
+  personalMessageWarning: state.getIn(['compose', 'privacy']) === 'personal',
 });
 
-const WarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning, limitedMessageWarning }) => {
+const WarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning, limitedMessageWarning, mutualMessageWarning, personalMessageWarning }) => {
   if (needsLockWarning) {
     return <Warning message={<FormattedMessage id='compose_form.lock_disclaimer' defaultMessage='Your account is not {locked}. Anyone can follow you to view your follower-only posts.' values={{ locked: <a href='/settings/profile'><FormattedMessage id='compose_form.lock_disclaimer.lock' defaultMessage='locked' /></a> }} />} />;
   }
@@ -60,6 +62,14 @@ const WarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning
     return <Warning message={<FormattedMessage id='compose_form.limited_message_warning' defaultMessage='This toot will only be sent to users in the circle.' />} />;
   }
 
+  if (mutualMessageWarning) {
+    return <Warning message={<FormattedMessage id='compose_form.mutual_message_warning' defaultMessage='This toot will only be sent to users in the circle.' />} />;
+  }
+
+  if (personalMessageWarning) {
+    return <Warning message={<FormattedMessage id='compose_form.personal_message_warning' defaultMessage='This toot will only be sent to users in the circle.' />} />;
+  }
+
   return null;
 };
 
@@ -68,6 +78,8 @@ WarningWrapper.propTypes = {
   hashtagWarning: PropTypes.bool,
   directMessageWarning: PropTypes.bool,
   limitedMessageWarning: PropTypes.bool,
+  mutualMessageWarning: PropTypes.bool,
+  personalMessageWarning: PropTypes.bool,
 };
 
 export default connect(mapStateToProps)(WarningWrapper);

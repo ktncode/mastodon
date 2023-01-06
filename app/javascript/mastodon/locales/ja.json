@@ -157,6 +157,8 @@
   "compose_form.limited_message_warning": "この投稿はサークルに含まれるユーザーにのみ送信されます。",
   "compose_form.lock_disclaimer": "あなたのアカウントは{locked}になっていません。誰でもあなたをフォローすることができ、フォロワー限定の投稿を見ることができます。",
   "compose_form.lock_disclaimer.lock": "承認制",
+  "compose_form.mutual_message_warning": "この投稿は相互フォローしているユーザーにのみ送信されます。",
+  "compose_form.personal_message_warning": "この投稿は自分限定で、他の誰にも送信されず、公開されません。",
   "compose_form.placeholder": "今なにしてる？",
   "compose_form.poll.add_option": "追加",
   "compose_form.poll.duration": "アンケート期間",
