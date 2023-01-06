@@ -382,7 +382,7 @@ ActiveRecord::Schema.define(version: 2023_01_29_193248) do
     t.boolean "irreversible", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "whole_word", default: true, null: false
+    t.boolean "whole_word", default: false, null: false
     t.index ["account_id"], name: "index_custom_filters_on_account_id"
   end
 
