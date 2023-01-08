@@ -742,7 +742,8 @@ html {
 }
 
 .status__content,
-.reply-indicator__content {
+.reply-indicator__content,
+.scheduled-status-warning-indicator__content {
   a {
     color: $highlight-text-color;
   }

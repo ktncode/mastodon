@@ -13,6 +13,7 @@ const tooltips = defineMessages({
   statuses: { id: 'notifications.filter.statuses', defaultMessage: 'Updates from people you follow' },
   reactions: { id: 'notifications.filter.emoji_reactions', defaultMessage: 'Reactions' },
   reference: { id: 'notifications.filter.status_references', defaultMessage: 'Status references' },
+  scheduled_statuses: { id: 'notifications.filter.scheduled_statuses', defaultMessage: 'Scheduled statuses' },
 });
 
 export default @injectIntl
@@ -97,6 +98,13 @@ class FilterBar extends React.PureComponent {
           title={intl.formatMessage(tooltips.statuses)}
         >
           <Icon id='home' fixedWidth />
+        </button>
+        <button
+          className={selectedFilter === 'scheduled_status' ? 'active' : ''}
+          onClick={this.onClick('scheduled_status')}
+          title={intl.formatMessage(tooltips.scheduled_statuses)}
+        >
+          <Icon id='clock-o' fixedWidth />
         </button>
         {enableReaction &&
           <button

@@ -16,6 +16,7 @@ import {
   COMPOSE_UPLOAD_FAIL,
   COMPOSE_UPLOAD_UNDO,
   COMPOSE_UPLOAD_PROGRESS,
+  SCHEDULED_STATUS_SUBMIT_SUCCESS,
   THUMBNAIL_UPLOAD_REQUEST,
   THUMBNAIL_UPLOAD_SUCCESS,
   THUMBNAIL_UPLOAD_FAIL,
@@ -54,6 +55,7 @@ import {
   COMPOSE_REFERENCE_ADD,
   COMPOSE_REFERENCE_REMOVE,
   COMPOSE_REFERENCE_RESET,
+  COMPOSE_SCHEDULED_EDIT_CANCEL,
 } from '../actions/compose';
 import { TIMELINE_DELETE, TIMELINE_EXPIRE } from '../actions/timelines';
 import { STORE_HYDRATE } from '../actions/store';
@@ -62,7 +64,7 @@ import { Map as ImmutableMap, List as ImmutableList, Set as ImmutableSet, Ordere
 import uuid from '../uuid';
 import { me } from '../initial_state';
 import { unescapeHTML } from '../utils/html';
-import { parseISO, format } from 'date-fns';
+import { format } from 'date-fns';
 
 const initialState = ImmutableMap({
   mounted: 0,
@@ -84,6 +86,7 @@ const initialState = ImmutableMap({
   is_submitting: false,
   is_changing_upload: false,
   is_uploading: false,
+  dirty: false,
   progress: 0,
   isUploadingThumbnail: false,
   thumbnailProgress: 0,
@@ -114,6 +117,7 @@ const initialState = ImmutableMap({
   context_references: ImmutableSet(),
   prohibited_visibilities: ImmutableSet(),
   prohibited_words: ImmutableSet(),
+  scheduled_status_id: null,
 });
 
 const initialPoll = ImmutableMap({
@@ -122,18 +126,18 @@ const initialPoll = ImmutableMap({
   multiple: false,
 });
 
-const statusToTextMentions = (text, privacy, status) => {
-  if(status === null) {
+const statusToTextMentions = (text, privacy, replyStatus) => {
+  if(replyStatus === null) {
     return text;
   }
 
   let mentions = ImmutableOrderedSet();
 
-  if (status.getIn(['account', 'id']) !== me) {
-    mentions = mentions.add(`@${status.getIn(['account', 'acct'])} `);
+  if (replyStatus.getIn(['account', 'id']) !== me) {
+    mentions = mentions.add(`@${replyStatus.getIn(['account', 'acct'])} `);
   }
 
-  mentions = mentions.union(status.get('mentions').filterNot(mention => mention.get('id') === me).map(mention => `@${mention.get('acct')} `));
+  mentions = mentions.union(replyStatus.get('mentions').filterNot(mention => mention.get('id') === me).map(mention => `@${mention.get('acct')} `));
 
   const match = /^(\s*(?:(?:@\S+)\s*)*)([\s\S]*)/.exec(text);
   const extrctMentions = ImmutableOrderedSet(match[1].trim().split(/\s+/).filter(Boolean).map(mention => `${mention} `));
@@ -163,6 +167,7 @@ const clearAll = state => {
     map.update('media_attachments', list => list.clear());
     map.set('poll', null);
     map.set('idempotencyKey', uuid());
+    map.set('dirty', false);
     map.set('datetime_form', null);
     map.set('default_expires', state.get('default_expires_in') ? true : null);
     map.set('scheduled', null);
@@ -170,7 +175,8 @@ const clearAll = state => {
     map.set('expires_action', state.get('default_expires_action', 'mark'));
     map.update('references', set => set.clear());
     map.update('context_references', set => set.clear());
-});
+    map.set('scheduled_status_id', null);
+  });
 };
 
 const appendMedia = (state, media, file) => {
@@ -284,9 +290,9 @@ const hydrate = (state, hydratedState) => {
 const domParser = new DOMParser();
 
 const expandMentions = status => {
-  const fragment = domParser.parseFromString(status.get('content'), 'text/html').documentElement;
+  const fragment = domParser.parseFromString(status.get('content', ''), 'text/html').documentElement;
 
-  status.get('mentions').forEach(mention => {
+  status.get('mentions', ImmutableList()).forEach(mention => {
     fragment.querySelector(`a[href="${mention.get('url')}"]`).textContent = `@${mention.get('acct')}`;
   });
 
@@ -357,11 +363,13 @@ export default function compose(state = initialState, action) {
       }
 
       map.set('idempotencyKey', uuid());
+      map.set('dirty', true);
     });
   case COMPOSE_SPOILERNESS_CHANGE:
     return state.withMutations(map => {
       map.set('spoiler', !state.get('spoiler'));
       map.set('idempotencyKey', uuid());
+      map.set('dirty', true);
 
       if (!state.get('sensitive') && state.get('media_attachments').size >= 1) {
         map.set('sensitive', true);
@@ -371,7 +379,8 @@ export default function compose(state = initialState, action) {
     if (!state.get('spoiler')) return state;
     return state
       .set('spoiler_text', action.text)
-      .set('idempotencyKey', uuid());
+      .set('idempotencyKey', uuid())
+      .set('dirty', true);
   case COMPOSE_VISIBILITY_CHANGE:
     return state.withMutations(map => {
       const searchability = searchabilityCap(action.value, state.get('searchability'));
@@ -380,12 +389,14 @@ export default function compose(state = initialState, action) {
       map.set('privacy', action.value);
       map.set('searchability', searchability);
       map.set('idempotencyKey', uuid());
+      map.set('dirty', true);
       map.set('circle_id', null);
     });
   case COMPOSE_SEARCHABILITY_CHANGE:
     return state.withMutations(map => {
       map.set('searchability', action.value);
       map.set('idempotencyKey', uuid());
+      map.set('dirty', true);
 
       const privacy = privacyExpand(action.value, state.get('privacy'));
 
@@ -398,11 +409,13 @@ export default function compose(state = initialState, action) {
   case COMPOSE_CIRCLE_CHANGE:
     return state
       .set('circle_id', action.value)
-      .set('idempotencyKey', uuid());
+      .set('idempotencyKey', uuid())
+      .set('dirty', true);
   case COMPOSE_CHANGE:
     return state
       .set('text', action.text)
-      .set('idempotencyKey', uuid());
+      .set('idempotencyKey', uuid())
+      .set('dirty', true);
   case COMPOSE_COMPOSING_CHANGE:
     return state.set('is_composing', action.value);
   case COMPOSE_REPLY:
@@ -422,12 +435,14 @@ export default function compose(state = initialState, action) {
       map.set('caretPosition', null);
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
+      map.set('dirty', false);
       map.set('datetime_form', null);
       map.set('default_expires', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
       map.set('expires', state.get('default_expires_in', null));
       map.set('expires_action', state.get('default_expires_action', 'mark'));
       map.update('context_references', set => set.clear().concat(action.context_references));
+      map.set('scheduled_status_id', null);
 
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
@@ -451,12 +466,14 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('preselectDate', new Date());
       map.set('idempotencyKey', uuid());
+      map.set('dirty', false);
       map.set('datetime_form', null);
       map.set('default_expires', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
       map.set('expires', state.get('default_expires_in', null));
       map.set('expires_action', state.get('default_expires_action', 'mark'));
       map.update('context_references', set => set.clear().add(action.status.get('id')));
+      map.set('scheduled_status_id', null);
 
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
@@ -468,6 +485,7 @@ export default function compose(state = initialState, action) {
     });
   case COMPOSE_REPLY_CANCEL:
   case COMPOSE_QUOTE_CANCEL:
+  case COMPOSE_SCHEDULED_EDIT_CANCEL:
   case COMPOSE_RESET:
     return state.withMutations(map => {
       map.set('in_reply_to', null);
@@ -482,21 +500,24 @@ export default function compose(state = initialState, action) {
       map.set('circle_id', null);
       map.set('poll', null);
       map.set('idempotencyKey', uuid());
+      map.set('dirty', false);
       map.set('datetime_form', null);
       map.set('default_expires', state.get('default_expires_in') ? true : null);
       map.set('scheduled', null);
       map.set('expires', state.get('default_expires_in', null));
       map.set('expires_action', state.get('default_expires_action', 'mark'));
       map.update('context_references', set => set.clear());
-      if (action.type == COMPOSE_RESET) {
+      if (action.type === COMPOSE_RESET || action.type === COMPOSE_SCHEDULED_EDIT_CANCEL) {
         map.update('references', set => set.clear());
       }
+      map.set('scheduled_status_id', null);
     });
   case COMPOSE_SUBMIT_REQUEST:
     return state.set('is_submitting', true);
   case COMPOSE_UPLOAD_CHANGE_REQUEST:
     return state.set('is_changing_upload', true);
   case COMPOSE_SUBMIT_SUCCESS:
+  case SCHEDULED_STATUS_SUBMIT_SUCCESS:
     return clearAll(state);
   case COMPOSE_SUBMIT_FAIL:
     return state.set('is_submitting', false);
@@ -547,6 +568,8 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
+      map.set('scheduled_status_id', null);
+      map.set('dirty', false);
     });
   case COMPOSE_DIRECT:
     return state.withMutations(map => {
@@ -557,6 +580,8 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
+      map.set('scheduled_status_id', null);
+      map.set('dirty', false);
     });
   case COMPOSE_SUGGESTIONS_CLEAR:
     return state.update('suggestions', ImmutableList(), list => list.clear()).set('suggestion_token', null);
@@ -593,27 +618,30 @@ export default function compose(state = initialState, action) {
       const datetime_form = !!action.status.get('scheduled_at') || !!action.status.get('expires_at') ? true : null;
 
       map.set('text', action.raw_text || unescapeHTML(rejectQuoteAltText(expandMentions(action.status))));
-      map.set('in_reply_to', action.status.get('in_reply_to_id'));
-      map.set('quote_from', action.status.getIn(['quote', 'id']));
+      map.set('in_reply_to', action.status.get('in_reply_to_id', null));
+      map.set('quote_from', action.status.getIn(['quote', 'id'], null));
       map.set('quote_from_url', action.status.getIn(['quote', 'url']));
       map.set('reply_status', action.replyStatus);
-      map.set('privacy', action.status.get('visibility'));
-      map.set('searchability', action.status.get('searchability'));
-      map.set('circle_id', action.status.get('circle_id'));
-      map.set('media_attachments', action.status.get('media_attachments'));
+      map.set('privacy', action.status.get('visibility', state.get('default_privacy')));
+      map.set('searchability', action.status.get('searchability', state.get('default_searchability')));
+      map.set('circle_id', action.status.get('circle_id', null));
+      map.set('media_attachments', action.status.get('media_attachments', ImmutableList()));
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
-      map.set('sensitive', action.status.get('sensitive'));
+      map.set('dirty', false);
+      map.set('poll', action.status.get('poll', null));
+      map.set('sensitive', action.status.get('sensitive', false));
       map.set('datetime_form', datetime_form);
       map.set('default_expires', !datetime_form && state.get('default_expires_in') ? true : null);
-      map.set('scheduled', action.status.get('scheduled_at'));
-      map.set('expires', action.status.get('expires_at') ? format(parseISO(action.status.get('expires_at')), 'yyyy-MM-dd HH:mm') : state.get('default_expires_in', null));
+      map.set('scheduled', action.status.get('scheduled_at') ? format(new Date(action.status.get('scheduled_at')), 'yyyy-MM-dd HH:mm') : null);
+      map.set('expires', action.status.get('expires_at') ? format(new Date(action.status.get('expires_at')), 'yyyy-MM-dd HH:mm') : state.get('default_expires_in', null));
       map.set('expires_action', action.status.get('expires_action') ?? state.get('default_expires_action', 'mark'));
-      map.update('references', set => set.clear().concat(action.status.get('status_reference_ids')).delete(action.status.getIn(['quote', 'id'])));
+      map.update('references', set => set.clear().concat(action.status.get('status_reference_ids', ImmutableList())).delete(action.status.getIn(['quote', 'id'], ImmutableList())));
       map.update('context_references', set => set.clear().concat(action.context_references));
+      map.set('scheduled_status_id', action.status.get('scheduled_status_id', null));
 
-      if (action.status.get('spoiler_text').length > 0) {
+      if (action.status.get('spoiler_text', '').length > 0) {
         map.set('spoiler', true);
         map.set('spoiler_text', action.status.get('spoiler_text'));
       } else {
@@ -623,7 +651,7 @@ export default function compose(state = initialState, action) {
 
       if (action.status.get('poll')) {
         map.set('poll', ImmutableMap({
-          options: action.status.getIn(['poll', 'options']).map(x => x.get('title')),
+          options: action.status.getIn(['poll', 'options']).map(x => typeof x === 'string' ? x : x.get('title')),
           multiple: action.status.getIn(['poll', 'multiple']),
           expires_in: expiresInFromExpiresAt(action.status.getIn(['poll', 'expires_at'])),
         }));
@@ -653,13 +681,14 @@ export default function compose(state = initialState, action) {
       map.set('scheduled', null);
       map.set('expires', null);
       map.set('expires_action', 'mark');
+      map.set('dirty', true);
     });
   case COMPOSE_SCHEDULED_CHANGE:
-    return state.set('scheduled', action.value);
+    return state.set('scheduled', action.value).set('dirty', true);;
   case COMPOSE_EXPIRES_CHANGE:
-    return state.set('expires', action.value);
+    return state.set('expires', action.value).set('dirty', true);;
   case COMPOSE_EXPIRES_ACTION_CHANGE:
-    return state.set('expires_action', action.value);
+    return state.set('expires_action', action.value).set('dirty', true);;
   case COMPOSE_REFERENCE_ADD:
     return state.update('references', set => set.add(action.id));
   case COMPOSE_REFERENCE_REMOVE:

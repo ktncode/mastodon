@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import Warning from '../components/warning';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { me } from '../../../initial_state';
+import { cancelScheduledStatusCompose } from '../../../actions/compose';
+import Icon from 'mastodon/components/icon';
+import IconButton from 'mastodon/components/icon_button';
 
 const buildHashtagRE = () => {
   try {
@@ -37,9 +40,38 @@ const mapStateToProps = state => ({
   limitedMessageWarning: state.getIn(['compose', 'privacy']) === 'limited',
   mutualMessageWarning: state.getIn(['compose', 'privacy']) === 'mutual',
   personalMessageWarning: state.getIn(['compose', 'privacy']) === 'personal',
+  isScheduledStatusEditting: !!state.getIn(['compose', 'scheduled_status_id']),
 });
 
-const WarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning, limitedMessageWarning, mutualMessageWarning, personalMessageWarning }) => {
+const mapDispatchToProps = dispatch => ({
+
+  onCancel () {
+    dispatch(cancelScheduledStatusCompose());
+  },
+
+});
+
+const ScheduledStatusWarningWrapper = ({ isScheduledStatusEditting, onCancel }) => {
+  if (!isScheduledStatusEditting) {
+    return null;
+  }
+
+  return (
+    <div className='scheduled-status-warning-indicator'>
+      <div className='scheduled-status-warning-indicator__cancel'><IconButton title='Cancel' icon='times' onClick={onCancel} inverted /></div>
+      <div className='scheduled-status-warning-indicator__content translate'>
+        <Icon id='clock-o' fixedWidth /><FormattedMessage id='compose_form.scheduled_status_warning' defaultMessage='Scheduled post editing in progress.' />
+      </div>
+    </div>
+  );
+};
+
+ScheduledStatusWarningWrapper.propTypes = {
+  isScheduledStatusEditting: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
+};
+
+const PrivacyWarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning, limitedMessageWarning, mutualMessageWarning, personalMessageWarning }) => {
   if (needsLockWarning) {
     return <Warning message={<FormattedMessage id='compose_form.lock_disclaimer' defaultMessage='Your account is not {locked}. Anyone can follow you to view your follower-only posts.' values={{ locked: <a href='/settings/profile'><FormattedMessage id='compose_form.lock_disclaimer.lock' defaultMessage='locked' /></a> }} />} />;
   }
@@ -73,7 +105,7 @@ const WarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning
   return null;
 };
 
-WarningWrapper.propTypes = {
+PrivacyWarningWrapper.propTypes = {
   needsLockWarning: PropTypes.bool,
   hashtagWarning: PropTypes.bool,
   directMessageWarning: PropTypes.bool,
@@ -82,4 +114,24 @@ WarningWrapper.propTypes = {
   personalMessageWarning: PropTypes.bool,
 };
 
-export default connect(mapStateToProps)(WarningWrapper);
+const WarningWrapper = (props) => {
+  return (
+    <Fragment>
+      <ScheduledStatusWarningWrapper {...props} />
+      <PrivacyWarningWrapper {...props} />
+    </Fragment>
+  );
+};
+
+WarningWrapper.propTypes = {
+  needsLockWarning: PropTypes.bool,
+  hashtagWarning: PropTypes.bool,
+  directMessageWarning: PropTypes.bool,
+  limitedMessageWarning: PropTypes.bool,
+  mutualMessageWarning: PropTypes.bool,
+  personalMessageWarning: PropTypes.bool,
+  isScheduledStatusEditting: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WarningWrapper);

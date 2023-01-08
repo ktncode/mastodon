@@ -27,6 +27,7 @@ class Notification < ApplicationRecord
     'Poll'            => :poll,
     'EmojiReaction'   => :emoji_reaction,
     'StatusReference' => :status_reference,
+    'ScheduledStatus' => :scheduled_status,
   }.freeze
 
   TYPES = %i(
@@ -39,6 +40,7 @@ class Notification < ApplicationRecord
     poll
     emoji_reaction
     status_reference
+    scheduled_status
   ).freeze
 
   TARGET_STATUS_INCLUDES_BY_TYPE = {
@@ -99,6 +101,8 @@ class Notification < ApplicationRecord
       emoji_reaction&.status
     when :status_reference
       status_reference&.status
+    when :scheduled_status
+      status
     end
   end
 
@@ -141,6 +145,8 @@ class Notification < ApplicationRecord
           notification.emoji_reaction.status = cached_status
         when :status_reference
           notification.status_reference.status = cached_status
+        when :scheduled_status
+          notification.status = cached_status
         end
       end
 
@@ -157,7 +163,7 @@ class Notification < ApplicationRecord
     return unless new_record?
 
     case activity_type
-    when 'Status', 'Follow', 'Favourite', 'FollowRequest', 'Poll', 'EmojiReaction'
+    when 'Status', 'Follow', 'Favourite', 'FollowRequest', 'Poll', 'EmojiReaction', 'ScheduledStatus'
       self.from_account_id = activity&.account_id
     when 'Mention', 'StatusReference'
       self.from_account_id = activity&.status&.account_id

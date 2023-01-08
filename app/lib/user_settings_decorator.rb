@@ -38,6 +38,7 @@ class UserSettingsDecorator
     post_reference_modal
     add_reference_modal
     unselect_reference_modal
+    delete_scheduled_status_modal
     auto_play_gif
     expand_spoiers
     reduce_motion

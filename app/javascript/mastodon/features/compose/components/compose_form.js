@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import CharacterCounter from './character_counter';
 import Button from '../../../components/button';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -36,6 +36,9 @@ const messages = defineMessages({
   spoiler_placeholder: { id: 'compose_form.spoiler_placeholder', defaultMessage: 'Write your warning here' },
   publish: { id: 'compose_form.publish', defaultMessage: 'Toot' },
   publishLoud: { id: 'compose_form.publish_loud', defaultMessage: '{publish}!' },
+  update: { id: 'compose_form.update_scheduled_status', defaultMessage: 'Update scheduled post' },
+  delete: { id: 'compose_form.delete_scheduled_status', defaultMessage: 'Delete scheduled post' },
+  and: { id: 'compose_form.and', defaultMessage: ' + ' },
 });
 
 export default @injectIntl
@@ -61,6 +64,8 @@ class ComposeForm extends ImmutablePureComponent {
     isCircleUnselected: PropTypes.bool,
     prohibitedVisibilities: ImmutablePropTypes.set,
     prohibitedWords: ImmutablePropTypes.set,
+    isScheduled: PropTypes.bool,
+    isScheduledStatusEditting: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onClearSuggestions: PropTypes.func.isRequired,
@@ -215,6 +220,14 @@ class ComposeForm extends ImmutablePureComponent {
       publishText = <span className='compose-form__publish-private'><Icon id='lock' /> {intl.formatMessage(messages.publish)}</span>;
     } else {
       publishText = this.props.privacy !== 'unlisted' ? intl.formatMessage(messages.publishLoud, { publish: intl.formatMessage(messages.publish) }) : intl.formatMessage(messages.publish);
+    }
+
+    if (this.props.isScheduledStatusEditting) {
+      if (this.props.isScheduled ) {
+        publishText = <span className='compose-form__update'>{intl.formatMessage(messages.update)}</span>;
+      } else {
+        publishText = <Fragment><span className='compose-form__delete'>{intl.formatMessage(messages.delete)}</span>{intl.formatMessage(messages.and)}{publishText}</Fragment>;
+      }
     }
 
     return (

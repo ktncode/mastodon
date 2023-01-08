@@ -25,6 +25,7 @@ class PostStatusService < BaseService
   # @option [String] :idempotency Optional idempotency key
   # @option [Boolean] :with_rate_limit
   # @option [String] :searchability
+  # @option [Boolean] :notify Optional notification of completion of schedule post
   # @return [Status]
   def call(account, options = {})
     @account     = account
@@ -53,10 +54,16 @@ class PostStatusService < BaseService
 
     redis.setex(idempotency_key, 3_600, @status.id) if idempotency_given?
 
+    create_notification!
+
     @status
   end
 
   private
+
+  def create_notification!
+    NotifyService.new.call(@status.account, :scheduled_status, @status) if @options[:notify] && @status.account.local?
+  end
 
   def status_from_uri(uri)
     ActivityPub::TagManager.instance.uri_to_resource(uri, Status)
@@ -81,7 +88,6 @@ class PostStatusService < BaseService
     @visibility     = :limited if @visibility&.to_sym != :direct && @in_reply_to&.limited_visibility?
     @searchability  = searchability
     @scheduled_at   = @options[:scheduled_at].is_a?(Time) ? @options[:scheduled_at] : @options[:scheduled_at]&.to_datetime&.to_time
-    @scheduled_at   = nil if scheduled_in_the_past?
     if @quote_id.nil? && md = @text.match(/QT:\s*\[\s*(https:\/\/.+?)\s*\]/)
       @quote_id = quote_from_url(md[1])&.id
       @text.sub!(/QT:\s*\[.*?\]/, '')
@@ -273,11 +279,12 @@ class PostStatusService < BaseService
 
   def scheduled_options
     @options.tap do |options_hash|
-      options_hash[:in_reply_to_id]  = options_hash.delete(:thread)&.id
-      options_hash[:application_id]  = options_hash.delete(:application)&.id
-      options_hash[:scheduled_at]    = nil
-      options_hash[:idempotency]     = nil
-      options_hash[:with_rate_limit] = false
+      options_hash[:in_reply_to_id]       = options_hash.delete(:thread)&.id&.to_s
+      options_hash[:application_id]       = options_hash.delete(:application)&.id
+      options_hash[:scheduled_at]         = nil
+      options_hash[:idempotency]          = nil
+      options_hash[:status_reference_ids] = options_hash[:status_reference_ids]&.map(&:to_s)&.filter{ |id| id != options_hash[:quote_id] }
+      options_hash[:with_rate_limit]      = false
     end
   end
 end

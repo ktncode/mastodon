@@ -255,6 +255,7 @@ ja:
         setting_default_search_searchability: 検索の対象とする範囲
         setting_default_sensitive: メディアを常に閲覧注意としてマークする
         setting_delete_modal: 投稿を削除する前に確認ダイアログを表示する
+        setting_delete_scheduled_status_modal: 予約投稿を削除する前に確認ダイアログを表示する
         setting_disable_account_delete: アカウント削除を無効にする
         setting_disable_block: ブロックを無効にする
         setting_disable_clear_all_notifications: 通知の全消去を無効にする

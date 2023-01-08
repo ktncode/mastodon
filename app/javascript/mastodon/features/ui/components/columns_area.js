@@ -33,6 +33,7 @@ import {
   Directory,
   Trends,
   Suggestions,
+  ScheduledStatuses,
 } from '../../ui/util/async-components';
 import Icon from 'mastodon/components/icon';
 import ComposePanel from './compose_panel';
@@ -65,6 +66,7 @@ const componentMap = {
   'DIRECTORY': Directory,
   'TRENDS': Trends,
   'SUGGESTIONS': Suggestions,
+  'SCHEDULED_STATUS': ScheduledStatuses,
 };
 
 const messages = defineMessages({

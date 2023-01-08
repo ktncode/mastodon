@@ -21,6 +21,7 @@ class ReplyIndicator extends ImmutablePureComponent {
 
   static propTypes = {
     status: ImmutablePropTypes.map,
+    isScheduledStatusEditting: PropTypes.bool,
     onCancel: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -42,7 +43,7 @@ class ReplyIndicator extends ImmutablePureComponent {
   }
 
   render () {
-    const { status, intl } = this.props;
+    const { status, isScheduledStatusEditting, intl } = this.props;
 
     if (!status) {
       return null;
@@ -53,7 +54,7 @@ class ReplyIndicator extends ImmutablePureComponent {
     return (
       <div className='reply-indicator'>
         <div className='reply-indicator__header'>
-          <div className='reply-indicator__cancel'><IconButton title={intl.formatMessage(messages.cancel)} icon='times' onClick={this.handleClick} inverted /></div>
+          {!isScheduledStatusEditting && <div className='reply-indicator__cancel'><IconButton title={intl.formatMessage(messages.cancel)} icon='times' onClick={this.handleClick} inverted /></div>}
 
           <a href={status.getIn(['account', 'url'])} onClick={this.handleAccountClick} className='reply-indicator__display-name'>
             <div className='reply-indicator__display-avatar'><Avatar account={status.get('account')} size={24} /></div>

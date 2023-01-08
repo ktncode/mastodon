@@ -5,6 +5,7 @@ import Icon from 'mastodon/components/icon';
 import { profile_directory, showTrends, enableLimitedTimeline, enableFederatedTimeline, enableLocalTimeline, enablePersonalTimeline } from 'mastodon/initial_state';
 import NotificationsCounterIcon from './notifications_counter_icon';
 import FollowRequestsNavLink from './follow_requests_nav_link';
+import ScheduledStatusesNavLink from './scheduled_statuses_nav_link';
 import ListPanel from './list_panel';
 import FavouriteDomainPanel from './favourite_domain_panel';
 import FavouriteTagPanel from './favourite_tag_panel';
@@ -17,6 +18,7 @@ const NavigationPanel = () => (
     {enablePersonalTimeline && <NavLink className='column-link column-link--transparent' to='/timelines/personal' data-preview-title-id='column.personal' data-preview-icon='book' ><Icon className='column-link__icon' id='book' fixedWidth /><FormattedMessage id='navigation_bar.personal_timeline' defaultMessage='Personal' /></NavLink>}
     <NavLink className='column-link column-link--transparent' to='/notifications' data-preview-title-id='column.notifications' data-preview-icon='bell' ><NotificationsCounterIcon className='column-link__icon' /><FormattedMessage id='tabs_bar.notifications' defaultMessage='Notifications' /></NavLink>
     <FollowRequestsNavLink />
+    <ScheduledStatusesNavLink />
     {enableLocalTimeline && <NavLink className='column-link column-link--transparent' exact to='/timelines/public/local' data-preview-title-id='column.community' data-preview-icon='users' ><Icon className='column-link__icon' id='users' fixedWidth /><FormattedMessage id='tabs_bar.local_timeline' defaultMessage='Local' /></NavLink>}
     {enableFederatedTimeline && <NavLink className='column-link column-link--transparent' exact to='/timelines/public' data-preview-title-id='column.public' data-preview-icon='globe' ><Icon className='column-link__icon' id='globe' fixedWidth /><FormattedMessage id='tabs_bar.federated_timeline' defaultMessage='Federated' /></NavLink>}
     <NavLink className='column-link column-link--transparent' to='/accounts/2'><Icon className='column-link__icon' id='info-circle' fixedWidth /><FormattedMessage id='navigation_bar.information_acct' defaultMessage='Fedibird info' /></NavLink>

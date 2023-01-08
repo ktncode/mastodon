@@ -111,6 +111,7 @@ defaults: &defaults
   post_reference_modal: false
   add_reference_modal: true
   unselect_reference_modal: false
+  delete_scheduled_status_modal: true
   hexagon_avatar: false
   enable_empty_column: false
   hide_bot_on_public_timeline: false

@@ -38,7 +38,7 @@ const mapStateToProps = (state, { value, origin, minDate, maxDate }) => {
     dateValue: dateValue,
     stringValue: stringValue,
     invalid: invalid,
-  }
+  };
 };
 
 export default @connect(mapStateToProps)

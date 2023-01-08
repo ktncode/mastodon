@@ -90,6 +90,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_post_reference_modal,
       :setting_add_reference_modal,
       :setting_unselect_reference_modal,
+      :setting_delete_scheduled_status_modal,
       :setting_enable_empty_column,
       :setting_content_font_size,
       :setting_info_font_size,

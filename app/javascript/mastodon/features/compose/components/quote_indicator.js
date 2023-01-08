@@ -21,6 +21,7 @@ class QuoteIndicator extends ImmutablePureComponent {
 
   static propTypes = {
     status: ImmutablePropTypes.map,
+    isScheduledStatusEditting: PropTypes.bool,
     onCancel: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
@@ -37,7 +38,7 @@ class QuoteIndicator extends ImmutablePureComponent {
   }
 
   render () {
-    const { status, intl } = this.props;
+    const { status, isScheduledStatusEditting, intl } = this.props;
 
     if (!status) {
       return null;
@@ -48,7 +49,7 @@ class QuoteIndicator extends ImmutablePureComponent {
     return (
       <div className='quote-indicator'>
         <div className='quote-indicator__header'>
-          <div className='quote-indicator__cancel'><IconButton title={intl.formatMessage(messages.cancel)} icon='times' onClick={this.handleClick} /></div>
+          {!isScheduledStatusEditting && <div className='quote-indicator__cancel'><IconButton title={intl.formatMessage(messages.cancel)} icon='times' onClick={this.handleClick} /></div>}
 
           <a href={status.getIn(['account', 'url'])} onClick={this.handleAccountClick} className='quote-indicator__display-name'>
             <div className='quote-indicator__display-avatar'><Avatar account={status.get('account')} size={24} /></div>

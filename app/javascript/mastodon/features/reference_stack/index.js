@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -20,20 +20,12 @@ const messages = defineMessages({
   clearConfirm: { id: 'confirmations.clear.confirm', defaultMessage: 'Clear' },
 });
 
-const makeMapStateToProps = () => {
-  const mapStateToProps = (state, props) => {
-    const statusIds = state.getIn(['compose', 'references']).toList().sort((a, b) => b - a);
-
-    return {
-      statusIds,
-    };
-  };
-
-  return mapStateToProps;
-};
+const mapStateToProps = (state) => ({
+  statusIds: state.getIn(['compose', 'references']).toList().sort((a, b) => b - a),
+});
 
 export default @injectIntl
-@connect(makeMapStateToProps)
+@connect(mapStateToProps)
 class ReferenceStack extends ImmutablePureComponent {
 
   static contextTypes = {
@@ -68,7 +60,7 @@ class ReferenceStack extends ImmutablePureComponent {
     const { statusIds, intl } = this.props;
 
     if (!enableStatusReference || statusIds.isEmpty()) {
-      return <Fragment></Fragment>;
+      return <Fragment />;
     }
 
     const title = (

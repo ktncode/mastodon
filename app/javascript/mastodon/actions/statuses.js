@@ -112,7 +112,7 @@ export function fetchStatuses(ids) {
       dispatch(fetchAccountsFromStatuses(statuses));
       dispatch(fetchStatusesSuccess());
     }).catch(error => {
-      dispatch(fetchStatusesFail(id, error));
+      dispatch(fetchStatusesFail(newStatusIds, error));
     });
   };
 };
@@ -123,10 +123,10 @@ export function fetchStatusesSuccess() {
   };
 };
 
-export function fetchStatusesFail(id, error) {
+export function fetchStatusesFail(ids, error) {
   return {
     type: STATUSES_FETCH_FAIL,
-    id,
+    ids,
     error,
     skipAlert: true,
   };
@@ -144,12 +144,8 @@ export function redraft(getState, status, replyStatus, raw_text) {
 
 export function deleteStatus(id, routerHistory, withRedraft = false) {
   return (dispatch, getState) => {
-    let status = getState().getIn(['statuses', id]);
-    const replyStatus = status.get('in_reply_to_id') ? getState().getIn(['statuses', status.get('in_reply_to_id')]) : null;
-
-    if (status.get('poll')) {
-      status = status.set('poll', getState().getIn(['polls', status.get('poll')]));
-    }
+    const status = getState().getIn(['statuses', id]).update('poll', poll => poll ? getState().getIn(['polls', poll]) : null);
+    const replyStatus = status.get('in_reply_to_id') ? getState().getIn(['statuses', status.get('in_reply_to_id')]).update('account', account => getState().getIn(['accounts', account])) : null;
 
     dispatch(deleteStatusRequest(id));
 

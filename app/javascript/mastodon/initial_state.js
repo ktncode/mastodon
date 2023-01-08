@@ -14,6 +14,7 @@ export const deleteModal = getMeta('delete_modal');
 export const postReferenceModal = getMeta('post_reference_modal');
 export const addReferenceModal = getMeta('add_reference_modal');
 export const unselectReferenceModal = getMeta('unselect_reference_modal');
+export const deleteScheduledStatusModal = getMeta('delete_scheduled_status_modal');
 export const me = getMeta('me');
 export const searchEnabled = getMeta('search_enabled');
 export const invitesEnabled = getMeta('invites_enabled');

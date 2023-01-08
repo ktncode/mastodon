@@ -711,9 +711,9 @@ class Status extends ImmutablePureComponent {
       );
     }
 
-    const expires_at = status.get('expires_at')
-    const expires_date = expires_at && new Date(expires_at)
-    const expired = expires_date && expires_date.getTime() < intl.now()
+    const expires_at = status.get('expires_at');
+    const expires_date = expires_at && new Date(expires_at);
+    const expired = expires_date && expires_date.getTime() < intl.now();
 
     const ancestorCount   = showThread && show_reply_tree_button && status.get('in_reply_to_id', 0) > 0 ? 1 : 0;
     const descendantCount = showThread && show_reply_tree_button ? status.get('replies_count', 0) : 0;
@@ -732,30 +732,34 @@ class Status extends ImmutablePureComponent {
       threadMarkTitle = intl.formatMessage(messages.mark_descendant);
     }
 
-    const threadMark = threadCount > 0 ? <span className={classNames('status__thread_mark', {
-      'status__thread_mark-ancenstor': (ancestorCount + referenceCount) > 0,
-      'status__thread_mark-descendant': descendantCount > 0,
-    })} title={threadMarkTitle}>+</span> : null;
+    const threadMark = threadCount > 0 ? (<span
+      className={classNames('status__thread_mark', {
+        'status__thread_mark-ancenstor': (ancestorCount + referenceCount) > 0,
+        'status__thread_mark-descendant': descendantCount > 0,
+      })} title={threadMarkTitle}
+    >+</span>) : null;
 
     return (
       <HotKeys handlers={handlers}>
-        <div className={classNames('status__wrapper', `status__wrapper-${status.get('visibility')}`, {
-          'status__wrapper-reply': !!status.get('in_reply_to_id'),
-          unread,
-          focusable: !this.props.muted,
-          'status__wrapper-with-expiration': expires_date,
-          'status__wrapper-expired': expired,
-          'status__wrapper-referenced': referenced,
-          'status__wrapper-context-referenced': contextReferenced,
-          'status__wrapper-reference': referenceCount > 0,
-        })} tabIndex={this.props.muted ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader(intl, status, rebloggedByText)} ref={this.handleRef}>
+        <div
+          className={classNames('status__wrapper', `status__wrapper-${status.get('visibility')}`, {
+            'status__wrapper-reply': !!status.get('in_reply_to_id'),
+            unread,
+            focusable: !this.props.muted,
+            'status__wrapper-with-expiration': expires_date,
+            'status__wrapper-expired': expired,
+            'status__wrapper-referenced': referenced,
+            'status__wrapper-context-referenced': contextReferenced,
+            'status__wrapper-reference': referenceCount > 0,
+          })} tabIndex={this.props.muted ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader(intl, status, rebloggedByText)} ref={this.handleRef}
+        >
           {prepend}
 
           <div className={classNames('status', `status-${status.get('visibility')}`, { 'status-reply': !!status.get('in_reply_to_id'), muted: this.props.muted, 'status-with-expiration': expires_date, 'status-expired': expired, referenced, 'context-referenced': contextReferenced })} data-id={status.get('id')}>
             <AccountActionBar account={status.get('account')} {...other} />
             <div className='status__expand' onClick={this.handleExpandClick} role='presentation' />
             <div className='status__info'>
-              {status.get('expires_at') && <span className='status__expiration-time'><time dateTime={expires_at} title={intl.formatDate(expires_date, dateFormatOptions)}><i className="fa fa-clock-o" aria-hidden="true"></i></time></span>}
+              {status.get('expires_at') && <span className='status__expiration-time'><time dateTime={expires_at} title={intl.formatDate(expires_date, dateFormatOptions)}><i className='fa fa-clock-o' aria-hidden='true' /></time></span>}
               <a href={status.get('url')} className='status__relative-time' target='_blank' rel='noopener noreferrer'>
                 {threadMark}
                 {disableRelativeTime ? <AbsoluteTimestamp timestamp={status.get('created_at')} /> : <RelativeTimestamp timestamp={status.get('created_at')} /> }
@@ -776,7 +780,7 @@ class Status extends ImmutablePureComponent {
             {quote}
             {media}
 
-            {enableReaction && (contextType == 'thread' || !compactReaction) && <EmojiReactionsBar
+            {enableReaction && (contextType === 'thread' || !compactReaction) && <EmojiReactionsBar
               status={status}
               addEmojiReaction={this.props.addEmojiReaction}
               removeEmojiReaction={this.props.removeEmojiReaction}

@@ -259,6 +259,7 @@ en:
         setting_default_search_searchability: Search range
         setting_default_sensitive: Always mark media as sensitive
         setting_delete_modal: Show confirmation dialog before deleting a post
+        setting_delete_scheduled_status_modal: Show confirmation dialog before removing a scheduled status
         setting_disable_account_delete: Disable account delete
         setting_disable_block: Disable block
         setting_disable_clear_all_notifications: Disable clear all notifications

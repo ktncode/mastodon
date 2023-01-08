@@ -13,6 +13,8 @@ class PublishScheduledStatusWorker
       scheduled_status.account,
       options_with_objects(scheduled_status.params.with_indifferent_access)
     )
+
+    remove_scheduled_status(scheduled_status)
   rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid
     true
   end
@@ -21,6 +23,11 @@ class PublishScheduledStatusWorker
     options.tap do |options_hash|
       options_hash[:application] = Doorkeeper::Application.find(options_hash.delete(:application_id)) if options[:application_id]
       options_hash[:thread]      = Status.find(options_hash.delete(:in_reply_to_id)) if options_hash[:in_reply_to_id]
+      options_hash[:notify]      = true
     end
+  end
+
+  def remove_scheduled_status(scheduled_status)
+    Redis.current.publish("timeline:#{scheduled_status.account.id}", Oj.dump(event: :scheduled_status, payload: scheduled_status.id.to_s))
   end
 end

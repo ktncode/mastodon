@@ -78,6 +78,7 @@ const initialState = ImmutableMap({
       status: false,
       emoji_reaction: false,
       status_reference: false,
+      scheduled_status: false,
     }),
 
     quickFilter: ImmutableMap({
@@ -99,6 +100,7 @@ const initialState = ImmutableMap({
       status: true,
       emoji_reaction: true,
       status_reference: true,
+      scheduled_status: true,
     }),
 
     sounds: ImmutableMap({
@@ -111,6 +113,7 @@ const initialState = ImmutableMap({
       status: true,
       emoji_reaction: true,
       status_reference: true,
+      scheduled_status: true,
     }),
   }),
 

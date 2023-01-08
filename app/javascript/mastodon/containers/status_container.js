@@ -102,7 +102,7 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     dispatch((_, getState) => {
       let state = getState();
 
-      if (state.getIn(['compose', 'text']).trim().length !== 0) {
+      if (state.getIn(['compose', 'text']).trim().length !== 0 && state.getIn(['compose', 'dirty'])) {
         dispatch(openModal('CONFIRM', {
           message: intl.formatMessage(messages.replyMessage),
           confirm: intl.formatMessage(messages.replyConfirm),
@@ -134,7 +134,7 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     dispatch((_, getState) => {
       let state = getState();
 
-      if (state.getIn(['compose', 'text']).trim().length !== 0) {
+      if (state.getIn(['compose', 'text']).trim().length !== 0 && state.getIn(['compose', 'dirty'])) {
         dispatch(openModal('CONFIRM', {
           message: intl.formatMessage(messages.quoteMessage),
           confirm: intl.formatMessage(messages.quoteConfirm),

@@ -178,6 +178,16 @@ export default class ColumnSettings extends React.PureComponent {
           </div>
         </div>
         }
+        <div role='group' aria-labelledby='notifications-scheduled-status'>
+          <span id='notifications-scheduled-status' className='column-settings__section'><FormattedMessage id='notifications.column_settings.scheduled_statuses' defaultMessage='Scheduled posts:' /></span>
+
+          <div className='column-settings__row'>
+            <SettingToggle disabled={browserPermission === 'denied'} prefix='notifications_desktop' settings={settings} settingPath={['alerts', 'scheduled_status']} onChange={onChange} label={alertStr} />
+            {showPushSettings && <SettingToggle prefix='notifications_push' settings={pushSettings} settingPath={['alerts', 'scheduled_status']} onChange={this.onPushChange} label={pushStr} />}
+            <SettingToggle prefix='notifications' settings={settings} settingPath={['shows', 'scheduled_status']} onChange={onChange} label={showStr} />
+            <SettingToggle prefix='notifications' settings={settings} settingPath={['sounds', 'scheduled_status']} onChange={onChange} label={soundStr} />
+          </div>
+        </div>
       </div>
     );
   }

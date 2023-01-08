@@ -66,7 +66,7 @@ export function updateNotifications(notification, intlMessages, intlLocale) {
 
     let filtered = false;
 
-    if (['mention', 'status', 'status_reference'].includes(notification.type)) {
+    if (['mention', 'status', 'scheduled_status', 'status_reference'].includes(notification.type)) {
       const dropRegex   = filters[0];
       const regex       = filters[1];
       const searchIndex = searchTextFromRawStatus(notification.status);

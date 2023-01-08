@@ -11,6 +11,7 @@ import { me, profile_directory, showTrends, enableLimitedTimeline, enablePersona
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { fetchFavouriteDomains } from 'mastodon/actions/favourite_domains';
 import { fetchFavouriteTags } from 'mastodon/actions/favourite_tags';
+import { fetchScheduledStatuses } from 'mastodon/actions/scheduled_statuses';
 import { List as ImmutableList } from 'immutable';
 import NavigationContainer from '../compose/containers/navigation_container';
 import Icon from 'mastodon/components/icon';
@@ -31,6 +32,7 @@ const messages = defineMessages({
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
   follow_requests: { id: 'navigation_bar.follow_requests', defaultMessage: 'Follow requests' },
+  scheduled_statuses: { id: 'navigation_bar.scheduled_statuses', defaultMessage: 'Scheduled Posts' },
   favourites: { id: 'navigation_bar.favourites', defaultMessage: 'Favourites' },
   emoji_reactions: { id: 'navigation_bar.emoji_reactions', defaultMessage: 'Emoji reactions' },
   blocks: { id: 'navigation_bar.blocks', defaultMessage: 'Blocked users' },
@@ -60,6 +62,7 @@ const mapStateToProps = state => ({
   myAccount: state.getIn(['accounts', me]),
   columns: state.getIn(['settings', 'columns']),
   unreadFollowRequests: state.getIn(['user_lists', 'follow_requests', 'items'], ImmutableList()).size,
+  scheduledStatusesCount: state.getIn(['scheduled_statuses', 'items'], ImmutableList()).size,
   lists: getOrderedLists(state),
   favourite_domains: getOrderedDomains(state),
   favourite_tags: getOrderedTags(state),
@@ -70,6 +73,7 @@ const mapDispatchToProps = dispatch => ({
   fetchFollowRequests: () => dispatch(fetchFollowRequests()),
   fetchFavouriteDomains: () => dispatch(fetchFavouriteDomains()),
   fetchFavouriteTags: () => dispatch(fetchFavouriteTags()),
+  fetchScheduledStatuses: () => dispatch(fetchScheduledStatuses()),
 });
 
 const badgeDisplay = (number, limit) => {
@@ -101,7 +105,9 @@ class GettingStarted extends ImmutablePureComponent {
     fetchFollowRequests: PropTypes.func.isRequired,
     fetchFavouriteDomains: PropTypes.func.isRequired,
     fetchFavouriteTags: PropTypes.func.isRequired,
+    fetchScheduledStatuses: PropTypes.func.isRequired,
     unreadFollowRequests: PropTypes.number,
+    scheduledStatusesCount: PropTypes.number,
     unreadNotifications: PropTypes.number,
     lists: ImmutablePropTypes.list,
     favourite_domains: ImmutablePropTypes.list,
@@ -109,7 +115,7 @@ class GettingStarted extends ImmutablePureComponent {
   };
 
   componentDidMount () {
-    const { fetchFollowRequests, fetchFavouriteDomains, fetchFavouriteTags, multiColumn } = this.props;
+    const { fetchFollowRequests, fetchFavouriteDomains, fetchFavouriteTags, fetchScheduledStatuses, multiColumn } = this.props;
 
     if (!multiColumn && window.innerWidth >= NAVIGATION_PANEL_BREAKPOINT) {
       this.context.router.history.replace('/timelines/home');
@@ -119,10 +125,11 @@ class GettingStarted extends ImmutablePureComponent {
     fetchFollowRequests();
     fetchFavouriteDomains();
     fetchFavouriteTags();
+    fetchScheduledStatuses();
   }
 
   render () {
-    const { intl, myAccount, columns, multiColumn, unreadFollowRequests, lists, favourite_domains, favourite_tags, columnWidth } = this.props;
+    const { intl, myAccount, columns, multiColumn, unreadFollowRequests, scheduledStatusesCount, lists, favourite_domains, favourite_tags, columnWidth } = this.props;
 
     const navItems = [];
     let height = (multiColumn) ? 0 : 60;
@@ -245,14 +252,24 @@ class GettingStarted extends ImmutablePureComponent {
 
     height += 48*6;
 
+    if (myAccount.get('locked') || unreadFollowRequests > 0) {
+      navItems.push(<ColumnLink key='follow_requests' icon='user-plus' text={intl.formatMessage(messages.follow_requests)} badge={badgeDisplay(unreadFollowRequests, 40)} to='/follow_requests' />);
+      height += 48;
+    }
+
+    if (scheduledStatusesCount > 0) {
+      navItems.push(<ColumnLink key='scheduled_statuses' icon='clock-o' text={intl.formatMessage(messages.scheduled_statuses)} to='/scheduled_statuses' />);
+      height += 48;
+    }
+
     if (lists && !lists.isEmpty()) {
       navItems.push(<ColumnSubheading key='header-lists' text={intl.formatMessage(messages.lists_subheading)} />);
       height += 34;
 
       lists.map(list => {
         navItems.push(<ColumnLink key={`list:${list.get('id')}`} icon='list-ul' text={list.get('title')} to={`/timelines/list/${list.get('id')}`} />);
-        height += 48
-      })
+        height += 48;
+      });
     }
 
     if (favourite_domains && !favourite_domains.isEmpty()) {
@@ -261,8 +278,8 @@ class GettingStarted extends ImmutablePureComponent {
 
       favourite_domains.map(favourite_domain => {
         navItems.push(<ColumnLink key={`favourite_domain:${favourite_domain.get('id')}`} icon='users' text={favourite_domain.get('name')} to={`/timelines/public/domain/${favourite_domain.get('name')}`} />);
-        height += 48
-      })
+        height += 48;
+      });
     }
 
     if (favourite_tags && !favourite_tags.isEmpty()) {
@@ -271,13 +288,8 @@ class GettingStarted extends ImmutablePureComponent {
 
       favourite_tags.map(favourite_tag => {
         navItems.push(<ColumnLink key={`favourite_tag:${favourite_tag.get('id')}`} icon='hashtag' text={favourite_tag.get('name')} to={`/timelines/tag/${favourite_tag.get('name')}`} />);
-        height += 48
-      })
-    }
-
-    if (myAccount.get('locked') || unreadFollowRequests > 0) {
-      navItems.push(<ColumnLink key='follow_requests' icon='user-plus' text={intl.formatMessage(messages.follow_requests)} badge={badgeDisplay(unreadFollowRequests, 40)} to='/follow_requests' />);
-      height += 48;
+        height += 48;
+      });
     }
 
     if (!multiColumn) {

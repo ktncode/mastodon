@@ -69,6 +69,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:post_reference_modal]              = object.current_account.user.setting_post_reference_modal
       store[:add_reference_modal]               = object.current_account.user.setting_add_reference_modal
       store[:unselect_reference_modal]          = object.current_account.user.setting_unselect_reference_modal
+      store[:delete_scheduled_status_modal]     = object.current_account.user.setting_delete_scheduled_status_modal
       store[:enable_empty_column]               = object.current_account.user.setting_enable_empty_column
       store[:content_font_size]                 = object.current_account.user.setting_content_font_size
       store[:info_font_size]                    = object.current_account.user.setting_info_font_size

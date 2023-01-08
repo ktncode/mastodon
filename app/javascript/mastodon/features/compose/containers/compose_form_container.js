@@ -29,6 +29,8 @@ const mapStateToProps = state => ({
   anyMedia: state.getIn(['compose', 'media_attachments']).size > 0,
   prohibitedVisibilities: state.getIn(['compose', 'prohibited_visibilities']),
   prohibitedWords: state.getIn(['compose', 'prohibited_words']),
+  isScheduled: !!state.getIn(['compose', 'scheduled']),
+  isScheduledStatusEditting: !!state.getIn(['compose', 'scheduled_status_id']),
 });
 
 const mapDispatchToProps = (dispatch, { intl }) => ({

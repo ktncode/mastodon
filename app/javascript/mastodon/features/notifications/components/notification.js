@@ -22,6 +22,7 @@ const messages = defineMessages({
   status: { id: 'notification.status', defaultMessage: '{name} just posted' },
   emoji_reaction: { id: 'notification.emoji_reaction', defaultMessage: '{name} reactioned your post' },
   status_reference: { id: 'notification.status_reference', defaultMessage: '{name} referenced your post' },
+  scheduled_status: { id: 'notification.scheduled_status', defaultMessage: 'Your scheduled post has been posted' },
 });
 
 const notificationForScreenReader = (intl, message, timestamp) => {
@@ -277,6 +278,38 @@ class Notification extends ImmutablePureComponent {
     );
   }
 
+  renderScheduledStatus (notification) {
+    const { intl, unread } = this.props;
+
+    return (
+      <HotKeys handlers={this.getHandlers()}>
+        <div className={classNames('notification notification-scheduled-status focusable', { unread })} tabIndex='0' aria-label={notificationForScreenReader(intl, intl.formatMessage(messages.scheduled_status, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
+          <div className='notification__message'>
+            <div className='notification__favourite-icon-wrapper'>
+              <Icon id='clock-o' fixedWidth />
+            </div>
+
+            <span title={notification.get('created_at')}>
+              <FormattedMessage id='notification.scheduled_status' defaultMessage='Your scheduled post has been posted' />
+            </span>
+          </div>
+
+          <StatusContainer
+            id={notification.get('status')}
+            account={notification.get('account')}
+            muted
+            withDismiss
+            hidden={this.props.hidden}
+            getScrollPosition={this.props.getScrollPosition}
+            updateScrollBottom={this.props.updateScrollBottom}
+            cachedMediaWidth={this.props.cachedMediaWidth}
+            cacheMediaWidth={this.props.cacheMediaWidth}
+          />
+        </div>
+      </HotKeys>
+    );
+  }
+
   renderPoll (notification, account) {
     const { intl, unread } = this.props;
     const ownPoll  = me === account.get('id');
@@ -402,6 +435,8 @@ class Notification extends ImmutablePureComponent {
       return this.renderReblog(notification, link);
     case 'status':
       return this.renderStatus(notification, link);
+    case 'scheduled_status':
+      return this.renderScheduledStatus(notification, link);
     case 'poll':
       return this.renderPoll(notification, account);
     case 'emoji_reaction':

@@ -12,9 +12,10 @@ import { showAlertForError } from './alerts';
 import { showAlert } from './alerts';
 import { openModal } from './modal';
 import { defineMessages } from 'react-intl';
-import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, parseISO, formatISO, format } from 'date-fns';
+import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, formatISO, format } from 'date-fns';
 import { Set as ImmutableSet } from 'immutable';
 import { postReferenceModal, enableFederatedTimeline } from '../initial_state';
+import { deleteScheduledStatus } from './scheduled_statuses';
 
 let cancelFetchComposeSuggestionsAccounts, cancelFetchComposeSuggestionsTags;
 
@@ -34,6 +35,10 @@ export const COMPOSE_UPLOAD_SUCCESS  = 'COMPOSE_UPLOAD_SUCCESS';
 export const COMPOSE_UPLOAD_FAIL     = 'COMPOSE_UPLOAD_FAIL';
 export const COMPOSE_UPLOAD_PROGRESS = 'COMPOSE_UPLOAD_PROGRESS';
 export const COMPOSE_UPLOAD_UNDO     = 'COMPOSE_UPLOAD_UNDO';
+
+export const COMPOSE_SCHEDULED_EDIT_CANCEL = 'COMPOSE_SCHEDULED_EDIT_CANCEL';
+
+export const SCHEDULED_STATUS_SUBMIT_SUCCESS = 'SCHEDULED_STATUS_SUBMIT_SUCCESS';
 
 export const THUMBNAIL_UPLOAD_REQUEST  = 'THUMBNAIL_UPLOAD_REQUEST';
 export const THUMBNAIL_UPLOAD_SUCCESS  = 'THUMBNAIL_UPLOAD_SUCCESS';
@@ -182,6 +187,12 @@ export function directCompose(account, routerHistory) {
   };
 };
 
+export function cancelScheduledStatusCompose() {
+  return {
+    type: COMPOSE_SCHEDULED_EDIT_CANCEL,
+  };
+};
+
 const parseSimpleDurationFormat = (value, origin = new Date()) => {
   if (!value || typeof value !== 'string') {
     return null;
@@ -205,7 +216,7 @@ export const getDateTimeFromText = (value, origin = new Date()) => {
     }
 
     if (value.length >= 7) {
-      const isoDateTime = parseISO(value);
+      const isoDateTime = new Date(value);
 
       if (isoDateTime.toString() === 'Invalid Date') {
         return null;
@@ -255,6 +266,7 @@ export function submitCompose(routerHistory) {
     const { in: expires_in = null, at: expires_at = null } = getDateTimeFromText(getState().getIn(['compose', 'expires']), scheduled_at ?? new Date());
     const expires_action = getState().getIn(['compose', 'expires_action']);
     const statusReferenceIds = getState().getIn(['compose', 'references']);
+    const scheduled_status_id = getState().getIn(['compose', 'scheduled_status_id']);
 
     if ((!status || !status.length) && media.size === 0) {
       return;
@@ -285,7 +297,11 @@ export function submitCompose(routerHistory) {
       },
     }).then(function (response) {
       if (response.data.scheduled_at !== null && response.data.scheduled_at !== undefined) {
-        dispatch(submitComposeSuccess({ ...response.data }));
+        dispatch(submitScheduledStatusSuccess({ ...response.data }));
+        if (scheduled_status_id) {
+          dispatch(deleteScheduledStatus(scheduled_status_id));
+        }
+        routerHistory.push('/scheduled_statuses');
         return;
       } else if (routerHistory && routerHistory.location.pathname === '/statuses/new' && window.history.state) {
         routerHistory.goBack();
@@ -345,6 +361,13 @@ export function submitComposeFail(error) {
   return {
     type: COMPOSE_SUBMIT_FAIL,
     error: error,
+  };
+};
+
+export function submitScheduledStatusSuccess(status) {
+  return {
+    type: SCHEDULED_STATUS_SUBMIT_SUCCESS,
+    scheduled_status: status,
   };
 };
 
@@ -898,7 +921,7 @@ export function removeReference(id) {
   };
 };
 
-export function resetReference() {  
+export function resetReference() {
   return {
     type: COMPOSE_REFERENCE_RESET,
   };

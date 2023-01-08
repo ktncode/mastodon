@@ -69,6 +69,7 @@ import {
   Trends,
   Suggestions,
   EmptyColumn,
+  ScheduledStatuses,
 } from './util/async-components';
 import { me, enableEmptyColumn } from '../../initial_state';
 import { closeOnboarding, INTRODUCTION_VERSION } from 'mastodon/actions/onboarding';
@@ -225,6 +226,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/mutes' component={Mutes} content={children} />
           <WrappedRoute path='/lists' component={Lists} content={children} />
           <WrappedRoute path='/circles' component={Circles} content={children} />
+          <WrappedRoute path='/scheduled_statuses' component={ScheduledStatuses} content={children} />
 
           <WrappedRoute path='/empty' component={EmptyColumn} content={children} />
 

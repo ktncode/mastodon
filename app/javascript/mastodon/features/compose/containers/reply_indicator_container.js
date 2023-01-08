@@ -8,6 +8,7 @@ const makeMapStateToProps = () => {
 
   const mapStateToProps = state => ({
     status: getStatus(state, { id: state.getIn(['compose', 'in_reply_to']) }),
+    isScheduledStatusEditting: !!state.getIn(['compose', 'scheduled_status_id']),
   });
 
   return mapStateToProps;

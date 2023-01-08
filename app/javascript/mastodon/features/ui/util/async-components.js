@@ -233,3 +233,7 @@ export function Suggestions () {
 export function EmptyColumn () {
   return import(/* webpackChunkName: "features/empty" */'../../empty');
 }
+
+export function ScheduledStatuses () {
+  return import(/* webpackChunkName: "features/scheduled_statuses" */'../../scheduled_statuses');
+}

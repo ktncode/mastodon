@@ -137,7 +137,7 @@ class User < ApplicationRecord
            :new_features_policy,
            :theme_instance_ticker, :theme_public,
            :enable_status_reference, :match_visibility_of_references,
-           :post_reference_modal, :add_reference_modal, :unselect_reference_modal,
+           :post_reference_modal, :add_reference_modal, :unselect_reference_modal, :delete_scheduled_status_modal,
            :hexagon_avatar, :enable_empty_column,
            :content_font_size, :info_font_size, :content_emoji_reaction_size, :emoji_scale, :picker_emoji_size,
            :hide_bot_on_public_timeline, :confirm_follow_from_bot,
