@@ -14,6 +14,7 @@ module Mastodon
     end
 
     option :days, type: :numeric, default: 7, aliases: [:d]
+    option :skip_followee, type: :boolean, default: false
     option :concurrency, type: :numeric, default: 5, aliases: [:c]
     option :verbose, type: :boolean, default: false, aliases: [:v]
     option :dry_run, type: :boolean, default: false
@@ -28,8 +29,11 @@ module Mastodon
       time_ago = options[:days].days.ago
       dry_run  = options[:dry_run] ? '(DRY RUN)' : ''
 
+      skip_followee_ids = options[:skip_followee] ? Account.remote.where(id: Follow.where(account_id: User.where(current_sign_in_at: User::ACTIVE_DURATION.ago...).select(:account_id)).select(:target_account_id).distinct).pluck(:id).sort : []
+
       processed, aggregate = parallelize_with_progress(MediaAttachment.cached.where.not(remote_url: '').where('created_at < ?', time_ago)) do |media_attachment|
         next if media_attachment.file.blank?
+        next if b_include?(skip_followee_ids, media_attachment.account_id)
 
         size = (media_attachment.file_file_size || 0) + (media_attachment.thumbnail_file_size || 0)
 
@@ -329,5 +333,9 @@ module Mastodon
         model_map[model_name] = model_name.constantize.where(id: record_ids).index_by(&:id)
       end
     end
+
+    def b_include?(array, target)
+      array.bsearch { |x| x >= target } == target
+    end    
   end
 end
