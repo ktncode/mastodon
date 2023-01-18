@@ -558,6 +558,7 @@
   "searchability.public.short": "公開（検索）",
   "searchability.public.long": "誰でも検索可",
   "search_popout.search_format": "高度な検索フォーマット",
+  "search_popout.tips.from_user": "投稿者",
   "search_popout.tips.full_text": "表示名やユーザー名、ハッシュタグのほか、あなたの投稿やお気に入り、ブーストした投稿、返信に一致する単純なテキスト。",
   "search_popout.tips.hashtag": "ハッシュタグ",
   "search_popout.tips.status": "投稿",
