@@ -30,6 +30,10 @@ class Import::RelationshipWorker
       MuteService.new.call(from_account, target_account, **options)
     when 'unmute'
       UnmuteService.new.call(from_account, target_account)
+    when 'account_subscribe'
+      AccountSubscribeService.new.call(from_account, target_account, **options)
+    when 'account_unsubscribe'
+      UnsubscribeAccountService.new.call(from_account, target_account, **options)
     end
   rescue ActiveRecord::RecordNotFound
     true

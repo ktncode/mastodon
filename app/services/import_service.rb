@@ -12,6 +12,8 @@ class ImportService < BaseService
     case @import.type
     when 'following'
       import_follows!
+    when 'account_subscribings'
+      import_account_subscribings!
     when 'blocking'
       import_blocks!
     when 'muting'
@@ -27,17 +29,22 @@ class ImportService < BaseService
 
   def import_follows!
     parse_import_data!(['Account address'])
-    import_relationships!('follow', 'unfollow', @account.following, ROWS_PROCESSING_LIMIT, reblogs: { header: 'Show boosts', default: true })
+    import_relationships!('follow', 'unfollow', @account.following.map { |account| { acct: account.acct }}, ROWS_PROCESSING_LIMIT, show_reblogs: { header: 'Show boosts', default: true }, notify: { header: 'Notify on new posts', default: false }, languages: { header: 'Languages', default: nil }, delivery: { header: 'Delivery to home', default: true })
+  end
+
+  def import_account_subscribings!
+    parse_import_data!(['Account address'])
+    import_relationships!('account_subscribe', 'account_unsubscribe', @account.active_subscribes.map { |subscribe| { acct: subscribe.target_account.acct, list_id: subscribe.list_id }}, ROWS_PROCESSING_LIMIT, lists: { header: 'List', default: nil }, show_reblogs: { header: 'Show boosts', default: true }, media_only: { header: 'Media only', default: false })
   end
 
   def import_blocks!
     parse_import_data!(['Account address'])
-    import_relationships!('block', 'unblock', @account.blocking, ROWS_PROCESSING_LIMIT)
+    import_relationships!('block', 'unblock', @account.blocking.map { |account| { acct: account.acct }}, ROWS_PROCESSING_LIMIT)
   end
 
   def import_mutes!
     parse_import_data!(['Account address'])
-    import_relationships!('mute', 'unmute', @account.muting, ROWS_PROCESSING_LIMIT, notifications: { header: 'Hide notifications', default: true })
+    import_relationships!('mute', 'unmute', @account.muting.map { |account| { acct: account.acct }}, ROWS_PROCESSING_LIMIT, notifications: { header: 'Hide notifications', default: true })
   end
 
   def import_domain_blocks!
@@ -67,26 +74,43 @@ class ImportService < BaseService
 
   def import_relationships!(action, undo_action, overwrite_scope, limit, extra_fields = {})
     local_domain_suffix = "@#{Rails.configuration.x.local_domain}"
-    items = @data.take(limit).map { |row| [row['Account address']&.strip&.delete_suffix(local_domain_suffix), Hash[extra_fields.map { |key, field_settings| [key, row[field_settings[:header]]&.strip || field_settings[:default]] }]] }.reject { |(id, _)| id.blank? }
+    items = @data.take(limit).each_with_object({}) do |row, mapping|
+      key = row['Account address']&.strip&.delete_suffix(local_domain_suffix)
+      return if key.blank?
+
+      extra = extra_fields.each_with_object({}) {|(key, field_settings), extra| extra[key] = row[field_settings[:header]]&.strip || field_settings[:default] }
+
+      if extra[:lists].nil?
+        extra.delete(:lists)
+      else
+        extra[:list_id] = List.find_or_create_by!({ account_id: @account.id, title: extra.delete(:lists) }).id
+        key = "#{key} #{extra[:list_id]}"
+      end
+
+      mapping[key] = extra
+    end
 
     if @import.overwrite?
-      presence_hash = items.each_with_object({}) { |(id, extra), mapping| mapping[id] = [true, extra] }
+      overwrite_scope.each do |scope|
+        acct   = scope[:acct]
+        key    = scope[:list_id] ? "#{acct} #{scope[:list_id]}" : acct
+        option = scope[:list_id] ? { list_id: scope[:list_id] } : {}
 
-      overwrite_scope.find_each do |target_account|
-        if presence_hash[target_account.acct]
-          items.delete(target_account.acct)
-          extra = presence_hash[target_account.acct][1]
-          Import::RelationshipWorker.perform_async(@account.id, target_account.acct, action, extra)
+        if items[key]
+          Import::RelationshipWorker.perform_async(@account.id, acct, action, items.delete(key))
         else
-          Import::RelationshipWorker.perform_async(@account.id, target_account.acct, undo_action)
+          Import::RelationshipWorker.perform_async(@account.id, acct, undo_action, option)
         end
       end
     end
 
-    head_items = items.uniq { |acct, _| acct.split('@')[1] }
-    tail_items = items - head_items
+    items = items.map { |item| [item[0].split(' ')[0], item[1]] }
 
-    Import::RelationshipWorker.push_bulk(head_items + tail_items) do |acct, extra|
+    # Process one item representing the domain ahead of time.
+    preceding_items = items.uniq { |acct, _| acct.split('@')[1] }
+    sorted_items    = preceding_items + (items - preceding_items)
+
+    Import::RelationshipWorker.push_bulk(sorted_items) do |acct, extra|
       [@account.id, acct, action, extra]
     end
   end
