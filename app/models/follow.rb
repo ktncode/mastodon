@@ -40,6 +40,10 @@ class Follow < ApplicationRecord
     destroy!
   end
 
+  def languages
+    nil
+  end
+
   before_validation :set_uri, only: :create
   after_create :increment_cache_counters
   after_create :invalidate_hash_cache

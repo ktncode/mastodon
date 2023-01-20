@@ -17,6 +17,10 @@
         %td= number_with_delimiter @export.total_follows
         %td= table_link_to 'download', t('exports.csv'), settings_exports_follows_path(format: :csv)
       %tr
+        %th= t('admin.accounts.subscribes')
+        %td= number_with_delimiter @export.total_subscribings
+        %td= table_link_to 'download', t('exports.csv'), settings_exports_account_subscribings_path(format: :csv)
+      %tr
         %th= t('exports.lists')
         %td= number_with_delimiter @export.total_lists
         %td= table_link_to 'download', t('exports.csv'), settings_exports_lists_path(format: :csv)

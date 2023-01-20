@@ -30,9 +30,17 @@ class Export
   end
 
   def to_following_accounts_csv
-    CSV.generate(headers: ['Account address', 'Show boosts'], write_headers: true) do |csv|
+    CSV.generate(headers: ['Account address', 'Show boosts', 'Notify on new posts', 'Languages', 'Delivery to home'], write_headers: true) do |csv|
       account.active_relationships.includes(:target_account).reorder(id: :desc).each do |follow|
-        csv << [acct(follow.target_account), follow.show_reblogs]
+        csv << [acct(follow.target_account), follow.show_reblogs, follow.notify, follow.languages&.join(', '), follow.delivery]
+      end
+    end
+  end
+
+  def to_subscribing_accounts_csv
+    CSV.generate(headers: ['Account address', 'List', 'Show boosts', 'Media only'], write_headers: true) do |csv|
+      account.active_subscribes.includes(:target_account, :list).references(:list).reorder(id: :desc).each do |subscribe|
+        csv << [acct(subscribe.target_account), subscribe.list&.title, subscribe.show_reblogs, subscribe.media_only]
       end
     end
   end
@@ -71,7 +79,7 @@ class Export
     account.following_count
   end
 
-  def total_subscribes
+  def total_subscribings
     account.subscribing_count
   end
 

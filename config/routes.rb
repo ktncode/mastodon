@@ -128,6 +128,7 @@ Rails.application.routes.draw do
       resources :lists, only: :index, controller: :lists
       resources :domain_blocks, only: :index, controller: :blocked_domains
       resources :bookmarks, only: :index, controller: :bookmarks
+      resources :account_subscribings, only: :index, controller: :account_subscribings
     end
 
     resources :two_factor_authentication_methods, only: [:index] do
