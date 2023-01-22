@@ -208,9 +208,9 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.5.2)
       railties (>= 5)
-    dotenv (2.7.6)
-    dotenv-rails (2.7.6)
-      dotenv (= 2.7.6)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
       railties (>= 3.2)
     e2mmap (0.1.0)
     ed25519 (1.2.4)
@@ -440,10 +440,10 @@ GEM
     parslet (2.0.0)
     pastel (0.8.0)
       tty-color (~> 0.5)
-    pg (1.2.3)
-    pghero (2.8.1)
-      activerecord (>= 5)
-    pkg-config (1.4.6)
+    pg (1.4.5)
+    pghero (3.1.0)
+      activerecord (>= 6)
+    pkg-config (1.5.1)
     posix-spawn (0.3.15)
     premailer (1.14.2)
       addressable
@@ -734,7 +734,7 @@ DEPENDENCIES
   devise_pam_authenticatable2 (~> 9.2)
   discard (~> 1.2)
   doorkeeper (~> 5.5)
-  dotenv-rails (~> 2.7)
+  dotenv-rails (~> 2.8)
   ed25519 (~> 1.2)
   fabrication (~> 2.22)
   faker (~> 2.18)
@@ -779,7 +779,7 @@ DEPENDENCIES
   parser (~> 3.0.2.0)
   parslet
   pg (~> 1.2)
-  pghero (~> 2.8)
+  pghero
   pkg-config (~> 1.4)
   posix-spawn
   premailer-rails
