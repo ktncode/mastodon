@@ -68,19 +68,23 @@ class SearchService < BaseService
   end
 
   def perform_statuses_search!
-    definition = parsed_query.apply(StatusesIndex.filter(term: { searchable_by: @account.id }))
+    privacy_definition = StatusesIndex.filter(term: { searchable_by: @account.id })
 
     case @searchability
     when 'public'
-      definition = definition.or(StatusesIndex.filter(term: { searchability: 'public' }))
-      definition = definition.or(StatusesIndex.filter(terms: { searchability: %w(unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
+      privacy_definition = privacy_definition.or(StatusesIndex.filter(term: { searchability: 'public' }))
+      privacy_definition = privacy_definition.or(StatusesIndex.filter(terms: { searchability: %w(unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
     when 'unlisted', 'private'
-      definition = definition.or(StatusesIndex.filter(terms: { searchability: %w(public unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
+      privacy_definition = privacy_definition.or(StatusesIndex.filter(terms: { searchability: %w(public unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
     end
+
+    definition = parsed_query.apply(StatusesIndex)
 
     if @options[:account_id].present?
       definition = definition.filter(term: { account_id: @options[:account_id] })
     end
+
+    definition = definition.and(privacy_definition)
 
     if @options[:min_id].present? || @options[:max_id].present?
       range      = {}
@@ -132,21 +136,29 @@ class SearchService < BaseService
   def full_text_searchable?
     return false unless Chewy.enabled?
 
-    statuses_search? && !@account.nil? && !((@query.start_with?('#') || @query.include?('@')) && !@query.include?(' '))
+    statuses_search? && !@account.nil? && !account_search_explicit_pattern? && !hashtag_search_explicit_pattern?
   end
 
   def account_full_text_searchable?
     return false unless Chewy.enabled?
 
-    (!@profile && account_search? || profiles_search?) && !@account.nil? && !((@query.start_with?('#') || @query.include?('@')) && !@query.include?(' '))
+    (!@profile && account_search? || profiles_search?) && !@account.nil? && !account_search_explicit_pattern? && !hashtag_search_explicit_pattern?
   end
 
   def account_searchable?
-    account_search? && !(@query.start_with?('#') || (@query.include?('@') && @query.include?(' ')))
+    account_search? && (account_search_explicit_pattern? || @query.match?(/\A#{Account::USERNAME_RE}\Z/))
   end
 
   def hashtag_searchable?
-    hashtag_search? && !@query.include?('@')
+    hashtag_search? && !account_search_explicit_pattern?
+  end
+
+  def account_search_explicit_pattern?
+    @query.start_with?('@') || @query.include?('@') && "@#{@query}".match?(/\A#{Account::MENTION_RE}\Z/)
+  end
+
+  def hashtag_search_explicit_pattern?
+    @query.start_with?('#') || @query.match?(/\A#{Tag::HASHTAG_RE}\Z/)
   end
 
   def account_search?

@@ -2,7 +2,7 @@
 
 class SearchQueryTransformer < Parslet::Transform
   class Query
-    attr_reader :should_clauses, :must_not_clauses, :must_clauses, :filter_clauses
+    attr_reader :should_clauses, :must_not_clauses, :must_clauses, :filter_clauses, :order_clauses
 
     def initialize(clauses)
       grouped = clauses.chunk(&:operator).to_h
@@ -10,6 +10,7 @@ class SearchQueryTransformer < Parslet::Transform
       @must_not_clauses = grouped.fetch(:must_not, [])
       @must_clauses = grouped.fetch(:must, [])
       @filter_clauses = grouped.fetch(:filter, [])
+      @order_clauses = grouped.fetch(:order, [])
     end
 
     def apply(search)
@@ -17,6 +18,7 @@ class SearchQueryTransformer < Parslet::Transform
       must_clauses.each { |clause| search = search.query.must(clause_to_query(clause)) }
       must_not_clauses.each { |clause| search = search.query.must_not(clause_to_query(clause)) }
       filter_clauses.each { |clause| search = search.filter(**clause_to_filter(clause)) }
+      order_clauses.each { |clause| search = search.order(**clause_to_order(clause)) }
       search.query.minimum_should_match(1)
     end
 
@@ -37,6 +39,15 @@ class SearchQueryTransformer < Parslet::Transform
       case clause
       when PrefixClause
         { term: { clause.filter => clause.term } }
+      else
+        raise "Unexpected clause type: #{clause}"
+      end
+    end
+
+    def clause_to_order(clause)
+      case clause
+      when PrefixClause
+        { id: clause.term }
       else
         raise "Unexpected clause type: #{clause}"
       end
@@ -84,9 +95,9 @@ class SearchQueryTransformer < Parslet::Transform
     attr_reader :filter, :operator, :term
 
     def initialize(prefix, term)
-      @operator = :filter
       case prefix
       when 'from'
+        @operator = :filter
         @filter = :account_id
         username, domain = term.split('@')
         account = Account.find_remote(username, domain)
@@ -94,6 +105,11 @@ class SearchQueryTransformer < Parslet::Transform
         raise "Account not found: #{term}" unless account
 
         @term = account.id
+      when 'order'
+        raise "Unknown order: #{term}" unless %w(asc desc).include?(term)
+
+        @operator = :order
+        @term = term
       else
         raise "Unknown prefix: #{prefix}"
       end
