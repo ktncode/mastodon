@@ -1,41 +1,28 @@
 # frozen_string_literal: true
 
 class AccountsIndex < Chewy::Index
-  settings index: {
-    refresh_interval: '5m',
-    number_of_shards: 1,
-    number_of_replicas: 0,
-  },
-  analysis: {
-    analyzer: {
-      content: {
-        tokenizer: 'whitespace',
-        filter: %w(lowercase asciifolding cjk_width),
+  settings index: { refresh_interval: '5m' }, analysis: {
+    filter: {
+      english_stop: {
+        type: 'stop',
+        stopwords: '_english_',
       },
-
-      edge_ngram: {
-        tokenizer: 'edge_ngram',
-        filter: %w(lowercase asciifolding cjk_width),
+      english_stemmer: {
+        type: 'stemmer',
+        language: 'english',
       },
-
-      sudachi_content: {
-        tokenizer: 'sudachi_tokenizer',
-        type: 'custom',
-        filter: %w(
-          lowercase
-          cjk_width
-          sudachi_part_of_speech
-          sudachi_ja_stop
-          sudachi_baseform
-          search
-        ),
+      english_possessive_stemmer: {
+        type: 'stemmer',
+        language: 'possessive_english',
       },
     },
 
-    normalizer: {
-      keyword: {
-        type: 'custom',
-        filter: %w(lowercase asciifolding cjk_width),
+    char_filter: {
+      tsconvert: {
+        type: 'stconvert',
+        keep_both: false,
+        delimiter: '#',
+        convert_type: 't2s',
       },
     },
 
@@ -46,18 +33,101 @@ class AccountsIndex < Chewy::Index
         max_gram: 15,
       },
 
-      sudachi_tokenizer: {
-        type: 'sudachi_tokenizer',
-        discard_punctuation: true,
-        resources_path: '/etc/elasticsearch/sudachi',
-        settings_path: '/etc/elasticsearch/sudachi/sudachi.json',
+      kuromoji_user_dict: {
+        type: 'kuromoji_tokenizer',
+        user_dictionary: 'userdic.txt',
+      },
+
+      nori_user_dict: {
+        type: 'nori_tokenizer',
+        decompound_mode: 'mixed',
       },
     },
 
-    filter: {
-      search: {
-        type: 'sudachi_split',
-        mode: 'search',
+    analyzer: {
+      title: {
+        tokenizer: 'whitespace',
+        filter: %w(lowercase asciifolding cjk_width),
+      },
+
+      ja_title: {
+        type: 'custom',
+        char_filter: %w(
+          icu_normalizer
+          kuromoji_iteration_mark
+        ),
+        tokenizer: 'kuromoji_user_dict',
+        filter: %w(lowercase asciifolding cjk_width),
+      },
+
+      ko_title: {
+        tokenizer: 'nori_user_dict',
+        filter: %w(lowercase asciifolding cjk_width),
+      },
+
+      zh_title: {
+        tokenizer: 'ik_max_word',
+        filter: %w(lowercase asciifolding cjk_width),
+      },
+
+      content: {
+        tokenizer: 'uax_url_email',
+        filter: %w(
+          english_possessive_stemmer
+          lowercase
+          asciifolding
+          cjk_width
+          english_stop
+          english_stemmer
+        ),
+      },
+
+      ja_content: {
+        type: 'custom',
+        char_filter: %w(
+          icu_normalizer
+          kuromoji_iteration_mark
+        ),
+        tokenizer: 'kuromoji_user_dict',
+        filter: %w(
+          kuromoji_baseform
+          kuromoji_part_of_speech
+          ja_stop
+          kuromoji_stemmer
+          kuromoji_number
+          cjk_width
+          lowercase
+        ),
+      },
+
+      ko_content: {
+        tokenizer: 'nori_user_dict',
+        filter: %w(
+          english_possessive_stemmer
+          lowercase
+          asciifolding
+          cjk_width
+          english_stop
+          english_stemmer
+        ),
+      },
+
+      zh_content: {
+        tokenizer: 'ik_max_word',
+        filter: %w(
+          english_possessive_stemmer
+          lowercase
+          asciifolding
+          cjk_width
+          english_stop
+          english_stemmer
+        ),
+        char_filter: %w(tsconvert),
+      },
+
+      edge_ngram: {
+        tokenizer: 'edge_ngram',
+        filter: %w(lowercase asciifolding cjk_width),
       },
     },
   }
@@ -67,19 +137,24 @@ class AccountsIndex < Chewy::Index
   root date_detection: false do
     field :id, type: 'long'
 
-    field :display_name, type: 'text', analyzer: 'content' do
-      field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'content'
+    field :display_name, type: 'text', analyzer: 'title' do
+      field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'title'
+      field :ja_stemmed, type: 'text', analyzer: 'ja_title', search_analyzer: 'title'
+      field :ko_stemmed, type: 'text', analyzer: 'ko_title', search_analyzer: 'title'
+      field :zh_stemmed, type: 'text', analyzer: 'zh_title', search_analyzer: 'title'
     end
 
-    field :acct, type: 'text', analyzer: 'content', value: ->(account) { [account.username, account.domain].compact.join('@') } do
-      field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'content'
+    field :acct, type: 'text', analyzer: 'title', value: ->(account) { [account.username, account.domain].compact.join('@') } do
+      field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'title'
     end
 
     field :actor_type, type: 'keyword', normalizer: 'keyword'
 
     field :text, type: 'text', value: ->(account) { account.index_text } do
-      field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'content'
-      field :stemmed, type: 'text', analyzer: 'sudachi_content'
+      field :en_stemmed, type: 'text', analyzer: 'content'
+      field :ja_stemmed, type: 'text', analyzer: 'ja_content'
+      field :ko_stemmed, type: 'text', analyzer: 'ko_content'
+      field :zh_stemmed, type: 'text', analyzer: 'zh_content'
     end
 
     field :discoverable, type: 'boolean'

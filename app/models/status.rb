@@ -178,6 +178,7 @@ class Status < ApplicationRecord
       ids += favourites.where(account: Account.local).pluck(:account_id)
       ids += reblogs.where(account: Account.local).pluck(:account_id)
       ids += bookmarks.where(account: Account.local).pluck(:account_id)
+      ids += poll.votes.where(account: Account.local).pluck(:account_id) if poll.present?
       ids += emoji_reactions.where(account: Account.local).pluck(:account_id)
       ids += referred_by_statuses.where(account: Account.local).pluck(:account_id)
     else
@@ -185,6 +186,7 @@ class Status < ApplicationRecord
       ids += preloaded.favourites[id] || []
       ids += preloaded.reblogs[id] || []
       ids += preloaded.bookmarks[id] || []
+      ids += preloaded.votes[id] || []
       ids += preloaded.emoji_reactions[id] || []
       ids += preloaded.status_references[id] || []
     end
@@ -329,6 +331,22 @@ class Status < ApplicationRecord
 
   def index_text
     @index_text ||= [spoiler_text, Formatter.instance.plaintext(self)].concat(media_attachments.map(&:description)).concat(preloadable_poll ? preloadable_poll.options : []).concat(quote? ? ["QT: [#{quote.url || ActivityPub::TagManager.instance.url_for(quote)}]"] : []).filter(&:present?).join("\n\n")
+  end
+
+  def tag_id
+    tags.map(&:id)
+  end
+
+  def mentioned_account_id
+    mentions.map(&:account_id)
+  end
+
+  def media_type
+    media_attachments&.first&.type
+  end
+
+  def reference_type
+    preview_card&.type
   end
 
   def replies_count

@@ -46,7 +46,8 @@ class SearchService < BaseService
       @account,
       limit: @limit,
       resolve: @resolve,
-      offset: @offset
+      offset: @offset,
+      language: @options[:language]
     )
   end
 
@@ -54,6 +55,7 @@ class SearchService < BaseService
     AccountSearchService.new.count(
       @query,
       @account,
+      language: @options[:language]
     )
   end
 
@@ -63,7 +65,8 @@ class SearchService < BaseService
       @account,
       limit: @limit,
       resolve: @resolve,
-      offset: @offset
+      offset: @offset,
+      language: @options[:language]
     )
   end
 
@@ -109,7 +112,8 @@ class SearchService < BaseService
       @query,
       limit: @limit,
       offset: @offset,
-      exclude_unreviewed: @options[:exclude_unreviewed]
+      exclude_unreviewed: @options[:exclude_unreviewed],
+      language: @options[:language]
     )
   end
 
@@ -146,7 +150,7 @@ class SearchService < BaseService
   end
 
   def account_searchable?
-    account_search? && (account_search_explicit_pattern? || @query.match?(/\A#{Account::USERNAME_RE}\Z/))
+    account_search?
   end
 
   def hashtag_searchable?

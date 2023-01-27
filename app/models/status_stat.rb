@@ -17,6 +17,8 @@
 #
 
 class StatusStat < ApplicationRecord
+  update_index('statuses') { status }
+
   belongs_to :status, inverse_of: :status_stat
 
   after_commit :reset_parent_cache

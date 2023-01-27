@@ -37,6 +37,8 @@ class PreviewCard < ApplicationRecord
 
   self.inheritance_column = false
 
+  update_index('statuses') { statuses }
+
   enum type: [:link, :photo, :video, :rich]
 
   has_and_belongs_to_many :statuses

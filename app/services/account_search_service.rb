@@ -8,6 +8,8 @@ class AccountSearchService < BaseService
     @query     = query&.strip&.gsub(/\A@/, '')
     @limit     = options[:limit].to_i
     @offset    = options[:offset].to_i
+    @lang      = options.delete(:language).to_s
+    @fields    = %w(acct.edge_ngram acct display_name).push(%w(ja ko zh).include?(@lang) ? "display_name.#{@lang}_stemmed" : 'display_name.edge_ngram')
     @options   = options
     @account   = account
 
@@ -85,7 +87,7 @@ class AccountSearchService < BaseService
   end
 
   def from_elasticsearch(count = false)
-    must_clauses   = [{ multi_match: { query: terms_for_query, fields: likely_acct? ? %w(acct.edge_ngram acct) : %w(acct.edge_ngram acct display_name.edge_ngram display_name), type: 'most_fields', operator: 'and' } }]
+    must_clauses   = [{ multi_match: { query: terms_for_query, fields: likely_acct? ? %w(acct.edge_ngram acct) : @fields, type: 'most_fields', operator: 'and' } }]
     should_clauses = []
 
     if account

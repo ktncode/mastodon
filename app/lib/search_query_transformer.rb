@@ -4,7 +4,8 @@ class SearchQueryTransformer < Parslet::Transform
   class Query
     attr_reader :should_clauses, :must_not_clauses, :must_clauses, :filter_clauses, :order_clauses
 
-    def initialize(clauses)
+    def initialize(clauses, language)
+      @fields = ['text'].push(%w(ja ko zh).include?(language) ? "text.#{language}_stemmed" : 'text.en_stemmed')
       grouped = clauses.chunk(&:operator).to_h
       @should_clauses = grouped.fetch(:should, [])
       @must_not_clauses = grouped.fetch(:must_not, [])
@@ -27,7 +28,7 @@ class SearchQueryTransformer < Parslet::Transform
     def clause_to_query(clause)
       case clause
       when TermClause
-        { multi_match: { type: 'most_fields', query: clause.term, fields: ['text', 'text.stemmed'] } }
+        { multi_match: { type: 'most_fields', query: clause.term, fields: @fields } }
       when PhraseClause
         { match_phrase: { text: { query: clause.phrase } } }
       else
@@ -94,7 +95,7 @@ class SearchQueryTransformer < Parslet::Transform
   class PrefixClause
     attr_reader :filter, :operator, :term
 
-    def initialize(prefix, term)
+    def initialize(prefix, operator, term)
       case prefix
       when 'from'
         @operator = :filter
@@ -106,7 +107,7 @@ class SearchQueryTransformer < Parslet::Transform
 
         @term = account.id
       when 'order'
-        raise "Unknown order: #{term}" unless %w(asc desc).include?(term)
+        raise "Unknown order: #{term}" unless %w(asc desc score).include?(term)
 
         @operator = :order
         @term = term
@@ -121,7 +122,7 @@ class SearchQueryTransformer < Parslet::Transform
     operator = clause[:operator]&.to_s
 
     if clause[:prefix]
-      PrefixClause.new(prefix, clause[:term].to_s)
+      PrefixClause.new(prefix, operator, clause[:term].to_s)
     elsif clause[:term]
       TermClause.new(prefix, operator, clause[:term].to_s)
     elsif clause[:shortcode]
@@ -133,5 +134,5 @@ class SearchQueryTransformer < Parslet::Transform
     end
   end
 
-  rule(query: sequence(:clauses)) { Query.new(clauses) }
+  rule(query: sequence(:clauses)) { Query.new(clauses, 'ja') }
 end

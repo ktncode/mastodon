@@ -1,16 +1,46 @@
 # frozen_string_literal: true
 
 class TagsIndex < Chewy::Index
-  settings index: {
-    refresh_interval: '15m',
-    number_of_shards: 1,
-    number_of_replicas: 0,
-  },
-  analysis: {
+  settings index: { refresh_interval: '15m' }, analysis: {
+    char_filter: {
+      tsconvert: {
+        type: 'stconvert',
+        keep_both: false,
+        delimiter: '#',
+        convert_type: 't2s',
+      },
+    },
+
     analyzer: {
       content: {
         tokenizer: 'keyword',
         filter: %w(lowercase asciifolding cjk_width),
+      },
+
+      ja_content: {
+        type: 'custom',
+        char_filter: %w(icu_normalizer kuromoji_iteration_mark),
+        tokenizer: 'kuromoji_user_dict',
+        filter: %w(
+          kuromoji_baseform
+          kuromoji_part_of_speech
+          ja_stop
+          kuromoji_stemmer
+          kuromoji_number
+          cjk_width
+          lowercase
+        ),
+      },
+
+      ko_content: {
+        tokenizer: 'nori_user_dict',
+        filter: %w(lowercase asciifolding cjk_width),
+      },
+
+      zh_content: {
+        tokenizer: 'ik_max_word',
+        filter: %w(lowercase asciifolding cjk_width),
+        char_filter: %w(tsconvert),
       },
 
       edge_ngram: {
@@ -25,6 +55,16 @@ class TagsIndex < Chewy::Index
         min_gram: 2,
         max_gram: 15,
       },
+
+      kuromoji_user_dict: {
+        type: 'kuromoji_tokenizer',
+        user_dictionary: 'userdic.txt',
+      },
+
+      nori_user_dict: {
+        type: 'nori_tokenizer',
+        decompound_mode: 'mixed',
+      },
     },
   }
 
@@ -33,6 +73,9 @@ class TagsIndex < Chewy::Index
   root date_detection: false do
     field :name, type: 'text', analyzer: 'content' do
       field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'content'
+      field :ja_stemmed, type: 'text', analyzer: 'ja_content', search_analyzer: 'content'
+      field :ko_stemmed, type: 'text', analyzer: 'ko_content', search_analyzer: 'content'
+      field :zh_stemmed, type: 'text', analyzer: 'zh_content', search_analyzer: 'content'
     end
 
     field :reviewed, type: 'boolean', value: ->(tag) { tag.reviewed? }

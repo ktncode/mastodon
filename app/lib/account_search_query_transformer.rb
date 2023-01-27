@@ -4,7 +4,8 @@ class AccountSearchQueryTransformer < Parslet::Transform
   class Query
     attr_reader :should_clauses, :must_not_clauses, :must_clauses
 
-    def initialize(clauses)
+    def initialize(clauses, language)
+      @fields = ['text'].push(%w(ja ko zh).include?(language) ? "text.#{language}_stemmed" : 'text.en_stemmed')
       grouped = clauses.chunk(&:operator).to_h
       @should_clauses = grouped.fetch(:should, [])
       @must_not_clauses = grouped.fetch(:must_not, [])
@@ -23,7 +24,7 @@ class AccountSearchQueryTransformer < Parslet::Transform
     def clause_to_query(clause)
       case clause
       when TermClause
-        { multi_match: { type: 'most_fields', query: clause.term, fields: ['text.edge_ngram', 'text.stemmed'] } }
+        { multi_match: { type: 'most_fields', query: clause.term, fields: @fields } }
       when PhraseClause
         { match_phrase: { text: { query: clause.phrase } } }
       else
@@ -102,5 +103,5 @@ class AccountSearchQueryTransformer < Parslet::Transform
     end
   end
 
-  rule(query: sequence(:clauses)) { Query.new(clauses) }
+  rule(query: sequence(:clauses)) { Query.new(clauses, 'ja') }
 end

@@ -5,6 +5,8 @@ class TagSearchService < BaseService
     @query   = query.strip.gsub(/\A#/, '')
     @offset  = options.delete(:offset).to_i
     @limit   = options.delete(:limit).to_i
+    @lang    = options.delete(:language).to_s
+    @fields = ['name'].push(%w(ja ko zh).include?(@lang) ? "name.#{@lang}_stemmed" : 'name.edge_ngram')
     @options = options
 
     results   = from_elasticsearch if Chewy.enabled?
@@ -21,7 +23,7 @@ class TagSearchService < BaseService
         query: {
           multi_match: {
             query: @query,
-            fields: %w(name.edge_ngram name),
+            fields: @fields,
             type: 'most_fields',
             operator: 'and',
           },

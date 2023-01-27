@@ -20,7 +20,8 @@ class Api::V1::Accounts::SearchController < Api::BaseController
       followers: truthy_param?(:followers),
       following: truthy_param?(:following),
       group_only: truthy_param?(:group_only),
-      offset: params[:offset]
+      offset: params[:offset],
+      language: current_user.setting_default_language
     )
   end
 end
