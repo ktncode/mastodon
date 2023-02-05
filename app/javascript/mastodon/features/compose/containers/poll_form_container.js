@@ -12,6 +12,7 @@ const mapStateToProps = state => ({
   options: state.getIn(['compose', 'poll', 'options']),
   expiresIn: state.getIn(['compose', 'poll', 'expires_in']),
   isMultiple: state.getIn(['compose', 'poll', 'multiple']),
+  pollMaxOptions: state.getIn(['compose', 'poll_max_options']),
 });
 
 const mapDispatchToProps = dispatch => ({

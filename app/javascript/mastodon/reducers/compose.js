@@ -93,6 +93,7 @@ const initialState = ImmutableMap({
   media_attachments: ImmutableList(),
   pending_media_attachments: 0,
   poll: null,
+  poll_max_options: 4,
   suggestion_token: null,
   suggestions: ImmutableList(),
   default_privacy: 'public',

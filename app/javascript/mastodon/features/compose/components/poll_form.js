@@ -126,6 +126,7 @@ class PollForm extends ImmutablePureComponent {
     onClearSuggestions: PropTypes.func.isRequired,
     onFetchSuggestions: PropTypes.func.isRequired,
     onSuggestionSelected: PropTypes.func.isRequired,
+    pollMaxOptions: PropTypes.number.isRequired,
     intl: PropTypes.object.isRequired,
   };
 
@@ -142,7 +143,7 @@ class PollForm extends ImmutablePureComponent {
   };
 
   render () {
-    const { options, expiresIn, isMultiple, onChangeOption, onRemoveOption, intl, ...other } = this.props;
+    const { options, expiresIn, isMultiple, onChangeOption, onRemoveOption, pollMaxOptions, intl, ...other } = this.props;
 
     if (!options) {
       return null;
@@ -157,7 +158,7 @@ class PollForm extends ImmutablePureComponent {
         </ul>
 
         <div className='poll__footer'>
-          <button disabled={options.size >= 4} className='button button-secondary' onClick={this.handleAddOption}><Icon id='plus' /> <FormattedMessage {...messages.add_option} /></button>
+          <button disabled={options.size >= pollMaxOptions} className='button button-secondary' onClick={this.handleAddOption}><Icon id='plus' /> <FormattedMessage {...messages.add_option} /></button>
 
           {/* eslint-disable-next-line jsx-a11y/no-onchange */}
           <select value={expiresIn} onChange={this.handleSelectDuration}>
