@@ -102,7 +102,7 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   end
 
   def discoverable
-    object.suspended? ? false : (object.discoverable || false)
+    object.suspended? || object.silenced? ? false : (object.discoverable || false)
   end
 
   def name
