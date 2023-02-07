@@ -112,6 +112,22 @@ Rails.application.configure do
     :ssl                  => ENV['SMTP_SSL'].presence,
   }
 
+  config.x.second_smtp_settings = {
+    :port                 => ENV['SECOND_SMTP_PORT'],
+    :address              => ENV['SECOND_SMTP_SERVER'],
+    :user_name            => ENV['SECOND_SMTP_LOGIN'].presence,
+    :password             => ENV['SECOND_SMTP_PASSWORD'].presence,
+    :domain               => ENV['SECOND_SMTP_DOMAIN'] || ENV['LOCAL_DOMAIN'],
+    :authentication       => ENV['SECOND_SMTP_AUTH_METHOD'] == 'none' ? nil : ENV['SMTP_AUTH_METHOD'] || :plain,
+    :ca_file              => ENV['SECOND_SMTP_CA_FILE'].presence,
+    :openssl_verify_mode  => ENV['SECOND_SMTP_OPENSSL_VERIFY_MODE'],
+    :enable_starttls_auto => ENV['SECOND_SMTP_ENABLE_STARTTLS_AUTO'] || true,
+    :tls                  => ENV['SECOND_SMTP_TLS'].presence,
+    :ssl                  => ENV['SECOND_SMTP_SSL'].presence,
+  }
+
+  config.x.domains_to_use_second_smtp = ENV.fetch('DOMAINS_TO_USE_SECOND_SMTP', '').parse_csv&.map(&:strip)
+
   config.action_mailer.delivery_method = ENV.fetch('SMTP_DELIVERY_METHOD', 'smtp').to_sym
 
   config.action_dispatch.default_headers = {
