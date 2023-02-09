@@ -159,6 +159,8 @@ const startWorker = (workerId) => {
    */
   const subs = {};
 
+  let stats = {};
+
   redisSubscribeClient.on('message', (channel, message) => {
     const callbacks = subs[channel];
 
@@ -750,6 +752,11 @@ const startWorker = (workerId) => {
   app.get('/api/v1/streaming/health', (req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('OK');
+  });
+
+  app.get('/api/v1/streaming/stats', (req, res) => {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(stats));
   });
 
   app.use(authenticationMiddleware);
@@ -1362,15 +1369,20 @@ const startWorker = (workerId) => {
   });
 
   setInterval(() => {
+    let count = 0;
+
     wss.clients.forEach(ws => {
       if (ws.isAlive === false) {
         ws.terminate();
         return;
       }
 
+      count++;
       ws.isAlive = false;
       ws.ping('', false);
     });
+
+    stats = { ...stats, connectionCounts: count };
   }, 30000);
 
   attachServerWithConfig(server, address => {
