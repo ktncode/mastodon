@@ -62,7 +62,7 @@ const updateEmojiReactionCount = (state, emojiReaction) => updateEmojiReaction(s
 
 const addEmojiReaction = (state, id, name, domain, url, static_url) => updateEmojiReaction(state, id, name, domain, url, static_url, x => x.update('count', y => y + 1).update('account_ids', z => z.push(me)));
 
-const removeEmojiReaction = (state, id, name, domain, url, static_url) => updateEmojiReaction(state, id, name, domain, url, static_url, x => x.update('count', y => y - 1).update('account_ids', z => z.filter(id => id != me)));
+const removeEmojiReaction = (state, id, name, domain, url, static_url) => updateEmojiReaction(state, id, name, domain, url, static_url, x => x.update('count', y => y - 1).update('account_ids', z => z.filter(id => id !== me)));
 
 const initialState = ImmutableMap();
 
