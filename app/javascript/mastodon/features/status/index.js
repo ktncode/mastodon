@@ -496,7 +496,7 @@ class Status extends ImmutablePureComponent {
     const index = this.getCurrentStatusIndex(id);
 
     if (index !== -1) {
-      return this._selectChild(index - 1, true);
+      this._selectChild(index - 1, true);
     }
   }
 
@@ -504,7 +504,7 @@ class Status extends ImmutablePureComponent {
     const index = this.getCurrentStatusIndex(id);
 
     if (index !== -1) {
-      return this._selectChild(index + 1, true);
+      this._selectChild(index + 1, true);
     }
   }
 
@@ -629,11 +629,13 @@ class Status extends ImmutablePureComponent {
             {ancestors}
 
             <HotKeys handlers={handlers}>
-              <div className={classNames('focusable', 'detailed-status__wrapper', {
-                'detailed-status__wrapper-referenced': referenced,
-                'detailed-status__wrapper-context-referenced': contextReferenced,
-                'detailed-status__wrapper-reference': referenceCount > 0,
-              })} tabIndex='0' aria-label={textForScreenReader(intl, status, false)}>
+              <div
+                className={classNames('focusable', 'detailed-status__wrapper', {
+                  'detailed-status__wrapper-referenced': referenced,
+                  'detailed-status__wrapper-context-referenced': contextReferenced,
+                  'detailed-status__wrapper-reference': referenceCount > 0,
+                })} tabIndex='0' aria-label={textForScreenReader(intl, status, false)}
+              >
                 <DetailedStatus
                   key={`details-${status.get('id')}`}
                   status={status}

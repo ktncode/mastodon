@@ -121,8 +121,9 @@ class StatusReferences extends ImmutablePureComponent {
     const { referencesIds } = this.props;
 
     const index = referencesIds.indexOf(id);
-    if (index !== -1 && index + 1 < referencesIds.size)
-    this._selectChild(index + 1, false);
+    if (index !== -1 && index + 1 < referencesIds.size) {
+      this._selectChild(index + 1, false);
+    }
   }
 
   _selectChild (index, align_top) {
