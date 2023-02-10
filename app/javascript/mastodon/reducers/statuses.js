@@ -25,7 +25,7 @@ import { me } from '../initial_state';
 import { Map as ImmutableMap, List, fromJS } from 'immutable';
 
 const importStatus = (state, status) => {
-  if (state.getIn([status.in_reply_to_id, 'replies_count'], null) == 0) {
+  if (state.getIn([status.in_reply_to_id, 'replies_count'], null) === 0) {
     state = state.setIn([status.in_reply_to_id, 'replies_count'], 1);
   }
   return state.set(status.id, fromJS(status));
