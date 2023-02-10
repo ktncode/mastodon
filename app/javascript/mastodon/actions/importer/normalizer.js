@@ -66,7 +66,6 @@ export function normalizeStatus(status, normalOldStatus) {
     normalStatus.spoiler_text = normalOldStatus.get('spoiler_text');
     normalStatus.hidden = normalOldStatus.get('hidden');
     normalStatus.visibility = normalOldStatus.get('visibility');
-    normalStatus.quote_hidden = normalOldStatus.get('quote_hidden');
   } else {
     // If the status has a CW but no contents, treat the CW as if it were the
     // status' contents, to avoid having a CW toggle with seemingly no effect.

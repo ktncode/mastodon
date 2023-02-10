@@ -29,8 +29,6 @@ import {
   hideStatus,
   revealStatus,
   toggleStatusCollapse,
-  hideQuote,
-  revealQuote,
 } from '../actions/statuses';
 import {
   followAccount,
@@ -90,7 +88,7 @@ const makeMapStateToProps = () => {
       id,
       referenced: state.getIn(['compose', 'references']).has(id),
       contextReferenced: state.getIn(['compose', 'context_references']).has(id),
-    }
+    };
   };
 
   return mapStateToProps;
@@ -266,14 +264,6 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
 
   deployPictureInPicture (status, type, mediaProps) {
     dispatch(deployPictureInPicture(status.get('id'), status.getIn(['account', 'id']), type, mediaProps));
-  },
-
-  onQuoteToggleHidden (status) {
-    if (status.get('quote_hidden')) {
-      dispatch(revealQuote(status.get('id')));
-    } else {
-      dispatch(hideQuote(status.get('id')));
-    }
   },
 
   onFollow (account) {

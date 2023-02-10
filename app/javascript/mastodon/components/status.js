@@ -132,7 +132,6 @@ class Status extends ImmutablePureComponent {
     onHeightChange: PropTypes.func,
     onToggleHidden: PropTypes.func,
     onToggleCollapsed: PropTypes.func,
-    onQuoteToggleHidden: PropTypes.func,
     onReference: PropTypes.func,
     onAddToList: PropTypes.func.isRequired,
     muted: PropTypes.bool,
@@ -263,8 +262,8 @@ class Status extends ImmutablePureComponent {
   }
 
   handleExpandedQuoteToggle = () => {
-    this.props.onQuoteToggleHidden(this._properStatus());
-  };
+    this.props.onToggleHidden(this._properQuoteStatus());
+  }
 
   renderLoadingMediaGallery () {
     return <div className='media-gallery' style={{ height: '110px' }} />;
@@ -696,7 +695,7 @@ class Status extends ImmutablePureComponent {
                 <DisplayName account={quote_status.get('account')} />
               </a>
             </div>
-            <StatusContent status={quote_status} onClick={this.handleQuoteClick} expanded={!status.get('quote_hidden')} onExpandedToggle={this.handleExpandedQuoteToggle} quote />
+            <StatusContent status={quote_status} onClick={this.handleQuoteClick} expanded={!quote_status.get('hidden')} onExpandedToggle={this.handleExpandedQuoteToggle} quote />
             {quote_media}
           </div>
         );

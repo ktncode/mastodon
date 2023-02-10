@@ -90,7 +90,6 @@ class DetailedStatus extends ImmutablePureComponent {
       available: PropTypes.bool,
     }),
     onToggleMediaVisibility: PropTypes.func,
-    onQuoteToggleHidden: PropTypes.func.isRequired,
     showQuoteMedia: PropTypes.bool,
     onToggleQuoteMediaVisibility: PropTypes.func,
     emojiMap: ImmutablePropTypes.map,
@@ -165,7 +164,7 @@ class DetailedStatus extends ImmutablePureComponent {
   }
 
   handleExpandedQuoteToggle = () => {
-    this.props.onQuoteToggleHidden(this.props.status);
+    this.props.onToggleHidden(this.props.status.get('quote'));
   }
 
   handleQuoteClick = () => {
@@ -179,7 +178,7 @@ class DetailedStatus extends ImmutablePureComponent {
 
   render () {
     const status = (this.props.status && this.props.status.get('reblog')) ? this.props.status.get('reblog') : this.props.status;
-    const quote_muted = this.props.quote_muted
+    const quote_muted = this.props.quote_muted;
     const outerStyle = { boxSizing: 'border-box' };
     const { intl, compact, pictureInPicture, referenced, contextReferenced } = this.props;
 
@@ -278,7 +277,7 @@ class DetailedStatus extends ImmutablePureComponent {
               <DisplayName account={quote_status.get('account')} localDomain={this.props.domain} />
             </a>
 
-            <StatusContent status={quote_status} onClick={this.handleQuoteClick} expanded={!status.get('quote_hidden')} onExpandedToggle={this.handleExpandedQuoteToggle} quote />
+            <StatusContent status={quote_status} onClick={this.handleQuoteClick} expanded={!quote_status.get('hidden')} onExpandedToggle={this.handleExpandedQuoteToggle} quote />
             {quote_media}
           </div>
         );
