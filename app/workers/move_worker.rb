@@ -13,6 +13,8 @@ class MoveWorker
       queue_follow_unfollows!
     end
 
+    rewrite_subscribes!
+
     @deferred_error = nil
 
     copy_account_notes!
@@ -30,6 +32,14 @@ class MoveWorker
     @source_account.passive_relationships
                    .where(account: Account.local)
                    .where.not(account: @target_account.followers.local)
+                   .where.not(account_id: @target_account.id)
+                   .in_batches
+                   .update_all(target_account_id: @target_account.id)
+  end
+
+  def rewrite_subscribes!
+    @source_account.passive_subscribes
+                   .where.not(account: @target_account.subscribers)
                    .where.not(account_id: @target_account.id)
                    .in_batches
                    .update_all(target_account_id: @target_account.id)
