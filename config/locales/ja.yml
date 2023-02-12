@@ -771,6 +771,7 @@ ja:
       body: Mastodonは有志によって翻訳されています。
       guide_link: https://ja.crowdin.com/project/mastodon
       guide_link_text: 誰でも参加することができます。
+    preview_card: プレビューカード
     sensitive_content: 閲覧注意コンテンツ
     themes: テーマ
     toot_layout: 投稿のレイアウト

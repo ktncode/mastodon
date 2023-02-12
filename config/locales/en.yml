@@ -792,6 +792,7 @@ en:
       body: Mastodon is translated by volunteers.
       guide_link: https://crowdin.com/project/mastodon
       guide_link_text: Everyone can contribute.
+    preview_card: Preview Card
     sensitive_content: Sensitive content
     themes: Themes
     toot_layout: Post layout

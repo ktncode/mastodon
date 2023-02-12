@@ -5,6 +5,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import Avatar from '../../../components/avatar';
 import DisplayName from '../../../components/display_name';
 import StatusContent from '../../../components/status_content';
+import { isHideCard } from '../../../components/status';
 import MediaGallery from '../../../components/media_gallery';
 import { Link } from 'react-router-dom';
 import { injectIntl, defineMessages, FormattedDate, FormattedMessage } from 'react-intl';
@@ -342,7 +343,7 @@ class DetailedStatus extends ImmutablePureComponent {
           />
         );
       }
-    } else if (status.get('spoiler_text').length === 0) {
+    } else if (status.get('spoiler_text').length === 0 && !isHideCard(status.getIn(['card', 'type']))) {
       media = <Card sensitive={status.get('sensitive')} onOpenMedia={this.props.onOpenMedia} card={status.get('card', null)} />;
     }
 

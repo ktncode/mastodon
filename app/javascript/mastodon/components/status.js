@@ -20,7 +20,7 @@ import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import EmojiReactionsBar from 'mastodon/components/emoji_reactions_bar';
 import PictureInPicturePlaceholder from 'mastodon/components/picture_in_picture_placeholder';
-import { displayMedia, enableReaction, compactReaction, show_reply_tree_button, enableStatusReference, disableRelativeTime } from 'mastodon/initial_state';
+import { displayMedia, enableReaction, compactReaction, show_reply_tree_button, enableStatusReference, disableRelativeTime, hideLinkPreview, hidePhotoPreview, hideVideoPreview } from 'mastodon/initial_state';
 import { List as ImmutableList } from 'immutable';
 
 // We use the component (and not the container) since we do not want
@@ -77,6 +77,19 @@ export const defaultMediaVisibility = (status) => {
   }
 
   return (displayMedia !== 'hide_all' && !status.get('sensitive') || displayMedia === 'show_all');
+};
+
+export const isHideCard = (type) => {
+  switch(type) {
+  case 'link':
+    return hideLinkPreview;
+  case 'photo':
+    return hidePhotoPreview;
+  case 'video':
+    return hideVideoPreview;
+  default:
+    return false;
+  }
 };
 
 const messages = defineMessages({
@@ -554,7 +567,7 @@ class Status extends ImmutablePureComponent {
           </Bundle>
         );
       }
-    } else if (showCard && status.get('spoiler_text').length === 0 && status.get('card')) {
+    } else if (showCard && status.get('spoiler_text').length === 0 && status.get('card') && !isHideCard(status.getIn(['card', 'type']))) {
       media = (
         <Card
           onOpenMedia={this.handleOpenMedia}

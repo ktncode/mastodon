@@ -146,6 +146,7 @@ class User < ApplicationRecord
            :disable_post, :disable_reactions, :disable_follow, :disable_unfollow, :disable_block, :disable_domain_block, :disable_clear_all_notifications, :disable_account_delete,
            :prohibited_visibilities, :prohibited_words,
            :disable_relative_time, :hide_direct_from_timeline, :hide_personal_from_timeline, :hide_personal_from_account, :hide_privacy_meta,
+           :hide_link_preview, :hide_photo_preview, :hide_video_preview,
 
            to: :settings, prefix: :setting, allow_nil: false
 

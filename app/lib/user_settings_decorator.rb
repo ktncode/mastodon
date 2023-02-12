@@ -96,6 +96,9 @@ class UserSettingsDecorator
     hide_personal_from_timeline
     hide_personal_from_account
     hide_privacy_meta
+    hide_link_preview
+    hide_photo_preview
+    hide_video_preview
   ).freeze
 
   STRING_KEYS = %w(

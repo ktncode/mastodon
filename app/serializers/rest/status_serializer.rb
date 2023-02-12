@@ -43,6 +43,21 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   delegate :quote?, to: :object
 
+  def preview_card
+    object.preview_card unless hide_preview_card?
+  end
+
+  def hide_preview_card?
+    case object&.preview_card&.type
+    when 'link'
+      current_user&.setting_hide_link_preview
+    when 'photo'
+      current_user&.setting_hide_photo_preview
+    when 'video'
+      current_user&.setting_hide_video_preview
+    end
+  end
+
   def id
     object.id.to_s
   end

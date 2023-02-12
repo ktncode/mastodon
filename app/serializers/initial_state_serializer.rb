@@ -93,6 +93,9 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:hide_personal_from_timeline]       = object.current_account.user.setting_hide_personal_from_timeline
       store[:hide_personal_from_account]        = object.current_account.user.setting_hide_personal_from_account
       store[:hide_privacy_meta]                 = object.current_account.user.setting_hide_privacy_meta
+      store[:hide_link_preview]                 = object.current_account.user.setting_hide_link_preview
+      store[:hide_photo_preview]                = object.current_account.user.setting_hide_photo_preview
+      store[:hide_video_preview]                = object.current_account.user.setting_hide_video_preview
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media
