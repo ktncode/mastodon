@@ -40,7 +40,7 @@ class UserSettingsDecorator
     unselect_reference_modal
     delete_scheduled_status_modal
     auto_play_gif
-    expand_spoiers
+    expand_spoilers
     reduce_motion
     disable_swiping
     system_font_ui
