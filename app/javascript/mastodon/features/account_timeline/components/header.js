@@ -171,7 +171,7 @@ export default class Header extends ImmutablePureComponent {
               <NavLink exact to={`/accounts/${account.get('id')}/about`}><Icon id='address-card-o' fixedWidth /><span className='account__section-headline__short-label'><FormattedMessage id='account.short.about' defaultMessage='About' children={msg=> <>{msg}</>} /></span></NavLink>
             </div>
 
-            {hideProfile && !hideFeaturedTags && <FeaturedTags account={account} tagged={tagged} />}
+            {!hideFeaturedTags && <FeaturedTags account={account} tagged={tagged} />}
             {!hideRelation && <InnerHeaderExtraLinks account={account} />}
             {!hideProfile && <InnerHeaderExtra account={account} identity_proofs={identity_proofs} />}
           </Fragment>
