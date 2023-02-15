@@ -1,7 +1,7 @@
 FROM ubuntu:20.04 as build-dep
 
-# Use bash for the shell
-SHELL ["/bin/bash", "-c"]
+FROM ghcr.io/moritzheiber/ruby-jemalloc:3.2.1-slim as ruby
+FROM node:${NODE_VERSION} as build
 
 # Install Node v14 (LTS)
 ENV NODE_VER="14.17.4"
