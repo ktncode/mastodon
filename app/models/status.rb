@@ -26,6 +26,7 @@
 #  quote_id               :bigint(8)
 #  expired_at             :datetime
 #  searchability          :integer
+#  generator_id           :bigint(8)
 #
 
 class Status < ApplicationRecord
@@ -57,6 +58,7 @@ class Status < ApplicationRecord
   UNCOUNT_VISIBILITY  = %w(direct personal)
 
   belongs_to :application, class_name: 'Doorkeeper::Application', optional: true
+  belongs_to :generator, optional: true, inverse_of: :statuses
 
   belongs_to :account, inverse_of: :statuses
   belongs_to :in_reply_to_account, foreign_key: 'in_reply_to_account_id', class_name: 'Account', optional: true
@@ -146,6 +148,7 @@ class Status < ApplicationRecord
                    :tags,
                    :preview_cards,
                    :preloadable_poll,
+                   :generator,
                    references: { account: :account_stat },
                    account: [:account_stat, :user],
                    active_mentions: { account: :account_stat },

@@ -33,6 +33,8 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
 
   attribute :voters_count, if: :poll_and_voters_count?
 
+  belongs_to :application, key: :generator, if: :show_application?, serializer: ActivityPub::GeneratorSerializer
+
   def id
     ActivityPub::TagManager.instance.uri_for(object)
   end
@@ -219,6 +221,10 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
 
   def poll_and_voters_count?
     object.preloadable_poll&.voters_count
+  end
+
+  def show_application?
+    local? && object.account.user_shows_application?
   end
 
   class MediaAttachmentSerializer < ActivityPub::Serializer

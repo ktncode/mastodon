@@ -189,6 +189,7 @@ Rails.application.routes.draw do
   resources :emoji_reactions, only: [:show]
   resources :invites, only: [:index, :create, :destroy]
   resources :filters, except: [:show]
+  resources :generators, only: [:show]
   resource :relationships, only: [:show, :update]
   resource :statuses_cleanup, controller: :statuses_cleanup, only: [:show, :update]
 

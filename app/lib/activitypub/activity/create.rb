@@ -120,6 +120,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         media_attachment_ids: process_attachments.take(4).map(&:id),
         poll: process_poll,
         quote: quote,
+        generator: generator,
       }
     end
   end
@@ -582,6 +583,17 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
     quote = ResolveURLService.new.call(url)
     status_from_uri(quote.uri) if quote
+  rescue
+    nil
+  end
+
+  def generator
+    @generator ||= Generator.find_or_create_by!(
+      uri: @object.dig('generator', 'id') || '',
+      type: @object.dig('generator', 'type')&.capitalize&.to_sym || :Application,
+      name: @object.dig('generator', 'name') || '',
+      website: @object.dig('generator', 'url') || '',
+    )
   rescue
     nil
   end

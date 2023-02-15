@@ -43,6 +43,10 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   delegate :quote?, to: :object
 
+  def application
+    object.account.local? ? object.application : object.generator
+  end
+
   def preview_card
     object.preview_card unless hide_preview_card?
   end
@@ -101,7 +105,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def show_application?
-    object.account.user_shows_application? || owned_status?
+    !object.account.local? || object.account.user_shows_application? || owned_status?
   end
 
   def expires?
@@ -248,6 +252,10 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   class ApplicationSerializer < ActiveModel::Serializer
+    attributes :name, :website
+  end
+
+  class GeneratorSerializer < ActiveModel::Serializer
     attributes :name, :website
   end
 
