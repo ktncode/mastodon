@@ -1,9 +1,10 @@
 import { connect } from 'react-redux';
 import PollButton from '../components/poll_button';
 import { addPoll, removePoll } from '../../../actions/compose';
+import { allowPollImage } from '../../../initial_state';
 
 const mapStateToProps = state => ({
-  unavailable: state.getIn(['compose', 'is_uploading']) || (state.getIn(['compose', 'media_attachments']).size > 0),
+  unavailable: !allowPollImage && (state.getIn(['compose', 'is_uploading']) || (state.getIn(['compose', 'media_attachments']).size > 0)),
   active: state.getIn(['compose', 'poll']) !== null,
 });
 

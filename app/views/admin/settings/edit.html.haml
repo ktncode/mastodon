@@ -92,6 +92,9 @@
     .fields-group
       = f.input :noindex, as: :boolean, wrapper: :with_label, label: t('admin.settings.default_noindex.title'), hint: t('admin.settings.default_noindex.desc_html')
 
+    .fields-group
+      = f.input :allow_poll_image, as: :boolean, wrapper: :with_label, label: t('admin.settings.allow_poll_image.title'), hint: t('admin.settings.allow_poll_image.desc_html'), fedibird_features: true
+
   %hr.spacer/
 
   .fields-group

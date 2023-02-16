@@ -23,6 +23,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       mascot: instance_presenter.mascot&.file&.url,
       profile_directory: Setting.profile_directory,
       trends: Setting.trends,
+      allow_poll_image: Setting.allow_poll_image,
     }
 
     if object.current_account

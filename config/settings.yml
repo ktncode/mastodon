@@ -138,6 +138,7 @@ defaults: &defaults
   hide_link_preview: false
   hide_photo_preview: false
   hide_video_preview: false
+  allow_poll_image: false
 
 development:
   <<: *defaults

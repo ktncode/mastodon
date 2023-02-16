@@ -627,6 +627,9 @@ en:
       activity_api_enabled:
         desc_html: Counts of locally published posts, active users, and new registrations in weekly buckets
         title: Publish aggregate statistics about user activity in the API
+      allow_poll_image:
+        desc_html: Allow image attachments to polls, which is prohibited by Mastodon standard
+        title: Allow to attach image to poll
       bootstrap_timeline_accounts:
         desc_html: Separate multiple usernames by comma. These accounts will be guaranteed to be shown in follow recommendations
         title: Recommend these accounts to new users

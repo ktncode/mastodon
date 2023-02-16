@@ -14,7 +14,7 @@ import { openModal } from './modal';
 import { defineMessages } from 'react-intl';
 import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, formatISO, format } from 'date-fns';
 import { Set as ImmutableSet } from 'immutable';
-import { postReferenceModal, enableFederatedTimeline } from '../initial_state';
+import { postReferenceModal, enableFederatedTimeline, allowPollImage } from '../initial_state';
 import { deleteScheduledStatus } from './scheduled_statuses';
 
 let cancelFetchComposeSuggestionsAccounts, cancelFetchComposeSuggestionsTags;
@@ -384,7 +384,7 @@ export function uploadCompose(files) {
       return;
     }
 
-    if (getState().getIn(['compose', 'poll'])) {
+    if (!allowPollImage && getState().getIn(['compose', 'poll'])) {
       dispatch(showAlert(undefined, messages.uploadErrorPoll));
       return;
     }

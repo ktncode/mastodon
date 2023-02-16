@@ -75,6 +75,7 @@ export const hidePrivacyMeta = getMeta('hide_privacy_meta');
 export const hideLinkPreview = getMeta('hide_link_preview');
 export const hidePhotoPreview = getMeta('hide_photo_preview');
 export const hideVideoPreview = getMeta('hide_video_preview');
+export const allowPollImage = getMeta('allow_poll_image');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 
