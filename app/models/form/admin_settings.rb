@@ -36,6 +36,7 @@ class Form::AdminSettings
     noindex
     require_invite_text
     allow_poll_image
+    poll_max_options
   ).freeze
 
   BOOLEAN_KEYS = %i(
@@ -55,6 +56,10 @@ class Form::AdminSettings
     allow_poll_image
   ).freeze
 
+  INTEGER_KEYS = %i(
+    poll_max_options
+  ).freeze
+
   UPLOAD_KEYS = %i(
     thumbnail
     hero
@@ -72,6 +77,7 @@ class Form::AdminSettings
   validates :bootstrap_timeline_accounts, existing_username: { multiple: true }
   validates :show_domain_blocks, inclusion: { in: %w(disabled users all) }
   validates :show_domain_blocks_rationale, inclusion: { in: %w(disabled users all) }
+  validates :poll_max_options, numericality: { greater_than: 2, less_than_or_equal_to: PollValidator::MAX_OPTIONS_LIMIT }
 
   def initialize(_attributes = {})
     super
@@ -105,6 +111,8 @@ class Form::AdminSettings
   def typecast_value(key, value)
     if BOOLEAN_KEYS.include?(key)
       value == '1'
+    elsif INTEGER_KEYS.include?(key)
+      Integer(value)
     else
       value
     end

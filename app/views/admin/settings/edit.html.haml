@@ -95,6 +95,9 @@
     .fields-group
       = f.input :allow_poll_image, as: :boolean, wrapper: :with_label, label: t('admin.settings.allow_poll_image.title'), hint: t('admin.settings.allow_poll_image.desc_html'), fedibird_features: true
 
+    .fields-group
+      = f.input :poll_max_options, wrapper: :with_label, label: t('admin.settings.poll_max_options.title'), hint: t('admin.settings.poll_max_options.desc_html', count: PollValidator::MAX_OPTIONS_LIMIT), fedibird_features: true
+
   %hr.spacer/
 
   .fields-group
