@@ -49,6 +49,7 @@ export const enableFederatedTimeline = getMeta('enable_federated_timeline') ?? t
 export const enableLocalTimeline = getMeta('enable_local_timeline') ?? true;
 export const enableReaction = getMeta('enable_reaction');
 export const compactReaction = getMeta('compact_reaction');
+export const disableReactionStreaming = getMeta('disable_reaction_streaming');
 export const show_reply_tree_button = getMeta('show_reply_tree_button');
 export const disable_joke_appearance = getMeta('disable_joke_appearance');
 export const new_features_policy = getMeta('new_features_policy');

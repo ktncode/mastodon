@@ -131,7 +131,7 @@ class User < ApplicationRecord
            :follow_button_to_list_adder, :show_navigation_panel, :show_quote_button, :show_bookmark_button,
            :place_tab_bar_at_bottom,:show_tab_bar_label,
            :enable_local_timeline, :enable_federated_timeline, :enable_limited_timeline, :enable_personal_timeline,
-           :enable_reaction, :compact_reaction,
+           :enable_reaction, :compact_reaction, :disable_reaction_streaming,
            :show_reply_tree_button,
            :hide_statuses_count, :hide_following_count, :hide_followers_count, :disable_joke_appearance,
            :new_features_policy,

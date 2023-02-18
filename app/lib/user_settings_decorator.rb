@@ -70,6 +70,7 @@ class UserSettingsDecorator
     enable_local_timeline
     enable_reaction
     compact_reaction
+    disable_reaction_streaming
     show_reply_tree_button
     hide_statuses_count
     hide_following_count

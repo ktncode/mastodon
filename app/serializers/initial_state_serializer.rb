@@ -60,6 +60,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:enable_local_timeline]             = false #object.current_account.user.setting_enable_local_timeline
       store[:enable_reaction]                   = object.current_account.user.setting_enable_reaction
       store[:compact_reaction]                  = object.current_account.user.setting_compact_reaction
+      store[:disable_reaction_streaming]        = object.current_account.user.setting_disable_reaction_streaming
       store[:show_reply_tree_button]            = object.current_account.user.setting_show_reply_tree_button
       store[:disable_joke_appearance]           = object.current_account.user.setting_disable_joke_appearance
       store[:new_features_policy]               = object.current_account.user.setting_new_features_policy

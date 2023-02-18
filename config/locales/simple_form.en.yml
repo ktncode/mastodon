@@ -77,6 +77,7 @@ en:
         setting_disable_follow: Restricts you from accidentally following
         setting_disable_joke_appearance: Disable April Fools' Day and other joke functions
         setting_disable_post: Restricts you from accidentally posting
+        setting_disable_reaction_streaming: Disable streaming events for real-time reflection of emoji reactions
         setting_disable_reactions: Restrict reactions for favorites, boosts ,emoji reactions and polls
         setting_disable_relative_time: 
         setting_disable_unfollow: Restricts you from accidentally unfollowing
@@ -270,6 +271,7 @@ en:
         setting_disable_follow: Disable follow
         setting_disable_joke_appearance: Disable joke feature to change appearance
         setting_disable_post: Disable post
+        setting_disable_reaction_streaming: Disable reaction streaming
         setting_disable_reactions: Disable reactions
         setting_disable_relative_time: Disable relative time on posts
         setting_disable_swiping: Disable swiping motions

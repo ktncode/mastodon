@@ -60,6 +60,7 @@ defaults: &defaults
   enable_local_timeline: true
   enable_reaction: true
   compact_reaction: false
+  disable_reaction_streaming: true
   show_reply_tree_button: true
   hide_statuses_count: false
   hide_following_count: false

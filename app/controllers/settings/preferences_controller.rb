@@ -76,6 +76,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_enable_local_timeline,
       :setting_enable_reaction,
       :setting_compact_reaction,
+      :setting_disable_reaction_streaming,
       :setting_show_reply_tree_button,
       :setting_hide_statuses_count,
       :setting_hide_following_count,
