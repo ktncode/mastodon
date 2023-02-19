@@ -515,6 +515,23 @@ module Mastodon
       end
     end
 
+    desc 'retry_follow_request ACCT', 'Retry follow request'
+    long_desc <<-LONG_DESC
+      Retry follow request.
+    LONG_DESC
+    def retry_follow_request(acct = nil)
+      username, domain = acct.split('@')
+      target_account = Account.find_remote(username, domain)
+
+      if target_account.nil?
+        say('No account(s) given', :red)
+        exit(1)
+      end
+
+      RetryFollowRequestWorker.perform_async(target_account.id)
+      say('OK', :green)
+    end
+
     private
 
     def rotate_keys_for_account(account, delay = 0)
