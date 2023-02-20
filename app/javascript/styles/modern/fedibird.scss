@@ -1,0 +1,88 @@
+/* ==UserStyle==
+@name         Adjust-fedibird-modern-theme
+@version      20230222.1
+@namespace    userstyles.world/user/laughk
+@description  adujust "Modern" theme on fedibird.com. 
+fedibird.com のモダンテーマ（ダーク・ライト共通）のデザインを調整します
+@author       laughk
+@license      MIT License
+==/UserStyle== */
+
+/* アクションボタンの修正 */
+#mastodon .status__action-bar .icon-button::after,
+.public-layout .status__action-bar .icon-button::after,
+#mastodon .detailed-status__action-bar .icon-button::after,
+.public-layout .detailed-status__action-bar .icon-button::after {
+  display: none;
+}
+/* 引用に含まれる画像・動画の位置 */
+div.quote-status > div.video-player.inline,
+div.quote-status > div.media-gallery {
+  left: 15%;
+  width: 90% !important;
+  padding: 1rem;
+}
+/*  statuses 表示の際の引用部分を調整  */
+.quote-status > a:nth-child(1) > div:nth-child(1) {
+  padding-top: 2.5px;
+  padding-left: 2.5px;
+}
+.quote-status > a:nth-child(1) > span:nth-child(2) > bdi:nth-child(1) {
+  padding-left: 0.25rem;
+}
+  
+/* 引用に含まれる画像・動画の位置 */
+div.quote-status > div.video-player.inline,
+div.quote-status > div.media-gallery {
+  left: 15%;
+  width: 90% !important;
+}
+
+/* 引用の表示調整 */
+  
+/* 引用アカウントのアイコンの位置の修正  */
+div.status__info:nth-child(1) > a:nth-child(1) > div:nth-child(1),
+div.quote-status > div.status__info > a.status__display-name > div.status__avatar {
+    top: revert !important;
+}
+div.status__info:nth-child(1) > a:nth-child(1) > span:nth-child(2),
+div.quote-status > div.status__info > a.status__display-name > .display-name{
+    padding-left: 35px !important; /* 本当は div.status__avatar に left revert; を指定できたほうがいいが、元の css で `15 px !important;` されてしまっているのでこちらの元の padding に +15px する */
+}
+  
+/* 引用に含まれるテキストエリアの調整 */
+div.status__content:nth-child(2),
+div.quote-status > div.status__content.status__content--with-action {
+      padding: 0.725rem;
+}
+
+/* 公開ページの引用投稿の表示調整 */
+
+/* 枠の中に引用内容が収まるようにする */
+div.status.quote-status {
+  padding-left: 0.75rem !important;
+  padding-top: 0.75rem !important;
+  width: 95% !important;
+  box-shadow: 1px 1px 1px 1px; /* 本当は border でやりたいが、 `0px !important` されているので box-shadow でそれっぽくくくる */
+}
+
+/* 引用した投稿者の名前・アイコンの位置を調整 */
+div.status.quote-status > a.status__display-name {
+    display: flex !important;
+}
+div.status.quote-status > a.status__display-name.u-url > div.status__avatar {
+    position: unset;
+    width: 1.5rem !important;
+    padding-top: 0.25rem !important;
+    padding-left: 0.25rem !important;
+}
+div.status.quote-status > a.status__display-name.u-url > span.display-name {
+    padding-left: unset;
+}
+
+/* 引用投稿内の画像・動画の大きさと位置 */
+div.quote-status > div > div.video-player.inline,
+div.quote-status > div > div.media-gallery {
+  left: 15% !important;
+  width: 90% !important;
+}
