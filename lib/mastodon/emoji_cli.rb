@@ -7,6 +7,8 @@ require_relative 'cli_helper'
 
 module Mastodon
   class EmojiCLI < Thor
+    include CLIHelper
+
     def self.exit_on_failure?
       true
     end
@@ -130,6 +132,38 @@ module Mastodon
       scope = options[:remote_only] ? CustomEmoji.remote : CustomEmoji
       scope.in_batches.destroy_all
       say('OK', :green)
+    end
+
+    option :local_only, type: :boolean
+    option :remote_only, type: :boolean
+    option :all, type: :boolean
+    option :concurrency, type: :numeric, default: 5, aliases: [:c]
+    option :verbose, type: :boolean, aliases: [:v]
+    desc 'fix-dimension', 'Fix dimension all custom emoji'
+    long_desc <<-LONG_DESC
+      Fix dimension all custom emoji.
+
+      With the --local-only option, only local emoji will be fixed.
+      With the --remote-only option, only remote emoji will be fixed.
+      With the --all option, fix dimension of all emojis.
+    LONG_DESC
+    def fix_dimension
+      scope = CustomEmoji
+      scope = scope.local if options[:local_only]
+      scope = scope.remote if options[:remote_only]
+      scope = scope.where(width: nil) unless options[:all]
+
+      processed, fixed = parallelize_with_progress(scope) do |emoji|
+        width, height = FastImage.size(emoji.image.url)
+        next if width.nil?
+
+        emoji.update!(width: width, height: height)
+        1
+      rescue
+        next
+      end
+
+      say("Checked #{processed} emojis, fixed #{fixed}", :green, true)
     end
 
     private

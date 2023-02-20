@@ -148,6 +148,8 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       :searchability,
       :status_compact_mode,
       :account_conversations,
+      :enable_wide_emoji,
+      :enable_wide_emoji_reaction,
     ]
 
     capabilities << :profile_search unless Chewy.enabled?

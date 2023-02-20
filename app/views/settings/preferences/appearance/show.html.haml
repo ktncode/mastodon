@@ -34,6 +34,12 @@
     = f.input :setting_picker_emoji_size, as: :range, input_html: { min: 22, max: 48, list: 'picker_emoji_size_label' }, wrapper: :with_label, false: true, fedibird_features: true
 
   .fields-group
+    = f.input :setting_enable_wide_emoji, as: :boolean, wrapper: :with_label, hint: true, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_enable_wide_emoji_reaction, as: :boolean, wrapper: :with_label, hint: true, fedibird_features: true
+
+  .fields-group
     = f.input :setting_theme_public, as: :boolean, wrapper: :with_label, hint: true, fedibird_features: true
 
   %h4= t 'appearance.advanced_web_interface'

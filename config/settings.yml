@@ -73,6 +73,8 @@ defaults: &defaults
   content_emoji_reaction_size: 16
   emoji_scale: 1,
   picker_emoji_size: 22,
+  enable_wide_emoji: true
+  enable_wide_emoji_reaction: true
   notification_emails:
     follow: false
     reblog: false

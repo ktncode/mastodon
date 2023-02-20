@@ -87,6 +87,8 @@ ja:
         setting_enable_personal_timeline: 自分限定を表示する自分限定ホームを有効にします
         setting_enable_reaction: タイムラインでリアクションの表示を有効にし、リアクションボタンを表示する
         setting_enable_status_reference: 投稿が別の投稿を参照する機能を有効にします
+        setting_enable_wide_emoji: Misskey由来の横幅の広い絵文字を元の比率で表示します（本文）
+        setting_enable_wide_emoji_reaction: Misskey由来の横幅の広い絵文字を元の比率で表示します（リアクション）
         setting_follow_button_to_list_adder: フォロー・購読ボタンの動作を変更し、フォロー・購読するリストを選択したり、ホームで受け取らないよう設定するダイアログを開きます
         setting_hexagon_avatar: 全員のアバターアイコンを6角形にくりぬいて表示します（ジョーク機能）
         setting_hide_bot_on_public_timeline: 連合・ハッシュタグ・ドメイン・グループタイムライン上にBotアカウントが表示されないようにします（※カラム設定を優先）
@@ -284,6 +286,8 @@ ja:
         setting_enable_personal_timeline: 自分限定ホームを有効にする
         setting_enable_reaction: リアクションを有効にする
         setting_enable_status_reference: 参照を有効にする
+        setting_enable_wide_emoji: ワイド絵文字を有効にする（本文）
+        setting_enable_wide_emoji_reaction: ワイド絵文字を有効にする（リアクション）
         setting_expand_spoilers: 閲覧注意としてマークされた投稿を常に展開する
         setting_follow_button_to_list_adder: フォローボタンでリスト追加ダイアログを開く
         setting_hexagon_avatar: NFTアイコンを体験する

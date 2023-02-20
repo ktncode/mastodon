@@ -352,18 +352,20 @@ class Notification extends ImmutablePureComponent {
     const { intl, unread, emojiMap } = this.props;
 
     if (!notification.get('emoji_reaction')) {
-      return <Fragment></Fragment>
+      return <Fragment />;
     }
+
+    const wide = notification.getIn(['emoji_reaction', 'width'], 1) / notification.getIn(['emoji_reaction', 'height'], 1) >= 1.4;
 
     return (
       <HotKeys handlers={this.getHandlers()}>
         <div className={classNames('notification notification-reaction focusable', { unread })} tabIndex='0' aria-label={notificationForScreenReader(intl, intl.formatMessage(messages.emoji_reaction, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
           <div className='notification__message'>
-            <div className='notification__favourite-icon-wrapper'>
+            <div className={classNames('notification__reaction-icon-wrapper', { wide })}>
               <Emoji hovered={false} emoji={notification.getIn(['emoji_reaction', 'name'])} emojiMap={emojiMap} url={notification.getIn(['emoji_reaction', 'url'])} static_url={notification.getIn(['emoji_reaction', 'static_url'])} />
             </div>
 
-            <span title={notification.get('created_at')}>
+            <span title={notification.get('created_at')} className={classNames('notification__reaction-message-wrapper', { wide })}>
               <FormattedMessage id='notification.emoji_reaction' defaultMessage='{name} reactioned your post' values={{ name: link }} />
             </span>
           </div>

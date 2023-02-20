@@ -18,13 +18,15 @@
 #  visible_in_picker            :boolean          default(TRUE), not null
 #  category_id                  :bigint(8)
 #  image_storage_schema_version :integer
+#  width                        :integer
+#  height                       :integer
 #
 
 class CustomEmoji < ApplicationRecord
   include Attachmentable
 
-  LOCAL_LIMIT = (ENV['MAX_EMOJI_SIZE'] || 50.kilobytes).to_i
-  LIMIT       = [LOCAL_LIMIT, (ENV['MAX_REMOTE_EMOJI_SIZE'] || 200.kilobytes).to_i].max
+  LOCAL_LIMIT = (ENV['MAX_EMOJI_SIZE'] || 256.kilobytes).to_i
+  LIMIT       = [LOCAL_LIMIT, (ENV['MAX_REMOTE_EMOJI_SIZE'] || 256.kilobytes).to_i].max
 
   SHORTCODE_RE_FRAGMENT = '[a-zA-Z0-9_]{2,}'
 
@@ -37,7 +39,7 @@ class CustomEmoji < ApplicationRecord
   belongs_to :category, class_name: 'CustomEmojiCategory', optional: true
   has_one :local_counterpart, -> { where(domain: nil) }, class_name: 'CustomEmoji', primary_key: :shortcode, foreign_key: :shortcode
 
-  has_attached_file :image, styles: { static: { format: 'png', convert_options: '-coalesce +profile exif' } }, validate_media_type: false
+  has_attached_file :image, styles: { static: { format: 'png', convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser } }, processors: [:dimension_extractor], validate_media_type: false
 
   before_validation :downcase_domain
 

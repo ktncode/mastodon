@@ -98,6 +98,8 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_content_emoji_reaction_size,
       :setting_emoji_scale,
       :setting_picker_emoji_size,
+      :setting_enable_wide_emoji,
+      :setting_enable_wide_emoji_reaction,
       :setting_hide_bot_on_public_timeline,
       :setting_confirm_follow_from_bot,
       :setting_default_search_searchability,

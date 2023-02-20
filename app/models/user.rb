@@ -140,6 +140,7 @@ class User < ApplicationRecord
            :post_reference_modal, :add_reference_modal, :unselect_reference_modal, :delete_scheduled_status_modal,
            :hexagon_avatar, :enable_empty_column,
            :content_font_size, :info_font_size, :content_emoji_reaction_size, :emoji_scale, :picker_emoji_size,
+           :enable_wide_emoji, :enable_wide_emoji_reaction,
            :hide_bot_on_public_timeline, :confirm_follow_from_bot,
            :default_search_searchability, :default_expires_in, :default_expires_action,
            :show_reload_button, :default_column_width,

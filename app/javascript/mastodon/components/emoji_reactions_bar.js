@@ -123,7 +123,7 @@ class EmojiReaction extends ImmutablePureComponent {
       <Fragment>
         <div className='reactions-bar__item-wrapper' ref={this.setTargetRef}>
           <button className={classNames('reactions-bar__item', { active: myReaction })} disabled={disableReactions || status.get('emoji_reactioned') && !myReaction} onClick={this.handleClick} title={`:${shortCode}:`} style={this.props.style}>
-            <span className='reactions-bar__item__emoji'><Emoji hovered={this.state.hovered} emoji={emojiReaction.get('name')} emojiMap={this.props.emojiMap} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} /></span>
+            <span className='reactions-bar__item__emoji'><Emoji className='reaction' hovered={this.state.hovered} emoji={emojiReaction.get('name')} emojiMap={this.props.emojiMap} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} /></span>
             <span className='reactions-bar__item__count'><AnimatedNumber value={emojiReaction.get('count')} /></span>
           </button>
         </div>

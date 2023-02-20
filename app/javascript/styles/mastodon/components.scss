@@ -1946,13 +1946,19 @@ a.account__display-name {
   }
 }
 
-.notification__favourite-icon-wrapper {
+.notification__favourite-icon-wrapper,
+.notification__reaction-icon-wrapper {
   left: -26px;
   position: absolute;
 
   .star-icon {
     color: $gold-star;
   }
+}
+
+.notification__reaction-message-wrapper.wide {
+  display: block;
+  margin-top: 22px;
 }
 
 .icon-button.star-icon.active {

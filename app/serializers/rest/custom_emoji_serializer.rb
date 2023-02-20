@@ -6,6 +6,8 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
   attributes :shortcode, :url, :static_url, :visible_in_picker
 
   attribute :category, if: :category_loaded?
+  attribute :width, if: :width?
+  attribute :height, if: :height?
 
   def url
     full_asset_url(object.image.url)
@@ -21,5 +23,21 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
 
   def category_loaded?
     object.association(:category).loaded? && object.category.present?
+  end
+
+  def width
+    object.width
+  end
+
+  def height
+    object.height
+  end
+
+  def width?
+    !object.width.nil?
+  end
+
+  def height?
+    !object.height.nil?
   end
 end

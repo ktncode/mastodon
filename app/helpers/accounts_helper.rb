@@ -123,12 +123,35 @@ module AccountsHelper
 
     return if user.nil?
 
-    ":root {
+    css = []
+
+    css << <<-EOS
+    :root {
       --content-font-size: #{h(user.setting_content_font_size)}px;
       --info-font-size: #{h(user.setting_info_font_size)}px;
       --content-emoji-reaction-size: #{h(user.setting_content_emoji_reaction_size)}px;
       --emoji-scale: #{h(user.setting_emoji_scale)};
-    }"
+    }
+    EOS
+
+    css << <<-EOS if user.setting_enable_wide_emoji
+    img.emojione.custom-emoji:not(.reaction) {
+      width: unset !important;
+      max-width: min(100%, 10em);
+    }
+    EOS
+
+    css << <<-EOS if user.setting_enable_wide_emoji_reaction
+    span.reactions-bar__item__emoji {
+      width: unset !important;
+    }
+    span.reactions-bar__item__emoji img.emojione.custom-emoji {
+      width: unset !important;
+      max-width: 8em;
+    }
+    EOS
+
+    css.join("\n")
   end
 
   def svg_logo

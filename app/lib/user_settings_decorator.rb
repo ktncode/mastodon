@@ -100,6 +100,8 @@ class UserSettingsDecorator
     hide_link_preview
     hide_photo_preview
     hide_video_preview
+    enable_wide_emoji
+    enable_wide_emoji_reaction
   ).freeze
 
   STRING_KEYS = %w(

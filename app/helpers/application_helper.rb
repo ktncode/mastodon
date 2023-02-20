@@ -139,7 +139,7 @@ module ApplicationHelper
     elsif animate
       image_tag(reaction['url'], class: 'emojione', alt: ":#{reaction['name']}:")
     else
-      image_tag(reaction['static_url'], class: 'emojione custom-emoji', alt: ":#{reaction['name']}", 'data-original' => full_asset_url(reaction['url']), 'data-static' => full_asset_url(reaction['static_url']))
+      image_tag(reaction['static_url'], class: 'emojione custom-emoji reaction', alt: ":#{reaction['name']}", 'data-original' => full_asset_url(reaction['url']), 'data-static' => full_asset_url(reaction['static_url']))
     end
   end
 
