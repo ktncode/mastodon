@@ -16,6 +16,18 @@ GIT
     blurhash (0.1.5)
       ffi (~> 1.14)
 
+GIT
+  remote: https://github.com/kreeti/kt-paperclip.git
+  revision: 11abf222dc31bff71160a1d138b445214f434b2b
+  ref: 11abf222dc31bff71160a1d138b445214f434b2b
+  specs:
+    kt-paperclip (7.1.1)
+      activemodel (>= 4.2.0)
+      activesupport (>= 4.2.0)
+      marcel (~> 1.0.1)
+      mime-types
+      terrapin (~> 0.6.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -312,7 +324,7 @@ GEM
     httplog (1.5.0)
       rack (>= 1.0)
       rainbow (>= 2.0.0)
-    i18n (1.8.10)
+    i18n (1.9.1)
       concurrent-ruby (~> 1.0)
     i18n-tasks (0.9.34)
       activesupport (>= 4.0.2)
@@ -375,7 +387,7 @@ GEM
       mini_mime (>= 0.1.1)
     makara (0.5.1)
       activerecord (>= 5.2.0)
-    marcel (1.0.1)
+    marcel (1.0.2)
     mario-redis-lock (1.2.1)
       redis (>= 3.0.5)
     memory_profiler (1.0.0)
@@ -385,10 +397,7 @@ GEM
       nokogiri (~> 1.10)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2020.0512)
-    mimemagic (0.3.10)
-      nokogiri (~> 1)
-      rake
+    mime-types-data (3.2022.0105)
     mini_mime (1.1.0)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
@@ -426,12 +435,6 @@ GEM
     openssl-signature_algorithm (0.4.0)
     orm_adapter (0.5.0)
     ox (2.14.5)
-    paperclip (6.0.0)
-      activemodel (>= 4.2.0)
-      activesupport (>= 4.2.0)
-      mime-types
-      mimemagic (~> 0.3.0)
-      terrapin (~> 0.6.0)
     parallel (1.20.1)
     parallel_tests (3.7.0)
       parallel
@@ -697,7 +700,7 @@ GEM
     xorcist (1.1.2)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.4.2)
+    zeitwerk (2.5.4)
 
 PLATFORMS
   ruby
@@ -755,6 +758,7 @@ DEPENDENCIES
   json-ld
   json-ld-preloaded (~> 3.1)
   kaminari (~> 1.2)
+  kt-paperclip (~> 7.1)!
   letter_opener (~> 1.7)
   letter_opener_web (~> 1.4)
   link_header (~> 0.0)
@@ -773,7 +777,6 @@ DEPENDENCIES
   omniauth-rails_csrf_protection (~> 0.1)
   omniauth-saml (~> 1.10)
   ox (~> 2.14)
-  paperclip (~> 6.0)
   parallel (~> 1.20)
   parallel_tests (~> 3.7)
   parser (~> 3.0.2.0)
