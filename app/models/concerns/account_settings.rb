@@ -26,7 +26,49 @@ module AccountSettings
   end
 
   def birthday=(val)
-    settings['birthday'] = ActiveRecord::Type::Date.new.cast(val)
+    set_birthday(val)
+  end
+
+  def birth_year
+    settings['birth_year'] || birthday && ActiveRecord::Type::Date.new.cast(birthday).year
+  end
+
+  def birth_year=(val)
+    settings['birth_year'] = Integer(val).then { |val| (0..9999).cover?(val) ? val : nil } rescue nil
+    normalize_birthday
+  end
+
+  def birth_month
+    settings['birth_month'] || birthday && ActiveRecord::Type::Date.new.cast(birthday).month
+  end
+
+  def birth_month=(val)
+    settings['birth_month'] = Integer(val).then { |val| (1..12).cover?(val) ? val : nil } rescue nil
+    normalize_birthday
+  end
+
+  def birth_day
+    settings['birth_day'] || birthday && ActiveRecord::Type::Date.new.cast(birthday).day
+  end
+
+  def birth_day=(val)
+    settings['birth_day'] = Integer(val).then { |val| (1..31).cover?(val) ? val : nil } rescue nil
+    normalize_birthday
+  end
+
+  def normalize_birthday
+    date = Date.new(settings['birth_year'], settings['birth_month'], settings['birth_day']) rescue nil
+    set_birthday(date)
+  end
+
+  def set_birthday(val)
+    date = ActiveRecord::Type::Date.new.cast(val)
+
+    if date.class.name === 'Date'
+      settings['birthday'] = date
+    else
+      settings.delete('birthday')
+    end
   end
 
   def location

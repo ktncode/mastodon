@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
@@ -11,6 +11,18 @@ import classNames from 'classnames';
 
 const messages = defineMessages({
   linkVerifiedOn: { id: 'account.link_verified_on', defaultMessage: 'Ownership of this link was checked on {date}' },
+  birth_month_1: { id: 'account.birthday.month.1', defaultMessage: 'January' },
+  birth_month_2: { id: 'account.birthday.month.2', defaultMessage: 'February' },
+  birth_month_3: { id: 'account.birthday.month.3', defaultMessage: 'March' },
+  birth_month_4: { id: 'account.birthday.month.4', defaultMessage: 'April' },
+  birth_month_5: { id: 'account.birthday.month.5', defaultMessage: 'May' },
+  birth_month_6: { id: 'account.birthday.month.6', defaultMessage: 'June' },
+  birth_month_7: { id: 'account.birthday.month.7', defaultMessage: 'July' },
+  birth_month_8: { id: 'account.birthday.month.8', defaultMessage: 'August' },
+  birth_month_9: { id: 'account.birthday.month.9', defaultMessage: 'September' },
+  birth_month_10: { id: 'account.birthday.month.10', defaultMessage: 'October' },
+  birth_month_11: { id: 'account.birthday.month.11', defaultMessage: 'November' },
+  birth_month_12: { id: 'account.birthday.month.12', defaultMessage: 'December' },
 });
 
 const dateFormatOptions = {
@@ -52,8 +64,37 @@ class HeaderExtra extends ImmutablePureComponent {
     const fields  = account.get('fields');
 
     const location = account.getIn(['other_settings', 'location']);
-    const birthday = account.getIn(['other_settings', 'birthday']);
     const joined = account.get('created_at');
+
+    const birthday = (() => {
+      const birth_year  = account.getIn(['other_settings', 'birth_year'], null);
+      const birth_month = account.getIn(['other_settings', 'birth_month'], null);
+      const birth_day   = account.getIn(['other_settings', 'birth_day'], null);
+
+      const birth_month_name = birth_month >= 1 && birth_month <= 12 ? intl.formatMessage(messages[`birth_month_${birth_month}`]) : null;
+
+      if (birth_year && birth_month && birth_day) {
+        const date = new Date(birth_year, birth_month - 1, birth_day);
+        return <Fragment><FormattedDate value={date} hour12={false} year='numeric' month='short' day='2-digit' />(<FormattedMessage id='account.age' defaultMessage='{age} years old}' values={{ age: age(date) }} />)</Fragment>;
+      } else if (birth_month && birth_day) {
+        return <FormattedMessage id='account.birthday.month_day' defaultMessage='{month_name} {day}' values={{ month: birth_month, day: birth_day, month_name: birth_month_name }} />;
+      } else if (birth_year && birth_month) {
+        return <FormattedMessage id='account.birthday.year_month' defaultMessage='{month_name}, {year}' values={{ year: birth_year, month: birth_month, month_name: birth_month_name }} />;
+      } else if (birth_year) {
+        return <FormattedMessage id='account.birthday.year' defaultMessage='{year}' values={{ year: birth_year }} />;
+      } else if (birth_month) {
+        return <FormattedMessage id='account.birthday.month' defaultMessage='{month_name}' values={{ month: birth_month, day: birth_day, month_name: birth_month_name }} />;
+      } else if (birth_day) {
+        return null;
+      } else {
+        const date = account.getIn(['other_settings', 'birthday'], null);
+        if (date) {
+          return <Fragment><FormattedDate value={date} hour12={false} year='numeric' month='short' day='2-digit' />(<FormattedMessage id='account.age' defaultMessage='{age} years old}' values={{ age: age(date) }} />)</Fragment>;
+        } else {
+          return null;
+        }
+      }
+    })();
 
     return (
       <div className={classNames('account__header', 'advanced', { inactive: !!account.get('moved') })}>
@@ -98,7 +139,7 @@ class HeaderExtra extends ImmutablePureComponent {
                   </tr>}
                   {birthday && <tr>
                     <th><Icon id='birthday-cake' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.birthday' defaultMessage='Birthday' /></th>
-                    <td><FormattedDate value={birthday} hour12={false} year='numeric' month='short' day='2-digit' />(<FormattedMessage id='account.age' defaultMessage='{age} years old}' values={{ age: age(birthday) }} />)</td>
+                    <td>{birthday}</td>
                   </tr>}
                   <tr>
                     <th><Icon id='calendar' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.joined' defaultMessage='Joined' /></th>

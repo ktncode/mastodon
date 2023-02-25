@@ -293,12 +293,24 @@ code {
       flex: 1 1 auto;
       min-height: 1px;
 
+      &-2 {
+        max-width: 16.7%;
+      }
+
+      &-4 {
+        max-width: 33.3%;
+      }
+
       &-6 {
         max-width: 50%;
       }
 
       &-8 {
         max-width: 66.67%;
+      }
+
+      &-12 {
+        max-width: 100%;
       }
 
       .actions {

@@ -260,6 +260,9 @@ class ActivityPub::ProcessAccountService < BaseService
 
   DEFER_SETTINGS_KEYS = %w(
     birthday
+    birth_year
+    birth_month
+    birth_day
     location
     cat_ears_color
     noindex

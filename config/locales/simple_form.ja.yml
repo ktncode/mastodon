@@ -33,8 +33,11 @@ ja:
       defaults:
         autofollow: 招待から登録した人が自動的にあなたをフォローするようになります
         avatar: "%{size}までのPNG、GIF、JPGが利用可能です。%{dimensions}pxまで縮小されます"
-        birthday: 誕生日を年月日の順にyyyy-mm-dd（ex. 2016-03-16）という書式で指定します
-        birthday_caution: インターネットに公開されます。個人情報は慎重に取り扱ってください
+        birthday_caution: インターネットに公開されます。個人情報は慎重に取り扱ってください。
+        birth_day: 1〜31
+        birth_month: 1〜12
+        birth_year: 0〜9999
+        birth_description: 誕生日を指定します。完全な日付を入力した場合はMisskeyと互換性があります。
         bot: このアカウントは主に自動で動作し、人が見ていない可能性があります
         context: フィルターを適用する対象 (複数選択可)
         current_password: 現在のアカウントのパスワードを入力してください
@@ -48,7 +51,7 @@ ja:
         irreversible: フィルターが後で削除されても、除外された投稿は元に戻せなくなります
         locale: ユーザーインターフェース、メールやプッシュ通知の言語
         location: 主に居住・活動する地域・場所
-        location_caution: インターネットに公開されます。ビジネス用途を除き詳細な住所を記載しないでください
+        location_caution: インターネットに公開されます。ビジネス用途を除き詳細な住所を記載しないでください。
         locked: フォロワーを手動で承認する必要があります
         password: 少なくとも8文字は入力してください
         phrase: 投稿内容の大文字小文字や閲覧注意に関係なく一致
@@ -214,6 +217,9 @@ ja:
         autofollow: 招待から参加後、あなたをフォロー
         avatar: アイコン
         birthday: 誕生日
+        birth_day: 誕生日
+        birth_month: 誕生月
+        birth_year: 誕生年
         bot: これは BOT アカウントです
         chosen_languages: 表示する言語
         confirm_new_password: 新しいパスワード（確認用）

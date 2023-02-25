@@ -27,7 +27,7 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   attribute :moved_to, if: :moved?
   attribute :also_known_as, if: :also_known_as?
   attribute :suspended, if: :suspended?
-  attribute :bday, key: :'vcard:bday'
+  attribute :bday, key: :'vcard:bday', if: :bday?
   attribute :address, key: :'vcard:Address'
 
   has_many :virtual_other_settings, key: :other_setting
@@ -174,6 +174,10 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   end
 
   def bday
+    object.birthday
+  end
+
+  def bday?
     object.birthday
   end
 

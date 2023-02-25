@@ -60,8 +60,14 @@
     %p.warning-hint= t('simple_form.hints.defaults.searchability')
 
   .fields-row
-    .fields-row__column.fields-group.fields-row__column-8
-      = f.input :birthday, wrapper: :with_label, input_html: { placeholder: '2016-03-16', pattern: '\d{4}-\d{1,2}-\d{1,2}' }, hint: t('simple_form.hints.defaults.birthday'), fedibird_features: true
+    .fields-row__column.fields-group.fields-row__column-2
+      = f.input :birth_year, wrapper: :with_label, input_html: { pattern: '\d{1,4}' }, hint: t('simple_form.hints.defaults.birth_year'), fedibird_features: true
+    .fields-row__column.fields-group.fields-row__column-2
+      = f.input :birth_month, wrapper: :with_label, input_html: { pattern: '\d{1,2}' }, hint: t('simple_form.hints.defaults.birth_month'), fedibird_features: true
+    .fields-row__column.fields-group.fields-row__column-2
+      = f.input :birth_day, wrapper: :with_label, input_html: { pattern: '\d{1,2}' }, hint: t('simple_form.hints.defaults.birth_day'), fedibird_features: true
+    .fields-row__column.fields-group.fields-row__column-6
+      %p.hint= t('simple_form.hints.defaults.birth_description')
       %p.warning-hint= t('simple_form.hints.defaults.birthday_caution')
 
   .fields-row

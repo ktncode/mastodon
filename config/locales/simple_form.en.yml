@@ -33,8 +33,11 @@ en:
       defaults:
         autofollow: People who sign up through the invite will automatically follow you
         avatar: PNG, GIF or JPG. At most %{size}. Will be downscaled to %{dimensions}px
-        birthday: Specify the date of birth in the format yyyy-mm-dd（ex. 2016-03-16）
-        birthday_caution: It will be published on the Internet. Please handle your personal information with care
+        birthday_caution: It will be published on the Internet. Please handle your personal information with care.
+        birth_day: 1-31
+        birth_month: 1-12
+        birth_year: 0-9999
+        birth_description: Specify the date of birth. If you enter a full date, it is compatible with Misskey.
         bot: Signal to others that the account mainly performs automated actions and might not be monitored
         context: One or multiple contexts where the filter should apply
         current_password: For security purposes please enter the password of the current account
@@ -48,7 +51,7 @@ en:
         irreversible: Filtered posts will disappear irreversibly, even if filter is later removed
         locale: The language of the user interface, e-mails and push notifications
         location: Area of primary residence or activity
-        location_caution: It will be published on the Internet. Please do not include detailed addresses except for business use
+        location_caution: It will be published on the Internet. Please do not include detailed addresses except for business use.
         locked: Manually control who can follow you by approving follow requests
         password: Use at least 8 characters
         phrase: Will be matched regardless of casing in text or content warning of a post
@@ -218,6 +221,9 @@ en:
         autofollow: Invite to follow your account
         avatar: Avatar
         birthday: Birthday
+        birth_day: Birth day
+        birth_month: Birth month
+        birth_year: Birth year
         bot: This is a bot account
         chosen_languages: Filter languages
         confirm_new_password: Confirm new password
