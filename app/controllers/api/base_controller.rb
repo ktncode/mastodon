@@ -132,4 +132,17 @@ class Api::BaseController < ApplicationController
   def disallow_unauthenticated_api_access?
     authorized_fetch_mode?
   end
+
+  def application
+    doorkeeper_token&.application
+  end
+
+  def mastodon_for_ios?
+    application&.name == 'Mastodon for iOS'
+  end
+
+  def mastodon_for_android?
+    application&.name == 'Mastodon for Android'
+  end
+
 end

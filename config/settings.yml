@@ -75,6 +75,7 @@ defaults: &defaults
   picker_emoji_size: 22,
   enable_wide_emoji: true
   enable_wide_emoji_reaction: true
+  unlocked_for_official_app: false
   notification_emails:
     follow: false
     reblog: false

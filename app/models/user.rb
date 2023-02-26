@@ -148,6 +148,7 @@ class User < ApplicationRecord
            :prohibited_visibilities, :prohibited_words,
            :disable_relative_time, :hide_direct_from_timeline, :hide_personal_from_timeline, :hide_personal_from_account, :hide_privacy_meta,
            :hide_link_preview, :hide_photo_preview, :hide_video_preview,
+           :unlocked_for_official_app,
 
            to: :settings, prefix: :setting, allow_nil: false
 

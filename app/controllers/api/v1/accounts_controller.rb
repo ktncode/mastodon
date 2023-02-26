@@ -94,7 +94,9 @@ class Api::V1::AccountsController < Api::BaseController
   private
 
   def set_account
-    @account = Account.find(params[:id])
+    @account = Account.find(params[:id]).tap do |account|
+      account.locked = false if account == current_account && current_user.setting_unlocked_for_official_app && (mastodon_for_ios? || mastodon_for_android?)
+    end
   end
 
   def relationships(**options)

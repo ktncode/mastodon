@@ -135,6 +135,7 @@ en:
         setting_theme_instance_ticker_type-2: Type-2 (Favicon + BG White)
         setting_theme_instance_ticker_type-3: Type-3 (Favicon + BG Black)
         setting_theme_public: Your public pages will reflect the theme currently in use
+        setting_unlocked_for_official_app: Force the official Mastodon app to recognize the account follow approval-only as disabled, making the default visibility public
         setting_use_blurhash: Gradients are based on the colors of the hidden visuals but obfuscate any details
         setting_use_pending_items: Hide timeline updates behind a click instead of automatically scrolling the feed
         username: Your username will be unique on %{domain}
@@ -344,6 +345,7 @@ en:
         setting_theme_public: Reflecting the theme on the public page
         setting_trends: Show today's trends
         setting_unfollow_modal: Show confirmation dialog before unfollowing someone
+        setting_unlocked_for_official_app: Disable follow approval-only for against the official Mastodon App
         setting_unsubscribe_modal: Show confirmation dialog before unsubscribing someone
         setting_use_blurhash: Show colorful gradients for hidden media
         setting_use_pending_items: Slow mode

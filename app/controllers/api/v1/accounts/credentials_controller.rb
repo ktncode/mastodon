@@ -6,7 +6,10 @@ class Api::V1::Accounts::CredentialsController < Api::BaseController
   before_action :require_user!
 
   def show
-    @account = current_account
+    @account = current_account.tap do |account|
+      account.locked = false if account.user.setting_unlocked_for_official_app && (mastodon_for_ios? || mastodon_for_android?)
+    end
+
     render json: @account, serializer: REST::CredentialAccountSerializer
   end
 

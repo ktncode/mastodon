@@ -131,6 +131,7 @@ ja:
         setting_theme_instance_ticker_type-2: Type-2 (Favicon + 白背景)
         setting_theme_instance_ticker_type-3: Type-3 (Favicon + 黒背景)
         setting_theme_public: あなたの公開ページに現在使用中のテーマを反映します
+        setting_unlocked_for_official_app: Mastodon公式アプリに対し、アカウントのフォロー承認制を強制的に無効と認識させることで、デフォルトの可視性を公開にします。
         setting_use_blurhash: ぼかしはメディアの色を元に生成されますが、細部は見えにくくなっています
         setting_use_pending_items: 新着があってもタイムラインを自動的にスクロールしないようにします
         username: あなたのユーザー名は %{domain} の中で重複していない必要があります
@@ -340,6 +341,7 @@ ja:
         setting_theme_public: 公開ページにテーマを反映する
         setting_trends: 本日のトレンドタグを表示する
         setting_unfollow_modal: フォローを解除する前に確認ダイアログを表示する
+        setting_unlocked_for_official_app: Mastodon公式アプリに対し、フォロー承認制を無効にする
         setting_unsubscribe_modal: 購読を解除する前に確認ダイアログを表示する
         setting_use_blurhash: 非表示のメディアを色付きのぼかしで表示する
         setting_use_pending_items: 手動更新モード
