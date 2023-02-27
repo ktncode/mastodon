@@ -140,6 +140,24 @@ const initialState = ImmutableMap({
       body: '',
     }),
   }),
+
+  bookmarked_statuses: ImmutableMap({
+    regex: ImmutableMap({
+      body: '',
+    }),
+  }),
+
+  favourited_statuses: ImmutableMap({
+    regex: ImmutableMap({
+      body: '',
+    }),
+  }),
+
+  emoji_reactioned_statuses: ImmutableMap({
+    regex: ImmutableMap({
+      body: '',
+    }),
+  }),
 });
 
 const defaultColumns = fromJS([

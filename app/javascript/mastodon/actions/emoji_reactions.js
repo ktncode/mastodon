@@ -10,15 +10,18 @@ export const EMOJI_REACTIONED_STATUSES_EXPAND_REQUEST = 'EMOJI_REACTIONED_STATUS
 export const EMOJI_REACTIONED_STATUSES_EXPAND_SUCCESS = 'EMOJI_REACTIONED_STATUSES_EXPAND_SUCCESS';
 export const EMOJI_REACTIONED_STATUSES_EXPAND_FAIL    = 'EMOJI_REACTIONED_STATUSES_EXPAND_FAIL';
 
-export function fetchEmojiReactionedStatuses() {
+export function fetchEmojiReactionedStatuses({ onlyMedia, withoutMedia } = {}) {
   return (dispatch, getState) => {
     if (getState().getIn(['status_lists', 'emoji_reactions', 'isLoading'])) {
       return;
     }
 
+    const params = ['compact=true', onlyMedia ? 'only_media=true' : null, withoutMedia ? 'without_media=true' : null];
+    const param_string = params.filter(e => !!e).join('&');
+
     dispatch(fetchEmojiReactionedStatusesRequest());
 
-    api(getState).get('/api/v1/emoji_reactions?compact=true').then(response => {
+    api(getState).get(`/api/v1/emoji_reactions?${param_string}`).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
       if ('statuses' in response.data && 'accounts' in response.data) {
         const { statuses, referenced_statuses, accounts, relationships } = response.data;

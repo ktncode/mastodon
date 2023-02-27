@@ -20,10 +20,14 @@ const mapStateToProps = (state, { columnId }) => {
   const uuid = columnId;
   const columns = state.getIn(['settings', 'columns']);
   const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const onlyMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'onlyMedia']) : state.getIn(['settings', 'personal', 'other', 'onlyMedia']);
+  const withoutMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutMedia']) : state.getIn(['settings', 'personal', 'other', 'withoutMedia']);
   const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'personal', 'columnWidth']);
 
   return {
     hasUnread: state.getIn(['timelines', 'personal', 'unread']) > 0,
+    onlyMedia,
+    withoutMedia,
     columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
@@ -37,17 +41,24 @@ class PersonalTimeline extends React.PureComponent {
     intl: PropTypes.object.isRequired,
     hasUnread: PropTypes.bool,
     columnId: PropTypes.string,
+    onlyMedia: PropTypes.bool,
+    withoutMedia: PropTypes.bool,
     multiColumn: PropTypes.bool,
     columnWidth: PropTypes.string,
   };
 
+  static defaultProps = {
+    onlyMedia: false,
+    withoutMedia: false,
+  };
+
   handlePin = () => {
-    const { columnId, dispatch } = this.props;
+    const { columnId, dispatch, onlyMedia, withoutMedia } = this.props;
 
     if (columnId) {
       dispatch(removeColumn(columnId));
     } else {
-      dispatch(addColumn('PERSONAL', {}));
+      dispatch(addColumn('PERSONAL', { other: { onlyMedia, withoutMedia } }));
     }
   }
 
@@ -65,15 +76,23 @@ class PersonalTimeline extends React.PureComponent {
   }
 
   handleLoadMore = maxId => {
-    const { dispatch } = this.props;
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
 
-    dispatch(expandPersonalTimeline({ maxId }));
+    dispatch(expandPersonalTimeline({ maxId, onlyMedia, withoutMedia }));
   }
 
   componentDidMount () {
-    const { dispatch } = this.props;
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
 
-    dispatch(expandPersonalTimeline({}));
+    dispatch(expandPersonalTimeline({ onlyMedia, withoutMedia }));
+  }
+
+  componentDidUpdate (prevProps) {
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
+
+    if (prevProps.onlyMedia !== onlyMedia || prevProps.withoutMedia !== withoutMedia) {
+      dispatch(expandPersonalTimeline({ onlyMedia, withoutMedia }));
+    }
   }
 
   handleWidthChange = (value) => {
@@ -87,7 +106,7 @@ class PersonalTimeline extends React.PureComponent {
   }
 
   render () {
-    const { intl, hasUnread, columnId, multiColumn, columnWidth } = this.props;
+    const { intl, hasUnread, columnId, multiColumn, columnWidth, onlyMedia, withoutMedia } = this.props;
     const pinned = !!columnId;
 
     return (
@@ -103,15 +122,18 @@ class PersonalTimeline extends React.PureComponent {
           multiColumn={multiColumn}
           columnWidth={columnWidth}
           onWidthChange={this.handleWidthChange}
-        />
+        >
+          <ColumnSettingsContainer columnId={columnId} />
+        </ColumnHeader>
 
         <StatusListContainer
+          timelineId={`personal${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}`}
+          onLoadMore={this.handleLoadMore}
           trackScroll={!pinned}
           scrollKey={`personal_timeline-${columnId}`}
-          onLoadMore={this.handleLoadMore}
-          timelineId='personal'
           emptyMessage={<FormattedMessage id='empty_column.personal' defaultMessage='Personal posts unavailable' />}
           bindToDocument={!multiColumn}
+          showCard={!withoutMedia}
         />
       </Column>
     );

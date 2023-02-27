@@ -6,6 +6,7 @@ import { fetchEmojiReactionedStatuses, expandEmojiReactionedStatuses } from '../
 import Column from '../ui/components/column';
 import ColumnHeader from '../../components/column_header';
 import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
+import ColumnSettingsContainer from './containers/column_settings_container';
 import StatusList from '../../components/status_list';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
@@ -22,12 +23,16 @@ const mapStateToProps = (state, { columnId }) => {
   const uuid = columnId;
   const columns = state.getIn(['settings', 'columns']);
   const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const onlyMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'onlyMedia']) : state.getIn(['settings', 'emoji_reactioned_statuses', 'other', 'onlyMedia']);
+  const withoutMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutMedia']) : state.getIn(['settings', 'emoji_reactioned_statuses', 'other', 'withoutMedia']);
   const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'emoji_reactioned_statuses', 'columnWidth']);
 
   return {
     statusIds: state.getIn(['status_lists', 'emoji_reactions', 'items']),
     isLoading: state.getIn(['status_lists', 'emoji_reactions', 'isLoading'], true),
     hasMore: !!state.getIn(['status_lists', 'emoji_reactions', 'next']),
+    onlyMedia,
+    withoutMedia,
     columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
@@ -43,21 +48,38 @@ class EmojiReactions extends ImmutablePureComponent {
     columnId: PropTypes.string,
     multiColumn: PropTypes.bool,
     columnWidth: PropTypes.string,
+    onlyMedia: PropTypes.bool,
+    withoutMedia: PropTypes.bool,
     hasMore: PropTypes.bool,
     isLoading: PropTypes.bool,
   };
 
-  componentWillMount () {
-    this.props.dispatch(fetchEmojiReactionedStatuses());
+  static defaultProps = {
+    onlyMedia: false,
+    withoutMedia: false,
+  };
+
+  componentDidMount () {
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
+
+    dispatch(fetchEmojiReactionedStatuses({ onlyMedia, withoutMedia }));
+  }
+
+  componentDidUpdate (prevProps) {
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
+
+    if (prevProps.onlyMedia !== onlyMedia || prevProps.withoutMedia !== withoutMedia) {
+      dispatch(fetchEmojiReactionedStatuses({ onlyMedia, withoutMedia }));
+    }
   }
 
   handlePin = () => {
-    const { columnId, dispatch } = this.props;
+    const { columnId, dispatch, onlyMedia, withoutMedia } = this.props;
 
     if (columnId) {
       dispatch(removeColumn(columnId));
     } else {
-      dispatch(addColumn('EMOJI_REACTIONS', {}));
+      dispatch(addColumn('EMOJI_REACTIONS', { other: { onlyMedia, withoutMedia } }));
     }
   }
 
@@ -89,7 +111,7 @@ class EmojiReactions extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, statusIds, columnId, multiColumn, hasMore, isLoading, columnWidth } = this.props;
+    const { intl, statusIds, columnId, multiColumn, hasMore, isLoading, columnWidth, withoutMedia } = this.props;
     const pinned = !!columnId;
 
     const emptyMessage = <FormattedMessage id='empty_column.emoji_reactioned_statuses' defaultMessage="You don't have any reaction posts yet. When you reaction one, it will show up here." />;
@@ -107,7 +129,9 @@ class EmojiReactions extends ImmutablePureComponent {
           columnWidth={columnWidth}
           onWidthChange={this.handleWidthChange}
           showBackButton
-        />
+        >
+          <ColumnSettingsContainer columnId={columnId} />
+        </ColumnHeader>
 
         <StatusList
           trackScroll={!pinned}
@@ -118,6 +142,7 @@ class EmojiReactions extends ImmutablePureComponent {
           onLoadMore={this.handleLoadMore}
           emptyMessage={emptyMessage}
           bindToDocument={!multiColumn}
+          showCard={!withoutMedia}
         />
       </Column>
     );

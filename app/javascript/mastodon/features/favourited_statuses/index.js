@@ -6,6 +6,7 @@ import { fetchFavouritedStatuses, expandFavouritedStatuses } from '../../actions
 import Column from '../ui/components/column';
 import ColumnHeader from '../../components/column_header';
 import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
+import ColumnSettingsContainer from './containers/column_settings_container';
 import StatusList from '../../components/status_list';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
@@ -22,12 +23,16 @@ const mapStateToProps = (state, { columnId }) => {
   const uuid = columnId;
   const columns = state.getIn(['settings', 'columns']);
   const index = columns.findIndex(c => c.get('uuid') === uuid);
+  const onlyMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'onlyMedia']) : state.getIn(['settings', 'favourited_statuses', 'other', 'onlyMedia']);
+  const withoutMedia = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'other', 'withoutMedia']) : state.getIn(['settings', 'favourited_statuses', 'other', 'withoutMedia']);
   const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'favourited_statuses', 'columnWidth']);
 
   return {
     statusIds: state.getIn(['status_lists', 'favourites', 'items']),
     isLoading: state.getIn(['status_lists', 'favourites', 'isLoading'], true),
     hasMore: !!state.getIn(['status_lists', 'favourites', 'next']),
+    onlyMedia,
+    withoutMedia,
     columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
@@ -43,21 +48,38 @@ class Favourites extends ImmutablePureComponent {
     columnId: PropTypes.string,
     multiColumn: PropTypes.bool,
     columnWidth: PropTypes.string,
+    onlyMedia: PropTypes.bool,
+    withoutMedia: PropTypes.bool,
     hasMore: PropTypes.bool,
     isLoading: PropTypes.bool,
   };
 
-  componentWillMount () {
-    this.props.dispatch(fetchFavouritedStatuses());
+  static defaultProps = {
+    onlyMedia: false,
+    withoutMedia: false,
+  };
+
+  componentDidMount () {
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
+
+    dispatch(fetchFavouritedStatuses({ onlyMedia, withoutMedia }));
+  }
+
+  componentDidUpdate (prevProps) {
+    const { dispatch, onlyMedia, withoutMedia } = this.props;
+
+    if (prevProps.onlyMedia !== onlyMedia || prevProps.withoutMedia !== withoutMedia) {
+      dispatch(fetchFavouritedStatuses({ onlyMedia, withoutMedia }));
+    }
   }
 
   handlePin = () => {
-    const { columnId, dispatch } = this.props;
+    const { columnId, dispatch, onlyMedia, withoutMedia } = this.props;
 
     if (columnId) {
       dispatch(removeColumn(columnId));
     } else {
-      dispatch(addColumn('FAVOURITES', {}));
+      dispatch(addColumn('FAVOURITES', { other: { onlyMedia, withoutMedia } }));
     }
   }
 
@@ -89,7 +111,7 @@ class Favourites extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, statusIds, columnId, multiColumn, hasMore, isLoading, columnWidth } = this.props;
+    const { intl, statusIds, columnId, multiColumn, hasMore, isLoading, columnWidth, withoutMedia } = this.props;
     const pinned = !!columnId;
 
     const emptyMessage = <FormattedMessage id='empty_column.favourited_statuses' defaultMessage="You don't have any favourite posts yet. When you favourite one, it will show up here." />;
@@ -107,7 +129,9 @@ class Favourites extends ImmutablePureComponent {
           columnWidth={columnWidth}
           onWidthChange={this.handleWidthChange}
           showBackButton
-        />
+        >
+          <ColumnSettingsContainer columnId={columnId} />
+        </ColumnHeader>
 
         <StatusList
           trackScroll={!pinned}
@@ -118,6 +142,7 @@ class Favourites extends ImmutablePureComponent {
           onLoadMore={this.handleLoadMore}
           emptyMessage={emptyMessage}
           bindToDocument={!multiColumn}
+          showCard={!withoutMedia}
         />
       </Column>
     );

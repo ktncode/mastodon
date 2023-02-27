@@ -10,15 +10,18 @@ export const BOOKMARKED_STATUSES_EXPAND_REQUEST = 'BOOKMARKED_STATUSES_EXPAND_RE
 export const BOOKMARKED_STATUSES_EXPAND_SUCCESS = 'BOOKMARKED_STATUSES_EXPAND_SUCCESS';
 export const BOOKMARKED_STATUSES_EXPAND_FAIL    = 'BOOKMARKED_STATUSES_EXPAND_FAIL';
 
-export function fetchBookmarkedStatuses() {
+export function fetchBookmarkedStatuses({ onlyMedia, withoutMedia } = {}) {
   return (dispatch, getState) => {
     if (getState().getIn(['status_lists', 'bookmarks', 'isLoading'])) {
       return;
     }
 
+    const params = ['compact=true', onlyMedia ? 'only_media=true' : null, withoutMedia ? 'without_media=true' : null];
+    const param_string = params.filter(e => !!e).join('&');
+
     dispatch(fetchBookmarkedStatusesRequest());
 
-    api(getState).get('/api/v1/bookmarks?compact=true').then(response => {
+    api(getState).get(`/api/v1/bookmarks?${param_string}`).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
       if ('statuses' in response.data && 'accounts' in response.data) {
         const { statuses, referenced_statuses, accounts, relationships } = response.data;

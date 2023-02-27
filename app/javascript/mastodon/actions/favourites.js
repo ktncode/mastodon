@@ -10,15 +10,18 @@ export const FAVOURITED_STATUSES_EXPAND_REQUEST = 'FAVOURITED_STATUSES_EXPAND_RE
 export const FAVOURITED_STATUSES_EXPAND_SUCCESS = 'FAVOURITED_STATUSES_EXPAND_SUCCESS';
 export const FAVOURITED_STATUSES_EXPAND_FAIL    = 'FAVOURITED_STATUSES_EXPAND_FAIL';
 
-export function fetchFavouritedStatuses() {
+export function fetchFavouritedStatuses({ onlyMedia, withoutMedia } = {}) {
   return (dispatch, getState) => {
     if (getState().getIn(['status_lists', 'favourites', 'isLoading'])) {
       return;
     }
 
+    const params = ['compact=true', onlyMedia ? 'only_media=true' : null, withoutMedia ? 'without_media=true' : null];
+    const param_string = params.filter(e => !!e).join('&');
+
     dispatch(fetchFavouritedStatusesRequest());
 
-    api(getState).get('/api/v1/favourites?compact=true').then(response => {
+    api(getState).get(`/api/v1/favourites?${param_string}`).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
       if ('statuses' in response.data && 'accounts' in response.data) {
         const { statuses, referenced_statuses, accounts, relationships } = response.data;

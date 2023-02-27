@@ -150,6 +150,10 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       :account_conversations,
       :enable_wide_emoji,
       :enable_wide_emoji_reaction,
+      :timeline_bookmark_media_option,
+      :timeline_favourite_media_option,
+      :timeline_emoji_reaction_media_option,
+      :timeline_personal_media_option,
     ]
 
     capabilities << :profile_search unless Chewy.enabled?

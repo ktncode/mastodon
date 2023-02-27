@@ -37,7 +37,19 @@ class Api::V1::Timelines::PersonalController < Api::BaseController
   end
 
   def personal_feed
-    PersonalFeed.new(current_account)
+    PersonalFeed.new(
+      current_account,
+      only_media: media_only?,
+      without_media: without_media?,
+    )
+  end
+
+  def media_only?
+    truthy_param?(:only_media)
+  end
+
+  def without_media?
+    truthy_param?(:without_media)
   end
 
   def compact?
@@ -49,7 +61,7 @@ class Api::V1::Timelines::PersonalController < Api::BaseController
   end
 
   def pagination_params(core_params)
-    params.slice(:local, :limit).permit(:local, :limit).merge(core_params)
+    params_slice(:limit, :compact, :only_media, :without_media).merge(core_params)
   end
 
   def next_path

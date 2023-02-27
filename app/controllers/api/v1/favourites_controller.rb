@@ -28,18 +28,41 @@ class Api::V1::FavouritesController < Api::BaseController
   end
 
   def results
-    @_results ||= account_favourites.joins(:status).eager_load(:status).to_a_paginated_by_id(
+    @_results ||= filtered_account_favourites.to_a_paginated_by_id(
       limit_param(DEFAULT_STATUSES_LIMIT),
       params_slice(:max_id, :since_id, :min_id)
     )
+  end
+
+  def filtered_account_favourites
+    account_favourites.joins(:status).eager_load(:status).tap do |scope|
+      scope.merge!(media_only_scope)    if media_only?
+      scope.merge!(without_media_scope) if without_media?
+    end
   end
 
   def account_favourites
     current_account.favourites
   end
 
+  def media_only?
+    truthy_param?(:only_media)
+  end
+
+  def without_media?
+    truthy_param?(:without_media)
+  end
+
   def compact?
     truthy_param?(:compact)
+  end
+
+  def media_only_scope
+    Status.joins(:media_attachments)
+  end
+
+  def without_media_scope
+    Status.left_joins(:media_attachments).where(media_attachments: {status_id: nil})
   end
 
   def insert_pagination_headers
@@ -71,6 +94,6 @@ class Api::V1::FavouritesController < Api::BaseController
   end
 
   def pagination_params(core_params)
-    params.slice(:limit, :compact).permit(:limit, :compact).merge(core_params)
+    params_slice(:limit, :compact, :only_media, :without_media).merge(core_params)
   end
 end
