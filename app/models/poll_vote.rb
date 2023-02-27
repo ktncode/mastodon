@@ -22,6 +22,7 @@ class PollVote < ApplicationRecord
   after_create_commit :increment_counter_cache
 
   delegate :local?, to: :account
+  delegate :multiple?, :expired?, to: :poll, prefix: true
 
   def object_type
     :vote
