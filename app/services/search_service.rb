@@ -26,7 +26,7 @@ class SearchService < BaseService
           accounts_count = results[:accounts].count
 
           if accounts_count == 0
-            @offset -= count_accounts_search!
+            # @offset -= count_accounts_search!
             results[:accounts] = perform_accounts_full_text_search!
           elsif accounts_count < @limit
             @limit -= accounts_count
