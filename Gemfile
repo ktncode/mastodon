@@ -95,6 +95,7 @@ gem 'tzinfo-data', '~> 1.2021'
 gem 'webpacker', '~> 5.4'
 gem 'webpush', '~> 0.3'
 gem 'webauthn', '~> 3.0.0.alpha1'
+gem 'rubyzip'
 
 gem 'json-ld'
 gem 'json-ld-preloaded', '~> 3.1'

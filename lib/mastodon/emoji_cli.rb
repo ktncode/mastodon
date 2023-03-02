@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rubygems/package'
+require 'zip'
 require_relative '../../config/boot'
 require_relative '../../config/environment'
 require_relative 'cli_helper'
@@ -117,6 +118,46 @@ module Mastodon
             end
           end
         end
+      end
+      say("Exported #{exported}")
+    end
+
+    option :category
+    option :overwrite, type: :boolean
+    desc 'misskey-export PATH', 'Misskey export emoji to a ZIP archive at PATH'
+    long_desc <<-LONG_DESC
+      Exports custom emoji to 'export.zip' at PATH.
+
+      The --category option dumps only the specified category.
+      If this option is not specified, all emoji will be exported.
+
+      The --overwrite option will overwrite an existing archive.
+    LONG_DESC
+    def misskey_export(path)
+      exported         = 0
+      category         = CustomEmojiCategory.find_by(name: options[:category])
+      export_file_name = File.join(path, 'export.zip')
+
+      if File.file?(export_file_name) && !options[:overwrite]
+        say("Archive already exists! Use '--overwrite' to overwrite it!")
+        exit 1
+      end
+      if category.nil? && options[:category]
+        say("Unable to find category '#{options[:category]}'!")
+        exit 1
+      end
+
+      Zip::OutputStream.open(export_file_name) do |zos|
+        scope = !options[:category] || category.nil? ? CustomEmoji.local : category.emojis
+        scope.find_each do |emoji|
+          say("Adding '#{emoji.shortcode}'...")
+          zos.put_next_entry(emoji.shortcode + File.extname(emoji.image_file_name))
+          zos.write Paperclip.io_adapters.for(emoji.image).read
+          exported += 1
+        end
+        say("Adding 'meta.json'...")
+        zos.put_next_entry('meta.json')
+        zos.write Oj.dump(Misskey::MetaSerializer.new(scope))
       end
       say("Exported #{exported}")
     end
