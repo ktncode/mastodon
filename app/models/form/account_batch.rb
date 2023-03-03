@@ -31,9 +31,15 @@ class Form::AccountBatch
   private
 
   def follow!
-    accounts.find_each do |target_account|
+    error = nil
+
+    accounts.each do |target_account|
       FollowService.new.call(current_account, target_account)
+    rescue Mastodon::NotPermittedError, ActiveRecord::RecordNotFound => e
+      error ||= e
     end
+
+    raise error if error.present?
   end
 
   def unfollow!

@@ -1290,6 +1290,7 @@ en:
   relationships:
     activity: Account activity
     dormant: Dormant
+    follow_failure: Could not follow some of the selected accounts.
     follow_selected_followers: Follow selected followers
     followers: Followers
     following: Following
