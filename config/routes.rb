@@ -368,6 +368,8 @@ Rails.application.routes.draw do
 
           resources :emoji_reactions, only: :update, constraints: { id: /[^\/]+/ }
           post :emoji_unreaction, to: 'emoji_reactions#destroy'
+
+          resource :history, only: :show
         end
 
         member do
