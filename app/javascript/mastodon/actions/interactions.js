@@ -877,20 +877,20 @@ export function emojiReactionFail(status, name, domain, url, static_url, error) 
   };
 };
 
-const findMyEmojiReaction = (status) => {
-  return status.get('emoji_reactioned') && status.get('emoji_reactions').find(emoji_reaction => emoji_reaction.get('account_ids').includes(me));
+const findMyEmojiReaction = (status, name) => {
+  return status.get('emoji_reactions').find(emoji_reaction => emoji_reaction.get('account_ids').includes(me) && emoji_reaction.get('name') === name);
 };
 
-export function removeEmojiReaction(status) {
+export function removeEmojiReaction(status, name) {
   return function (dispatch, getState) {
-    const emoji_reaction = findMyEmojiReaction(status);
+    const emoji_reaction = findMyEmojiReaction(status, name);
 
     if (emoji_reaction) {
-      const {name, domain, url, static_url} = emoji_reaction.toObject();
+      const { name, domain, url, static_url } = emoji_reaction.toObject();
 
       dispatch(unEmojiReactionRequest(status, name, domain, url, static_url));
 
-      api(getState).post(`/api/v1/statuses/${status.get('id')}/emoji_unreaction`).then(function (response) {
+      api(getState).delete(`/api/v1/statuses/${status.get('id')}/emoji_reactions/${name}${domain ? `@${domain}` : ''}`).then(function (response) {
         dispatch(importFetchedStatus(response.data));
         dispatch(unEmojiReactionSuccess(status, name, domain, url, static_url));
       }).catch(function (error) {

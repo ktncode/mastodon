@@ -35,6 +35,9 @@ const messages = defineMessages({
   bookmark: { id: 'status.bookmark', defaultMessage: 'Bookmark' },
   removeBookmark: { id: 'status.remove_bookmark', defaultMessage: 'Remove bookmark' },
   emoji_reaction: { id: 'status.emoji_reaction', defaultMessage: 'Emoji reaction' },
+  emoji_reaction_disable: { id: 'status.emoji_reaction_disable', defaultMessage: 'Emoji reaction' },
+  emoji_reaction_expired: { id: 'status.emoji_reaction_expired', defaultMessage: 'Emoji reaction' },
+  emoji_reaction_limit_reatched: { id: 'status.emoji_reaction_limit_reatched', defaultMessage: 'Emoji reaction' },
   open: { id: 'status.open', defaultMessage: 'Expand this status' },
   show_reblogs: { id: 'status.show_reblogs', defaultMessage: 'Show boosted users' },
   show_favourites: { id: 'status.show_favourites', defaultMessage: 'Show favourited users' },
@@ -111,6 +114,8 @@ class StatusActionBar extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
     addEmojiReaction: PropTypes.func,
     removeEmojiReaction: PropTypes.func,
+    emojiReactioned: PropTypes.bool,
+    reactionLimitReached: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -327,7 +332,7 @@ class StatusActionBar extends ImmutablePureComponent {
   }
 
   render () {
-    const { status, relationship, intl, withDismiss, scrollKey, expired, referenced, contextReferenced, referenceCountLimit, contextType } = this.props;
+    const { status, relationship, intl, withDismiss, scrollKey, expired, referenced, contextReferenced, referenceCountLimit, contextType, emojiReactioned, reactionLimitReached } = this.props;
 
     const anonymousAccess    = !me;
     const publicStatus       = ['public', 'unlisted'].includes(status.get('visibility'));
@@ -339,7 +344,6 @@ class StatusActionBar extends ImmutablePureComponent {
     const reblogged          = status.get('reblogged');
     const favourited         = status.get('favourited');
     const bookmarked         = status.get('bookmarked');
-    const emoji_reactioned   = status.get('emoji_reactioned');
     const reblogsCount       = status.get('reblogs_count');
     const referredByCount    = status.get('status_referred_by_count');
     const favouritesCount    = status.get('favourites_count');
@@ -477,10 +481,22 @@ class StatusActionBar extends ImmutablePureComponent {
 
     const reactionsCounter = compactReaction && contextType !== 'thread' && status.get('emoji_reactions_count') > 0 ? status.get('emoji_reactions_count') : undefined;
 
+    const emojiReactionMessage = (() => {
+      if (disableReactions) {
+        return intl.formatMessage(messages.emoji_reaction_disable);
+      } else if (expired) {
+        return intl.formatMessage(messages.emoji_reaction_expired);
+      } else if (reactionLimitReached) {
+        return intl.formatMessage(messages.emoji_reaction_limit_reatched);
+      } else {
+        return intl.formatMessage(messages.emoji_reaction);
+      }
+    })();
+
     return (
       <div className='status__action-bar'>
         <IconButton className='status__action-bar-button' disabled={disablePost || expired} title={replyTitle} icon={status.get('in_reply_to_account_id') === status.getIn(['account', 'id']) ? 'reply' : replyIcon} onClick={this.handleReplyClick} counter={status.get('replies_count')} obfuscateCount />
-        {enableStatusReference && me && <IconButton className={classNames('status__action-bar-button link-icon', {referenced, 'context-referenced': contextReferenced})} animate disabled={disablePost || referenceDisabled} active={referenced} pressed={referenced} title={intl.formatMessage(messages.reference)} icon='link' onClick={this.handleReferenceClick} />}
+        {enableStatusReference && me && <IconButton className={classNames('status__action-bar-button link-icon', { referenced, 'context-referenced': contextReferenced })} animate disabled={disablePost || referenceDisabled} active={referenced} pressed={referenced} title={intl.formatMessage(messages.reference)} icon='link' onClick={this.handleReferenceClick} />}
         <IconButton className={classNames('status__action-bar-button', { reblogPrivate })} disabled={disableReactions || !publicStatus && !reblogPrivate || expired}  active={reblogged} pressed={reblogged} title={reblogTitle} icon='retweet' onClick={this.handleReblogClick} />
         <IconButton className='status__action-bar-button star-icon' animate disabled={disableReactions || !favourited && expired} active={favourited} pressed={favourited} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} />
         {show_quote_button && <IconButton className='status__action-bar-button' disabled={disablePost || anonymousAccess || !publicStatus || expired} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} />}
@@ -490,18 +506,18 @@ class StatusActionBar extends ImmutablePureComponent {
         {enableReaction && <div className={classNames('status__action-bar-dropdown', { 'icon-button--with-counter': reactionsCounter })}>
           <ReactionPickerDropdownContainer
             scrollKey={scrollKey}
-            disabled={disableReactions || expired || anonymousAccess}
-            active={emoji_reactioned}
-            pressed={emoji_reactioned}
+            disabled={disableReactions || expired || anonymousAccess || reactionLimitReached}
+            active={emojiReactioned}
             className='status__action-bar-button'
             status={status}
-            title={intl.formatMessage(messages.emoji_reaction)}
+            title={emojiReactionMessage}
             icon='smile-o'
             size={18}
             direction='right'
             counter={reactionsCounter}
             onPickEmoji={this.handleEmojiPick}
             onRemoveEmoji={this.handleEmojiRemove}
+            reactionLimitReached={reactionLimitReached}
           />
         </div>}
 

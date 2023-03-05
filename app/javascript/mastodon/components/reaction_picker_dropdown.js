@@ -286,7 +286,6 @@ export default class ReactionPickerDropdown extends React.PureComponent {
     openedViaKeyboard: PropTypes.bool,
     custom_emojis: ImmutablePropTypes.list,
     onPickEmoji: PropTypes.func.isRequired,
-    onRemoveEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     skinTone: PropTypes.number.isRequired,
@@ -305,9 +304,7 @@ export default class ReactionPickerDropdown extends React.PureComponent {
   };
 
   handleClick = ({ target, type }) => {
-    if (this.props.pressed) {
-      this.props.onRemoveEmoji();
-    } else if (this.state.id === this.props.openDropdownId) {
+    if (this.state.id === this.props.openDropdownId) {
       this.handleClose();
     } else {
       const { top } = target.getBoundingClientRect();

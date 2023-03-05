@@ -65,10 +65,6 @@ const getCustomEmojis = createSelector([
   }
 }));
 
-const getState = (dispatch) => new Promise((resolve) => {
-  dispatch((dispatch, getState) => {resolve(getState())})
-})
-
 const mapStateToProps = state => ({
   custom_emojis: getCustomEmojis(state),
   skinTone: state.getIn(['settings', 'skinTone']),
@@ -90,7 +86,7 @@ const mapDispatchToProps = (dispatch, { status, onPickEmoji, scrollKey }) => ({
       onPickEmoji(emoji);
     }
   },
-  
+
   onOpen(id, dropdownPlacement, keyboard) {
     dispatch((_, getState) => {
       let state = getState();

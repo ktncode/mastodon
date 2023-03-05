@@ -40,7 +40,6 @@ class ScheduledStatus extends ImmutablePureComponent {
     onMoveDown: PropTypes.func,
     onDeleteScheduledStatus: PropTypes.func,
     onRedraftScheduledStatus: PropTypes.func,
-    emojiMap: ImmutablePropTypes.map,
   };
 
   handleHotkeyMoveUp = () => {

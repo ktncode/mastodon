@@ -4,8 +4,6 @@ import { deleteScheduledStatus, redraftScheduledStatus } from 'mastodon/actions/
 import { openModal } from 'mastodon/actions/modal';
 import { defineMessages, injectIntl } from 'react-intl';
 import { deleteScheduledStatusModal } from 'mastodon/initial_state';
-import { createSelector } from 'reselect';
-import { Map as ImmutableMap } from 'immutable';
 
 const messages = defineMessages({
   deleteConfirm: { id: 'confirmations.delete.confirm', defaultMessage: 'Delete' },
@@ -13,16 +11,6 @@ const messages = defineMessages({
   redraftConfirm: { id: 'confirmations.redraft_scheduled_status.confirm', defaultMessage: 'View & redraft' },
   redraftMessage: { id: 'confirmations.redraft_scheduled_status.message', defaultMessage: 'Redraft now will overwrite the message you are currently composing. Are you sure you want to proceed?' },
 });
-
-const makeMapStateToProps = () => {
-  const customEmojiMap = createSelector([state => state.get('custom_emojis')], items => items.reduce((map, emoji) => map.set(emoji.get('shortcode'), emoji), ImmutableMap()));
-
-  const mapStateToProps = (state) => ({
-    emojiMap: customEmojiMap(state),
-  });
-
-  return mapStateToProps;
-};
 
 const mapDispatchToProps = (dispatch, { intl }) => ({
 
@@ -56,4 +44,4 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
 
 });
 
-export default injectIntl(connect(makeMapStateToProps, mapDispatchToProps)(ScheduledStatus));
+export default injectIntl(connect(null, mapDispatchToProps)(ScheduledStatus));

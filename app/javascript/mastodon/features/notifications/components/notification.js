@@ -56,7 +56,6 @@ class Notification extends ImmutablePureComponent {
     cacheMediaWidth: PropTypes.func,
     cachedMediaWidth: PropTypes.number,
     unread: PropTypes.bool,
-    emojiMap: ImmutablePropTypes.map,
   };
 
   handleMoveUp = () => {
@@ -349,7 +348,7 @@ class Notification extends ImmutablePureComponent {
   }
 
   renderReaction (notification, link) {
-    const { intl, unread, emojiMap } = this.props;
+    const { intl, unread } = this.props;
 
     if (!notification.get('emoji_reaction')) {
       return <Fragment />;
@@ -362,7 +361,7 @@ class Notification extends ImmutablePureComponent {
         <div className={classNames('notification notification-reaction focusable', { unread })} tabIndex='0' aria-label={notificationForScreenReader(intl, intl.formatMessage(messages.emoji_reaction, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
           <div className='notification__message'>
             <div className={classNames('notification__reaction-icon-wrapper', { wide })}>
-              <Emoji hovered={false} emoji={notification.getIn(['emoji_reaction', 'name'])} emojiMap={emojiMap} url={notification.getIn(['emoji_reaction', 'url'])} static_url={notification.getIn(['emoji_reaction', 'static_url'])} />
+              <Emoji hovered={false} emoji={notification.getIn(['emoji_reaction', 'name'])} url={notification.getIn(['emoji_reaction', 'url'])} static_url={notification.getIn(['emoji_reaction', 'static_url'])} />
             </div>
 
             <span title={notification.get('created_at')} className={classNames('notification__reaction-message-wrapper', { wide })}>

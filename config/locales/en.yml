@@ -667,6 +667,9 @@ en:
       profile_directory:
         desc_html: Allow users to be discoverable
         title: Enable profile directory
+      reaction_max_per_account:
+        desc_html: "Specifies the maximum number of emoji reaction per account (<= %{count})"
+        title: Maximum number of emoji reaction per account
       registrations:
         closed_message:
           desc_html: Displayed on frontpage when registrations are closed. You can use HTML tags

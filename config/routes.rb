@@ -366,7 +366,7 @@ Rails.application.routes.draw do
           resource :pin, only: :create
           post :unpin, to: 'pins#destroy'
 
-          resources :emoji_reactions, only: :update, constraints: { id: /[^\/]+/ }
+          resources :emoji_reactions, only: [:update, :destroy], constraints: { id: /[^\/]+/ }
           post :emoji_unreaction, to: 'emoji_reactions#destroy'
 
           resource :history, only: :show

@@ -43,7 +43,7 @@ class Api::V1::EmojiReactionsController < Api::BaseController
   end
 
   def account_emoji_reactions
-    current_account.emoji_reactions
+    EmojiReaction.where(id: current_account.emoji_reactions.group(:status_id).select('min(id)'))
   end
 
   def emojis_requested?

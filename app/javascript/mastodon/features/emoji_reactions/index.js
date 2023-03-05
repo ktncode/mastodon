@@ -12,8 +12,6 @@ import ScrollableList from '../../components/scrollable_list';
 import Icon from 'mastodon/components/icon';
 import ColumnHeader from '../../components/column_header';
 import Emoji from '../../components/emoji';
-import { createSelector } from 'reselect';
-import { Map as ImmutableMap } from 'immutable';
 import ReactedHeaderContaier from '../reactioned/containers/header_container';
 import { debounce } from 'lodash';
 import { defaultColumnWidth } from 'mastodon/initial_state';
@@ -23,8 +21,6 @@ import { changeColumnParams } from '../../actions/columns';
 const messages = defineMessages({
   refresh: { id: 'refresh', defaultMessage: 'Refresh' },
 });
-
-const customEmojiMap = createSelector([state => state.get('custom_emojis')], items => items.reduce((map, emoji) => map.set(emoji.get('shortcode'), emoji), ImmutableMap()));
 
 const mapStateToProps = (state, { columnId, params }) => {
   const uuid = columnId;
@@ -36,7 +32,6 @@ const mapStateToProps = (state, { columnId, params }) => {
     emojiReactions: state.getIn(['user_lists', 'emoji_reactioned_by', params.statusId, 'items']),
     isLoading: state.getIn(['user_lists', 'emoji_reactioned_by', params.statusId, 'isLoading'], true),
     hasMore: !!state.getIn(['user_lists', 'emoji_reactioned_by', params.statusId, 'next']),
-    emojiMap: customEmojiMap(state),
     columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
@@ -45,7 +40,6 @@ class Reaction extends ImmutablePureComponent {
 
   static propTypes = {
     emojiReaction: ImmutablePropTypes.map.isRequired,
-    emojiMap: ImmutablePropTypes.map.isRequired,
   };
 
   state = {
@@ -57,11 +51,11 @@ class Reaction extends ImmutablePureComponent {
   handleMouseLeave = () => this.setState({ hovered: false })
 
   render () {
-    const { emojiReaction, emojiMap } = this.props;
+    const { emojiReaction } = this.props;
 
     return (
       <div className='account__emoji_reaction' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-        <Emoji className='reaction' hovered={this.state.hovered} emoji={emojiReaction.get('name')} emojiMap={emojiMap} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} />
+        <Emoji className='reaction' hovered={this.state.hovered} emoji={emojiReaction.get('name')} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} />
       </div>
     );
   };
@@ -77,7 +71,6 @@ class EmojiReactions extends ImmutablePureComponent {
     emojiReactions: ImmutablePropTypes.list,
     multiColumn: PropTypes.bool,
     columnWidth: PropTypes.string,
-    emojiMap: ImmutablePropTypes.map.isRequired,
     intl: PropTypes.object.isRequired,
     hasMore: PropTypes.bool,
     isLoading: PropTypes.bool,
@@ -114,7 +107,7 @@ class EmojiReactions extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, emojiReactions, multiColumn, emojiMap, hasMore, isLoading, columnWidth } = this.props;
+    const { intl, emojiReactions, multiColumn, hasMore, isLoading, columnWidth } = this.props;
 
     if (!emojiReactions) {
       return (
@@ -149,7 +142,7 @@ class EmojiReactions extends ImmutablePureComponent {
           bindToDocument={!multiColumn}
         >
           {emojiReactions.map(emojiReaction =>
-            <AccountContainer key={emojiReaction.get('account')+emojiReaction.get('name')} id={emojiReaction.get('account')} withNote={false} append={<Reaction emojiReaction={emojiReaction} emojiMap={emojiMap} />} />,
+            <AccountContainer key={emojiReaction.get('account')+emojiReaction.get('name')} id={emojiReaction.get('account')} withNote={false} append={<Reaction emojiReaction={emojiReaction} />} />,
           )}
         </ScrollableList>
       </Column>

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
+import { List as ImmutableList } from 'immutable';
 import { createSelector } from 'reselect';
 import { fetchStatus } from '../../actions/statuses';
 import MissingIndicator from '../../components/missing_indicator';
@@ -63,7 +63,7 @@ import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from
 import { textForScreenReader, defaultMediaVisibility } from '../../components/status';
 import Icon from 'mastodon/components/icon';
 import DetailedHeaderContaier from './containers/header_container';
-import { defaultColumnWidth } from 'mastodon/initial_state';
+import { defaultColumnWidth, me, maxReactionsPerAccount } from 'mastodon/initial_state';
 import { changeSetting } from '../../actions/settings';
 import { changeColumnParams } from '../../actions/columns';
 
@@ -86,7 +86,6 @@ const messages = defineMessages({
 const makeMapStateToProps = () => {
   const getStatus = makeGetStatus();
   const getPictureInPicture = makeGetPictureInPicture();
-  const customEmojiMap = createSelector([state => state.get('custom_emojis')], items => items.reduce((map, emoji) => map.set(emoji.get('shortcode'), emoji), ImmutableMap()));
   const getProper = (status) => status.get('reblog', null) !== null && typeof status.get('reblog') === 'object' ? status.get('reblog') : status;
 
   const getAncestorsIds = createSelector([
@@ -160,6 +159,8 @@ const makeMapStateToProps = () => {
     const descendantsIds = status ? getDescendantsIds(state, { id: status.get('id') }) : ImmutableList();
     const referencesIds  = status ? getReferencesIds(state, { id: status.get('id') }) : ImmutableList();
     const id             = status ? getProper(status).get('id') : null;
+    const emojiReactions = status ? status.get('emoji_reactions', ImmutableList()) : ImmutableList();
+    const myCount        = emojiReactions.count((emojiReaction) => emojiReaction.get('account_ids', ImmutableList()).includes(me));
 
     return {
       status,
@@ -168,10 +169,11 @@ const makeMapStateToProps = () => {
       askReplyConfirmation: state.getIn(['compose', 'text']).trim().length !== 0,
       domain: state.getIn(['meta', 'domain']),
       pictureInPicture: getPictureInPicture(state, { id: params.statusId }),
-      emojiMap: customEmojiMap(state),
       referenced: state.getIn(['compose', 'references']).has(id),
       contextReferenced: state.getIn(['compose', 'context_references']).has(id),
       columnWidth: columnWidth ?? defaultColumnWidth,
+      emojiReactioned: myCount > 0,
+      reactionLimitReached: myCount >= maxReactionsPerAccount,
     };
   };
 
@@ -203,7 +205,8 @@ class Status extends ImmutablePureComponent {
       inUse: PropTypes.bool,
       available: PropTypes.bool,
     }),
-    emojiMap: ImmutablePropTypes.map,
+    emojiReactioned: PropTypes.bool,
+    reactionLimitReached: PropTypes.bool,
   };
 
   state = {
@@ -473,8 +476,8 @@ class Status extends ImmutablePureComponent {
     this.props.dispatch(addEmojiReaction(status, name, domain, url, static_url));
   }
 
-  handleRemoveEmojiReaction = (status) => {
-    this.props.dispatch(removeEmojiReaction(status));
+  handleRemoveEmojiReaction = (status, name) => {
+    this.props.dispatch(removeEmojiReaction(status, name));
   }
 
   handleAddReference = (id, change) => {
@@ -575,7 +578,7 @@ class Status extends ImmutablePureComponent {
 
   render () {
     let ancestors, descendants;
-    const { status, ancestorsIds, descendantsIds, intl, domain, multiColumn, pictureInPicture, emojiMap, referenced, contextReferenced, columnWidth } = this.props;
+    const { status, ancestorsIds, descendantsIds, intl, domain, multiColumn, pictureInPicture, referenced, contextReferenced, columnWidth, emojiReactioned, reactionLimitReached } = this.props;
     const { fullscreen } = this.state;
 
     if (status === null) {
@@ -652,7 +655,6 @@ class Status extends ImmutablePureComponent {
                   pictureInPicture={pictureInPicture}
                   showQuoteMedia={this.state.showQuoteMedia}
                   onToggleQuoteMediaVisibility={this.handleToggleQuoteMediaVisibility}
-                  emojiMap={emojiMap}
                   addEmojiReaction={this.handleAddEmojiReaction}
                   removeEmojiReaction={this.handleRemoveEmojiReaction}
                 />
@@ -662,6 +664,8 @@ class Status extends ImmutablePureComponent {
                   status={status}
                   referenced={referenced}
                   contextReferenced={contextReferenced}
+                  emojiReactioned={emojiReactioned}
+                  reactionLimitReached={reactionLimitReached}
                   onReply={this.handleReplyClick}
                   onFavourite={this.handleFavouriteClick}
                   onReblog={this.handleReblogClick}

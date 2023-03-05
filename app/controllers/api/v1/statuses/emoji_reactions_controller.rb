@@ -18,8 +18,7 @@ class Api::V1::Statuses::EmojiReactionsController < Api::BaseController
   end
 
   def destroy
-    #UnEmojiReactionWorker.perform_async(current_account.id, @status.id)
-    if UnEmojiReactionService.new.call(current_account, @status).present?
+    if UnEmojiReactionService.new.call(current_account, @status, params[:id], shortcode_only: true).present?
       @status = Status.include_expired.find(params[:status_id])
     end
 

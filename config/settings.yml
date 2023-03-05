@@ -144,6 +144,7 @@ defaults: &defaults
   hide_video_preview: false
   allow_poll_image: false
   poll_max_options: 4
+  reaction_max_per_account: 1
 
 development:
   <<: *defaults

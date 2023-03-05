@@ -165,9 +165,10 @@ class Status extends ImmutablePureComponent {
       available: PropTypes.bool,
     }),
     contextType: PropTypes.string,
-    emojiMap: ImmutablePropTypes.map,
     addEmojiReaction: PropTypes.func.isRequired,
     removeEmojiReaction: PropTypes.func.isRequired,
+    emojiReactioned: PropTypes.bool,
+    reactionLimitReached: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -404,7 +405,7 @@ class Status extends ImmutablePureComponent {
     let media = null;
     let statusAvatar, prepend, rebloggedByText;
 
-    const { intl, hidden, featured, otherAccounts, unread, showThread, showCard, scrollKey, pictureInPicture, contextType, quote_muted, referenced, contextReferenced } = this.props;
+    const { intl, hidden, featured, otherAccounts, unread, showThread, showCard, scrollKey, pictureInPicture, contextType, quote_muted, referenced, contextReferenced, reactionLimitReached } = this.props;
 
     let { status, account, ...other } = this.props;
 
@@ -796,7 +797,7 @@ class Status extends ImmutablePureComponent {
               status={status}
               addEmojiReaction={this.props.addEmojiReaction}
               removeEmojiReaction={this.props.removeEmojiReaction}
-              emojiMap={this.props.emojiMap}
+              reactionLimitReached={reactionLimitReached}
             />}
             <StatusActionBar scrollKey={scrollKey} status={status} account={account} expired={expired} {...other} />
           </div>

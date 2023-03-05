@@ -27,7 +27,6 @@ class StatusItem extends ImmutablePureComponent {
     status: ImmutablePropTypes.map,
     onClick: PropTypes.func,
     onUnselectReference: PropTypes.func,
-    emojiMap: ImmutablePropTypes.map,
   };
 
   updateOnProps = [

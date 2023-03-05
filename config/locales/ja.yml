@@ -646,6 +646,9 @@ ja:
       profile_directory:
         desc_html: ユーザーが見つかりやすくできるようになります
         title: ディレクトリを有効にする
+      reaction_max_per_account:
+        desc_html: "1アカウントあたりの絵文字リアクションの最大数（%{count}以下）を指定します。"
+        title: 絵文字リアクションの最大数
       registrations:
         closed_message:
           desc_html: 新規登録を停止しているときにフロントページに表示されます。HTMLタグが使えます

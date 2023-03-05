@@ -3,14 +3,25 @@
 class UnEmojiReactionService < BaseService
   include Payloadable
 
-  def call(account, status)
-    @account = account
+  def call(account, status, emoji, **options)
+    @account          = account
+    shortcode, domain = emoji&.split("@")
 
-    emoji_reaction = EmojiReaction.find_by!(account: account, status: status)
+    if shortcode
+      if options[:shortcode_only]
+        emoji_reactions = EmojiReaction.where(account: account, status: status, name: shortcode)
+      else
+        custom_emoji    = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
+        emoji_reactions = EmojiReaction.where(account: account, status: status, name: shortcode, custom_emoji: custom_emoji)
+      end
+    else
+      emoji_reactions = EmojiReaction.where(account: account, status: status)
+    end
 
-    emoji_reaction.destroy!
-    create_notification(emoji_reaction)
-    emoji_reaction
+    emoji_reactions.each do |emoji_reaction|
+      emoji_reaction.destroy!
+      create_notification(emoji_reaction)
+    end
   end
 
   private

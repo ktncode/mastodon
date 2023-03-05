@@ -79,6 +79,7 @@ export const hideLinkPreview = getMeta('hide_link_preview');
 export const hidePhotoPreview = getMeta('hide_photo_preview');
 export const hideVideoPreview = getMeta('hide_video_preview');
 export const allowPollImage = getMeta('allow_poll_image');
+export const maxReactionsPerAccount = initialState?.emoji_reactions?.max_reactions_per_account ?? 1;
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

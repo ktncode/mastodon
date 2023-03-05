@@ -5,22 +5,18 @@ class EmojiReactionService < BaseService
   include Payloadable
 
   def call(account, status, emoji)
-    @account = account
-
-    emoji_reaction = EmojiReaction.find_by(account_id: account.id, status_id: status.id)
-
-    return emoji_reaction unless emoji_reaction.nil?
-
+    @account          = account
     shortcode, domain = emoji.split("@")
 
-    custom_emoji = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
+    return if account.nil? || status.nil? || shortcode.nil?
 
-    emoji_reaction = EmojiReaction.create!(account: account, status: status, name: shortcode, custom_emoji: custom_emoji)
+    custom_emoji   = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
+    emoji_reaction = EmojiReaction.find_or_create_by!(account_id: account.id, status_id: status.id, name: shortcode, custom_emoji: custom_emoji)
 
-    create_notification(emoji_reaction)
-    bump_potential_friendship(account, status)
-
-    emoji_reaction
+    emoji_reaction.tap do |emoji_reaction|
+      create_notification(emoji_reaction)
+      bump_potential_friendship(account, status)
+    end
   end
 
   private 

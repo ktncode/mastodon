@@ -94,6 +94,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
 
       emoji_reactions: {
         max_reactions: EmojiReactionValidator::LIMIT,
+        max_reactions_per_account: [EmojiReactionValidator::MAX_PER_ACCOUNT, Setting.reaction_max_per_account].max,
       },
 
       status_references: {

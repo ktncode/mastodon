@@ -2,7 +2,8 @@
 
 class InitialStateSerializer < ActiveModel::Serializer
   attributes :meta, :compose, :search, :accounts, :lists,
-             :media_attachments, :status_references, :settings, :max_toot_chars
+             :media_attachments, :status_references, :emoji_reactions,
+             :settings, :max_toot_chars
 
   has_one :push_subscription, serializer: REST::WebPushSubscriptionSerializer
 
@@ -160,6 +161,10 @@ class InitialStateSerializer < ActiveModel::Serializer
 
   def status_references
     { max_references: StatusReferenceValidator::LIMIT }
+  end
+
+  def emoji_reactions
+    { max_reactions_per_account: [EmojiReactionValidator::MAX_PER_ACCOUNT, Setting.reaction_max_per_account].max }
   end
 
   private

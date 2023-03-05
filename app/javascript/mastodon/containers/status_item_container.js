@@ -1,16 +1,11 @@
 import { connect } from 'react-redux';
 import StatusItem from '../components/status_item';
 import { makeGetStatus } from '../selectors';
-import {
-  removeReference,
-} from '../actions/compose';
+import { removeReference } from '../actions/compose';
 import { openModal } from '../actions/modal';
 import { unselectReferenceModal } from '../initial_state';
 
 import { injectIntl, defineMessages } from 'react-intl';
-
-import { createSelector } from 'reselect';
-import { Map as ImmutableMap } from 'immutable';
 
 const messages = defineMessages({
   unselectMessage: { id: 'confirmations.unselect.message', defaultMessage: 'Are you sure you want to unselect a reference?' },
@@ -19,16 +14,10 @@ const messages = defineMessages({
 
 const makeMapStateToProps = () => {
   const getStatus = makeGetStatus();
-  const customEmojiMap = createSelector([state => state.get('custom_emojis')], items => items.reduce((map, emoji) => map.set(emoji.get('shortcode'), emoji), ImmutableMap()));
 
-  const mapStateToProps = (state, props) => {
-    const status = getStatus(state, props);
-
-    return {
-      status,
-      emojiMap: customEmojiMap(state),
-    }
-  };
+  const mapStateToProps = (state, props) => ({
+    status: getStatus(state, props),
+  });
 
   return mapStateToProps;
 };

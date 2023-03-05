@@ -42,13 +42,12 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
 
     return if @account.reacted?(@original_status, shortcode, emoji)
 
-    EmojiReaction.find_by(account: @account, status: @original_status)&.destroy! 
-    reaction = @original_status.emoji_reactions.create!(account: @account, name: shortcode, custom_emoji: emoji, uri: @json['id'])
-
-    if @original_status.account.local?
-      NotifyService.new.call(@original_status.account, :emoji_reaction, reaction)
-      forward_for_emoji_reaction
-      relay_for_emoji_reaction
+    @original_status.emoji_reactions.create!(account: @account, name: shortcode, custom_emoji: emoji, uri: @json['id']).tap do |reaction|
+      if @original_status.account.local? && !@original_status.account.silenced?
+        NotifyService.new.call(@original_status.account, :emoji_reaction, reaction)
+        forward_for_emoji_reaction
+        relay_for_emoji_reaction
+      end
     end
   rescue Seahorse::Client::NetworkingError
     nil

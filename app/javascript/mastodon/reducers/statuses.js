@@ -87,14 +87,12 @@ export default function statuses(state = initialState, action) {
   case EMOJI_REACTION_REQUEST:
   case UN_EMOJI_REACTION_FAIL:
     if (state.get(action.status.get('id')) !== undefined) {
-      state = state.setIn([action.status.get('id'), 'emoji_reactioned'], true);
       state = addEmojiReaction(state, action.status.get('id'), action.name, action.domain, action.url, action.static_url);
     }
     return state;
   case UN_EMOJI_REACTION_REQUEST:
   case EMOJI_REACTION_FAIL:
     if (state.get(action.status.get('id')) !== undefined) {
-      state = state.setIn([action.status.get('id'), 'emoji_reactioned'], false);
       state = removeEmojiReaction(state, action.status.get('id'), action.name, action.domain, action.url, action.static_url);
     }
     return state;

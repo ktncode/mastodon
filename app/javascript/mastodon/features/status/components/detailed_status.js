@@ -93,10 +93,10 @@ class DetailedStatus extends ImmutablePureComponent {
     onToggleMediaVisibility: PropTypes.func,
     showQuoteMedia: PropTypes.bool,
     onToggleQuoteMediaVisibility: PropTypes.func,
-    emojiMap: ImmutablePropTypes.map,
     addEmojiReaction: PropTypes.func.isRequired,
     removeEmojiReaction: PropTypes.func.isRequired,
     onReference: PropTypes.func,
+    reactionLimitReached: PropTypes.bool,
   };
 
   state = {
@@ -181,7 +181,7 @@ class DetailedStatus extends ImmutablePureComponent {
     const status = (this.props.status && this.props.status.get('reblog')) ? this.props.status.get('reblog') : this.props.status;
     const quote_muted = this.props.quote_muted;
     const outerStyle = { boxSizing: 'border-box' };
-    const { intl, compact, pictureInPicture, referenced, contextReferenced } = this.props;
+    const { intl, compact, pictureInPicture, referenced, contextReferenced, reactionLimitReached } = this.props;
 
     if (!status) {
       return null;
@@ -467,7 +467,7 @@ class DetailedStatus extends ImmutablePureComponent {
             status={status}
             addEmojiReaction={this.props.addEmojiReaction}
             removeEmojiReaction={this.props.removeEmojiReaction}
-            emojiMap={this.props.emojiMap}
+            reactionLimitReached={reactionLimitReached}
           />}
 
           <div className='detailed-status__meta'>

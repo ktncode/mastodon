@@ -77,10 +77,18 @@ const appendToList = (state, listType, statuses, next) => {
   }));
 };
 
+const itemExists = (state, listType, status) => {
+  return state.getIn([listType, 'items']).findIndex(item => item === status.get('id')) > -1;
+};
+
 const prependOneToList = (state, listType, status) => {
-  return state.update(listType, listMap => listMap.withMutations(map => {
-    map.set('items', map.get('items').unshift(status.get('id')));
-  }));
+  if (!itemExists(state, listType, status)) {
+    state = state.update(listType, listMap => listMap.withMutations(map => {
+      map.set('items', map.get('items').unshift(status.get('id')));
+    }));
+  }
+
+  return state;
 };
 
 const removeOneFromList = (state, listType, status) => {
@@ -131,8 +139,6 @@ export default function statusLists(state = initialState, action) {
     return removeOneFromList(state, 'bookmarks', action.status);
   case EMOJI_REACTION_SUCCESS:
     return prependOneToList(state, 'emoji_reactions', action.status);
-  case UN_EMOJI_REACTION_SUCCESS:
-    return removeOneFromList(state, 'emoji_reactions', action.status);
   case PINNED_STATUSES_FETCH_SUCCESS:
     return normalizeList(state, 'pins', action.statuses, action.next);
   case PIN_SUCCESS:
