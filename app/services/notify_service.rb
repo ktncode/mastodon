@@ -47,7 +47,7 @@ class NotifyService < BaseService
   end
 
   def blocked_emoji_reaction?
-    false
+    @recipient.muting?(@notification.from_account)
   end
 
   def blocked_status_reference?

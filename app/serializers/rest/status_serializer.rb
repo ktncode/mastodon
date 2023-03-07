@@ -4,7 +4,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   attributes :id, :created_at, :in_reply_to_id, :in_reply_to_account_id,
              :sensitive, :spoiler_text, :visibility, :language,
              :uri, :url, :replies_count, :reblogs_count,
-             :favourites_count, :emoji_reactions_count, :emoji_reactions,
+             :favourites_count, :emoji_reactions, :emoji_reactions_count,
              :status_reference_ids,
              :status_references_count, :status_referred_by_count,
              :searchability

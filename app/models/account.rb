@@ -578,6 +578,10 @@ class Account < ApplicationRecord
       end
     end
 
+    def excluded_silenced_account_ids
+      Rails.cache.fetch("excluded_silenced_account_ids") { Account.silenced.pluck(:id) }
+    end
+
     private
 
     def first_degree(options)

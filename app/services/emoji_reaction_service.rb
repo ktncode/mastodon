@@ -24,8 +24,8 @@ class EmojiReactionService < BaseService
   def create_notification(emoji_reaction)
     status = emoji_reaction.status
 
-    if status.account.local?
-      NotifyService.new.call(status.account, :emoji_reaction, emoji_reaction) if status.account.local?
+    if status.account.local? && !status.account.silenced?
+      NotifyService.new.call(status.account, :emoji_reaction, emoji_reaction)
       ActivityPub::RawDistributionWorker.perform_async(build_json(emoji_reaction), status.account.id, [@account.preferred_inbox_url])
     elsif status.account.activitypub?
       ActivityPub::DeliveryWorker.perform_async(build_json(emoji_reaction), emoji_reaction.account_id, status.account.inbox_url)

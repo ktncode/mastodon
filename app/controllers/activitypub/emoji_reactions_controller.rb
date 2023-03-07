@@ -31,7 +31,7 @@ class ActivityPub::EmojiReactionsController < ActivityPub::BaseController
   end
 
   def set_emoji_reactions
-    @emoji_reactions = @status.emoji_reactions
+    @emoji_reactions = @status.emoji_reactions.joins(:account).merge(Account.without_silenced)
     @emoji_reactions = @emoji_reactions.paginate_by_min_id(EMOJI_REACTIONS_LIMIT, params[:min_id])
   end
 

@@ -47,7 +47,7 @@ class EmojiReaction < ApplicationRecord
   private
 
   def queue_publish
-    PublishEmojiReactionWorker.perform_async(status_id, account_id, name) unless status.destroyed?
+    PublishEmojiReactionWorker.perform_async(status_id, account_id, name) unless status.destroyed? || account.silenced?
   end
 
   def refresh_status

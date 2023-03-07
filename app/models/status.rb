@@ -365,7 +365,7 @@ class Status < ApplicationRecord
   end
 
   def emoji_reactions_count
-    status_stat&.emoji_reactions_count || 0
+    @emoji_reactions_count || status_stat&.emoji_reactions_count || 0
   end
 
   def status_references_count
@@ -390,13 +390,22 @@ class Status < ApplicationRecord
   end
 
   def grouped_emoji_reactions(account = nil)
-    (Oj.load(status_stat&.emoji_reactions_cache || '', mode: :strict) || []).tap do |emoji_reactions|
-      if account.present?
-        emoji_reactions.each do |emoji_reaction|
+    (Oj.load(status_stat&.emoji_reactions_cache || '', mode: :strict) || []).then do |emoji_reactions|
+      @emoji_reactions_count = 0
+
+      emoji_reactions.filter do |emoji_reaction|
+        if account.present?
           emoji_reaction['me'] = emoji_reaction['account_ids'].include?(account.id.to_s)
-          emoji_reaction['account_ids'] -= account.excluded_from_timeline_account_ids.map(&:to_s)
-          emoji_reaction['count'] = emoji_reaction['account_ids'].size
+          emoji_reaction['account_ids'] -= (account.excluded_from_timeline_account_ids + (Account.excluded_silenced_account_ids - [account.id])).uniq.map(&:to_s)
+        else
+          emoji_reaction['me'] = false
+          emoji_reaction['account_ids'] -= Account.excluded_silenced_account_ids.map(&:to_s)
         end
+
+        emoji_reaction['count'] = emoji_reaction['account_ids'].size
+        @emoji_reactions_count += emoji_reaction['count']
+
+        emoji_reaction['count'] > 0
       end
     end
   end
