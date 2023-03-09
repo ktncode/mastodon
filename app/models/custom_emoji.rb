@@ -34,12 +34,16 @@ class CustomEmoji < ApplicationRecord
     :(#{SHORTCODE_RE_FRAGMENT}):
     (?=[^[:alnum:]:]|$)/x
 
-  IMAGE_MIME_TYPES = %w(image/png image/gif image/webp).freeze
+  IMAGE_MIME_TYPES = %w(image/png image/gif image/webp image/jpeg image/heif image/heic).freeze
+  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/jpeg image/heif image/heic).freeze
 
   belongs_to :category, class_name: 'CustomEmojiCategory', optional: true
   has_one :local_counterpart, -> { where(domain: nil) }, class_name: 'CustomEmoji', primary_key: :shortcode, foreign_key: :shortcode
 
-  has_attached_file :image, styles: { static: { format: 'png', convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser } }, processors: [:dimension_extractor], validate_media_type: false
+  has_attached_file :image, styles: {
+      original: { convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser, processors: ->(f) { file_processors f } },
+      static: { format: 'png', convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser }
+    }, validate_media_type: false
 
   before_validation :downcase_domain
 
@@ -85,6 +89,16 @@ class CustomEmoji < ApplicationRecord
 
     def search(shortcode)
       where('"custom_emojis"."shortcode" ILIKE ?', "%#{shortcode}%")
+    end
+
+    private
+
+    def file_processors(instance)
+      if IMAGE_CONVERTIBLE_MIME_TYPES.include?(instance.image_content_type)
+        [:webp_converter, :dimension_extractor]
+      else
+        [:dimension_extractor]
+      end
     end
   end
 
