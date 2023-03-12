@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_02_21_031206) do
+ActiveRecord::Schema.define(version: 2023_03_10_214919) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -711,6 +711,28 @@ ActiveRecord::Schema.define(version: 2023_02_21_031206) do
     t.datetime "expires_at"
     t.index ["account_id", "target_account_id"], name: "index_mutes_on_account_id_and_target_account_id", unique: true
     t.index ["target_account_id"], name: "index_mutes_on_target_account_id"
+  end
+
+  create_table "nodes", force: :cascade do |t|
+    t.string "domain", null: false
+    t.jsonb "info"
+    t.jsonb "info_override"
+    t.jsonb "nodeinfo"
+    t.jsonb "instance_data"
+    t.string "thumbnail_file_name"
+    t.string "thumbnail_content_type"
+    t.bigint "thumbnail_file_size"
+    t.datetime "thumbnail_updated_at"
+    t.string "thumbnail_remote_url"
+    t.string "blurhash"
+    t.datetime "last_fetched_at"
+    t.integer "status", default: 0, null: false
+    t.string "note", default: "", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["domain"], name: "index_nodes_on_domain", unique: true
+    t.index ["info"], name: "index_nodes_on_info", using: :gin
+    t.index ["last_fetched_at"], name: "index_nodes_on_last_fetched_at"
   end
 
   create_table "notifications", force: :cascade do |t|

@@ -84,6 +84,9 @@ module AccountAssociations
 
     # Account statuses cleanup policy
     has_one :statuses_cleanup_policy, class_name: 'AccountStatusesCleanupPolicy', inverse_of: :account, dependent: :destroy
+
+    # Node
+    belongs_to :node, primary_key: :domain, foreign_key: :domain, inverse_of: :accounts, optional: true
   end
 
   def permitted_group_statuses(account)

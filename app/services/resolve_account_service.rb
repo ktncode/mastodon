@@ -24,7 +24,7 @@ class ResolveAccountService < BaseService
 
     @account ||= Account.find_remote(@username, @domain)
 
-    return @account if @account&.local? || @domain.nil? || !webfinger_update_due?
+    return @account if @account&.local? || @domain.nil? || !webfinger_update_due? || !Node.resolve_domain(@domain)&.features(:resolve_account)
 
     # At this point we are in need of a Webfinger query, which may
     # yield us a different username/domain through a redirect

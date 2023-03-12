@@ -26,6 +26,7 @@ class ActivityPub::ProcessAccountService < BaseService
         @old_searchability  = @account&.searchability
         @suspension_changed = false
 
+        update_node if @account.nil? && !Node.domain(domain).exists?
         create_account if @account.nil?
         process_tags
         update_account
@@ -57,6 +58,10 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   private
+
+  def update_node
+    UpdateNodeWorker.perform_async(@domain)
+  end
 
   def create_account
     @account = Account.new
