@@ -5,7 +5,7 @@ class Api::V1::StatusesController < Api::BaseController
 
   before_action -> { authorize_if_got_token! :read, :'read:statuses' }, except: [:create, :destroy]
   before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only:   [:create, :destroy]
-  before_action :require_user!, except:  [:show, :context]
+  before_action :require_user!, except:  [:index, :show, :context]
   before_action :set_statuses, only:     [:index]
   before_action :set_status, only:       [:show, :context]
   before_action :set_thread, only:       [:create]

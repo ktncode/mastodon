@@ -155,6 +155,8 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       :timeline_favourite_media_option,
       :timeline_emoji_reaction_media_option,
       :timeline_personal_media_option,
+      :bulk_get_api_for_accounts,
+      :bulk_get_api_for_statuses,
     ]
 
     capabilities << :profile_search unless Chewy.enabled?

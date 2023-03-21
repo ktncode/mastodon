@@ -7,8 +7,9 @@ class Api::V1::AccountsController < Api::BaseController
   before_action -> { doorkeeper_authorize! :follow, :write, :'write:blocks' }, only: [:block, :unblock]
   before_action -> { doorkeeper_authorize! :write, :'write:accounts' }, only: [:create]
 
-  before_action :require_user!, except: [:show, :create]
+  before_action :require_user!, except: [:index, :show, :create]
   before_action :set_account, except: [:index, :create]
+  before_action :set_accounts, only: [:index]
   before_action :check_enabled_registrations, only: [:create]
 
   skip_before_action :require_authenticated_user!, only: :create
@@ -16,9 +17,7 @@ class Api::V1::AccountsController < Api::BaseController
   override_rate_limit_headers :follow, family: :follows
 
   def index
-    accounts = Account.where(id: account_ids)
-
-    render json: accounts, each_serializer: REST::AccountSerializer
+    render json: @accounts, each_serializer: REST::AccountSerializer
   end
 
   def show
@@ -103,12 +102,20 @@ class Api::V1::AccountsController < Api::BaseController
     end
   end
 
+  def set_accounts
+    @accounts = Account.where(id: account_ids)
+  end
+
   def relationships(**options)
     AccountRelationshipsPresenter.new([@account.id], current_user.account_id, **options)
   end
 
   def account_ids
-    Array(params[:id]).uniq.map(&:to_i)
+    Array(accounts_params[:id]).concat(Array(accounts_params[:ids])).uniq.map(&:to_i)
+  end
+
+  def accounts_params
+    params.permit(id: [], ids: [])
   end
 
   def account_params
