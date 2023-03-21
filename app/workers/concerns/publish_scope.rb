@@ -19,6 +19,8 @@ module PublishScope
           .union(local_mentions_scope)
           .union(local_sender_scope)
         )
+      else
+        Account.none
       end.select(:id)
     end
   
