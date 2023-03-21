@@ -126,8 +126,8 @@ class PostStatusService < BaseService
     end
 
     ProcessHashtagsService.new.call(@status)
-    ProcessMentionsService.new.call(@status, @circle) unless @status.personal_visibility?
     ProcessStatusReferenceService.new.call(@status, status_reference_ids: (@options[:status_reference_ids] || []) + [@quote_id], urls: @options[:status_reference_urls])
+    ProcessMentionsService.new.call(@status, @circle) unless @status.personal_visibility?
   end
 
   def schedule_status!
