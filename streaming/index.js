@@ -371,6 +371,8 @@ const startWorker = (workerId) => {
       return 'user';
     case '/api/v1/streaming/user/notification':
       return 'user:notification';
+    case '/api/v1/streaming/public/index':
+      return 'public:index';
     case '/api/v1/streaming/public':
       return ['public', ...names].join(':');
     case '/api/v1/streaming/public/local':
@@ -855,36 +857,33 @@ const startWorker = (workerId) => {
       });
 
       break;
+    case 'public:index':
+      resolve({
+        channelIds: ['timeline:index'],
+        options: { needsFiltering: true, notificationOnly: false },
+      });
+
+      break;
     case 'public:local':
-      if (!req.accountId) {
-        resolve({
-          channelIds: ['timeline:index'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
-        resolve({
-          channelIds: ['timeline:public'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else {
+      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
         reject('No local stream provided');
       }
 
+      resolve({
+        channelIds: ['timeline:public'],
+        options: { needsFiltering: true, notificationOnly: false },
+      });
+
       break;
     case 'public:local:nobot':
-      if (!req.accountId) {
-        resolve({
-          channelIds: ['timeline:index'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
-        resolve({
-          channelIds: ['timeline:public:nobot'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else {
+      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
         reject('No local stream provided');
       }
+
+      resolve({
+        channelIds: ['timeline:public:nobot'],
+        options: { needsFiltering: true, notificationOnly: false },
+      });
 
       break;
     case 'public:remote':
@@ -965,35 +964,25 @@ const startWorker = (workerId) => {
 
       break;
     case 'public:local:media':
-      if (!req.accountId) {
-        resolve({
-          channelIds: ['timeline:index'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
-        resolve({
-          channelIds: ['timeline:public:media'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else {
+      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
         reject('No local stream provided');
       }
 
+      resolve({
+        channelIds: ['timeline:public:media'],
+        options: { needsFiltering: true, notificationOnly: false },
+      });
+
       break;
     case 'public:local:nobot:media':
-      if (!req.accountId) {
-        resolve({
-          channelIds: ['timeline:index'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else if (isImast(req) || isMastodonForiOS(req) || isMastodonForAndroid(req)) {
-        resolve({
-          channelIds: ['timeline:public:nobot:media'],
-          options: { needsFiltering: true, notificationOnly: false },
-        });
-      } else {
+      if (!isImast(req) && !isMastodonForiOS(req) && !isMastodonForAndroid(req)) {
         reject('No local stream provided');
       }
+
+      resolve({
+        channelIds: ['timeline:public:nobot:media'],
+        options: { needsFiltering: true, notificationOnly: false },
+      });
 
       break;
     case 'public:remote:media':
