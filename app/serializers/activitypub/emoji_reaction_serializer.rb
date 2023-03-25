@@ -11,7 +11,7 @@ class ActivityPub::EmojiReactionSerializer < ActivityPub::Serializer
   end
 
   def type
-    'Like'
+    %w(Like EmojiReact).include?(instance_options[:type]) ? instance_options[:type] : 'Like'
   end
 
   def actor

@@ -24,21 +24,27 @@ class EmojiReactionService < BaseService
   def create_notification(emoji_reaction)
     status = emoji_reaction.status
 
-    if status.account.local? && !status.account.silenced?
-      NotifyService.new.call(status.account, :emoji_reaction, emoji_reaction)
-      ActivityPub::RawDistributionWorker.perform_async(build_json(emoji_reaction), status.account.id, [@account.preferred_inbox_url])
+    NotifyService.new.call(status.account, :emoji_reaction, emoji_reaction) if status.account.local?
+
+    return if status.account.silenced?
+
+    if status.account.local?
+      ActivityPub::CustomEmojiDistributionWorker.perform_async(emoji_reaction.id, 'create')
     elsif status.account.activitypub?
-      ActivityPub::DeliveryWorker.perform_async(build_json(emoji_reaction), emoji_reaction.account_id, status.account.inbox_url)
+      type = emoji_reaction.unicode? && status.account.node.features(:emoji_reaction_type) == 'unicode' ? 'EmojiReact' : 'Like'
+      ActivityPub::DeliveryWorker.perform_async(build_json(emoji_reaction, type), emoji_reaction.account_id, status.account.inbox_url)
     end
   end
 
   def bump_potential_friendship(account, status)
     ActivityTracker.increment('activity:interactions')
+
     return if account.following?(status.account_id)
+
     PotentialFriendshipTracker.record(account.id, status.account_id, :emoji_reaction)
   end
 
-  def build_json(emoji_reaction)
-    Oj.dump(serialize_payload(emoji_reaction, ActivityPub::EmojiReactionSerializer, signer: @account))
+  def build_json(emoji_reaction, type)
+    Oj.dump(serialize_payload(emoji_reaction, ActivityPub::EmojiReactionSerializer, signer: @account, type: type))
   end
 end

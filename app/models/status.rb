@@ -53,6 +53,7 @@ class Status < ApplicationRecord
   enum searchability: { public: 0, unlisted: 1, private: 2, direct: 3, limited: 4, mutual: 100, personal: 200 }, _suffix: :searchability
 
   STANDARD_VISIBILITY = %w(public unlisted private direct)
+  FOLLOWER_VISIBILITY = %w(public unlisted private)
   EXTRA_VISIBILITY    = %w(limited personal)
   PSEUDO_VISIBILITY   = %w(mutual)
   UNCOUNT_VISIBILITY  = %w(direct personal)
@@ -203,6 +204,10 @@ class Status < ApplicationRecord
 
   def standard_visibility?
     STANDARD_VISIBILITY.include?(visibility)
+  end
+  
+  def follower_visibility?
+    FOLLOWER_VISIBILITY.include?(visibility)
   end
   
   def extra_visibility?

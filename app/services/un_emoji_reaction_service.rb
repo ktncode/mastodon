@@ -19,8 +19,8 @@ class UnEmojiReactionService < BaseService
     end
 
     emoji_reactions.each do |emoji_reaction|
-      emoji_reaction.destroy!
       create_notification(emoji_reaction)
+      emoji_reaction.destroy!
     end
   end
 
@@ -30,13 +30,14 @@ class UnEmojiReactionService < BaseService
     status = emoji_reaction.status
 
     if status.account.local?
-      ActivityPub::RawDistributionWorker.perform_async(build_json(emoji_reaction), status.account.id, [@account.preferred_inbox_url])
+      ActivityPub::CustomEmojiDistributionWorker.new.perform(emoji_reaction.id, 'delete')
     elsif status.account.activitypub?
-      ActivityPub::DeliveryWorker.perform_async(build_json(emoji_reaction), emoji_reaction.account_id, status.account.inbox_url)
+      type = emoji_reaction.unicode? && status.account.node.features(:emoji_reaction_type) == 'unicode' ? 'EmojiReact' : 'Like'
+      ActivityPub::DeliveryWorker.perform_async(build_json(emoji_reaction, type), emoji_reaction.account_id, status.account.inbox_url)
     end
   end
 
-  def build_json(emoji_reaction)
-    Oj.dump(serialize_payload(emoji_reaction, ActivityPub::UndoEmojiReactionSerializer, signer: @account))
+  def build_json(emoji_reaction, type)
+    Oj.dump(serialize_payload(emoji_reaction, ActivityPub::UndoEmojiReactionSerializer, signer: @account, type: type))
   end
 end

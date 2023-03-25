@@ -12,11 +12,15 @@ class PublishEmojiReactionWorker
     @name       = name
 
     FeedManager.instance.active_accounts.merge(visibility_scope).find_each do |account|
-      redis.publish("timeline:#{account.id}", payload_json) if redis.exists?("subscribed:timeline:#{account.id}") && !account.user.setting_disable_reaction_streaming
+      next if !redis.exists?("subscribed:timeline:#{account.id}") || !account.user.setting_enable_reaction || account.user.setting_compact_reaction || account.user.setting_disable_reaction_streaming
+
+      redis.publish("timeline:#{account.id}", payload_json)
     end
   rescue ActiveRecord::RecordNotFound
     true
   end
+
+  private
 
   def payload_json
     return @payload_json if defined?(@payload_json)

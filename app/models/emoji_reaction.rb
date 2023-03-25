@@ -44,6 +44,14 @@ class EmojiReaction < ApplicationRecord
     :emoji_reaction
   end
 
+  def unicode?
+    custom_emoji_id.nil?
+  end
+
+  def custom?
+    !custom_emoji_id.nil?
+  end
+
   private
 
   def queue_publish
