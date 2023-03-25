@@ -10,8 +10,10 @@ class PublishStatusUpdateWorker
     @status  = Status.find(status_id)
 
     FeedManager.instance.active_accounts.merge(visibility_scope).find_each do |account|
+      next if !redis.exists?("subscribed:timeline:#{account.id}") || !account.user.setting_enable_status_reference
+
       @account = account
-      redis.publish("timeline:#{account.id}", payload_json) if redis.exists?("subscribed:timeline:#{account.id}")
+      redis.publish("timeline:#{account.id}", payload_json)
     end
   rescue ActiveRecord::RecordNotFound
     true
