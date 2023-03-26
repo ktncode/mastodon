@@ -12,7 +12,7 @@ class FetchLinkCardService < BaseService
     )
   }iox
 
-  def call(status)
+  def call(status, **options)
     @status = status
     @url    = parse_urls
 
@@ -20,12 +20,12 @@ class FetchLinkCardService < BaseService
 
     @url = @url.to_s
 
-    RedisLock.acquire(lock_options) do |lock|
+    RedisLock.acquire(lock_options.merge(options.slice(:retry))) do |lock|
       if lock.acquired?
         @card = PreviewCard.find_by(url: @url)
         process_url if @card.nil? || @card.updated_at <= 2.weeks.ago || @card.missing_image?
       else
-        raise Mastodon::RaceConditionError
+        raise Mastodon::RaceConditionError unless options[:retry] == false
       end
     end
 
