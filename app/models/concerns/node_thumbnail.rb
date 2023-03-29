@@ -3,7 +3,7 @@
 module NodeThumbnail
   extend ActiveSupport::Concern
 
-  IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].freeze
+  IMAGE_MIME_TYPES = %w(image/jpeg image/png image/gif image/webp).freeze
   LIMIT = 4.megabytes
   MAX_PIXELS = 750_000 # 1500x500px
 

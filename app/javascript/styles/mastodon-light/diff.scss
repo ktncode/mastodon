@@ -81,6 +81,11 @@ html {
   background: $white;
 }
 
+.public-layout .directory__card,
+.columns-area--mobile .directory__card {
+  background: $white;
+}
+
 .column-header__button.active {
   color: $ui-highlight-color;
 

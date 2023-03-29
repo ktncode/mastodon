@@ -23,6 +23,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       limited_federation_mode: Rails.configuration.x.whitelist_mode,
       mascot: instance_presenter.mascot&.file&.url,
       profile_directory: Setting.profile_directory,
+      server_directory: Setting.server_directory,
       trends: Setting.trends,
       allow_poll_image: Setting.allow_poll_image,
     }

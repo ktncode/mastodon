@@ -84,6 +84,9 @@
       = f.input :profile_directory, as: :boolean, wrapper: :with_label, label: t('admin.settings.profile_directory.title'), hint: t('admin.settings.profile_directory.desc_html')
 
     .fields-group
+      = f.input :server_directory, as: :boolean, wrapper: :with_label, label: t('admin.settings.server_directory.title'), hint: t('admin.settings.server_directory.desc_html')
+
+    .fields-group
       = f.input :trends, as: :boolean, wrapper: :with_label, label: t('admin.settings.trends.title'), hint: t('admin.settings.trends.desc_html')
 
     .fields-group

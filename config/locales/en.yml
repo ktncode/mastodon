@@ -13,9 +13,11 @@ en:
     browse_directory: Browse a profile directory and filter by interests
     browse_local_posts: Browse a live stream of public posts from this server
     browse_public_posts: Browse a live stream of public posts on Mastodon
+    browse_server_directory: Browse a server directory and filter by interests
     contact: Contact
     contact_missing: Not set
     contact_unavailable: N/A
+    discover_servers: Discover servers
     discover_users: Discover users
     documentation: Documentation
     federation_hint_html: With an account on %{instance} you'll be able to follow people on any Mastodon server and beyond.
@@ -395,6 +397,7 @@ en:
       feature_profile_directory: Profile directory
       feature_registrations: Registrations
       feature_relay: Federation relay
+      feature_server_directory: Server directory
       feature_timeline_preview: Timeline preview
       features: Features
       hidden_service: Federation with hidden services
@@ -689,6 +692,9 @@ en:
           none: Nobody can sign up
           open: Anyone can sign up
         title: Registrations mode
+      server_directory:
+        desc_html: Allow servers to be discoverable
+        title: Enable server directory
       show_known_fediverse_at_about_page:
         desc_html: When disabled, restricts the public timeline linked from the landing page to showing only local content
         title: Include federated content on unauthenticated public timeline page
@@ -1342,6 +1348,10 @@ en:
       private_long: Only search to own or follows or reacted posts
       public: Public
       public_long: Everyone can search
+  server_directories:
+    directory: Server directory
+    explanation: Discover servers based on their interests
+    explore_fediverse: Explore Fediverse
   sessions:
     activity: Last activity
     browser: Browser

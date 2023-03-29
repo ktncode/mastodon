@@ -10,6 +10,11 @@
 #  info_override          :jsonb
 #  nodeinfo               :jsonb
 #  instance_data          :jsonb
+#  icon_file_name         :string
+#  icon_content_type      :string
+#  icon_file_size         :bigint(8)
+#  icon_updated_at        :datetime
+#  icon_remote_url        :string
 #  thumbnail_file_name    :string
 #  thumbnail_content_type :string
 #  thumbnail_file_size    :bigint(8)
@@ -24,7 +29,10 @@
 #
 class Node < ApplicationRecord
   include DomainControlHelper
+  include RoutingHelper
   include NodeThumbnail
+  include NodeIcon
+  include Paginable
 
   enum status: { up: 0, gone: 1, reject: 2, busy: 3, not_found: 4, error: 5, no_address: 6 }, _suffix: :status
 
@@ -32,6 +40,9 @@ class Node < ApplicationRecord
 
   scope :domain, ->(domain) { where(domain: domain.downcase) if domain.present? }
   scope :software, ->(name) { where("nodeinfo->'software'->>'name' = ?", name.downcase) if name.present? }
+  scope :available, -> { where(status: :up).has_nodeinfo }
+  scope :has_nodeinfo, -> { where("not(nodeinfo ? 'error' and nodeinfo->>'error' = 'missing')") }
+  scope :missing, -> { where("nodeinfo is null or nodeinfo->>'error' = 'missing'") }
 
   ERROR_MISSING = { 'error': 'missing' }
 
@@ -40,6 +51,7 @@ class Node < ApplicationRecord
     pleroma
     pixelfed
     gotosocial
+    friendica
   )
 
   MISSKEY_API_COMPATIBLE = %w(
@@ -53,6 +65,7 @@ class Node < ApplicationRecord
       fedibird
       koyuspace
       ecko
+      brighteon
     ),
     'misskey' => %w(
       meisskey
@@ -88,11 +101,13 @@ class Node < ApplicationRecord
     languages: [],
     region: '',
     categories: [],
-    proxied_thumbnail: '',
     total_users: 0,
     last_week_users: 0,
     registrations: false,
     approval_required: nil,
+    name: '',
+    url: '',
+    theme_color: nil,
   }.each do |key, default|
     define_method(key) do
       self[:info]&.dig(key.to_s) || default
@@ -102,6 +117,14 @@ class Node < ApplicationRecord
   alias software software_name
   alias version software_version
   alias upstream upstream_name
+
+  def proxied_thumbnail
+    full_asset_url(thumbnail_original_url) if thumbnail_original_url.present?
+  end
+
+  def proxied_icon
+    full_asset_url(icon_original_url) if icon_original_url.present?
+  end
 
   def node?
     !missing?

@@ -10,27 +10,33 @@ class UpdateNodeService < BaseService
   
   def call(domain, **options)
     @domain   = domain
-    @options  = options
+    @options  = { fetch: true, process: false }.merge(options)
     @node     = Node.find_or_create_by!(domain: domain)
 
     last_fetched_at = node.last_fetched_at
 
-    fetch_all     if !options[:skip_fetch]
-    proccess_info if options[:force] || last_fetched_at != node.last_fetched_at
+    fetch_all     if options[:fetch]
+    proccess_info if options[:process] || last_fetched_at != node.last_fetched_at
   end
 
   private
 
   def nodeinfo(*args)
     node&.nodeinfo&.dig(*args)
+  rescue
+    nil
   end
 
   def instance(*args)
     node&.instance_data&.dig(*args)
+  rescue
+    nil
   end
 
   def info(*args)
     node&.info&.dig(*args)
+  rescue
+    nil
   end
 
   def fetch_all
@@ -50,6 +56,7 @@ class UpdateNodeService < BaseService
   def proccess_info
     preprocess_info
     process_features
+    process_icon
     process_thumbnail
     process_software_specific_override
     process_override
@@ -66,21 +73,21 @@ class UpdateNodeService < BaseService
 
     if build.blank?
       {
-        'upstream_name'    => nodeinfo('metadata', 'upstream', 'name')&.downcase || Node::COMPATIBLES[software] || software,
+        'upstream_name'    => nodeinfo('metadata', 'upstream', 'name')&.downcase || Node.upstream(software) || software,
         'upstream_version' => nodeinfo('metadata', 'upstream', 'version') || core,
         'software_name'    => software,
         'software_version' => core,
       }
     elsif /^[\d\.]$/i.match?(build)
       {
-        'upstream_name'    => Node::COMPATIBLES[software] || software,
+        'upstream_name'    => Node.upstream(software) || software,
         'upstream_version' => build,
         'software_name'    => software,
         'software_version' => core,
       }
     else
       {
-        'upstream_name'    =>  Node::COMPATIBLES[software] || software,
+        'upstream_name'    => Node.upstream(software) || software,
         'upstream_version' => core,
         'software_name'    => software,
         'software_version' => version,
@@ -105,13 +112,21 @@ class UpdateNodeService < BaseService
       ),
       'quote'             => nodeinfo('metadata', 'features')&.include?('quote_posting') || instance('feature_quote') || node.info.dig('upstream_name') == 'misskey',
       'favourite'         => info('upstream_name') != 'misskey',
-      'description'       => instance('short_description') || instance('description') || nodeinfo('nodeDescription') || '',
-      'languages'         => info('languages') || instance('languages') || instance('langs') || [],
+      'description'       => Formatter.instance.reformat(instance('short_description').presence || instance('description').presence || nodeinfo('metadata', 'nodeDescription').presence || ''),
+      'languages'         => info('languages').presence || instance('languages').presence || instance('langs').presence || [],
       'registrations'     => nodeinfo('openRegistrations') || (instance('registrations').is_a?(Hash) ? instance('registrations', 'enabled') : instance('registrations')) || instance('features', 'registration'),
       'approval_required' => instance('registrations').is_a?(Hash) ? instance('registrations', 'approval_required') : nil,
       'total_users'       => nodeinfo('usage', 'users', 'total') || instance('stats', 'user_count'),
       'last_week_users'   => nodeinfo('usage', 'users', 'activeMonth') || instance('usage', 'users', 'active_month') || instance('pleroma', 'stats', 'mau'),
+      'name'              => nodeinfo('metadata', 'nodeName').presence || instance('name').presence || instance('title').presence || instance('name').presence,
+      'url'               => full_uri(instance('domain').presence || instance('uri').presence || @domain),
+      'theme_color'       => nodeinfo('metadata', 'themeColor').presence || instance('themeColor').presence,
     })
+  end
+
+  def full_uri(domain)
+    domain = "https://#{domain}" unless domain.start_with?(%r(http[s]?://))
+    Addressable::URI.parse(domain).normalize.to_s
   end
 
   def process_software_specific_override
@@ -139,10 +154,52 @@ class UpdateNodeService < BaseService
 
     node.thumbnail_remote_url = nil if options[:force]
     node.thumbnail_remote_url = remote_url
+  rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
+  end
+
+  def process_icon
+    remote_url = instance('iconUrl') || fetch_icon_url
+
+    node.icon_remote_url = nil if options[:force]
+    node.icon_remote_url = remote_url
+  rescue Mastodon::UnexpectedResponseError, Mastodon::LengthValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
   end
 
   def process_override
     node.info.merge!(node.info_override || {})
+  end
+
+  def fetch_icon_url
+    doc = Nokogiri::HTML(html_fetch(info('url')))
+    uri = Addressable::URI.parse(
+            doc.css("meta[itemprop*=image]")&.first&.attributes&.fetch('content', nil)&.value ||
+            doc.css("link[rel*=apple-touch-icon]")&.first&.attributes&.fetch('href', nil)&.value ||
+            doc.css("link[rel*=icon]")&.first&.attributes&.fetch('href', nil)&.value
+          )
+
+    return if uri.nil?
+
+    base = Addressable::URI.parse(doc.css("base")&.first&.attributes&.fetch('href', nil)&.value)
+
+    if base.present?
+      uri.path   = "#{base.path}#{uri.path}" unless uri.path.start_with?('/')
+      uri.host   = base.host                 unless uri.host
+      uri.scheme = base.scheme               unless uri.scheme
+    end
+
+    uri.path   = "/#{uri.path}" unless uri.path.start_with?('/')
+    uri.host   = domain         unless uri.host
+    uri.scheme = 'https'        unless uri.scheme
+
+    uri.normalize.to_s
+  end
+
+  def html_fetch(url, raise_error = false)
+    Request.new(:get, url).perform do |response|
+      raise Mastodon::UnexpectedResponseError, response unless response_successful?(response) || !raise_error
+
+      response.body_with_limit(3.megabyte) if response.code == 200
+    end
   end
 
   def fetch_nodeinfo
@@ -193,8 +250,8 @@ class UpdateNodeService < BaseService
 
     major, minor, patch = node.upstream_version&.split('.')&.map(&:to_i)
 
-    json   = json_fetch(instance_v2) if major.nil? || major >= 4
-    json ||= json_fetch(instance_v1)
+    json = json_fetch(instance_v2) if major.nil? || major >= 4
+    json = json_fetch(instance_v1) if json.nil? || json.dig('error').present?
 
     node.update!(instance_data: json) unless json.nil?
   end

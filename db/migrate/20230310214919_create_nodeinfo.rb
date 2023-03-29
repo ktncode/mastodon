@@ -6,6 +6,8 @@ class CreateNode < ActiveRecord::Migration[6.1]
       t.jsonb :info_override
       t.jsonb :nodeinfo
       t.jsonb :instance_data
+      t.attachment :icon
+      t.string :icon_remote_url
       t.attachment :thumbnail
       t.string :thumbnail_remote_url
       t.string :blurhash

@@ -34,6 +34,7 @@ module Admin
       @authorized_fetch      = authorized_fetch_mode?
       @whitelist_enabled     = whitelist_mode?
       @profile_directory     = Setting.profile_directory
+      @server_directory      = Setting.server_directory
       @timeline_preview      = Setting.timeline_preview
       @trends_enabled        = Setting.trends
     end

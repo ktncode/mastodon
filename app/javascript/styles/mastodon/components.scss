@@ -2736,6 +2736,10 @@ a.account__display-name {
     grid-gap: 10px;
     grid-template-columns: minmax(0, 50%) minmax(0, 50%);
 
+    &.server {
+      grid-template-columns: minmax(0, 33.3%) minmax(0, 33.3%) minmax(0, 33.3%);
+    }
+
     @media screen and (max-width: $no-gap-breakpoint) {
       display: block;
     }
@@ -2743,6 +2747,7 @@ a.account__display-name {
 
   .directory__card {
     margin-bottom: 0;
+    background: $ui-base-color;
   }
 
   .filter-form {
@@ -6526,7 +6531,7 @@ a.status-card.compact:hover {
     &__img {
       height: 125px;
       position: relative;
-      background: darken($ui-base-color, 12%);
+      background: var(--theme-color, darken($ui-base-color, 12%));
       overflow: hidden;
 
       img {
@@ -6619,6 +6624,27 @@ a.status-card.compact:hover {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        p {
+          display: none;
+
+          &:first-child {
+            display: inline;
+          }
+        }
+
+        br {
+          display: none;
+        }
+      }
+
+      .server__header__content {
+        box-sizing: border-box;
+        padding: 15px 10px;
+        width: 100%;
+        min-height: 18px + 30px;
+        max-height: calc(18px + 30px + 6em);
+        overflow-y: auto;
 
         p {
           display: none;
@@ -7532,7 +7558,8 @@ noscript {
   }
 }
 
-.account__header__content {
+.account__header__content,
+.server__header__content {
   color: $darker-text-color;
   font-size: 14px;
   font-weight: 400;

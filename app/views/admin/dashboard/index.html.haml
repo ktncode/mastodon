@@ -72,6 +72,8 @@
         %li
           = feature_hint(link_to(t('admin.dashboard.feature_profile_directory'), edit_admin_settings_path), @profile_directory)
         %li
+          = feature_hint(link_to(t('admin.dashboard.feature_server_directory'), edit_admin_settings_path), @server_directory)
+        %li
           = feature_hint(link_to(t('admin.dashboard.feature_timeline_preview'), edit_admin_settings_path), @timeline_preview)
         %li
           = feature_hint(link_to(t('admin.dashboard.trends'), edit_admin_settings_path), @trends_enabled)

@@ -13,9 +13,11 @@ ja:
     browse_directory: ディレクトリから気になる人を探しましょう
     browse_local_posts: このサーバーの公開タイムラインをご覧ください
     browse_public_posts: Mastodonの公開ライブストリームをご覧ください
+    browse_server_directory: サーバーディレクトリから気になるサーバーを探しましょう
     contact: 連絡先
     contact_missing: 未設定
     contact_unavailable: N/A
+    discover_servers: サーバーを見つける
     discover_users: ユーザーを見つける
     documentation: ドキュメント
     federation_hint_html: "%{instance} のアカウントひとつでどんなMastodon互換サーバーのユーザーでもフォローできるでしょう。"
@@ -380,6 +382,7 @@ ja:
       feature_profile_directory: ディレクトリ
       feature_registrations: 新規登録
       feature_relay: 連合リレー
+      feature_server_directory: サーバーディレクトリ
       feature_timeline_preview: タイムラインプレビュー
       features: 機能
       hidden_service: 秘匿サービスとの連合
@@ -668,6 +671,9 @@ ja:
           none: 誰にも許可しない
           open: 誰でも登録可
         title: 新規登録
+      server_directory:
+        desc_html: サーバーが見つかりやすくできるようになります
+        title: サーバーディレクトリを有効にする
       show_known_fediverse_at_about_page:
         desc_html: チェックを外すと、ランディングページからリンクされた公開タイムラインにローカルの公開投稿のみ表示します。
         title: 公開タイムラインに連合先のコンテンツも表示する
@@ -1281,6 +1287,10 @@ ja:
       private_long: フォローしているアカウントの投稿、リアクション限定の投稿を検索できます
       public: 公開
       public_long: 検索を公開に指定した投稿、フォロワー限定、リアクション限定の投稿を検索できます
+  server_directories:
+    directory: サーバーディレクトリ
+    explanation: 関心を軸にサーバーを発見しよう
+    explore_fediverse: Fediverseを探索
   sessions:
     activity: 最後のアクティビティ
     browser: ブラウザ

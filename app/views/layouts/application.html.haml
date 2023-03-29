@@ -37,6 +37,7 @@
       = stylesheet_link_tag custom_css_path, host: request.host, media: 'all'
 
     %style{ nonce: request.content_security_policy_nonce }
+      != server_theme_color_styles
       != account_cat_styles
       != account_theme_valiables(@account)
 

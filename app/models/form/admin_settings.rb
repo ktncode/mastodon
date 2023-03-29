@@ -26,6 +26,7 @@ class Form::AdminSettings
     preview_sensitive_media
     custom_css
     profile_directory
+    server_directory
     thumbnail
     hero
     mascot
@@ -50,6 +51,7 @@ class Form::AdminSettings
     show_known_fediverse_at_about_page
     preview_sensitive_media
     profile_directory
+    server_directory
     trends
     trendable_by_default
     noindex

@@ -1,0 +1,39 @@
+- content_for :page_title do
+  = t('server_directories.explore_fediverse')
+
+- content_for :header_tags do
+  %meta{ name: 'description', content: t('server_directories.explanation') }
+
+  = opengraph 'og:site_name', t('about.hosted_on', domain: site_hostname)
+  = opengraph 'og:type', 'website'
+  = opengraph 'og:title', t('server_directories.explore_fediverse', title: site_title)
+  = opengraph 'og:description', t('server_directories.explanation')
+  = opengraph 'og:image', File.join(root_url, 'android-chrome-192x192.png')
+
+.page-header
+  %h1= t('server_directories.explore_fediverse', title: site_title)
+  %p= t('server_directories.explanation')
+
+- if @servers.empty?
+  = nothing_here
+- else
+  .directory__list.server
+    - @servers.each do |server|
+      .directory__card{server_theme_color_params(server)}
+        = link_to server.url do
+          .directory__card__img
+            - if server.thumbnail_file_name.present?
+              = image_tag server.thumbnail_original_url, alt: ''
+            - else
+              = default_thumbnail(server)
+        .directory__card__bar
+          .directory__card__bar__name
+            .avatar
+              = image_tag server.icon_original_url, alt: '', class: 'u-photo'
+            .display-name
+              %bdi
+                %strong.p-name= server.name
+              %span= server.domain
+        .directory__card__extra
+          .server__header__content!= server.description
+  = paginate @servers
