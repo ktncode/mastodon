@@ -64,6 +64,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       accounts: {
         max_favourite_tags: FavouriteTag::LIMIT,
         max_featured_tags: FeaturedTag::LIMIT,
+        max_profile_fields: Account::DEFAULT_FIELDS_SIZE,
       },
 
       statuses: {
