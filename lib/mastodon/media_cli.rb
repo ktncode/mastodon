@@ -257,6 +257,7 @@ module Mastodon
       say("Backups:\t#{number_to_human_size(Backup.sum(:dump_file_size))}")
       say("Imports:\t#{number_to_human_size(Import.sum(:data_file_size))}")
       say("Settings:\t#{number_to_human_size(SiteUpload.sum(:file_file_size))}")
+      say("Node images:\t#{number_to_human_size(Node.sum(Arel.sql('COALESCE(icon_file_size, 0) + COALESCE(thumbnail_file_size, 0)')))}")
     end
 
     desc 'lookup URL', 'Lookup where media is displayed by passing a media URL'
