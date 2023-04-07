@@ -1553,6 +1553,7 @@ ja:
     mobile-small: Mobile 小 / Mastodon (ダーク)
     modern-dark: モダン（ダーク）
     modern-light: モダン（ライト）
+    takibi: takibi(WIP)
   thread_mark:
     ancestor: 参照あり
     both: 参照・返信あり

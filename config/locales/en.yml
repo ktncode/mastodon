@@ -1657,6 +1657,7 @@ en:
     mobile-small: Mobile Small / Mastodon (Dark)
     modern-dark: Modern Dark
     modern-light: Modern Light
+    takibi: takibi(WIP)
   thread_mark:
     ancestor: Has reference
     both: Has reference and reply
