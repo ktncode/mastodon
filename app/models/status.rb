@@ -121,6 +121,7 @@ class Status < ApplicationRecord
   scope :with_public_visibility, -> { where(visibility: :public) }
   scope :with_personal_visibility, -> { where(visibility: :personal) }
   scope :without_personal_visibility, -> { where.not(visibility: :personal) }
+  scope :counting_visibility, -> { where.not(visibility: UNCOUNT_VISIBILITY) }
   scope :tagged_with, ->(tag_ids) { joins(:statuses_tags).where(statuses_tags: { tag_id: tag_ids }) }
   scope :in_chosen_languages, ->(account) { where(language: nil).or where(language: account.chosen_languages) }
   scope :mentioned_with, ->(account) { joins(:mentions).where(mentions: { account_id: account }) }
