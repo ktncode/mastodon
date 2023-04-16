@@ -6583,6 +6583,7 @@ a.status-card.compact:hover {
       .display-name {
         margin-left: 15px;
         text-align: left;
+        white-space: normal;
 
         strong {
           font-size: var(--info-font-size, 15px);

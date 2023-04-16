@@ -77,7 +77,7 @@ class GroupTimeline extends React.PureComponent {
   };
 
   state = {
-    collapsed: true,
+    collapsed: false,
     animating: false,
   };
 

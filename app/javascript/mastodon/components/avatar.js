@@ -49,6 +49,7 @@ export default class Avatar extends React.PureComponent {
       ...this.props.style,
       width: `${size}px`,
       height: `${size}px`,
+      minWidth: `${size}px`,
       backgroundSize: `${size}px ${size}px`,
       ...catEarsColorStyle,
     };
