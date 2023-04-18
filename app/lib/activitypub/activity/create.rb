@@ -89,6 +89,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     fetch_replies(@status)
     StatusesIndex.import @status if Chewy.enabled?
     distribute(@status)
+    distribute_group(@status)
     forward_for_conversation
     forward_for_reply
     expire_queue_action
@@ -549,6 +550,10 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def expires_soon?
     expires_at = @status&.status_expire&.expires_at
     expires_at.present? && expires_at <= Time.now.utc + PostStatusService::MIN_SCHEDULE_OFFSET
+  end
+
+  def distribute_group(status)
+    ActivityPub::GroupDistributionWorker.perform_async(status.id) if Account.local.groups.where(id: @status.mentions.select(:account_id)).joins(:passive_relationships).exists?
   end
 
   def increment_voters_count!

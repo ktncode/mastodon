@@ -48,6 +48,8 @@ class ReblogService < BaseService
     DistributionWorker.perform_async(reblog.id)
     ActivityPub::DistributionWorker.perform_async(reblog.id)
 
+    return reblog if reblog.account.group?
+
     create_notification(reblog)
     bump_potential_friendship(account, reblog)
     record_use(account, reblog)

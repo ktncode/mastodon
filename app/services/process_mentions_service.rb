@@ -77,7 +77,12 @@ class ProcessMentionsService < BaseService
   def create_notification(mention)
     mentioned_account = mention.account
 
-    if mentioned_account.local?
+    if mentioned_account.local? && mentioned_account.group?
+      group      = mentioned_account
+      visibility = Status.visibilities.key([Status.visibilities[@status.visibility], Status.visibilities[group.user&.setting_default_privacy]].max)
+
+      ReblogService.new.call(group, @status, { visibility: visibility })
+    elsif mentioned_account.local?
       LocalNotificationWorker.perform_async(mentioned_account.id, mention.id, mention.class.name, :mention)
     elsif mentioned_account.activitypub?
       ActivityPub::DeliveryWorker.perform_async(activitypub_json, mention.status.account_id, mentioned_account.inbox_url, { synchronize_followers: !mention.status.distributable? })
