@@ -87,12 +87,18 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     resolve_references(@status, @mentions, @object['references'])
     resolve_thread(@status)
     fetch_replies(@status)
-    StatusesIndex.import @status if Chewy.enabled?
+    update_status_index(@status)
     distribute(@status)
     distribute_group(@status)
     forward_for_conversation
     forward_for_reply
     expire_queue_action
+  end
+
+  def update_status_index(status)
+    StatusesIndex.import status if Chewy.enabled?
+  rescue
+    # Do nothing when the index server is down
   end
 
   def find_existing_status
