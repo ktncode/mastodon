@@ -168,18 +168,28 @@ class HeaderCommon extends ImmutablePureComponent {
     }
 
     if (me !== account.get('id')) {
-      if (!account.get('relationship')) { // Wait until the relationship is loaded
-        actionBtn = '';
-      } else if (account.getIn(['relationship', 'requested'])) {
-        actionBtn = <Button className={classNames('logo-button', { 'button--with-bell': bellBtn !== '' })} text={intl.formatMessage(messages.cancel_follow_request)} title={intl.formatMessage(messages.requested)} onClick={this.props.onFollow} />;
-      } else if (!account.getIn(['relationship', 'blocking'])) {
-        if (account.getIn(['relationship', 'following'])) {
-          actionBtn = <Button disabled={disableUnfollow || account.getIn(['relationship', 'blocked_by'])} className={classNames('logo-button', { 'button--destructive': !disableUnfollow, 'button--with-bell': bellBtn !== '' })} text={intl.formatMessage(messages.unfollow)} onClick={this.props.onFollow} />;
-        } else {
-          actionBtn = <Button disabled={disableFollow || account.getIn(['relationship', 'blocked_by'])} className={classNames('logo-button', { 'button--with-bell': bellBtn !== '' })} text={intl.formatMessage(messages.follow)} onClick={this.props.onFollow} />;
+      if (suspended) {
+        if (!account.get('relationship')) { // Wait until the relationship is loaded
+          actionBtn = '';
+        } else if (account.getIn(['relationship', 'blocking'])) {
+          actionBtn = <Button className='logo-button' text={intl.formatMessage(messages.unblock, { name: account.get('username') })} onClick={this.props.onBlock} />;
+        } else if (!disableBlock) {
+          actionBtn = <Button className='logo-button' text={intl.formatMessage(messages.block, { name: account.get('username') })} onClick={this.props.onBlock} />;
         }
-      } else if (account.getIn(['relationship', 'blocking'])) {
-        actionBtn = <Button className='logo-button' text={intl.formatMessage(messages.unblock, { name: account.get('username') })} onClick={this.props.onBlock} />;
+      } else {
+        if (!account.get('relationship')) { // Wait until the relationship is loaded
+          actionBtn = '';
+        } else if (account.getIn(['relationship', 'requested'])) {
+          actionBtn = <Button className={classNames('logo-button', { 'button--with-bell': bellBtn !== '' })} text={intl.formatMessage(messages.cancel_follow_request)} title={intl.formatMessage(messages.requested)} onClick={this.props.onFollow} />;
+        } else if (!account.getIn(['relationship', 'blocking'])) {
+          if (account.getIn(['relationship', 'following'])) {
+            actionBtn = <Button disabled={disableUnfollow || account.getIn(['relationship', 'blocked_by'])} className={classNames('logo-button', { 'button--destructive': !disableUnfollow, 'button--with-bell': bellBtn !== '' })} text={intl.formatMessage(messages.unfollow)} onClick={this.props.onFollow} />;
+          } else {
+            actionBtn = <Button disabled={disableFollow || account.getIn(['relationship', 'blocked_by'])} className={classNames('logo-button', { 'button--with-bell': bellBtn !== '' })} text={intl.formatMessage(messages.follow)} onClick={this.props.onFollow} />;
+          }
+        } else if (account.getIn(['relationship', 'blocking'])) {
+          actionBtn = <Button className='logo-button' text={intl.formatMessage(messages.unblock, { name: account.get('username') })} onClick={this.props.onBlock} />;
+        }
       }
     } else {
       actionBtn = <Button className='logo-button' text={intl.formatMessage(messages.edit_profile)} onClick={this.openEditProfile} />;
@@ -345,14 +355,14 @@ class HeaderCommon extends ImmutablePureComponent {
 
             <div className='spacer' />
 
-            {!suspended && (
-              <div className='account__header__tabs__buttons'>
-                {actionBtn}
+            <div className='account__header__tabs__buttons'>
+              {actionBtn}
+              {!suspended && (<>
                 {bellBtn}
 
                 <DropdownMenuContainer items={menu} icon='ellipsis-v' size={24} direction='right' />
-              </div>
-            )}
+              </>)}
+            </div>
           </div>
 
           <div className='account__header__tabs__name'>
