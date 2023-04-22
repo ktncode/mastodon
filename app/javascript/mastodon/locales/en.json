@@ -169,6 +169,7 @@
   "community.column_settings.without_bot": "Without bot",
   "community.column_settings.without_media": "Without media",
   "compose_form.and": " + ",
+  "compose_form.attachment_warning": "Attached media after the 5th may not be visible to remote followers. (Post public or unlisted so remote users can see it from the public link)",
   "compose_form.delete_scheduled_status": "Delete scheduled post",
   "compose_form.direct_message_warning": "This post will only be sent to the mentioned users.",
   "compose_form.direct_message_warning_learn_more": "Learn more",

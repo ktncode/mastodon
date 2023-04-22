@@ -39,6 +39,7 @@ class Form::AdminSettings
     allow_poll_image
     poll_max_options
     reaction_max_per_account
+    attachments_max
   ).freeze
 
   BOOLEAN_KEYS = %i(
@@ -62,6 +63,7 @@ class Form::AdminSettings
   INTEGER_KEYS = %i(
     poll_max_options
     reaction_max_per_account
+    attachments_max
   ).freeze
 
   UPLOAD_KEYS = %i(
@@ -83,6 +85,7 @@ class Form::AdminSettings
   validates :show_domain_blocks_rationale, inclusion: { in: %w(disabled users all) }
   validates :poll_max_options, numericality: { greater_than: 2, less_than_or_equal_to: PollValidator::MAX_OPTIONS_LIMIT }
   validates :reaction_max_per_account, numericality: { greater_than_or_equal: 1, less_than_or_equal_to: EmojiReactionValidator::MAX_PER_ACCOUNT_LIMIT }
+  validates :attachments_max, numericality: { greater_than_or_equal: 1, less_than_or_equal_to: MediaAttachment::ATTACHMENTS_LIMIT }
 
   def initialize(_attributes = {})
     super

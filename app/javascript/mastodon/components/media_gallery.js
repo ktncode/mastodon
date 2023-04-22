@@ -92,8 +92,10 @@ class Item extends React.PureComponent {
       width = 100;
     }
 
-    if (size === 4 || (size === 3 && index > 0)) {
+    if (size === 3 && index > 0) {
       height = 50;
+    } else if (size >= 4) {
+      height = 1 / Math.floor((size + 1) / 2) * 100;
     }
 
     if (size === 2) {
@@ -114,19 +116,21 @@ class Item extends React.PureComponent {
       } else if (index > 1) {
         top = '2px';
       }
-    } else if (size === 4) {
-      if (index === 0 || index === 2) {
+    } else if (size >= 4) {
+      if (index % 2 === 0) {
         right = '2px';
       }
 
-      if (index === 1 || index === 3) {
+      if (index % 2 === 1) {
         left = '2px';
       }
 
       if (index < 2) {
         bottom = '2px';
-      } else {
+      } else if (index < 4) {
         top = '2px';
+      } else {
+        top = `${Math.floor(index / 2) * 4 - 2}px`;
       }
     }
 
@@ -134,7 +138,7 @@ class Item extends React.PureComponent {
 
     if (attachment.get('type') === 'unknown') {
       return (
-        <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: `${height}%` }}>
+        <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: size > 4 ? `calc(${height}% - 4px)` : `${height}%` }}>
           <a className='media-gallery__item-thumbnail' href={attachment.get('remote_url') || attachment.get('url')} style={{ cursor: 'pointer' }} title={attachment.get('description')} target='_blank' rel='noopener noreferrer'>
             <Blurhash
               hash={attachment.get('blurhash')}
@@ -205,7 +209,7 @@ class Item extends React.PureComponent {
     }
 
     return (
-      <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: `${height}%` }}>
+      <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: size > 4 ? `calc(${height}% - 4px)` : `${height}%` }}>
         <Blurhash
           hash={attachment.get('blurhash')}
           dummy={!useBlurhash}
@@ -220,7 +224,6 @@ class Item extends React.PureComponent {
 
 }
 
-export default @injectIntl
 class MediaGallery extends React.PureComponent {
 
   static propTypes = {
@@ -331,17 +334,21 @@ class MediaGallery extends React.PureComponent {
       style.height = height;
     }
 
-    const size     = media.take(4).size;
+    const size     = media.take(16).size;
     const uncached = media.every(attachment => attachment.get('type') === 'unknown');
 
     if (quote && style.height) {
       style.height /= 2;
     }
 
+    if (size > 4) {
+      style.height = style.height * Math.trunc((size + 1) / 2) / 2;
+    }
+
     if (standalone && this.isFullSizeEligible()) {
       children = <Item standalone autoplay={autoplay} onClick={this.handleClick} attachment={media.get(0)} displayWidth={width} visible={visible} />;
     } else {
-      children = media.take(4).map((attachment, i) => <Item key={attachment.get('id')} autoplay={autoplay} onClick={this.handleClick} attachment={attachment} index={i} size={size} displayWidth={width} visible={visible || uncached} />);
+      children = media.take(16).map((attachment, i) => <Item key={attachment.get('id')} autoplay={autoplay} onClick={this.handleClick} attachment={attachment} index={i} size={size} displayWidth={width} visible={visible || uncached} />);
     }
 
     if (uncached) {
@@ -372,3 +379,5 @@ class MediaGallery extends React.PureComponent {
   }
 
 }
+
+export default injectIntl(MediaGallery);

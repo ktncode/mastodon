@@ -169,6 +169,7 @@
   "community.column_settings.without_bot": "Botを除外",
   "community.column_settings.without_media": "メディアを除外",
   "compose_form.and": " + ",
+  "compose_form.attachment_warning": "5個目以降の添付メディアは、リモートのフォロワーに見えない可能性があります。（公開または未収載で投稿すれば、公開リンクから見ることができます）",
   "compose_form.delete_scheduled_status": "予約投稿の削除",
   "compose_form.direct_message_warning": "この投稿はメンションされた人にのみ送信されます。",
   "compose_form.direct_message_warning_learn_more": "もっと詳しく",

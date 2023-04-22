@@ -633,6 +633,9 @@ en:
       allow_poll_image:
         desc_html: Allow image attachments to polls, which is prohibited by Mastodon standard
         title: Allow to attach image to poll
+      attachments_max:
+        desc_html: "Specifies the maximum number of attachments (<= %{count})"
+        title: Maximum number of attachments
       bootstrap_timeline_accounts:
         desc_html: Separate multiple usernames by comma. These accounts will be guaranteed to be shown in follow recommendations
         title: Recommend these accounts to new users

@@ -36,6 +36,8 @@ class MediaAttachment < ApplicationRecord
   enum type: [:image, :gifv, :video, :unknown, :audio]
   enum processing: [:queued, :in_progress, :complete, :failed], _prefix: true
 
+  ATTACHMENTS_LIMIT = 20
+
   MAX_DESCRIPTION_LENGTH = 1_500
 
   IMAGE_LIMIT = 16.megabytes

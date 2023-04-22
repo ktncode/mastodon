@@ -12,7 +12,7 @@ import { getHomeVisibilities, getLimitedVisibilities } from 'mastodon/selectors'
 import { openModal } from './modal';
 import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, formatISO, format } from 'date-fns';
 import { Set as ImmutableSet } from 'immutable';
-import { postReferenceModal, enableFederatedTimeline, allowPollImage } from '../initial_state';
+import { postReferenceModal, enableFederatedTimeline, allowPollImage, maxAttachments } from '../initial_state';
 import { deleteScheduledStatus } from './scheduled_statuses';
 
 let cancelFetchComposeSuggestionsAccounts, cancelFetchComposeSuggestionsTags;
@@ -373,7 +373,7 @@ export function submitScheduledStatusSuccess(status) {
 
 export function uploadCompose(files) {
   return function (dispatch, getState) {
-    const uploadLimit = 4;
+    const uploadLimit = maxAttachments;
     const media  = getState().getIn(['compose', 'media_attachments']);
     const pending  = getState().getIn(['compose', 'pending_media_attachments']);
     const progress = new Array(files.length).fill(0);
@@ -392,7 +392,7 @@ export function uploadCompose(files) {
     dispatch(uploadComposeRequest());
 
     for (const [i, file] of Array.from(files).entries()) {
-      if (media.size + i > 3) break;
+      if (media.size + i >= maxAttachments) break;
 
       const data = new FormData();
       data.append('file', file);

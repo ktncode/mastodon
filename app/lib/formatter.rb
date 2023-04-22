@@ -7,6 +7,7 @@ class Formatter
   include RoutingHelper
 
   include ActionView::Helpers::TextHelper
+  include StatusesHelper
 
   DISALLOWED_BOUNDING_REGEX = /[[:alnum:]:]/.freeze
 
@@ -24,7 +25,12 @@ class Formatter
       raw_content = raw_content + "\n\n" + status.preloadable_poll.options.map { |title| "[ ] #{title}" }.join("\n")
     end
 
-    return '' if raw_content.blank?
+    if raw_content.blank?
+      html = ''
+      html = add_original_link_from_status(html, status) if status.media_attachments.count > 4
+      html = add_compatible_reference_link(html, status) if status.references.exists?
+      return html.html_safe # rubocop:disable Rails/OutputSafety
+    end
 
     unless status.local?
       html = reformat(raw_content)
@@ -44,6 +50,7 @@ class Formatter
     html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
     html = simple_format(html, {}, sanitize: false)
     html = quotify(html, status) if status.quote? && !options[:escape_quotify]
+    html = add_original_link_from_status(html, status) if status.media_attachments.count > 4
     html = add_compatible_reference_link(html, status) if status.references.exists?
     html = nyaize_html(html) if options[:nyaize]
     html = html.delete("\n")
@@ -116,6 +123,19 @@ class Formatter
     html = html.delete("\n")
 
     html.html_safe # rubocop:disable Rails/OutputSafety
+  end
+
+  def add_original_link_from_status(html, status)
+    url     = ActivityPub::TagManager.instance.url_for(status)
+    summary = media_summary(status)
+    link    = "<a href=\"#{url}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"unhandled-link\">[#{summary}]</a>"
+    html    = '<p></p>' if html.blank?
+    html.sub(/<\/p>\z/, "<span class=\"original-media-link\"> #{link}</span></p>")
+  end
+
+  def add_original_link(html, url, summary)
+    html = '<p></p>' if html.blank?
+    html.sub(/<\/p>\z/, " <a href=\"#{url}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"unhandled-link\">[#{summary}]</a></p>")
   end
 
   private
@@ -215,6 +235,7 @@ class Formatter
   def add_compatible_reference_link(html, status)
     url = references_short_account_status_url(status.account, status)
     link = "<a href=\"#{url}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"status-link unhandled-link\" data-status-id=\"#{status.id}\">#{I18n.t('status_references.link_text')}</a>"
+    html = '<p></p>' if html.blank?
     html.sub(/<\/p>\z/, "<span class=\"reference-link-inline\"> #{link}</span></p>")
   end
 

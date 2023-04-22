@@ -71,7 +71,7 @@ import {
   EmptyColumn,
   ScheduledStatuses,
 } from './util/async-components';
-import { me, enableEmptyColumn } from '../../initial_state';
+import { me, enableEmptyColumn, maxAttachments } from '../../initial_state';
 import { closeOnboarding, INTRODUCTION_VERSION } from 'mastodon/actions/onboarding';
 
 // Dummy import, to make sure that <Status /> ends up in the application bundle.
@@ -87,7 +87,7 @@ const mapStateToProps = state => ({
   isComposing: state.getIn(['compose', 'is_composing']),
   hasComposingText: state.getIn(['compose', 'text']).trim().length !== 0,
   hasMediaAttachments: state.getIn(['compose', 'media_attachments']).size > 0,
-  canUploadMore: !state.getIn(['compose', 'media_attachments']).some(x => ['audio', 'video'].includes(x.get('type'))) && state.getIn(['compose', 'media_attachments']).size < 4,
+  canUploadMore: !state.getIn(['compose', 'media_attachments']).some(x => ['audio', 'video'].includes(x.get('type'))) && state.getIn(['compose', 'media_attachments']).size < maxAttachments,
   dropdownMenuIsOpen: state.getIn(['dropdown_menu', 'openId']) !== null,
   firstLaunch: state.getIn(['settings', 'introductionVersion'], 0) < INTRODUCTION_VERSION,
   advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], false),

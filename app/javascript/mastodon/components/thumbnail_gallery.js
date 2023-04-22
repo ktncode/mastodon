@@ -3,7 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import classNames from 'classnames';
-import { displayMedia, useBlurhash } from '../initial_state';
+import { displayMedia, useBlurhash, maxAttachments } from '../initial_state';
 import Blurhash from 'mastodon/components/blurhash';
 import { FormattedMessage } from 'react-intl';
 
@@ -154,7 +154,7 @@ class ThumbnailGallery extends React.PureComponent {
     const { visible } = this.state;
 
     const uncached = media.every(attachment => attachment.get('type') === 'unknown');
-    const children = media.take(4).map((attachment) => <Item key={attachment.get('id')} attachment={attachment} visible={visible || uncached} />);
+    const children = media.take(maxAttachments).map((attachment) => <Item key={attachment.get('id')} attachment={attachment} visible={visible || uncached} />);
 
     return (
       <div className='thumbnail-gallery' ref={this.handleRef}>

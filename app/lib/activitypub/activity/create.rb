@@ -113,7 +113,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         uri: object_uri,
         url: object_url || object_uri,
         account: @account,
-        text: text_from_content || '',
+        text: add_compatible_content(text_from_content || ''),
         language: detected_language,
         spoiler_text: converted_object_type? ? '' : (text_from_summary || ''),
         created_at: @object['published'],
@@ -124,7 +124,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         searchability: searchability,
         thread: replied_to_status,
         conversation: conversation_from_context,
-        media_attachment_ids: process_attachments.take(4).map(&:id),
+        media_attachment_ids: process_attachments.take(Setting.attachments_max).map(&:id),
         poll: process_poll,
         quote: quote,
         generator: generator,
@@ -266,7 +266,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     media_attachments = []
 
     as_array(@object['attachment']).each do |attachment|
-      next if attachment['url'].blank? || media_attachments.size >= 4
+      next if attachment['url'].blank? || media_attachments.size >= Setting.attachments_max
 
       begin
         href             = Addressable::URI.parse(attachment['url']).normalize.to_s
@@ -437,6 +437,14 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     elsif content_language_map?
       @object['contentMap'].values.first
     end
+  end
+
+  def add_compatible_content(html)
+    attachment_count = as_array(@object['attachment']).count
+
+    return html unless !html.include?('original-media-link') && attachment_count > Setting.attachments_max
+
+    Formatter.instance.add_original_link(html, object_url || object_uri, I18n.t('statuses.attached.description', attached: attachment_count))
   end
 
   def text_from_summary

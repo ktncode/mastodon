@@ -157,7 +157,10 @@ class InitialStateSerializer < ActiveModel::Serializer
   end
 
   def media_attachments
-    { accept_content_types: MediaAttachment.supported_file_extensions + MediaAttachment.supported_mime_types }
+    {
+      accept_content_types: MediaAttachment.supported_file_extensions + MediaAttachment.supported_mime_types,
+      max_attachments: [MediaAttachment::ATTACHMENTS_LIMIT, Setting.attachments_max].min,
+    }
   end
 
   def status_references

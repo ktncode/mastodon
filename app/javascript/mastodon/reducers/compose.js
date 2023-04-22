@@ -341,8 +341,13 @@ const updateSuggestionTags = (state, token) => {
   });
 };
 
-const rejectQuoteAltText = html => {
+const stripCompatibleText = html => {
   const fragment = domParser.parseFromString(html, 'text/html').documentElement;
+
+  const original_media_link = fragment.querySelector('span.original-media-link');
+  if (original_media_link) {
+    original_media_link.remove();
+  }
 
   const quote_inline = fragment.querySelector('span.quote-inline');
   if (quote_inline) {
@@ -625,7 +630,7 @@ export default function compose(state = initialState, action) {
     return state.withMutations(map => {
       const datetime_form = !!action.status.get('scheduled_at') || !!action.status.get('expires_at') ? true : null;
 
-      map.set('text', action.raw_text || unescapeHTML(rejectQuoteAltText(expandMentions(action.status))));
+      map.set('text', action.raw_text || unescapeHTML(stripCompatibleText(expandMentions(action.status))));
       map.set('in_reply_to', action.status.get('in_reply_to_id', null));
       map.set('quote_from', action.status.getIn(['quote', 'id'], null));
       map.set('quote_from_url', action.status.getIn(['quote', 'url']));

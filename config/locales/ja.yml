@@ -612,6 +612,9 @@ ja:
       allow_poll_image:
         desc_html: Mastodon標準で禁止されている投票へのイメージ添付を許可します
         title: 投票にイメージ添付を許可
+      attachments_max:
+        desc_html: "添付の最大数（%{count}以下）を指定します。"
+        title: 添付の最大数
       bootstrap_timeline_accounts:
         desc_html: 複数のユーザー名を指定する場合コンマで区切ります。おすすめに表示されます。
         title: 新規ユーザーにおすすめするアカウント

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Warning from '../components/warning';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { me } from '../../../initial_state';
+import { me, maxAttachments } from '../../../initial_state';
 import { cancelScheduledStatusCompose } from '../../../actions/compose';
 import Icon from 'mastodon/components/icon';
 import IconButton from 'mastodon/components/icon_button';
@@ -41,6 +41,7 @@ const mapStateToProps = state => ({
   mutualMessageWarning: state.getIn(['compose', 'privacy']) === 'mutual',
   personalMessageWarning: state.getIn(['compose', 'privacy']) === 'personal',
   isScheduledStatusEditting: !!state.getIn(['compose', 'scheduled_status_id']),
+  attachmentsWarning: !['public', 'unlisted', 'personal'].includes(state.getIn(['compose', 'privacy'])) && state.getIn(['compose', 'media_attachments']).size > 4,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -69,6 +70,18 @@ const ScheduledStatusWarningWrapper = ({ isScheduledStatusEditting, onCancel }) 
 ScheduledStatusWarningWrapper.propTypes = {
   isScheduledStatusEditting: PropTypes.bool,
   onCancel: PropTypes.func.isRequired,
+};
+
+const AttachmentWarningWrapper = ({ attachmentsWarning }) => {
+  if (attachmentsWarning) {
+    return <Warning message={<FormattedMessage id='compose_form.attachment_warning' defaultMessage='Attached media after the 5th may not be visible to remote followers. (Post public or unlisted so remote users can see it from the public link)' />} />;
+  }
+
+  return null;
+};
+
+AttachmentWarningWrapper.propTypes = {
+  attachmentsWarning: PropTypes.bool,
 };
 
 const PrivacyWarningWrapper = ({ needsLockWarning, hashtagWarning, directMessageWarning, limitedMessageWarning, mutualMessageWarning, personalMessageWarning }) => {
@@ -118,6 +131,7 @@ const WarningWrapper = (props) => {
   return (
     <Fragment>
       <ScheduledStatusWarningWrapper {...props} />
+      <AttachmentWarningWrapper {...props} />
       <PrivacyWarningWrapper {...props} />
     </Fragment>
   );
