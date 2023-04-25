@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ActivityPub::NoteSerializer < ActivityPub::Serializer
-  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quote_uri, :expiry, :references, :emoji_reactions, :searchable_by
+  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quote_uri, :'_misskey_quote', :'_misskey_content', :expiry, :references, :emoji_reactions, :searchable_by
 
   attributes :id, :type, :summary,
              :in_reply_to, :published, :url,

@@ -30,6 +30,8 @@ module ContextHelper
     references: { 'fedibird' => 'http://fedibird.com/ns#', 'references' => { '@id' => "fedibird:references", '@type' => '@id' } },
     emoji_reactions: { 'fedibird' => 'http://fedibird.com/ns#', 'emojiReactions' => { '@id' => "fedibird:emojiReactions", '@type' => '@id' } },
     searchable_by: { 'fedibird' => 'http://fedibird.com/ns#', 'searchableBy' => { '@id' => "fedibird:searchableBy", '@type' => '@id' } },
+    '_misskey_content': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_content' => 'misskey:_misskey_content' },
+    '_misskey_quote': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_quote' => 'misskey:_misskey_quote' },
     is_cat: { 'misskey' => 'https://misskey-hub.net/ns#', 'isCat' => 'misskey:isCat' },
     vcard: { 'vcard' => 'http://www.w3.org/2006/vcard/ns#' },
   }.freeze
