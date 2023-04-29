@@ -79,6 +79,14 @@ module AccountSettings
     settings['location'] = val
   end
 
+  def deny_subscribed?
+    true & settings['deny_subscribed']
+  end
+
+  def deny_subscribed=(val)
+    settings['deny_subscribed'] = true & ActiveModel::Type::Boolean.new.cast(val)
+  end
+
   def noindex?
     true & (local? ? user&.noindex? : (settings['noindex'].nil? ? true : settings['noindex']))
   end

@@ -34,6 +34,7 @@ module ContextHelper
     '_misskey_quote': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_quote' => 'misskey:_misskey_quote' },
     is_cat: { 'misskey' => 'https://misskey-hub.net/ns#', 'isCat' => 'misskey:isCat' },
     vcard: { 'vcard' => 'http://www.w3.org/2006/vcard/ns#' },
+    subscribable_by: { 'kmyblue' => 'http://kmy.blue/ns#', 'subscribableBy' => { '@id' => "kmyblue:subscribableBy", '@type' => '@id' } },
   }.freeze
 
   def full_context

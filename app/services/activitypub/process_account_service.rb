@@ -107,7 +107,7 @@ class ActivityPub::ProcessAccountService < BaseService
     @account.note                         = @json['summary'] || ''
     @account.locked                       = @json['manuallyApprovesFollowers'] || false
     @account.fields                       = property_values || {}
-    @account.settings                     = defer_settings.merge(other_settings, birthday, address, is_cat)
+    @account.settings                     = defer_settings.merge(other_settings, birthday, address, is_cat, deny_subscribed)
     @account.also_known_as                = as_array(@json['alsoKnownAs'] || []).map { |item| value_or_id(item) }
     @account.discoverable                 = @json['discoverable'] || false
     @account.searchability                = searchability_from_audience
@@ -241,6 +241,17 @@ class ActivityPub::ProcessAccountService < BaseService
     else
       :direct
     end
+  end
+
+  def subscribable_by
+    return nil if @json['subscribableBy'].nil?
+
+    @subscribable_by = as_array(@json['subscribableBy']).map { |x| value_or_id(x) }
+  end
+
+  def deny_subscribed
+    return {} if @json['subscribableBy'].nil?
+    { 'deny_subscribed' => subscribable_by&.all? { |uri| !ActivityPub::TagManager.instance.public_collection?(uri) } }
   end
 
   def property_values

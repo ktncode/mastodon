@@ -324,12 +324,24 @@ class ActivityPub::Activity
     end
   end
 
-  def visibility_from_audience_with_silence
+  def visibility_from_audience_with_correction
     visibility = visibility_from_audience
+    visibility = apply_silence_to_visibility(visibility)
+    visibility = apply_deny_subscribed_to_visibility(visibility)    
+  end
 
+  def apply_silence_to_visibility(visibility)
     if @account.hard_silenced? && %i(public, unlisted).include?(visibility)
       :private
     elsif @account.silenced? && %i(public).include?(visibility)
+      :unlisted
+    else
+      visibility
+    end
+  end
+
+  def apply_deny_subscribed_to_visibility(visibility)
+    if @account.deny_subscribed? && %i(public).include?(visibility)
       :unlisted
     else
       visibility
@@ -358,7 +370,7 @@ class ActivityPub::Activity
 
     return nil if searchability.nil?
 
-    visibility    = visibility_from_audience_with_silence
+    visibility = visibility_from_audience_with_correction
 
     if searchability === visibility
       searchability

@@ -52,7 +52,7 @@ class ActivityPub::Activity::Announce < ActivityPub::Activity
         uri: @json['id'],
         created_at: @json['published'],
         override_timestamps: @options[:override_timestamps],
-        visibility: visibility_from_audience_with_silence,
+        visibility: visibility_from_audience_with_correction,
         expires_at: @json['expiry'],
         expires_action: :mark,
       }
