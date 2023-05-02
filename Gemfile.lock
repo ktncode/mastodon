@@ -856,7 +856,7 @@ DEPENDENCIES
   rubocop (~> 1.18)
   rubocop-rails (~> 2.11)
   ruby-progressbar (~> 1.11)
-  rubyzip
+  rubyzip (~> 2.3)
   sanitize (~> 6.0)
   scenic (~> 1.5)
   sidekiq (~> 6.2)
