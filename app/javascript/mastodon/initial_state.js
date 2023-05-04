@@ -82,6 +82,9 @@ export const hideVideoPreview = getMeta('hide_video_preview');
 export const allowPollImage = getMeta('allow_poll_image');
 export const maxReactionsPerAccount = initialState?.emoji_reactions?.max_reactions_per_account ?? 1;
 export const maxAttachments = initialState?.media_attachments?.max_attachments ?? 1;
+export const useLowResolutionThumbnails = getMeta('use_low_resolution_thumbnails');
+export const useFullsizeAvatarOnDetail = getMeta('use_fullsize_avatar_on_detail');
+export const useFullsizeHeaderOnDetail = getMeta('use_fullsize_header_on_detail');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

@@ -5,13 +5,18 @@ class REST::AccountSerializer < ActiveModel::Serializer
 
   attributes :id, :username, :acct, :display_name, :locked, :bot, :cat, :discoverable, :group, :created_at,
              :note, :url, :avatar, :avatar_static, :header, :header_static, :searchability,
-             :followers_count, :following_count, :subscribing_count, :statuses_count, :last_status_at
+             :followers_count, :following_count, :subscribing_count, :statuses_count, :last_status_at,
+             :avatar_thumbhash, :header_thumbhash
 
   has_one :moved_to_account, key: :moved, serializer: REST::AccountSerializer, if: :moved_and_not_nested?
 
   has_many :emojis, serializer: REST::CustomEmojiSerializer
 
   attribute :suspended, if: :suspended?
+  attribute :avatar_full,        if: :with_fullsize_avatar?
+  attribute :avatar_full_static, if: :with_fullsize_avatar?
+  attribute :header_full,        if: :with_fullsize_header?
+  attribute :header_full_static, if: :with_fullsize_header?
 
   class FieldSerializer < ActiveModel::Serializer
     attributes :name, :value, :verified_at
@@ -41,18 +46,50 @@ class REST::AccountSerializer < ActiveModel::Serializer
   end
 
   def avatar
-    full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_original_url)
+    if respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails
+      full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_tiny_url, ext: object.avatar_file_name)
+    else
+      full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_original_url)
+    end
   end
 
   def avatar_static
+    if respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails
+      full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_tiny_static_url, ext: object.avatar_file_name)
+    else
+      full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_static_url, ext: object.avatar_file_name)
+    end
+  end
+
+  def avatar_full
+    full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_original_url)
+  end
+
+  def avatar_full_static
     full_asset_url(object.suspended? ? object.avatar.default_url : object.avatar_static_url)
   end
 
   def header
-    full_asset_url(object.suspended? ? object.header.default_url : object.header_original_url)
+    if respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails
+      full_asset_url(object.suspended? ? object.header.default_url : object.header_tiny_url, ext: object.header_file_name)
+    else
+      full_asset_url(object.suspended? ? object.header.default_url : object.header_original_url)
+    end
   end
 
   def header_static
+    if respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails
+      full_asset_url(object.suspended? ? object.header.default_url : object.header_tiny_static_url, ext: object.header_file_name)
+    else
+      full_asset_url(object.suspended? ? object.header.default_url : object.header_static_url, ext: object.header_file_name)
+    end
+  end
+
+  def header_full
+    full_asset_url(object.suspended? ? object.header.default_url : object.header_original_url)
+  end
+
+  def header_full_static
     full_asset_url(object.suspended? ? object.header.default_url : object.header_static_url)
   end
 
@@ -120,5 +157,13 @@ class REST::AccountSerializer < ActiveModel::Serializer
 
   def moved_and_not_nested?
     object.moved? && object.moved_to_account.moved_to_account_id.nil?
+  end
+
+  def with_fullsize_avatar?
+    respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails && current_user&.setting_use_fullsize_avatar_on_detail
+  end
+
+  def with_fullsize_header?
+    respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails && current_user&.setting_use_fullsize_header_on_detail
   end
 end

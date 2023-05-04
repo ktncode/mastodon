@@ -41,6 +41,7 @@ class VideoModal extends ImmutablePureComponent {
           <Video
             preview={media.get('preview_url')}
             frameRate={media.getIn(['meta', 'original', 'frame_rate'])}
+            thumbhash={media.get('thumbhash')}
             blurhash={media.get('blurhash')}
             src={media.get('url')}
             currentTime={options.startTime}

@@ -3,23 +3,44 @@
 module NodeIcon
   extend ActiveSupport::Concern
 
-  IMAGE_MIME_TYPES = %w(image/jpeg image/png image/gif image/webp image/vnd.microsoft.icon).freeze
-  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/vnd.microsoft.icon).freeze
-  LIMIT = 2.megabytes
+  IMAGE_MIME_TYPES = %w(image/jpeg image/png image/gif image/webp image/heif image/heic image/avif image/vnd.microsoft.icon).freeze
+  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/heif image/heic image/vnd.microsoft.icon).freeze
+  LIMIT = 4.megabytes
+
+  GLOBAL_CONVERT_OPTIONS = {
+    all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 90',
+  }.freeze
 
   class_methods do
     def icon_styles(file)
-      styles = { original: { geometry: '400x400#', convert_options: '+profile exif', file_geometry_parser: FastGeometryParser, processors: ->(f) { file_processors f } } }
-      styles[:static] = { geometry: '400x400#', format: 'png', convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser } if file.content_type == 'image/gif'
-      styles
-    end
+      styles = {
+        original: {
+          animated: true,
+          geometry: '400x400#',
+          file_geometry_parser: FastGeometryParser,
+          processors: [:lazy_thumbnail],
+        }
+      }
 
-    def file_processors(instance)
-      if IMAGE_CONVERTIBLE_MIME_TYPES.include?(instance.icon_content_type)
-        [:webp_converter]
-      else
-        [:noop]
+      if IMAGE_CONVERTIBLE_MIME_TYPES.include?(file.content_type)
+        styles[:original].merge!({
+          format: 'webp',
+          content_type: 'image/webp',
+          animated: true,
+        })
       end
+
+      if file.content_type == 'image/gif'
+        styles[:static] = {
+          format: 'webp',
+          content_type: 'image/webp',
+          animated: false,
+          file_geometry_parser: FastGeometryParser,
+          processors: [:lazy_thumbnail],
+        }
+      end
+
+      styles
     end
 
     private :icon_styles
@@ -27,7 +48,7 @@ module NodeIcon
 
   included do
     # Icon upload
-    has_attached_file :icon, styles: ->(f) { icon_styles(f) }
+    has_attached_file :icon, styles: ->(f) { icon_styles(f) }, convert_options: GLOBAL_CONVERT_OPTIONS
     validates_attachment_content_type :icon, content_type: IMAGE_MIME_TYPES, presence: true
     validates_attachment_size :icon, less_than: LIMIT
     remotable_attachment :icon, LIMIT, suppress_errors: true

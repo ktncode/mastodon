@@ -228,11 +228,11 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   class MediaAttachmentSerializer < ActivityPub::Serializer
-    context_extensions :blurhash, :focal_point
+    context_extensions :blurhash, :thumbhash, :focal_point
 
     include RoutingHelper
 
-    attributes :type, :media_type, :url, :name, :blurhash
+    attributes :type, :media_type, :url, :name, :blurhash, :thumbhash
     attribute :focal_point, if: :focal_point?
     attribute :width, if: :width?
     attribute :height, if: :height?

@@ -19,6 +19,7 @@
 #  description                 :text
 #  scheduled_status_id         :bigint(8)
 #  blurhash                    :string
+#  thumbhash                   :string
 #  processing                  :integer
 #  file_storage_schema_version :integer
 #  thumbnail_file_name         :string
@@ -40,13 +41,13 @@ class MediaAttachment < ApplicationRecord
 
   MAX_DESCRIPTION_LENGTH = 1_500
 
-  IMAGE_LIMIT = 16.megabytes
+  IMAGE_LIMIT = 24.megabytes
   VIDEO_LIMIT = 99.megabytes
 
   MAX_VIDEO_MATRIX_LIMIT = 8_294_400 # 3840x2160px
   MAX_VIDEO_FRAME_RATE   = 120
 
-  IMAGE_FILE_EXTENSIONS = %w(.jpg .jpeg .png .gif .webp .heic .heif .avif).freeze
+  IMAGE_FILE_EXTENSIONS = %w(.jpg .jpeg .png .gif .webp .heic .heif .avif .bmp).freeze
   VIDEO_FILE_EXTENSIONS = %w(.webm .mp4 .m4v .mov).freeze
   AUDIO_FILE_EXTENSIONS = %w(.ogg .oga .mp3 .wav .flac .opus .aac .m4a .3gp .wma).freeze
 
@@ -55,10 +56,11 @@ class MediaAttachment < ApplicationRecord
     colors
     original
     small
+    tiny
   ).freeze
 
-  IMAGE_MIME_TYPES             = %w(image/jpeg image/png image/gif image/webp image/heif image/heic).freeze
-  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/webp image/heif image/heic).freeze
+  IMAGE_MIME_TYPES             = %w(image/jpeg image/png image/gif image/webp image/heif image/heic image/avif image/bmp).freeze
+  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/heif image/heic image/bmp).freeze
   VIDEO_MIME_TYPES             = %w(video/webm video/mp4 video/quicktime video/ogg).freeze
   VIDEO_CONVERTIBLE_MIME_TYPES = %w(video/webm video/quicktime).freeze
   AUDIO_MIME_TYPES             = %w(audio/wave audio/wav audio/x-wav audio/x-pn-wave audio/ogg audio/vorbis audio/mpeg audio/mp3 audio/webm audio/flac audio/aac audio/m4a audio/x-m4a audio/mp4 audio/3gpp video/x-ms-asf).freeze
@@ -75,10 +77,31 @@ class MediaAttachment < ApplicationRecord
     }.freeze,
 
     small: {
+      format: 'webp',
+      content_type: 'image/webp',
       pixels: 160_000, # 400x400px
+      file_geometry_parser: FastGeometryParser,
+    }.freeze,
+
+    tiny: {
+      format: 'webp',
+      content_type: 'image/webp',
+      pixels: 40_000, # 200x200px
       file_geometry_parser: FastGeometryParser,
       blurhash: BLURHASH_OPTIONS,
     }.freeze,
+  }.freeze
+
+  IMAGE_CONVERTED_STYLES = {
+    original: {
+      format: 'webp',
+      content_type: 'image/webp',
+      pixels: 8_294_400, # 3840x2160px
+      file_geometry_parser: FastGeometryParser,
+    }.freeze,
+
+    small: IMAGE_STYLES[:small].freeze,
+    tiny:  IMAGE_STYLES[:tiny].freeze,
   }.freeze
 
   VIDEO_FORMAT = {
@@ -123,11 +146,27 @@ class MediaAttachment < ApplicationRecord
       convert_options: {
         output: {
           'loglevel' => 'fatal',
-          vf: 'scale=\'min(400\, iw):min(400\, ih)\':force_original_aspect_ratio=decrease',
+          vf: 'thumbnail=n=100,scale=\'min(400\, iw):min(400\, ih)\':force_original_aspect_ratio=decrease',
         }.freeze,
       }.freeze,
-      format: 'png',
-      time: 0,
+      format: 'webp',
+      content_type: 'image/webp',
+      animated: false,
+      pixels: 160_000, # 400x400px
+      file_geometry_parser: FastGeometryParser,
+    }.freeze,
+
+    tiny: {
+      convert_options: {
+        output: {
+          'loglevel' => 'fatal',
+          vf: 'thumbnail=n=100,scale=\'min(200\, iw):min(200\, ih)\':force_original_aspect_ratio=decrease',
+        }.freeze,
+      }.freeze,
+      format: 'webp',
+      content_type: 'image/webp',
+      animated: false,
+      pixels: 40_000, # 200x200px
       file_geometry_parser: FastGeometryParser,
       blurhash: BLURHASH_OPTIONS,
     }.freeze,
@@ -150,6 +189,7 @@ class MediaAttachment < ApplicationRecord
 
   VIDEO_CONVERTED_STYLES = {
     small: VIDEO_STYLES[:small].freeze,
+    tiny: VIDEO_STYLES[:tiny].freeze,
     original: VIDEO_FORMAT.freeze,
   }.freeze
 
@@ -158,7 +198,7 @@ class MediaAttachment < ApplicationRecord
   }.freeze
 
   GLOBAL_CONVERT_OPTIONS = {
-    all: '-quality 90 +profile exif +set modify-date +set create-date',
+    all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 90',
   }.freeze
 
   belongs_to :account,          inverse_of: :media_attachments, optional: true
@@ -207,8 +247,16 @@ class MediaAttachment < ApplicationRecord
     processing.present? && !processing_complete?
   end
 
+  def file_exists?
+    remote_resource_exists?(full_asset_url(file.url(:original)))
+  end
+
   def needs_redownload?
     file.blank? && remote_url.present?
+  end
+
+  def needs_reprocess?(version)
+    !file_meta.key?(version.to_s)
   end
 
   def larger_media_format?
@@ -276,6 +324,8 @@ class MediaAttachment < ApplicationRecord
     def file_styles(attachment)
       if attachment.instance.file_content_type == 'image/gif' || VIDEO_CONVERTIBLE_MIME_TYPES.include?(attachment.instance.file_content_type)
         VIDEO_CONVERTED_STYLES
+      elsif IMAGE_CONVERTIBLE_MIME_TYPES.include?(attachment.instance.file_content_type)
+        IMAGE_CONVERTED_STYLES
       elsif IMAGE_MIME_TYPES.include?(attachment.instance.file_content_type)
         IMAGE_STYLES
       elsif VIDEO_MIME_TYPES.include?(attachment.instance.file_content_type)
@@ -287,15 +337,13 @@ class MediaAttachment < ApplicationRecord
 
     def file_processors(instance)
       if instance.file_content_type == 'image/gif'
-        [:gif_transcoder, :blurhash_transcoder]
+        [:gif_transcoder, :blurhash_transcoder, :thumbhash_transcoder]
       elsif VIDEO_MIME_TYPES.include?(instance.file_content_type)
-        [:transcoder, :blurhash_transcoder, :type_corrector]
+        [:transcoder, :blurhash_transcoder, :thumbhash_transcoder, :type_corrector]
       elsif AUDIO_MIME_TYPES.include?(instance.file_content_type)
         [:image_extractor, :transcoder, :type_corrector]
-      elsif IMAGE_CONVERTIBLE_MIME_TYPES.include?(instance.file_content_type)
-        [:img_converter, :lazy_thumbnail, :blurhash_transcoder, :type_corrector]
       else
-        [:lazy_thumbnail, :blurhash_transcoder, :type_corrector]
+        [:lazy_thumbnail, :blurhash_transcoder, :thumbhash_transcoder, :type_corrector]
       end
     end
   end
@@ -353,7 +401,7 @@ class MediaAttachment < ApplicationRecord
     meta = (file.instance_read(:meta) || {}).with_indifferent_access.slice(*META_KEYS)
 
     file.queued_for_write.each do |style, file|
-      meta[style] = style == :small || image? ? image_geometry(file) : video_metadata(file)
+      meta[style] = style == :small || style == :tiny || image? ? image_geometry(file) : video_metadata(file)
     end
 
     meta[:small] = image_geometry(thumbnail.queued_for_write[:original]) if thumbnail.queued_for_write.key?(:original)

@@ -21,10 +21,12 @@
     .p-author.h-card
       = link_to ActivityPub::TagManager.instance.url_for(status.account), class: 'status__display-name u-url', target: stream_link_target, rel: 'noopener noreferrer' do
         .status__avatar{ account_cat_params(status.account) }
-          - if prefers_autoplay?
-            = image_tag status.account.avatar_original_url, alt: '', class: 'u-photo account__avatar'
+          - if current_account&.user&.setting_use_low_resolution_thumbnails
+            = image_tag status.account.avatar_tiny_url, alt: '', class: 'account__avatar u-photo'
+          - elsif prefers_autoplay?
+            = image_tag status.account.avatar_original_url, alt: '', class: 'account__avatar u-photo'
           - else
-            = image_tag status.account.avatar_static_url, alt: '', class: 'u-photo account__avatar'
+            = image_tag status.account.avatar_static_url, alt: '', class: 'account__avatar u-photo'
         %span.display-name
           %bdi
             %strong.display-name__html.p-name.emojify= display_name(status.account, custom_emojify: true, autoplay: prefers_autoplay?)

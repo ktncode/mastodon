@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_10_214919) do
+ActiveRecord::Schema.define(version: 2023_05_04_022308) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -211,6 +211,8 @@ ActiveRecord::Schema.define(version: 2023_03_10_214919) do
     t.integer "silence_mode", default: 0, null: false
     t.integer "searchability", default: 3, null: false
     t.string "featured_tags_collection_url"
+    t.string "avatar_thumbhash"
+    t.string "header_thumbhash"
     t.index "(((setweight(to_tsvector('simple'::regconfig, (display_name)::text), 'A'::\"char\") || setweight(to_tsvector('simple'::regconfig, (username)::text), 'B'::\"char\")) || setweight(to_tsvector('simple'::regconfig, (COALESCE(domain, ''::character varying))::text), 'C'::\"char\")))", name: "search_index", using: :gin
     t.index "lower((username)::text), COALESCE(lower((domain)::text), ''::text)", name: "index_accounts_on_username_and_domain_lower", unique: true
     t.index ["moved_to_account_id"], name: "index_accounts_on_moved_to_account_id"
@@ -373,6 +375,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_214919) do
     t.integer "image_storage_schema_version"
     t.integer "width"
     t.integer "height"
+    t.string "thumbhash"
     t.index ["shortcode", "domain"], name: "index_custom_emojis_on_shortcode_and_domain", unique: true
   end
 
@@ -686,6 +689,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_214919) do
     t.integer "thumbnail_file_size"
     t.datetime "thumbnail_updated_at"
     t.string "thumbnail_remote_url"
+    t.string "thumbhash"
     t.index ["account_id", "status_id"], name: "index_media_attachments_on_account_id_and_status_id", order: { status_id: :desc }
     t.index ["scheduled_status_id"], name: "index_media_attachments_on_scheduled_status_id"
     t.index ["shortcode"], name: "index_media_attachments_on_shortcode", unique: true
@@ -735,6 +739,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_214919) do
     t.string "note", default: "", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "thumbhash"
     t.index ["domain"], name: "index_nodes_on_domain", unique: true
     t.index ["info"], name: "index_nodes_on_info", using: :gin
     t.index ["last_fetched_at"], name: "index_nodes_on_last_fetched_at"
@@ -867,6 +872,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_214919) do
     t.string "embed_url", default: "", null: false
     t.integer "image_storage_schema_version"
     t.string "blurhash"
+    t.string "thumbhash"
     t.index ["url"], name: "index_preview_cards_on_url", unique: true
   end
 

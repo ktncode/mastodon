@@ -180,6 +180,7 @@ class Header extends ImmutablePureComponent {
     let bellBtn     = '';
     let lockedIcon  = '';
     let menu        = [];
+    let header      = '';
 
     if (me !== account.get('id') && account.getIn(['relationship', 'followed_by'])) {
       info.push(<span key='followed_by' className='relationship-tag'><FormattedMessage id='account.follows_you' defaultMessage='Follows you' /></span>);
@@ -408,6 +409,20 @@ class Header extends ImmutablePureComponent {
       }
     })();
 
+    if (account.get('header_full')) {
+      if (autoPlayGif) {
+        header = account.get('header_full');
+      } else {
+        header = account.get('header_full_static');
+      }
+    } else {
+      if (autoPlayGif) {
+        header = account.get('header');
+      } else {
+        header = account.get('header_static');
+      }
+    }
+
     return (
       <div className={classNames('account__header', { inactive: !!account.get('moved') })} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
         <div className='account__header__image'>
@@ -415,13 +430,13 @@ class Header extends ImmutablePureComponent {
             {!suspended && info}
           </div>
 
-          <img src={autoPlayGif ? account.get('header') : account.get('header_static')} alt='' className='parallax' />
+          <img src={header} alt='' className='parallax' />
         </div>
 
         <div className='account__header__bar'>
           <div className='account__header__tabs'>
             <a className='avatar' href={account.get('url')} rel='noopener noreferrer' target='_blank'>
-              <Avatar account={account} size={90} />
+              <Avatar account={account} size={90} full />
             </a>
 
             <div className='spacer' />

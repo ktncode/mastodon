@@ -8,6 +8,7 @@ import classnames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import { useBlurhash } from 'mastodon/initial_state';
 import Blurhash from 'mastodon/components/blurhash';
+import Thumbhash from 'mastodon/components/thumbhash';
 import { debounce } from 'lodash';
 
 const IDNA_PREFIX = 'xn--';
@@ -234,16 +235,23 @@ export default class Card extends React.PureComponent {
       </div>
     );
 
-    let embed     = '';
-    let canvas = (
-      <Blurhash
+    let embed  = '';
+    let canvas = card.get('thumbhash') ?
+      (<Thumbhash
+        hash={card.get('thumbhash')}
         className={classnames('status-card__image-preview', {
           'status-card__image-preview--hidden': revealed && this.state.previewLoaded,
         })}
-        hash={card.get('blurhash')}
         dummy={!useBlurhash}
-      />
-    );
+      />)
+      :
+      (<Blurhash
+        hash={card.get('blurhash')}
+        className={classnames('status-card__image-preview', {
+          'status-card__image-preview--hidden': revealed && this.state.previewLoaded,
+        })}
+        dummy={!useBlurhash}
+      />);
     let thumbnail = <img src={card.get('image')} alt='' style={{ width: horizontal ? width : null, height: horizontal ? height : null, visibility: revealed ? null : 'hidden' }} onLoad={this.handleImageLoad} className='status-card__image-image' />;
     let spoilerButton = (
       <button type='button' onClick={this.handleReveal} className='spoiler-button__overlay'>

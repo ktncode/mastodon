@@ -119,12 +119,32 @@ class ActivityPub::ProcessAccountService < BaseService
 
   def set_fetchable_attributes!
     begin
+      previous_avatar_remote_url = @account.avatar_remote_url
       @account.avatar_remote_url = image_url('icon') || '' unless skip_download?
+      if @account.avatar_remote_url.blank? || @account.avatar_remote_url != previous_avatar_remote_url
+        # no action
+      elsif @account.avatar_exists?
+        @account.avatar.styles.keys.each do |style|
+          @account.avatar.reprocess!(style) if style != @account.avatar.default_style && @account.needs_avatar_reprocess?(style)
+        end
+      else
+        @account.reset_avatar!
+      end
     rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
       RedownloadAvatarWorker.perform_in(rand(30..600).seconds, @account.id)
     end
     begin
+      previous_header_remote_url = @account.header_remote_url
       @account.header_remote_url = image_url('image') || '' unless skip_download?
+      if @account.header_remote_url.blank? || @account.header_remote_url != previous_header_remote_url
+        # no action
+      elsif @account.header_exists?
+        @account.header.styles.keys.each do |style|
+          @account.header.reprocess!(style) if style != @account.header.default_style && @account.needs_header_reprocess?(style)
+        end
+      else
+        @account.reset_header!
+      end
     rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
       RedownloadHeaderWorker.perform_in(rand(30..600).seconds, @account.id)
     end
@@ -340,7 +360,7 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   def skip_download?
-    @account.suspended? || @account.sensitized? || domain_block&.reject_media?
+    @account.suspended? || domain_block&.reject_media?
   end
 
   def auto_suspend?

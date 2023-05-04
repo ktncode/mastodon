@@ -13,9 +13,13 @@ module RoutingHelper
   end
 
   def full_asset_url(source, **options)
+    ext = File.extname(options.delete(:ext) || '').delete_prefix('.')
+
     source = ActionController::Base.helpers.asset_url(source, **options) unless use_storage?
 
-    URI.join(root_url, source).to_s
+    url = URI.join(root_url, source).to_s
+    url = "#{url}?original_ext=#{ext}" if ext.present? && ext != File.extname(source).delete_prefix('.')
+    url
   end
 
   def full_pack_url(source, **options)

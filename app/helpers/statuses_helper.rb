@@ -157,6 +157,7 @@ module StatusesHelper
       preview: full_asset_url(video.thumbnail.present? ? video.thumbnail.url : video.file.url(:small)),
       alt: video.description,
       blurhash: video.blurhash,
+      thumbhash: video.thumbhash,
       frameRate: meta.dig('original', 'frame_rate'),
       inline: true,
       media: [

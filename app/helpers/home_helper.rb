@@ -23,7 +23,7 @@ module HomeHelper
                   else
                     link_to(path || ActivityPub::TagManager.instance.url_for(account), class: 'account__display-name') do
                       content_tag(:div, class: 'account__avatar-wrapper') do
-                        image_tag(full_asset_url(current_account&.user&.setting_auto_play_gif ? account.avatar_original_url : account.avatar_static_url), class: 'account__avatar')
+                        image_tag(full_asset_url(current_account&.user&.setting_use_low_resolution_thumbnails ? account.avatar_tiny_url : current_account&.user&.setting_auto_play_gif ? account.avatar_original_url : account.avatar_static_url, ext: account.avatar_file_name), class: 'account__avatar')
                       end +
                         content_tag(:span, class: 'display-name') do
                           content_tag(:bdi) do

@@ -24,6 +24,7 @@
 #  embed_url                    :string           default(""), not null
 #  image_storage_schema_version :integer
 #  blurhash                     :string
+#  thumbhash                    :string
 #
 
 class PreviewCard < ApplicationRecord
@@ -37,6 +38,30 @@ class PreviewCard < ApplicationRecord
     y_comp: 4,
   }.freeze
 
+  GLOBAL_CONVERT_OPTIONS = {
+    all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 90',
+  }.freeze
+
+  IMAGE_STYLES = {
+    original: {
+      format: 'webp',
+      content_type: 'image/webp',
+      animated: false,
+      pixels: 230_400, # 640x360px
+      file_geometry_parser: FastGeometryParser,
+      processors: [:lazy_thumbnail],
+    }.freeze,
+
+    tiny: {
+      format: 'webp',
+      content_type: 'image/webp',
+      pixels: 25_680, # 214x120px
+      file_geometry_parser: FastGeometryParser,
+      processors: [:lazy_thumbnail, :blurhash_transcoder, :thumbhash_transcoder],
+      blurhash: BLURHASH_OPTIONS,
+    }.freeze,
+  }
+
   self.inheritance_column = false
 
   update_index('statuses') { statuses }
@@ -45,8 +70,7 @@ class PreviewCard < ApplicationRecord
 
   has_and_belongs_to_many :statuses
 
-  has_attached_file :image, processors: [:thumbnail, :blurhash_transcoder], styles: ->(f) { image_styles(f) }, convert_options: { all: '-quality 80 +profile exif' }, validate_media_type: false
-
+  has_attached_file :image, styles: IMAGE_STYLES, convert_options: GLOBAL_CONVERT_OPTIONS
   validates :url, presence: true, uniqueness: true
   validates_attachment_content_type :image, content_type: IMAGE_MIME_TYPES
   validates_attachment_size :image, less_than: LIMIT
@@ -69,26 +93,6 @@ class PreviewCard < ApplicationRecord
   rescue ActiveRecord::RecordInvalid
     self.image = nil
     save!
-  end
-
-  class << self
-    private
-
-    # rubocop:disable Naming/MethodParameterName
-    def image_styles(f)
-      styles = {
-        original: {
-          pixels: 230_400, # 640x360px
-          file_geometry_parser: FastGeometryParser,
-          convert_options: '-coalesce +profile exif',
-          blurhash: BLURHASH_OPTIONS,
-        },
-      }
-
-      styles[:original][:format] = 'jpg' if f.instance.image_content_type == 'image/gif'
-      styles
-    end
-    # rubocop:enable Naming/MethodParameterName
   end
 
   private

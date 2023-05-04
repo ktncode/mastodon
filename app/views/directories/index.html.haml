@@ -21,11 +21,11 @@
     - @accounts.each do |account|
       .directory__card
         .directory__card__img
-          = image_tag account.header.url, alt: ''
+          = image_tag (current_account && current_account.user&.setting_use_low_resolution_thumbnails ? (prefers_autoplay? ? account.header_tiny_url : account.header_tiny_static_url) : (prefers_autoplay? ? account.header_original_url : account.header_static_url)), alt: ''
         .directory__card__bar
           = link_to TagManager.instance.url_for(account), class: 'directory__card__bar__name' do
             .avatar{ account_cat_params(account) }
-              = image_tag account.avatar.url, alt: '', class: 'u-photo'
+              = image_tag (current_account && current_account.user&.setting_use_low_resolution_thumbnails ? (prefers_autoplay? ? account.avatar_tiny_url : account.avatar_tiny_static_url) : (prefers_autoplay? ? account.avatar_original_url : account.avatar_static_url)), alt: '', class: 'u-photo'
 
             .display-name
               %bdi

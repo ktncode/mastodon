@@ -6,7 +6,9 @@
   .p-author.h-card
     = link_to ActivityPub::TagManager.instance.url_for(status.account), class: 'detailed-status__display-name u-url', target: stream_link_target, rel: 'noopener' do
       .detailed-status__display-avatar{ account_cat_params(status.account) }
-        - if prefers_autoplay?
+        - if current_account&.user&.setting_use_low_resolution_thumbnails
+          = image_tag status.account.avatar_tiny_url, alt: '', class: 'account__avatar u-photo'
+        - elsif prefers_autoplay?
           = image_tag status.account.avatar_original_url, alt: '', class: 'account__avatar u-photo'
         - else
           = image_tag status.account.avatar_static_url, alt: '', class: 'account__avatar u-photo'

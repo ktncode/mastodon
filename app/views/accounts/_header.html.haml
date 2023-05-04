@@ -3,7 +3,7 @@
     = image_tag (prefers_autoplay? ? account.header_original_url : account.header_static_url), class: 'parallax'
   .public-account-header__bar
     = link_to short_account_url(account), account_cat_params(account, class: 'avatar') do
-      = image_tag (prefers_autoplay? ? account.avatar_original_url : account.avatar_static_url), id: 'profile_page_avatar', data: { original: full_asset_url(account.avatar_original_url), static: full_asset_url(account.avatar_static_url), autoplay: prefers_autoplay? }
+      = image_tag (current_account && current_account.user&.setting_use_low_resolution_thumbnails && !current_account.user&.setting_use_fullsize_avatar_on_detail ? (prefers_autoplay? ? account.avatar_tiny_url : account.avatar_tiny_static_url) : (prefers_autoplay? ? account.avatar_original_url : account.avatar_static_url)), id: 'profile_page_avatar', data: { original: full_asset_url(account.avatar_original_url), tiny: full_asset_url(account.avatar_tiny_url), static: full_asset_url(account.avatar_static_url), tiny_static: full_asset_url(account.avatar_tiny_static_url), autoplay: prefers_autoplay? }
     .public-account-header__tabs
       .public-account-header__tabs__name
         %h1

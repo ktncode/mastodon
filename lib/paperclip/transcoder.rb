@@ -33,9 +33,7 @@ module Paperclip
       @input_options  = @convert_options[:input]&.dup  || {}
 
       case @format.to_s
-      when /jpg$/, /jpeg$/, /png$/, /gif$/
-        @input_options['ss'] = @time
-
+      when /jpg$/, /jpeg$/, /png$/, /gif$/, /webp$/
         @output_options['f']       = 'image2'
         @output_options['vframes'] = 1
       when 'mp4'

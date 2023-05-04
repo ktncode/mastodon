@@ -140,6 +140,15 @@
   .fields-group
     = f.input :setting_unlocked_for_official_app, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  .fields-group
+    = f.input :setting_use_low_resolution_thumbnails, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_use_fullsize_avatar_on_detail, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_use_fullsize_header_on_detail, as: :boolean, wrapper: :with_label, fedibird_features: true
+
   %h4= t 'preferences.public_timelines'
 
   .fields-group

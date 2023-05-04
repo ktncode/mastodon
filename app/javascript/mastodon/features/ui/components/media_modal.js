@@ -167,6 +167,7 @@ class MediaModal extends ImmutablePureComponent {
         return (
           <Video
             preview={image.get('preview_url')}
+            thumbhash={image.get('thumbhash')}
             blurhash={image.get('blurhash')}
             src={image.get('url')}
             width={image.get('width')}

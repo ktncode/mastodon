@@ -247,6 +247,57 @@ module Mastodon
       say("Downloaded #{processed} media attachments (approx. #{number_to_human_size(aggregate)})#{dry_run}", :green, true)
     end
 
+    option :days, type: :numeric, default: 0, aliases: [:d]
+    option :concurrency, type: :numeric, default: 5, aliases: [:c]
+    option :verbose, type: :boolean, default: false, aliases: [:v]
+    option :dry_run, type: :boolean, default: false
+    option :force, type: :boolean, default: false
+    desc 'clear-missing-cache', 'Fix missing media files'
+    long_desc <<-DESC
+      Fixes the status of remote attached media where the file does not
+      actually exist.
+
+      If only a file is lost due to deletion or storage switching of
+      a local file or object storage, the attached media on the database
+      will be corrected to a state that requires re-downloading.
+
+      This allows the media proxy to perform a delayed reacquisition from
+      a remote URL when that data is needed.
+
+      Please note that some storage providers may charge for the API requests
+      necessary to verify the existence of an object.
+    DESC
+    def clear_missing_cache
+      dry_run = options[:dry_run] ? ' (DRY RUN)' : ''
+
+      scope = MediaAttachment.cached.attached
+      scope = scope.where(created_at: ..Time.current.ago(options[:days].days)) if options[:days] > 0
+
+      if options[:force]
+        processed = scope.count
+
+        unless options[:dry_run]
+          scope.in_batches.update_all(file_file_name: nil, file_content_type: nil, file_file_size: nil, file_updated_at: nil, thumbnail_file_name: nil, thumbnail_content_type: nil, thumbnail_file_size: nil, thumbnail_updated_at: nil)
+        end
+
+        say("Fixed #{processed} media attachments#{dry_run}", :green, true)
+      else
+        processed, aggregate = parallelize_with_progress(scope, order: :desc) do |media_attachment|
+          next if media_attachment.file.exists?(:original)
+
+          unless options[:dry_run]
+            media_attachment.file = nil
+            media_attachment.thumbnail = nil
+            media_attachment.save!
+          end
+
+          1
+        end
+
+        say("Processed #{processed} media attachments (fixed #{number_to_human(aggregate)} records)#{dry_run}", :green, true)
+      end
+    end
+
     desc 'usage', 'Calculate disk space consumed by Mastodon'
     def usage
       say("Attachments:\t#{number_to_human_size(MediaAttachment.sum(Arel.sql('COALESCE(file_file_size, 0) + COALESCE(thumbnail_file_size, 0)')))} (#{number_to_human_size(MediaAttachment.where(account: Account.local).sum(Arel.sql('COALESCE(file_file_size, 0) + COALESCE(thumbnail_file_size, 0)')))} local)")

@@ -8,13 +8,14 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
   attribute :category, if: :category_loaded?
   attribute :width, if: :width?
   attribute :height, if: :height?
+  attribute :thumbhash, if: :thumbhash?
 
   def url
     full_asset_url(object.image.url)
   end
 
   def static_url
-    full_asset_url(object.image.url(:static))
+    full_asset_url(object.image.url(:static), ext: '.png')
   end
 
   def category
@@ -39,5 +40,9 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
 
   def height?
     !object.height.nil?
+  end
+
+  def thumbhash?
+    !object.thumbhash.blank?
   end
 end

@@ -5,6 +5,7 @@ import { is } from 'immutable';
 import classNames from 'classnames';
 import { displayMedia, useBlurhash, maxAttachments } from '../initial_state';
 import Blurhash from 'mastodon/components/blurhash';
+import Thumbhash from 'mastodon/components/thumbhash';
 import { FormattedMessage } from 'react-intl';
 
 class Item extends React.PureComponent {
@@ -31,7 +32,8 @@ class Item extends React.PureComponent {
 
     const id          = attachment.get('id');
     const type        = attachment.get('type');
-    const hash        = attachment.get('blurhash');
+    const blurhash    = attachment.get('blurhash');
+    const thumbhash   = attachment.get('thumbhash');
     const preview     = attachment.get('preview_url');
     const description = attachment.get('description');
 
@@ -98,13 +100,21 @@ class Item extends React.PureComponent {
       break;
 
     default:
-      return hash ? (
+      return thumbhash || blurhash ? (
         <div className='thumbnail-gallery__item' key={id}>
-          <Blurhash
-            hash={hash}
-            className='thumbnail-gallery__preview'
-            dummy={!useBlurhash}
-          />
+          {thumbhash ?
+            <Thumbhash
+              hash={thumbhash}
+              className='thumbnail-gallery__preview'
+              dummy={!useBlurhash}
+            />
+            :
+            <Blurhash
+              hash={blurhash}
+              className='thumbnail-gallery__preview'
+              dummy={!useBlurhash}
+            />
+          }
         </div>
       ) : null;
     }
@@ -112,13 +122,24 @@ class Item extends React.PureComponent {
     return (
       <Fragment>
         <div className='thumbnail-gallery__item' key={id}>
-          {hash && <Blurhash
-            hash={hash}
-            dummy={!useBlurhash}
-            className={classNames('thumbnail-gallery__preview', {
-              'thumbnail-gallery__preview--hidden': visible && this.state.loaded,
-            })}
-          />}
+          {(thumbhash || blurhash) &&
+            thumbhash ?
+            (<Thumbhash
+              hash={thumbhash}
+              dummy={!useBlurhash}
+              className={classNames('thumbnail-gallery__preview', {
+                'thumbnail-gallery__preview--hidden': visible && this.state.loaded,
+              })}
+            />)
+            :
+            (<Blurhash
+              hash={blurhash}
+              dummy={!useBlurhash}
+              className={classNames('thumbnail-gallery__preview', {
+                'thumbnail-gallery__preview--hidden': visible && this.state.loaded,
+              })}
+            />)
+          }
           {visible && thumbnail}
         </div>
         {typeLabel && <div className='thumbnail-gallery__type' key='type'>{typeLabel}</div>}

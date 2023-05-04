@@ -267,7 +267,7 @@ GEM
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
     fast_blank (1.0.0)
-    fastimage (2.2.4)
+    fastimage (2.2.6)
     ffi (1.15.0)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
@@ -642,6 +642,7 @@ GEM
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
     thor (1.1.0)
+    thumbhash (0.0.1)
     thwait (0.2.0)
       e2mmap
     tilt (2.0.10)
@@ -825,6 +826,7 @@ DEPENDENCIES
   stoplight (~> 2.2.1)
   strong_migrations (~> 0.7)
   thor (~> 1.1)
+  thumbhash (~> 0.0.1)
   tty-prompt (~> 0.23)
   twitter-text (~> 3.1.0)
   tzinfo-data (~> 1.2021)
@@ -833,3 +835,9 @@ DEPENDENCIES
   webpacker (~> 5.4)
   webpush (~> 0.3)
   xorcist (~> 1.1)
+
+RUBY VERSION
+   ruby 2.7.8p225
+
+BUNDLED WITH
+   2.1.4

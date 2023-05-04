@@ -103,6 +103,9 @@ class UserSettingsDecorator
     enable_wide_emoji
     enable_wide_emoji_reaction
     unlocked_for_official_app
+    use_low_resolution_thumbnails
+    use_fullsize_avatar_on_detail
+    use_fullsize_header_on_detail
   ).freeze
 
   STRING_KEYS = %w(

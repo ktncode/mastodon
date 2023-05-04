@@ -133,6 +133,9 @@ ja:
         setting_theme_public: あなたの公開ページに現在使用中のテーマを反映します
         setting_unlocked_for_official_app: Mastodon公式アプリに対し、アカウントのフォロー承認制を強制的に無効と認識させることで、デフォルトの可視性を公開にします。
         setting_use_blurhash: ぼかしはメディアの色を元に生成されますが、細部は見えにくくなっています
+        setting_use_fullsize_avatar_on_detail: 低解像度サムネイル使用時でも、詳細画面ではフルサイズのアバターを表示したい場合に有効にします。通信量がわずかに増えます。
+        setting_use_fullsize_header_on_detail: 低解像度サムネイル使用時でも、詳細画面ではフルサイズのヘッダーを表示したい場合に有効にします。通信量がわずかに増えます。
+        setting_use_low_resolution_thumbnails: 画像の通信量を節約し、モバイルでの費用と速度を向上します
         setting_use_pending_items: 新着があってもタイムラインを自動的にスクロールしないようにします
         username: あなたのユーザー名は %{domain} の中で重複していない必要があります
         whole_word: キーワードまたはフレーズが英数字のみの場合、単語全体と一致する場合のみ適用されるようになります
@@ -344,6 +347,9 @@ ja:
         setting_unlocked_for_official_app: Mastodon公式アプリに対し、フォロー承認制を無効にする
         setting_unsubscribe_modal: 購読を解除する前に確認ダイアログを表示する
         setting_use_blurhash: 非表示のメディアを色付きのぼかしで表示する
+        setting_use_fullsize_avatar_on_detail: 詳細画面でフルサイズのアバターを使う
+        setting_use_fullsize_header_on_detail: 詳細画面でフルサイズのヘッダーを使う
+        setting_use_low_resolution_thumbnails: 低解像度のサムネイルを使う
         setting_use_pending_items: 手動更新モード
         severity: 重大性
         sign_in_token_attempt: セキュリティコード

@@ -5,8 +5,10 @@ require 'mime/types/columnar'
 module Attachmentable
   extend ActiveSupport::Concern
 
+  include RoutingHelper
+
   MAX_MATRIX_LIMIT = 33_177_600 # 7680x4320px or approx. 847MB in RAM
-  GIF_MATRIX_LIMIT = 921_600    # 1280x720px
+  GIF_MATRIX_LIMIT = 3_000_000  # 2000x1500px
 
   # For some file extensions, there exist different content
   # type variants, and browsers often send the wrong one,
@@ -22,7 +24,7 @@ module Attachmentable
 
   included do
     def self.has_attached_file(name, options = {}) # rubocop:disable Naming/PredicateName
-      options = { validate_media_type: false }.merge(options)
+      options = { validate_media_type: false, default_url: "/#{name.to_s.pluralize}/original/missing.png" }.merge(options)
       super(name, options)
       send(:"before_#{name}_post_process") do
         attachment = send(name)
@@ -80,5 +82,11 @@ module Attachmentable
     return if attachment.blank? || attachment.queued_for_write[:original].blank? || attachment.options[:preserve_files]
 
     attachment.instance_write :file_name, SecureRandom.hex(8) + File.extname(attachment.instance_read(:file_name))
+  end
+
+  def remote_resource_exists?(url)
+    Request.new(:head, url).perform {|res| res.code == 200}
+  rescue
+    false
   end
 end

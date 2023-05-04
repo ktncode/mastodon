@@ -12,12 +12,14 @@ export default class Avatar extends React.PureComponent {
     style: PropTypes.object,
     inline: PropTypes.bool,
     animate: PropTypes.bool,
+    full: PropTypes.bool,
   };
 
   static defaultProps = {
     animate: autoPlayGif,
     size: 20,
     inline: false,
+    full: false,
   };
 
   state = {
@@ -35,13 +37,13 @@ export default class Avatar extends React.PureComponent {
   }
 
   render () {
-    const { account, size, animate, inline } = this.props;
+    const { account, size, animate, inline, full } = this.props;
     const { hovering } = this.state;
 
-    const src = account.get('avatar');
+    const src = full && account.get('avatar_full') ? account.get('avatar_full') : account.get('avatar');
     const isCat = !disable_joke_appearance && account.getIn(['other_settings', 'is_cat']);
     const catEarsColor = !disable_joke_appearance && account.getIn(['other_settings', 'cat_ears_color']);
-    const staticSrc = account.get('avatar_static');
+    const staticSrc = full && account.get('avatar_full_static') ? account.get('avatar_full_static') : account.get('avatar_static');
 
     const catEarsColorStyle = catEarsColor ? { '--cat-ears-color': catEarsColor } : {};
 

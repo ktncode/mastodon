@@ -1,4 +1,5 @@
 import Blurhash from 'mastodon/components/blurhash';
+import Thumbhash from 'mastodon/components/thumbhash';
 import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import { autoPlayGif, displayMedia, useBlurhash } from 'mastodon/initial_state';
@@ -130,12 +131,19 @@ export default class MediaItem extends ImmutablePureComponent {
     return (
       <div className='account-gallery__item' style={{ width, height }}>
         <a className='media-gallery__item-thumbnail' href={status.get('url')} onClick={this.handleClick} title={title} target='_blank' rel='noopener noreferrer'>
-          <Blurhash
-            hash={attachment.get('blurhash')}
-            className={classNames('media-gallery__preview', { 'media-gallery__preview--hidden': visible && loaded })}
-            dummy={!useBlurhash}
-          />
-
+          {attachment.get('thumbhash') ?
+            <Thumbhash
+              hash={attachment.get('thumbhash')}
+              className={classNames('media-gallery__preview', { 'media-gallery__preview--hidden': visible && loaded })}
+              dummy={!useBlurhash}
+            />
+            :
+            <Blurhash
+              hash={attachment.get('blurhash')}
+              className={classNames('media-gallery__preview', { 'media-gallery__preview--hidden': visible && loaded })}
+              dummy={!useBlurhash}
+            />
+          }
           {visible ? thumbnail : icon}
         </a>
       </div>

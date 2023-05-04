@@ -6,9 +6,10 @@ import IconButton from './icon_button';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { isIOS } from '../is_mobile';
 import classNames from 'classnames';
-import { autoPlayGif, cropImages, displayMedia, useBlurhash } from '../initial_state';
+import { autoPlayGif, cropImages, displayMedia, useBlurhash, useLowResolutionThumbnails } from '../initial_state';
 import { debounce } from 'lodash';
 import Blurhash from 'mastodon/components/blurhash';
+import Thumbhash from 'mastodon/components/thumbhash';
 
 const messages = defineMessages({
   toggle_visible: { id: 'media_gallery.toggle_visible', defaultMessage: '{number, plural, one {Hide image} other {Hide images}}' },
@@ -140,11 +141,19 @@ class Item extends React.PureComponent {
       return (
         <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: size > 4 ? `calc(${height}% - 4px)` : `${height}%` }}>
           <a className='media-gallery__item-thumbnail' href={attachment.get('remote_url') || attachment.get('url')} style={{ cursor: 'pointer' }} title={attachment.get('description')} target='_blank' rel='noopener noreferrer'>
-            <Blurhash
-              hash={attachment.get('blurhash')}
-              className='media-gallery__preview'
-              dummy={!useBlurhash}
-            />
+            {attachment.get('thumbhash') ?
+              <Thumbhash
+                hash={attachment.get('thumbhash')}
+                className='media-gallery__preview'
+                dummy={!useBlurhash}
+              />
+              :
+              <Blurhash
+                hash={attachment.get('blurhash')}
+                className='media-gallery__preview'
+                dummy={!useBlurhash}
+              />
+            }
           </a>
         </div>
       );
@@ -157,7 +166,7 @@ class Item extends React.PureComponent {
 
       const hasSize = typeof originalWidth === 'number' && typeof previewWidth === 'number';
 
-      const srcSet = hasSize ? `${originalUrl} ${originalWidth}w, ${previewUrl} ${previewWidth}w` : null;
+      const srcSet = !useLowResolutionThumbnails && hasSize ? `${originalUrl} ${originalWidth}w, ${previewUrl} ${previewWidth}w` : null;
       const sizes  = hasSize && (displayWidth > 0) ? `${displayWidth * (width / 100)}px` : null;
 
       const focusX = attachment.getIn(['meta', 'focus', 'x']) || 0;
@@ -210,13 +219,23 @@ class Item extends React.PureComponent {
 
     return (
       <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: size > 4 ? `calc(${height}% - 4px)` : `${height}%` }}>
-        <Blurhash
-          hash={attachment.get('blurhash')}
-          dummy={!useBlurhash}
-          className={classNames('media-gallery__preview', {
-            'media-gallery__preview--hidden': visible && this.state.loaded,
-          })}
-        />
+        {attachment.get('thumbhash') ?
+          <Thumbhash
+            hash={attachment.get('thumbhash')}
+            dummy={!useBlurhash}
+            className={classNames('media-gallery__preview', {
+              'media-gallery__preview--hidden': visible && this.state.loaded,
+            })}
+          />
+          :
+          <Blurhash
+            hash={attachment.get('blurhash')}
+            dummy={!useBlurhash}
+            className={classNames('media-gallery__preview', {
+              'media-gallery__preview--hidden': visible && this.state.loaded,
+            })}
+          />
+        }
         {visible && thumbnail}
       </div>
     );

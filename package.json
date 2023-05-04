@@ -161,6 +161,7 @@
     "terser-webpack-plugin": "^4.2.3",
     "tesseract.js": "^2.1.1",
     "throng": "^4.0.0",
+    "thumbhash": "^0.1.1",
     "tiny-queue": "^0.2.1",
     "twitter-text": "3.1.0",
     "uuid": "^8.3.1",

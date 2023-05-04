@@ -10,6 +10,7 @@ class REST::EmojiReactionSerializer < ActiveModel::Serializer
   attribute :domain, if: :custom_emoji?
   attribute :width, if: :width?
   attribute :height, if: :height?
+  attribute :thumbhash, if: :thumbhash?
 
   belongs_to :account, serializer: REST::AccountSerializer
 
@@ -22,7 +23,7 @@ class REST::EmojiReactionSerializer < ActiveModel::Serializer
   end
 
   def static_url
-    full_asset_url(object.custom_emoji.image.url(:static))
+    full_asset_url(object.custom_emoji.image.url(:static), ext: '.png')
   end
 
   def domain
@@ -37,11 +38,19 @@ class REST::EmojiReactionSerializer < ActiveModel::Serializer
     object.custom_emoji.height
   end
 
+  def thumbhash
+    object.custom_emoji.thumbhash
+  end
+
   def width?
     custom_emoji? && object.custom_emoji.width
   end
 
   def height?
     custom_emoji? && object.custom_emoji.height
+  end
+
+  def thumbhash?
+    custom_emoji? && !object.custom_emoji.thumbhash.blank?
   end
 end

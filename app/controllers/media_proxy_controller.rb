@@ -17,9 +17,15 @@ class MediaProxyController < ApplicationController
   def show
     RedisLock.acquire(lock_options) do |lock|
       if lock.acquired?
-        @media_attachment = MediaAttachment.remote.attached.find(params[:id])
+        @media_attachment = MediaAttachment.find(params[:id])
         authorize @media_attachment.status, :show?
-        redownload! if @media_attachment.needs_redownload? && !reject_media?
+        if !reject_media?
+          if @media_attachment.needs_redownload? || !@media_attachment.file_exists?
+            redownload!
+          elsif @media_attachment.needs_reprocess?(version)
+            reprocess!
+          end
+        end
       else
         raise Mastodon::RaceConditionError
       end
@@ -36,12 +42,21 @@ class MediaProxyController < ApplicationController
     @media_attachment.save!
   end
 
+  def reprocess!
+    @media_attachment.file.reprocess!(version)
+    @media_attachment.created_at = Time.now.utc
+    @media_attachment.save!
+  end
+
   def version
-    if request.path.end_with?('/small')
-      :small
-    else
-      :original
-    end
+    @version ||=
+      if request.path.end_with?('/tiny')
+        :tiny
+      elsif request.path.end_with?('/small')
+        :small
+      else
+        :original
+      end
   end
 
   def lock_options

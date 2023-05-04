@@ -6,7 +6,7 @@ class REST::PreviewCardSerializer < ActiveModel::Serializer
   attributes :url, :title, :description, :type,
              :author_name, :author_url, :provider_name,
              :provider_url, :html, :width, :height,
-             :image, :embed_url, :blurhash
+             :image, :embed_url, :blurhash, :thumbhash
 
   attribute :status_id, if: :status_id
   attribute :account_id, if: :account_id
@@ -32,6 +32,10 @@ class REST::PreviewCardSerializer < ActiveModel::Serializer
   end
 
   def image
-    object.image? ? full_asset_url(object.image.url(:original)) : nil
+    if respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails
+      object.image? ? full_asset_url(object.image.url(:tiny), ext: object.image_file_name) : nil
+    else
+      object.image? ? full_asset_url(object.image.url(:original)) : nil
+    end
   end
 end

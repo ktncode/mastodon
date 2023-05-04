@@ -20,6 +20,7 @@
 #  image_storage_schema_version :integer
 #  width                        :integer
 #  height                       :integer
+#  thumbhash                    :string
 #
 
 class CustomEmoji < ApplicationRecord
@@ -27,6 +28,7 @@ class CustomEmoji < ApplicationRecord
 
   LOCAL_LIMIT = (ENV['MAX_EMOJI_SIZE'] || 256.kilobytes).to_i
   LIMIT       = [LOCAL_LIMIT, (ENV['MAX_REMOTE_EMOJI_SIZE'] || 256.kilobytes).to_i].max
+  MAX_PIXELS  = 750_000 # 1500x500px
 
   SHORTCODE_RE_FRAGMENT = '[a-zA-Z0-9_]{2,}'
 
@@ -34,16 +36,17 @@ class CustomEmoji < ApplicationRecord
     :(#{SHORTCODE_RE_FRAGMENT}):
     (?=[^[:alnum:]:]|$)/x
 
-  IMAGE_MIME_TYPES = %w(image/png image/gif image/webp image/jpeg image/heif image/heic).freeze
-  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/jpeg image/heif image/heic).freeze
+  IMAGE_MIME_TYPES = %w(image/png image/gif image/webp image/jpeg image/heif image/heic image/avif image/bmp).freeze
+  IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/jpeg image/heif image/heic image/bmp).freeze
+
+  GLOBAL_CONVERT_OPTIONS = {
+    all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 90',
+  }.freeze
 
   belongs_to :category, class_name: 'CustomEmojiCategory', optional: true
   has_one :local_counterpart, -> { where(domain: nil) }, class_name: 'CustomEmoji', primary_key: :shortcode, foreign_key: :shortcode
 
-  has_attached_file :image, styles: {
-      original: { convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser, processors: ->(f) { file_processors f } },
-      static: { format: 'png', convert_options: '-coalesce +profile exif', file_geometry_parser: FastGeometryParser }
-    }, validate_media_type: false
+  has_attached_file :image, styles: ->(f) { file_styles(f) }, processors: [:lazy_thumbnail], convert_options: GLOBAL_CONVERT_OPTIONS
 
   before_validation :downcase_domain
 
@@ -60,6 +63,7 @@ class CustomEmoji < ApplicationRecord
 
   remotable_attachment :image, LIMIT
 
+  before_save :extract_dimensions
   after_commit :remove_entity_cache
 
   def local?
@@ -93,16 +97,47 @@ class CustomEmoji < ApplicationRecord
 
     private
 
-    def file_processors(instance)
-      if IMAGE_CONVERTIBLE_MIME_TYPES.include?(instance.image_content_type)
-        [:webp_converter, :dimension_extractor]
-      else
-        [:dimension_extractor]
+    def file_styles(file)
+      styles = {
+        original: {
+          pixels: MAX_PIXELS,
+          file_geometry_parser: FastGeometryParser,
+        },
+    
+        static: {
+          format: 'webp',
+          content_type: 'image/webp',
+          animated: false,
+          file_geometry_parser: FastGeometryParser,
+        },
+      }
+
+      if IMAGE_CONVERTIBLE_MIME_TYPES.include?(file.content_type)
+        styles[:original].merge!({
+          format: 'webp',
+          content_type: 'image/webp',
+          animated: true,
+        })
       end
+
+      styles
     end
   end
 
   private
+
+  def extract_dimensions
+    file = image.queued_for_write[:original]
+
+    return if file.nil?
+
+    width, height = FastImage.size(file.path)
+
+    return nil if width.nil?
+
+    self.width  = width
+    self.height = height
+  end
 
   def remove_entity_cache
     Rails.cache.delete(EntityCache.instance.to_key(:emoji, shortcode, domain))

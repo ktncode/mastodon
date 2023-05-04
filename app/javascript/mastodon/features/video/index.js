@@ -8,6 +8,7 @@ import { isFullscreen, requestFullscreen, exitFullscreen } from '../ui/util/full
 import { displayMedia, useBlurhash } from '../../initial_state';
 import Icon from 'mastodon/components/icon';
 import Blurhash from 'mastodon/components/blurhash';
+import Thumbhash from 'mastodon/components/thumbhash';
 
 const messages = defineMessages({
   play: { id: 'video.play', defaultMessage: 'Play' },
@@ -118,6 +119,7 @@ class Video extends React.PureComponent {
     deployPictureInPicture: PropTypes.func,
     intl: PropTypes.object.isRequired,
     blurhash: PropTypes.string,
+    thumbhash: PropTypes.string,
     autoPlay: PropTypes.bool,
     volume: PropTypes.number,
     muted: PropTypes.bool,
@@ -524,7 +526,7 @@ class Video extends React.PureComponent {
   }
 
   render () {
-    const { preview, src, inline, onOpenVideo, onCloseVideo, intl, alt, detailed, sensitive, editable, blurhash, quote } = this.props;
+    const { preview, src, inline, onOpenVideo, onCloseVideo, intl, alt, detailed, sensitive, editable, blurhash, thumbhash, quote } = this.props;
     const { containerWidth, currentTime, duration, volume, buffer, dragging, paused, fullscreen, hovered, muted, revealed } = this.state;
     const progress = Math.min((currentTime / duration) * 100, 100);
     const playerStyle = {};
@@ -573,13 +575,23 @@ class Video extends React.PureComponent {
         onKeyDown={this.handleKeyDown}
         tabIndex={0}
       >
-        <Blurhash
-          hash={blurhash}
-          className={classNames('media-gallery__preview', {
-            'media-gallery__preview--hidden': revealed,
-          })}
-          dummy={!useBlurhash}
-        />
+        {thumbhash ?
+          (<Thumbhash
+            hash={thumbhash}
+            dummy={!useBlurhash}
+            className={classNames('media-gallery__preview', {
+              'media-gallery__preview--hidden': revealed,
+            })}
+          />)
+          :
+          (<Blurhash
+            hash={blurhash}
+            dummy={!useBlurhash}
+            className={classNames('media-gallery__preview', {
+              'media-gallery__preview--hidden': revealed,
+            })}
+          />)
+        }
 
         {(revealed || editable) && <video
           ref={this.setVideoRef}

@@ -19,7 +19,7 @@ module Mastodon
       ProgressBar.create(total: total, format: '%c/%u |%b%i| %e')
     end
 
-    def parallelize_with_progress(scope)
+    def parallelize_with_progress(scope, order: :asc)
       if options[:concurrency] < 1
         say('Cannot run with this concurrency setting, must be at least 1', :red)
         exit(1)
@@ -34,7 +34,7 @@ module Mastodon
       total     = Concurrent::AtomicFixnum.new(0)
       aggregate = Concurrent::AtomicFixnum.new(0)
 
-      scope.reorder(nil).find_in_batches do |items|
+      scope.reorder(nil).find_in_batches(order: order) do |items|
         futures = []
 
         items.each do |item|

@@ -3,7 +3,7 @@
 class REST::NodeSerializer < ActiveModel::Serializer
   include RoutingHelper
 
-  attributes :id, :domain, :software, :version, :upstream, :upstream_version, :description, :languages, :region, :categories, :proxied_icon, :proxied_thumbnail, :blurhash,
+  attributes :id, :domain, :software, :version, :upstream, :upstream_version, :description, :languages, :region, :categories, :proxied_icon, :proxied_thumbnail, :blurhash, :thumbhash,
              :total_users, :last_week_users, :registrations, :approval_required, :language, :category,
              :emoji_reaction_type, :emoji_reaction_max, :referencability, :favouritability, :repliabilty, :reblogability
 

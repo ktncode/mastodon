@@ -233,6 +233,7 @@ class DetailedStatus extends ImmutablePureComponent {
             <Video
               preview={attachment.get('preview_url')}
               frameRate={attachment.getIn(['meta', 'original', 'frame_rate'])}
+              thumbhash={attachment.get('thumbhash')}
               blurhash={attachment.get('blurhash')}
               src={attachment.get('url')}
               alt={attachment.get('description')}
@@ -318,6 +319,7 @@ class DetailedStatus extends ImmutablePureComponent {
           <Video
             preview={attachment.get('preview_url')}
             frameRate={attachment.getIn(['meta', 'original', 'frame_rate'])}
+            thumbhash={attachment.get('thumbhash')}
             blurhash={attachment.get('blurhash')}
             src={attachment.get('url')}
             alt={attachment.get('description')}

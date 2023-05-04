@@ -51,6 +51,8 @@
 #  silence_mode                  :integer          default(0), not null
 #  searchability                 :integer          default(3), not null
 #  featured_tags_collection_url  :string
+#  avatar_thumbhash              :string
+#  header_thumbhash              :string
 #
 
 class Account < ApplicationRecord
@@ -68,12 +70,12 @@ class Account < ApplicationRecord
 
   DEFAULT_FIELDS_SIZE = 8
 
+  include Attachmentable
   include AccountAssociations
   include AccountAvatar
   include AccountFinderConcern
   include AccountHeader
   include AccountInteractions
-  include Attachmentable
   include Paginable
   include AccountCounters
   include DomainNormalizable
@@ -377,9 +379,15 @@ class Account < ApplicationRecord
 
   def save_with_optional_media!
     save!
-  rescue ActiveRecord::RecordInvalid
-    self.avatar = nil
-    self.header = nil
+  rescue ActiveRecord::RecordInvalid => e
+    errors = e.record.errors.errors
+    errors.each do |err|
+      if err.attribute == :avatar
+        self.avatar = nil
+      elsif err.attribute == :header
+        self.header = nil
+      end
+    end
 
     save!
   end
@@ -406,6 +414,10 @@ class Account < ApplicationRecord
 
   def excluded_from_timeline_domains
     Rails.cache.fetch("exclude_domains_for:#{id}") { domain_blocks.pluck(:domain) }
+  end
+
+  def inbox_url
+    self[:inbox_url]
   end
 
   def preferred_inbox_url
