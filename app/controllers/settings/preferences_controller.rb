@@ -131,7 +131,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_use_fullsize_header_on_detail,
       setting_prohibited_visibilities: [],
       notification_emails: %i(follow follow_request reblog favourite emoji_reaction status_reference mention digest report pending_account trending_tag),
-      interactions: %i(must_be_follower must_be_following must_be_following_dm must_be_dm_to_send_email must_be_following_reference)
+      interactions: %i(must_be_follower must_be_following must_be_following_dm must_be_following_newcommer must_be_following_newcommer_dm must_be_dm_to_send_email must_be_following_reference)
     )
   end
 

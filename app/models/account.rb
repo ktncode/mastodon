@@ -172,6 +172,10 @@ class Account < ApplicationRecord
     moved_to_account_id.present?
   end
 
+  def newcommer?
+    created_at > Time.current.ago(3.days)
+  end
+
   def bot?
     %w(Application Service).include? actor_type
   end

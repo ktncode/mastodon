@@ -63,12 +63,21 @@ class NotifyService < BaseService
     @following_sender = @recipient.following?(@notification.from_account) || @recipient.requested?(@notification.from_account)
   end
 
+  def newcommer_sender?
+    return @newcommer_sender if defined?(@newcommer_sender)
+    @newcommer_sender = @notification.from_account.newcommer?
+  end
+
   def optional_non_follower?
     @recipient.user.settings.interactions['must_be_follower']  && !@notification.from_account.following?(@recipient)
   end
 
   def optional_non_following?
-    @recipient.user.settings.interactions['must_be_following'] && !following_sender?
+    !follow? && !follow_request? && @recipient.user.settings.interactions['must_be_following'] && !following_sender?
+  end
+
+  def optional_non_following_newcommer?
+    !follow? && !follow_request? && @recipient.user.settings.interactions['must_be_following_newcommer'] && !following_sender? && newcommer_sender?
   end
 
   def optional_non_following_and_reference?
@@ -81,6 +90,14 @@ class NotifyService < BaseService
 
   def message?
     @notification.type == :mention
+  end
+
+  def follow?
+    @notification.type == :follow
+  end
+
+  def follow_request?
+    @notification.type == :follow_request
   end
 
   def status_reference?
@@ -150,6 +167,14 @@ class NotifyService < BaseService
       !response_to_recipient?
   end
 
+  def optional_non_following_newcommer_and_direct?
+    direct_message? &&
+      @recipient.user.settings.interactions['must_be_following_newcommer_dm'] &&
+      !following_sender? &&
+      newcommer_sender? &&
+      !response_to_recipient?
+  end
+
   def hellbanned?
     @notification.from_account.silenced? && !following_sender?
   end
@@ -174,8 +199,10 @@ class NotifyService < BaseService
     blocked ||= hellbanned?                                      # Hellban
     blocked ||= optional_non_follower?                           # Options
     blocked ||= optional_non_following?                          # Options
+    blocked ||= optional_non_following_newcommer?                # Options
     blocked ||= optional_non_following_and_reference?            # Options
     blocked ||= optional_non_following_and_direct?               # Options
+    blocked ||= optional_non_following_newcommer_and_direct?     # Options
     blocked ||= conversation_muted?
     blocked ||= send("blocked_#{@notification.type}?")           # Type-dependent filters
     blocked

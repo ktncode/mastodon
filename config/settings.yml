@@ -94,6 +94,8 @@ defaults: &defaults
     must_be_follower: false
     must_be_following: false
     must_be_following_dm: false
+    must_be_following_newcommer: false
+    must_be_following_newcommer_dm: false
     must_be_following_reference: true
   reserved_usernames:
     - admin

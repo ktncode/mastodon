@@ -389,6 +389,8 @@ ja:
         must_be_follower: フォロワー以外からの通知をブロック
         must_be_following: フォローしていないユーザーからの通知をブロック
         must_be_following_dm: フォローしていないユーザーからのダイレクトメッセージをブロック
+        must_be_following_newcommer: フォローしていない新規ユーザーからの通知をブロック
+        must_be_following_newcommer_dm:  フォローしていない新規ユーザーからのダイレクトメッセージをブロック
         must_be_following_reference: フォローしていないユーザーからの参照通知をブロック
       invite:
         comment: コメント
