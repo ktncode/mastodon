@@ -6,7 +6,13 @@ class Form::CustomEmojiBatch
   include AccountableConcern
 
   attr_accessor :custom_emoji_ids, :action, :current_account,
-                :category_id, :category_name, :visible_in_picker
+                :category_id, :category_name, :visible_in_picker,
+                :keyword_action, :keyword_action_value,
+                :description, :author, :copy_permission, :license, :usage_info
+
+  KEYWORD_ACTIONS         = %w(apend prepend remove overwrite)
+  LICENSE_ACTIONS         = %w(apend prepend remove overwrite)
+  COPY_PERMISSION_ACTIONS = %w(prompt none allow deny conditional)
 
   def save
     case action
@@ -45,8 +51,35 @@ class Form::CustomEmojiBatch
     end
 
     custom_emojis.each do |custom_emoji|
-      custom_emoji.update(category_id: category&.id)
+      custom_emoji.category_id     = category&.id         if category.present?
+      custom_emoji.aliases         = applied_aliases(custom_emoji)
+      custom_emoji.description     = a_strip(description) if description.present?
+      custom_emoji.author          = a_strip(author)      if author.present?
+      custom_emoji.copy_permission = copy_permission      if COPY_PERMISSION_ACTIONS.include?(copy_permission) && copy_permission != 'prompt'
+      custom_emoji.license         = a_strip(license)     if license.present?
+      custom_emoji.usage_info      = a_strip(usage_info)  if usage_info.present?
+      custom_emoji.save
       log_action :update, custom_emoji
+    end
+  end
+
+  def a_strip(str)
+    str == '*' ? '' : str.strip
+  end
+
+  def applied_aliases(custom_emoji)
+    case keyword_action
+    when 'apend'
+      (custom_emoji.aliases + keyword_action_value.split(' ')).uniq
+    when 'prepend'
+      aliases = keyword_action_value.split(' ')
+      aliases.concat(custom_emoji.aliases - aliases)
+    when 'remove'
+      custom_emoji.aliases - keyword_action_value.split(' ')
+    when 'overwrite'
+      keyword_action_value.split(' ')
+    else
+      custom_emoji.aliases
     end
   end
 

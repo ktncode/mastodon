@@ -304,7 +304,7 @@ Rails.application.routes.draw do
       resource :sign_in_token_authentication, only: [:create, :destroy]
     end
 
-    resources :custom_emojis, only: [:index, :new, :create] do
+    resources :custom_emojis, only: [:index, :new, :create, :update, :edit] do
       collection do
         post :batch
       end

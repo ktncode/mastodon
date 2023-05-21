@@ -24,12 +24,35 @@
         - else
           = filter_link_to t('admin.accounts.location.remote'), remote: '1', local: nil
 
+  .filter-subset
+    %strong= t('admin.custom_emojis.keywords.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.keywords.all'), keywords: nil
+      %li= filter_link_to t('admin.custom_emojis.keywords.unset'), keywords: '0'
+      %li= filter_link_to t('admin.custom_emojis.keywords.set'), keywords: '1'
+
+  .filter-subset
+    %strong= t('admin.custom_emojis.copy_permission.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.copy_permission.all'), copy_permission: nil
+      %li= filter_link_to t('admin.custom_emojis.copy_permission.none'), copy_permission: :none
+      %li= filter_link_to t('admin.custom_emojis.copy_permission.allow'), copy_permission: :allow
+      %li= filter_link_to t('admin.custom_emojis.copy_permission.deny'), copy_permission: :deny
+      %li= filter_link_to t('admin.custom_emojis.copy_permission.conditional'), copy_permission: :conditional
+
+  .filter-subset
+    %strong= t('admin.custom_emojis.license.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.license.all'), license: nil
+      %li= filter_link_to t('admin.custom_emojis.license.unset'), license: '0'
+      %li= filter_link_to t('admin.custom_emojis.license.set'), license: '1'
+
 = form_tag admin_custom_emojis_url, method: 'GET', class: 'simple_form' do
   .fields-group
     - CustomEmojiFilter::KEYS.each do |key|
       = hidden_field_tag key, params[key] if params[key].present?
 
-    - %i(shortcode by_domain).each do |key|
+    - %i(shortcode by_domain category).each do |key|
       .input.string.optional
         = text_field_tag key, params[key], class: 'string optional', placeholder: I18n.t("admin.custom_emojis.#{key}")
 
@@ -49,7 +72,7 @@
         = check_box_tag :batch_checkbox_all, nil, false
       .batch-table__toolbar__actions
         - if params[:local] == '1'
-          = f.button safe_join([fa_icon('save'), t('generic.save_changes')]), name: :update, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
+          = f.button safe_join([fa_icon('save'), t('admin.custom_emojis.apply_batch_assignment')]), name: :update, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
           = f.button safe_join([fa_icon('eye'), t('admin.custom_emojis.list')]), name: :list, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
@@ -77,6 +100,46 @@
             .input.string.optional
               .label_input
                 = f.text_field :category_name, class: 'string optional', placeholder: t('admin.custom_emojis.create_new_category'), 'aria-label': t('admin.custom_emojis.create_new_category')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-6
+            .input.select.optional
+              .label_input
+                = f.select :keyword_action, options_for_select(Form::CustomEmojiBatch::KEYWORD_ACTIONS.map { |keyword_action| [I18n.t("admin.custom_emojis.keyword_action.#{keyword_action}"), keyword_action]}), class: 'select optional', 'aria-label': t('admin.custom_emojis.keyword_action.prompt')
+
+          .fields-group.fields-row__column.fields-row__column-6
+            .input.string.optional
+              .label_input
+                = f.text_field :keyword_action_value, class: 'string optional', placeholder: t('admin.custom_emojis.keyword_action.value'), 'aria-label': t('admin.custom_emojis.keyword_action.value')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_field :description, class: 'string optional', placeholder: t('admin.custom_emojis.description.title'), 'aria-label': t('admin.custom_emojis.description.title')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-6
+            .input.select.optional
+              .label_input
+                = f.text_field :author, class: 'string optional', placeholder: t('admin.custom_emojis.author.title'), 'aria-label': t('admin.custom_emojis.author.title')
+
+          .fields-group.fields-row__column.fields-row__column-6
+            .input.select.optional
+              .label_input
+                = f.select :copy_permission, options_for_select(Form::CustomEmojiBatch::COPY_PERMISSION_ACTIONS.map { |copy_permission_action| [I18n.t("admin.custom_emojis.copy_permission_action.#{copy_permission_action}"), copy_permission_action]}), class: 'select optional', 'aria-label': t('admin.custom_emojis.copy_permission_action.prompt')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_field :license, class: 'string optional', placeholder: t('admin.custom_emojis.license.title'), 'aria-label': t('admin.custom_emojis.license.title')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_field :usage_info, class: 'string optional', placeholder: t('admin.custom_emojis.usage_info.title'), 'aria-label': t('admin.custom_emojis.usage_info.title')
 
     .batch-table__body
       - if @custom_emojis.empty?

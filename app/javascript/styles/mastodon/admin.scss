@@ -924,3 +924,28 @@ a.name-tag,
 .exclude-keyword {
   color: $error-value-color;
 }
+
+.license {
+  color: $classic-primary-color;
+}
+
+.emoji-detail {
+  .emojione {
+    max-width: 640px;
+    width: auto;
+    height: 64px;
+  }
+}
+
+.edit_custom_emoji.simple_form {
+  .actions {
+    flex-direction: row-reverse;
+    gap: 10px;
+
+    button,
+    button:last-child {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+}

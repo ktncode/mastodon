@@ -21,6 +21,10 @@
 #  width                        :integer
 #  height                       :integer
 #  thumbhash                    :string
+#  copy_permission              :integer          default(0), not null
+#  aliases                      :string           default([]), not null, is an Array
+#  meta                         :jsonb            default({}), not null
+#  combined_name                :text
 #
 
 class CustomEmoji < ApplicationRecord
@@ -42,6 +46,10 @@ class CustomEmoji < ApplicationRecord
   GLOBAL_CONVERT_OPTIONS = {
     all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 90',
   }.freeze
+
+  attr_accessor :category_name
+
+  enum copy_permission: { none: 0, allow: 1, deny: 2, conditional: 3 }, _suffix: :permission
 
   belongs_to :category, class_name: 'CustomEmojiCategory', optional: true
   has_one :local_counterpart, -> { where(domain: nil) }, class_name: 'CustomEmoji', primary_key: :shortcode, foreign_key: :shortcode
@@ -66,6 +74,54 @@ class CustomEmoji < ApplicationRecord
   before_save :extract_dimensions
   after_commit :remove_entity_cache
 
+  def keywords
+    self.aliases.join(' ')
+  end
+
+  def keywords=(val)
+    self.aliases = val.split(' ')
+  end
+
+  def license
+    meta['license']
+  end
+
+  def license=(val)
+    meta['license'] = val
+  end
+
+  def usage_info
+    meta['usage_info']
+  end
+
+  def usage_info=(val)
+    meta['usage_info'] = val
+  end
+
+  def author
+    meta['author']
+  end
+
+  def author=(val)
+    meta['author'] = val
+  end
+
+  def description
+    meta['description']
+  end
+
+  def description=(val)
+    meta['description'] = val
+  end
+
+  def is_based_on
+    meta['is_based_on']
+  end
+
+  def is_based_on=(val)
+    meta['is_based_on'] = val
+  end
+
   def local?
     domain.nil?
   end
@@ -77,6 +133,12 @@ class CustomEmoji < ApplicationRecord
   def copy!
     copy = self.class.find_or_initialize_by(domain: nil, shortcode: shortcode)
     copy.image = image
+    copy.width = self.width
+    copy.height = self.height
+    copy.thumbhash = self.thumbhash
+    copy.copy_permission = self.copy_permission
+    copy.aliases = self.aliases
+    copy.meta = self.meta.merge({ is_based_on: self.uri })
     copy.tap(&:save!)
   end
 
@@ -92,7 +154,7 @@ class CustomEmoji < ApplicationRecord
     end
 
     def search(shortcode)
-      where('"custom_emojis"."shortcode" ILIKE ?', "%#{shortcode}%")
+      where('"custom_emojis"."combined_name" ILIKE ?', "%#{shortcode}%")
     end
 
     private

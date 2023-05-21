@@ -2,6 +2,8 @@
 
 module Admin
   class CustomEmojisController < BaseController
+    before_action :set_custom_emoji, only: [:edit, :update]
+
     def index
       authorize :custom_emoji, :index?
 
@@ -22,12 +24,33 @@ module Admin
 
       if @custom_emoji.save
         log_action :create, @custom_emoji
-        redirect_to admin_custom_emojis_path, notice: I18n.t('admin.custom_emojis.created_msg')
+
+        if params[:upload_once_more]
+          redirect_to new_admin_custom_emoji_path(filter_params.merge(resource_params)), notice: I18n.t('admin.custom_emojis.created_msg')
+        else
+          redirect_to admin_custom_emojis_path(filter_params), notice: I18n.t('admin.custom_emojis.created_msg')
+        end
       else
         render :new
       end
     end
 
+    def edit; end
+
+    def update
+      return redirect_to admin_custom_emojis_path(filter_params) if params[:go_to_index]
+
+      if @custom_emoji.update(resource_params)
+        if params[:update_and_next] && (id = filtered_custom_emojis.where(domain: @custom_emoji.domain..).where('shortcode > ?', @custom_emoji.shortcode).take&.id)
+          redirect_to edit_admin_custom_emoji_path(id, filter_params), notice: I18n.t('admin.custom_emojis.updated_msg')
+        else
+          redirect_to admin_custom_emojis_path(filter_params), notice: I18n.t('admin.custom_emojis.updated_msg')
+        end
+      else
+        render action: :edit
+      end
+    end
+  
     def batch
       @form = Form::CustomEmojiBatch.new(form_custom_emoji_batch_params.merge(current_account: current_account, action: action_from_button))
       @form.save
@@ -41,8 +64,14 @@ module Admin
 
     private
 
+    def set_custom_emoji
+      @custom_emoji = CustomEmoji.find(params[:id])
+    end
+
     def resource_params
-      params.require(:custom_emoji).permit(:shortcode, :image, :visible_in_picker)
+      params.require(:custom_emoji).permit(:shortcode, :image, :visible_in_picker, :category_id, :category_name, :keywords, :description, :author, :copy_permission, :license, :usage_info).tap do |p|
+        p[:category_id] = CustomEmojiCategory.find_or_create_by!(name: p[:category_name]).id if p[:category_name].present?
+      end
     end
 
     def filtered_custom_emojis
@@ -72,7 +101,7 @@ module Admin
     end
 
     def form_custom_emoji_batch_params
-      params.require(:form_custom_emoji_batch).permit(:action, :category_id, :category_name, custom_emoji_ids: [])
+      params.require(:form_custom_emoji_batch).permit(:action, :category_id, :category_name, :keyword_action, :keyword_action_value, :description, :author, :copy_permission, :license, :usage_info, custom_emoji_ids: [])
     end
   end
 end

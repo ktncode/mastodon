@@ -9,6 +9,7 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
   attribute :width, if: :width?
   attribute :height, if: :height?
   attribute :thumbhash, if: :thumbhash?
+  attribute :aliases, if: :aliases?
 
   def url
     full_asset_url(object.image.url)
@@ -34,6 +35,10 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
     object.height
   end
 
+  def aliases
+    object.aliases
+  end
+
   def width?
     !object.width.nil?
   end
@@ -44,5 +49,9 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
 
   def thumbhash?
     !object.thumbhash.blank?
+  end
+
+  def aliases?
+    object.aliases.present?
   end
 end

@@ -356,29 +356,76 @@ en:
       unpublished_msg: Announcement successfully unpublished!
       updated_msg: Announcement successfully updated!
     custom_emojis:
+      apply_batch_assignment: Apply batch assignment
       assign_category: Assign category
+      author:
+        title: Author
       by_domain: Domain
+      category: Category
       copied_msg: Successfully created local copy of the emoji
       copy: Copy
       copy_failed_msg: Could not make a local copy of that emoji
+      copy_permission:
+        all: All
+        allow: Allow
+        allow_long: Allow copying use to remote servers
+        conditional: Conditional
+        conditional_long: Must not be processed automatically without checking the license conditions
+        deny: Deny
+        deny_long: Deny copying use to remote servers
+        none: Undefined
+        none_long: Not set
+        title: Copy permission
+      copy_permission_action:
+        allow: Allow copy use
+        conditional: Set copy use as conditional
+        deny: Deny copy use
+        none: Unset
+        prompt: (select copy permission)
       create_new_category: Create new category
       created_msg: Emoji successfully created!
       delete: Delete
+      description:
+        title: Custom emoji description
       destroyed_msg: Emojo successfully destroyed!
       disable: Disable
       disabled: Disabled
       disabled_msg: Successfully disabled that emoji
+      edit:
+        title: Edit
       emoji: Emoji
       enable: Enable
       enabled: Enabled
       enabled_msg: Successfully enabled that emoji
+      go_to_index: Go to index
       image_hint: PNG up to 50KB
+      keyword_action:
+        apend: Add keywords at the end
+        overwrite: Overwrite keywords
+        prepend: Add keywords at the top
+        prompt: Select an action for the keyword
+        remove: Delete keywords
+        value: Keywords to be applied (separated by spaces)
+      keywords:
+        all: All
+        hint: Define space-separated aliases for search
+        set: Set
+        title: Keywords
+        unset: Unset
+      license:
+        all: All
+        hint: It recommends a well-known license such as Creative Commons
+        set: Set
+        title: License
+        unset: Unset
       list: List
       listed: Listed
       new:
         title: Add new custom emoji
       not_permitted: You are not permitted to perform this action
       overwrite: Overwrite
+      save_changes: Save changes
+      save_changes_and_next: Save changes and next
       shortcode: Shortcode
       shortcode_hint: At least 2 characters, only alphanumeric characters and underscores
       title: Custom emojis
@@ -388,6 +435,10 @@ en:
       update_failed_msg: Could not update that emoji
       updated_msg: Emoji successfully updated!
       upload: Upload
+      upload_once_more: Upload (repeat)
+      usage_info:
+        hint: Supplemental information that cannot be explained by the license alone, or special contracting methods
+        title: License Details
     dashboard:
       authorized_fetch_mode: Secure mode
       backlog: backlogged jobs

@@ -1,7 +1,7 @@
 - content_for :page_title do
   = t('.title')
 
-= simple_form_for @custom_emoji, url: admin_custom_emojis_path do |f|
+= simple_form_for @custom_emoji, url: admin_custom_emoji_path(@custom_emoji), method: :put do |f|
   = render 'shared/error_messages', object: @custom_emoji
 
   = hidden_field_tag :page, params[:page] || 1
@@ -9,10 +9,11 @@
   - CustomEmojiFilter::KEYS.each do |key|
     = hidden_field_tag key, params[key] if params[key].present?
 
-  .fields-group
-    = f.input :shortcode, wrapper: :with_label, label: t('admin.custom_emojis.shortcode'), hint: t('admin.custom_emojis.shortcode_hint')
-  .fields-group
-    = f.input :image, wrapper: :with_label, input_html: { accept: ['image/png', 'image/jpeg'] }, hint: t('admin.custom_emojis.image_hint')
+  .fields-group.emoji-detail
+    = custom_emoji_tag(@custom_emoji, animate = current_account&.user&.setting_auto_play_gif)
+    %samp= ":#{@custom_emoji.shortcode}:"
+    - if @custom_emoji.local?
+      %span.account-role.bot= @custom_emoji.category&.name || t('admin.custom_emojis.uncategorized')
   .fields-group
     .input.with_label.integer.optional.custom_emoji_category_id
       .label_input
@@ -27,7 +28,7 @@
               .label_input
                 = f.text_field :category_name, class: 'string optional', placeholder: t('admin.custom_emojis.create_new_category'), 'aria-label': t('admin.custom_emojis.create_new_category')
   .fields-group
-    = f.input :keywords, wrapper: :with_label, label: t('admin.custom_emojis.keywords.title'), hint: t('admin.custom_emojis.keywords.hint'), fedibird_features: true
+    = f.input :keywords, wrapper: :with_label, label: t('admin.custom_emojis.keywords.title'), hint: t('admin.custom_emojis.keywords.hint'), input_html: { autofocus: true }, fedibird_features: true
   .fields-group
     = f.input :description, wrapper: :with_label, label: t('admin.custom_emojis.description.title'), fedibird_features: true
   .fields-group
@@ -40,5 +41,7 @@
     = f.input :usage_info, wrapper: :with_label, label: t('admin.custom_emojis.usage_info.title'), hint: t('admin.custom_emojis.usage_info.hint'), fedibird_features: true
 
   .actions
-    = f.button :button, t('admin.custom_emojis.upload_once_more'), name: :upload_once_more, type: :submit
-    = f.button :button, t('admin.custom_emojis.upload'), name: :upload, type: :submit
+    - if @custom_emoji.local?
+      = f.button :button, t('admin.custom_emojis.save_changes_and_next'), name: :update_and_next, type: :submit
+      = f.button :button, t('admin.custom_emojis.save_changes'), name: :update, type: :submit
+    = f.button :button, t('admin.custom_emojis.go_to_index'), name: :go_to_index, type: :submit

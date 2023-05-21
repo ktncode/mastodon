@@ -239,16 +239,31 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     return if skip_download?
     return if tag['name'].blank? || tag['icon'].blank? || tag['icon']['url'].blank?
 
-    shortcode = tag['name'].delete(':')
-    image_url = tag['icon']['url']
-    uri       = tag['id']
-    updated   = tag['updated']
-    emoji     = CustomEmoji.find_by(shortcode: shortcode, domain: @account.domain)
+    shortcode       = tag['name'].delete(':')
+    image_url       = tag['icon']['url']
+    uri             = tag['id']
+    updated         = tag['updated']
+    copy_permission = tag['copyPermission']
+    license         = tag['license']
+    aliases         = as_array(tag['keywords'])
+    usage_info      = tag['usageInfo']
+    author          = tag['author']
+    description     = tag['description']
+    is_based_on     = tag['isBasedOn']
+    emoji           = CustomEmoji.find_by(shortcode: shortcode, domain: @account.domain)
 
     return unless emoji.nil? || image_url != emoji.image_remote_url || (updated && updated >= emoji.updated_at)
 
     emoji ||= CustomEmoji.new(domain: @account.domain, shortcode: shortcode, uri: uri)
+    emoji.copy_permission  = case copy_permission when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
+    emoji.license          = license
+    emoji.aliases          = aliases
+    emoji.usage_info       = usage_info
+    emoji.author           = author
+    emoji.description      = description
+    emoji.is_based_on      = is_based_on
     emoji.image_remote_url = image_url
+    emoji.updated_at       = updated   if updated
     emoji.save
   rescue Seahorse::Client::NetworkingError => e
     Rails.logger.warn "Error storing emoji: #{e}"

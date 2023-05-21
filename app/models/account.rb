@@ -47,7 +47,7 @@
 #  devices_url                   :string
 #  suspension_origin             :integer
 #  sensitized_at                 :datetime
-#  settings                      :jsonb            default("{}"), not null
+#  settings                      :jsonb            default({}), not null
 #  silence_mode                  :integer          default(0), not null
 #  searchability                 :integer          default(3), not null
 #  featured_tags_collection_url  :string

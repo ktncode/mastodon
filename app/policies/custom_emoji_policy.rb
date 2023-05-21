@@ -14,7 +14,7 @@ class CustomEmojiPolicy < ApplicationPolicy
   end
 
   def copy?
-    admin?
+    admin? && (!record.is_a?(CustomEmoji) || !record.deny_permission?)
   end
 
   def enable?

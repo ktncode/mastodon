@@ -341,29 +341,76 @@ ja:
       unpublished_msg: お知らせを非掲載にしました
       updated_msg: お知らせを更新しました
     custom_emojis:
+      apply_batch_assignment: 一括指定を適用
       assign_category: カテゴリーを割り当て
+      author:
+        title: 制作者
       by_domain: ドメイン
+      category: カテゴリー
       copied_msg: 絵文字のコピーをローカルに作成しました
       copy: コピー
       copy_failed_msg: 絵文字のコピーをローカルに作成できませんでした
+      copy_permission:
+        all: すべて
+        allow: 許可
+        allow_long: リモートサーバーへのコピー利用を許可する
+        conditional: 条件付き
+        conditional_long: ライセンス条件を確認せずに自動的に処理してはならない
+        deny: 禁止
+        deny_long: リモートサーバーへのコピー利用を拒否する
+        none: 未設定
+        none_long: 設定しない
+        title: コピー許可
+      copy_permission_action:
+        allow: コピー利用を許可する
+        conditional: コピー利用を条件付きに設定する
+        deny: コピー利用を拒否する
+        none: 未設定にする
+        prompt: （コピー利用の可否を選択）
       create_new_category: カテゴリーを作成
       created_msg: 絵文字の追加に成功しました！
       delete: 削除
+      description:
+        title: 絵文字の説明
       destroyed_msg: 絵文字の削除に成功しました！
       disable: 無効化
       disabled: 無効
       disabled_msg: 絵文字を無効化しました
+      edit:
+        title: 編集
       emoji: 絵文字
       enable: 有効化
       enabled: 有効
       enabled_msg: 絵文字を有効化しました
+      go_to_index: 一覧へ（保存しない）
       image_hint: 50KBまでのPNG画像を利用できます
+      keyword_action:
+        apend: キーワードを末尾に追加
+        overwrite: キーワードを上書き
+        prepend: キーワードを先頭に追加
+        prompt: キーワードへのアクションを選択
+        remove: キーワードを削除
+        value: 適用するキーワード（スペース区切りで複数）
+      keywords:
+        all: すべて
+        hint: 検索に使う別名をスペース区切りで定義します
+        set: 設定済み
+        title: キーワード
+        unset: 未設定
+      license:
+        all: すべて
+        hint: クリエイティブ・コモンズのような、よく知られたライセンスを推奨します
+        set: 設定済み
+        title: ライセンス
+        unset: 未設定
       list: 表示
       listed: 表示
       new:
         title: 新規カスタム絵文字の追加
       not_permitted: この操作を実行する権限がありません。
       overwrite: 上書き
+      save_changes: 保存して一覧へ
+      save_changes_and_next: 保存して次へ
       shortcode: ショートコード
       shortcode_hint: 2文字以上の半角英数字とアンダーバーのみ利用できます
       title: カスタム絵文字
@@ -373,6 +420,10 @@ ja:
       update_failed_msg: 絵文字を更新できませんでした
       updated_msg: 絵文字の更新に成功しました！
       upload: アップロード
+      upload_once_more: アップロード（連続）
+      usage_info:
+        hint: ライセンスだけで説明できない内容の補足や、特別な契約方法などを記載します。
+        title: ライセンスの詳細
     dashboard:
       authorized_fetch_mode: セキュアモード
       backlog: 未処理のジョブ

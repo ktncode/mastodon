@@ -218,16 +218,24 @@
   background-color: rgba($ui-secondary-color, 0.1);
   border: 1px solid rgba($ui-secondary-color, 0.5);
 
+  &.allow,
   &.moderator {
     color: $success-green;
     background-color: rgba($success-green, 0.1);
     border-color: rgba($success-green, 0.5);
   }
 
+  &.deny,
   &.admin {
     color: lighten($error-red, 12%);
     background-color: rgba(lighten($error-red, 12%), 0.1);
     border-color: rgba(lighten($error-red, 12%), 0.5);
+  }
+
+  &.conditional {
+    color: lighten($gold-star, 12%);
+    background-color: rgba(lighten($gold-star, 12%), 0.1);
+    border-color: rgba(lighten($gold-star, 12%), 0.5);
   }
 
   &.float {

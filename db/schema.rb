@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_05_04_022308) do
+ActiveRecord::Schema.define(version: 2023_05_20_141042) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -355,6 +355,7 @@ ActiveRecord::Schema.define(version: 2023_05_04_022308) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "view_style", default: 0, null: false
     t.index ["name"], name: "index_custom_emoji_categories_on_name", unique: true
   end
 
@@ -376,6 +377,11 @@ ActiveRecord::Schema.define(version: 2023_05_04_022308) do
     t.integer "width"
     t.integer "height"
     t.string "thumbhash"
+    t.integer "copy_permission", default: 0, null: false
+    t.string "aliases", default: [], null: false, array: true
+    t.jsonb "meta", default: "{}", null: false
+    t.text "combined_name", default: -> { "array_to_string_immutable(((aliases || shortcode))::text[], chr(10))" }
+    t.index ["meta"], name: "index_custom_emoji_on_meta", using: :gin
     t.index ["shortcode", "domain"], name: "index_custom_emojis_on_shortcode_and_domain", unique: true
   end
 
