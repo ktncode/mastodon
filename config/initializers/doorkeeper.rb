@@ -87,6 +87,7 @@ Doorkeeper.configure do
                   :'read:blocks',
                   :'read:bookmarks',
                   :'read:circles',
+                  :'read:custom_emojis',
                   :'read:favourites',
                   :'read:filters',
                   :'read:follows',

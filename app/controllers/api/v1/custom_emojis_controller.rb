@@ -7,4 +7,9 @@ class Api::V1::CustomEmojisController < Api::BaseController
     expires_in 3.minutes, public: true
     render_with_cache(each_serializer: REST::CustomEmojiSerializer) { CustomEmoji.listed.includes(:category) }
   end
+
+  def show
+    @custom_emoji = CustomEmoji.listed.includes(:category).find(params[:id])
+    render json: @custom_emoji, serializer: REST::CustomEmojiDetailSerializer
+  end
 end

@@ -391,7 +391,7 @@ Rails.application.routes.draw do
       get '/streaming', to: 'streaming#index'
       get '/streaming/(*any)', to: 'streaming#index'
 
-      resources :custom_emojis, only: [:index]
+      resources :custom_emojis, only: [:index, :show]
       resources :suggestions, only: [:index, :destroy]
       resources :scheduled_statuses, only: [:index, :show, :update, :destroy]
       resources :preferences, only: [:index]
