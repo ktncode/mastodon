@@ -24,15 +24,14 @@ module Attachmentable
 
   included do
     def self.has_attached_file(name, options = {}) # rubocop:disable Naming/PredicateName
-      options = { validate_media_type: false, default_url: "/#{name.to_s.pluralize}/original/missing.png" }.merge(options)
+      options = { default_url: "/#{name.to_s.pluralize}/original/missing.png" }.merge(options)
       super(name, options)
-      send(:"before_#{name}_post_process") do
+      send(:"before_#{name}_validate") do
         attachment = send(name)
         check_image_dimension(attachment)
         set_file_content_type(attachment)
         obfuscate_file_name(attachment)
         set_file_extension(attachment)
-        Paperclip::Validators::MediaTypeSpoofDetectionValidator.new(attributes: [name]).validate(self)
       end
     end
   end
