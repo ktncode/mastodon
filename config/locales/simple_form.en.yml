@@ -510,6 +510,8 @@ en:
         name: Hashtag
         trendable: Allow this hashtag to appear under trends
         usable: Allow posts to use this hashtag
+      user:
+        time_zone: Time zone
     'no': 'No'
     recommended: Recommended
     required:

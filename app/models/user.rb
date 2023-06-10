@@ -43,6 +43,7 @@
 #  webauthn_id               :string
 #  sign_up_ip                :inet
 #  skip_sign_in_token        :boolean
+#  time_zone                 :string
 #
 
 class User < ApplicationRecord
@@ -95,6 +96,7 @@ class User < ApplicationRecord
   validates_with EmailMxValidator, if: :validate_email_dns?
   validates :agreement, acceptance: { allow_nil: false, accept: [true, 'true', '1'] }, on: :create
   validates :setting_max_frequently_used_emojis, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: CustomEmoji::FREQUENTLY_USED_EMOJIS_LIMIT }
+  validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name } }, allow_blank: true
 
   # Honeypot/anti-spam fields
   attr_accessor :registration_form_time, :website, :confirm_password

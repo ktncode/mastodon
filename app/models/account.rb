@@ -174,6 +174,7 @@ class Account < ApplicationRecord
            :hide_following_count_from_yourself?,
            :hide_subscribing_count_from_yourself?,
            :shows_application?,
+           :time_zone,
            to: :user,
            prefix: true,
            allow_nil: true

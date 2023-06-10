@@ -510,6 +510,8 @@ ja:
         name: ハッシュタグ
         trendable: トレンドへの表示を許可する
         usable: 投稿への使用を許可する
+      user:
+        time_zone: タイムゾーン
     'no': いいえ
     recommended: おすすめ
     required:

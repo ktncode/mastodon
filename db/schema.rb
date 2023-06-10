@@ -1198,6 +1198,7 @@ ActiveRecord::Schema.define(version: 2024_02_01_030756) do
     t.string "webauthn_id"
     t.inet "sign_up_ip"
     t.boolean "skip_sign_in_token"
+    t.string "time_zone"
     t.index ["account_id"], name: "index_users_on_account_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["created_by_application_id"], name: "index_users_on_created_by_application_id"
