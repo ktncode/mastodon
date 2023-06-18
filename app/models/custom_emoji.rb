@@ -66,6 +66,7 @@ class CustomEmoji < ApplicationRecord
   scope :local, -> { where(domain: nil) }
   scope :remote, -> { where.not(domain: nil) }
   scope :alphabetic, -> { order(domain: :asc, shortcode: :asc) }
+  scope :reading_order, -> { order(Arel.sql('coalesce(aliases[1], shortcode) COLLATE "ja-x-icu" asc')) }
   scope :by_domain_and_subdomains, ->(domain) { where(domain: domain).or(where(arel_table[:domain].matches('%.' + domain))) }
   scope :listed, -> { local.where(disabled: false).where(visible_in_picker: true) }
 
