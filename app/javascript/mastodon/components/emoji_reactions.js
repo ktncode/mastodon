@@ -5,6 +5,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { List } from 'immutable';
 import classNames from 'classnames';
+import { fetchAccounts } from 'mastodon/actions/accounts';
 import Emoji from './emoji';
 import unicodeMapping from 'mastodon/features/emoji/emoji_unicode_mapping_light';
 import AnimatedNumber from 'mastodon/components/animated_number';
@@ -29,12 +30,13 @@ const getFilteredEmojiReaction = (emojiReaction, relationships) => {
 };
 
 const mapStateToProps = (state, { emojiReaction }) => {
-  const relationship = new Map();
-  emojiReaction.get('account_ids').forEach(accountId => relationship.set(accountId, state.getIn(['relationships', accountId])));
+  const relationships = new Map();
+  emojiReaction.get('account_ids').forEach(accountId => relationships.set(accountId, state.getIn(['relationships', accountId])));
 
   return {
-    emojiReaction: emojiReaction,
-    relationships: relationship,
+    emojiReaction,
+    relationships,
+    updateCount: state.getIn(['relationships', 'updateCount']),
   };
 };
 
@@ -48,6 +50,7 @@ const mergeProps = ({ emojiReaction, relationships }, dispatchProps, ownProps) =
 export default class EmojiReaction extends ImmutablePureComponent {
 
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     status: ImmutablePropTypes.map.isRequired,
     emojiReaction: ImmutablePropTypes.map,
     myReaction: PropTypes.bool.isRequired,
@@ -59,6 +62,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
 
   state = {
     hovered: false,
+    fetched: false,
   };
 
   handleClick = () => {
@@ -73,9 +77,15 @@ export default class EmojiReaction extends ImmutablePureComponent {
 
   handleMouseEnter = ({ target }) => {
     const { top } = target.getBoundingClientRect();
+    const { dispatch, emojiReaction } = this.props;
+
+    if (!this.state.fetched) {
+      dispatch(fetchAccounts(emojiReaction.get('account_ids')));
+    }
 
     this.setState({
       hovered: true,
+      fetched: true,
       placement: top * 2 < innerHeight ? 'bottom' : 'top',
     });
   };

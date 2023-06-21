@@ -383,8 +383,7 @@ class Status < ApplicationRecord
   end
 
   def account_ids(recursive: true)
-    ids = (Oj.load(status_stat&.emoji_reactions_cache || '', mode: :strict) || []).flat_map { |emoji_reaction| emoji_reaction['account_ids'] }
-    ids << account_id.to_s
+    ids = [account_id.to_s]
 
     if recursive
       ids.concat(quote.account_ids(recursive: false)) unless quote.nil?

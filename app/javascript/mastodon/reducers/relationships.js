@@ -49,7 +49,7 @@ const setDomainBlocking = (state, accounts, blocking) => {
   });
 };
 
-const initialState = ImmutableMap();
+const initialState = ImmutableMap({ updateCount: 0 });
 
 export default function relationships(state = initialState, action) {
   switch(action.type) {
@@ -69,14 +69,15 @@ export default function relationships(state = initialState, action) {
     return state.setIn([action.id, 'subscribing'], false);
   case ACCOUNT_UNSUBSCRIBE_FAIL:
     return state.setIn([action.id, 'subscribing'], true);
-  case ACCOUNT_FOLLOW_SUCCESS:
-  case ACCOUNT_UNFOLLOW_SUCCESS:
-  case ACCOUNT_SUBSCRIBE_SUCCESS:
-  case ACCOUNT_UNSUBSCRIBE_SUCCESS:
   case ACCOUNT_BLOCK_SUCCESS:
   case ACCOUNT_UNBLOCK_SUCCESS:
   case ACCOUNT_MUTE_SUCCESS:
   case ACCOUNT_UNMUTE_SUCCESS:
+    return normalizeRelationship(state, action.relationship).update('updateCount', x => x + 1);
+  case ACCOUNT_FOLLOW_SUCCESS:
+  case ACCOUNT_UNFOLLOW_SUCCESS:
+  case ACCOUNT_SUBSCRIBE_SUCCESS:
+  case ACCOUNT_UNSUBSCRIBE_SUCCESS:
   case ACCOUNT_PIN_SUCCESS:
   case ACCOUNT_UNPIN_SUCCESS:
   case ACCOUNT_NOTE_SUBMIT_SUCCESS:
@@ -84,9 +85,9 @@ export default function relationships(state = initialState, action) {
   case RELATIONSHIPS_FETCH_SUCCESS:
     return normalizeRelationships(state, action.relationships);
   case DOMAIN_BLOCK_SUCCESS:
-    return setDomainBlocking(state, action.accounts, true);
+    return setDomainBlocking(state, action.accounts, true).update('updateCount', x => x + 1);
   case DOMAIN_UNBLOCK_SUCCESS:
-    return setDomainBlocking(state, action.accounts, false);
+    return setDomainBlocking(state, action.accounts, false).update('updateCount', x => x + 1);
   default:
     return state;
   }

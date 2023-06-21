@@ -1,4 +1,4 @@
-import { fetchRelationshipsSuccess, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationshipsFromStatuses } from './accounts';
 import api, { getLinks } from '../api';
 import { importFetchedStatuses, importFetchedAccounts } from './importer';
 
@@ -33,7 +33,6 @@ export function fetchBookmarkedStatuses({ onlyMedia, withoutMedia } = {}) {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(fetchBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
       }
     }).catch(error => {
@@ -85,7 +84,6 @@ export function expandBookmarkedStatuses() {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(expandBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
       }
     }).catch(error => {

@@ -1,6 +1,6 @@
 import api, { getLinks } from '../api';
 import { importFetchedAccounts, importFetchedStatus, importFetchedStatuses } from './importer';
-import { fetchRelationshipsSuccess, fetchRelationships, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationships, fetchRelationshipsFromStatuses } from './accounts';
 import { me } from '../initial_state';
 
 export const REBLOG_REQUEST = 'REBLOG_REQUEST';
@@ -579,7 +579,6 @@ export function fetchReferredByStatuses(id) {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(fetchReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
       }
     }).catch(error => {
@@ -634,7 +633,6 @@ export function expandReferredByStatuses(id) {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(expandReferredByStatusesSuccess(id, statuses, next ? next.uri : null));
       }
     }).catch(error => {

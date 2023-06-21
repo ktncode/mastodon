@@ -1,5 +1,4 @@
 import api from '../api';
-import { fetchAccountsFromStatuses } from './accounts';
 import { importFetchedStatuses } from './importer';
 
 export const PINNED_STATUSES_FETCH_REQUEST = 'PINNED_STATUSES_FETCH_REQUEST';
@@ -14,7 +13,6 @@ export function fetchPinnedStatuses() {
 
     api(getState).get(`/api/v1/accounts/${me}/statuses`, { params: { pinned: true } }).then(response => {
       dispatch(importFetchedStatuses(response.data));
-      dispatch(fetchAccountsFromStatuses(response.data));
       dispatch(fetchPinnedStatusesSuccess(response.data, null));
     }).catch(error => {
       dispatch(fetchPinnedStatusesFail(error));

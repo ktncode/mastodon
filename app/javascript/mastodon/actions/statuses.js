@@ -1,7 +1,7 @@
 import api from '../api';
 
 import { deleteFromTimelines } from './timelines';
-import { fetchRelationshipsFromStatus, fetchAccountsFromStatus, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsFromStatus, fetchRelationshipsFromStatuses } from './accounts';
 import { importFetchedStatus, importFetchedStatuses, importFetchedAccount } from './importer';
 import { ensureComposeIsVisible, getContextReference } from './compose';
 
@@ -59,7 +59,6 @@ export function fetchStatus(id) {
       const status = response.data;
       dispatch(importFetchedStatus(status));
       dispatch(fetchRelationshipsFromStatus(status));
-      dispatch(fetchAccountsFromStatus(status));
       dispatch(fetchStatusSuccess(skipLoading));
     }).catch(error => {
       dispatch(fetchStatusFail(id, error, skipLoading));
@@ -106,7 +105,6 @@ export function fetchStatuses(ids) {
       const statuses = response.data;
       dispatch(importFetchedStatuses(statuses));
       dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
       dispatch(fetchStatusesSuccess());
     }).catch(error => {
       dispatch(fetchStatusesFail(newStatusIds, error));
@@ -192,7 +190,6 @@ export function fetchContext(id) {
       const statuses = response.data.ancestors.concat(response.data.descendants).concat(response.data.references);
       dispatch(importFetchedStatuses(statuses));
       dispatch(fetchRelationshipsFromStatuses(statuses));
-      dispatch(fetchAccountsFromStatuses(statuses));
       dispatch(fetchContextSuccess(id, response.data.ancestors, response.data.descendants, response.data.references));
 
     }).catch(error => {

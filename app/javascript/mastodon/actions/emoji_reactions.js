@@ -1,4 +1,4 @@
-import { fetchRelationshipsSuccess, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationshipsFromStatuses } from './accounts';
 import api, { getLinks } from '../api';
 import { importFetchedStatuses, importFetchedAccounts } from './importer';
 
@@ -33,7 +33,6 @@ export function fetchEmojiReactionedStatuses({ onlyMedia, withoutMedia } = {}) {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(fetchEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
       }
     }).catch(error => {
@@ -85,7 +84,6 @@ export function expandEmojiReactionedStatuses() {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(expandEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
       }
     }).catch(error => {

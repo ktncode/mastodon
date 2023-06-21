@@ -130,22 +130,6 @@ export function fetchAccountFail(id, error) {
   };
 };
 
-export function fetchAccountsFromStatus(status) {
-  return fetchAccountsFromStatuses([status]);
-};
-
-export function fetchAccountsFromStatuses(statuses) {
-  return fetchAccounts(
-    uniq(
-      statuses
-        .map(status => status.reblog ? status.reblog : status)
-        .flatMap(status => [status.emoji_reactions, status.quote?.emoji_reactions])
-        .flatMap(emoji_reaction => emoji_reaction?.account_ids)
-        .filter(e => !!e),
-    ),
-  );
-};
-
 export function fetchAccounts(accountIds) {
   return (dispatch, getState) => {
     dispatch(fetchRelationships(accountIds));

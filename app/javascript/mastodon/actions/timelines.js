@@ -1,4 +1,4 @@
-import { fetchRelationshipsSuccess, fetchRelationshipsFromStatus, fetchAccountsFromStatus, fetchRelationshipsFromStatuses, fetchAccountsFromStatuses } from './accounts';
+import { fetchRelationshipsSuccess, fetchRelationshipsFromStatus, fetchRelationshipsFromStatuses } from './accounts';
 import { importFetchedStatus, importFetchedStatuses, importFetchedAccounts } from './importer';
 import { submitMarkers } from './markers';
 import api, { getLinks } from 'mastodon/api';
@@ -44,9 +44,6 @@ export function updateTimeline(timeline, status, accept) {
     dispatch(importFetchedStatus(status));
     if (show_follow_button_on_timeline || show_subscribe_button_on_timeline || status.quote_id) {
       dispatch(fetchRelationshipsFromStatus(status));
-    }
-    if (status.emoji_reactions.length) {
-      dispatch(fetchAccountsFromStatus(status));
     }
 
     const insertTimeline = timeline => {
@@ -166,7 +163,6 @@ export function expandTimeline(timelineId, path, params = {}, done = noOp) {
         const statuses = response.data;
         dispatch(importFetchedStatuses(statuses));
         dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchAccountsFromStatuses(statuses));
         dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
       }
 
