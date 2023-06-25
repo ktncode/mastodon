@@ -29,7 +29,10 @@ class ColumnSettings extends React.PureComponent {
               <SettingToggle settings={settings} settingPath={['other', 'withoutReblogs']} onChange={onChange} label={<FormattedMessage id='account.column_settings.without_reblogs' defaultMessage='Without boosts' />} />
               <SettingToggle settings={settings} settingPath={['other', 'showPostsInAbout']} onChange={onChange} label={<FormattedMessage id='account.column_settings.show_posts_in_about' defaultMessage='Show posts in about' />} />
               <SettingToggle settings={settings} settingPath={['other', 'hideFeaturedTags']} onChange={onChange} label={<FormattedMessage id='account.column_settings.hide_featured_tags' defaultMessage='Hide featuread tags selection' />} />
-              <SettingToggle settings={settings} settingPath={['other', 'hideRelation']} onChange={onChange} label={<FormattedMessage id='account.column_settings.hide_relation' defaultMessage='Hide post and follow counters (except about)' />} />
+              <SettingToggle settings={settings} settingPath={['other', 'hidePostCount']} onChange={onChange} label={<FormattedMessage id='account.column_settings.hide_post_count' defaultMessage='Hide post counters' />} />
+              <SettingToggle settings={settings} settingPath={['other', 'hideFollowingCount']} onChange={onChange} label={<FormattedMessage id='account.column_settings.hide_following_count' defaultMessage='Hide following counters' />} />
+              <SettingToggle settings={settings} settingPath={['other', 'hideFollowerCount']} onChange={onChange} label={<FormattedMessage id='account.column_settings.hide_follower_count' defaultMessage='Hide follower counters' />} />
+              <SettingToggle settings={settings} settingPath={['other', 'hideSubscribingCount']} onChange={onChange} label={<FormattedMessage id='account.column_settings.hide_subscribing_count' defaultMessage='Hide subscribing counters' />} />
             </Fragment>
           )}
         </div>

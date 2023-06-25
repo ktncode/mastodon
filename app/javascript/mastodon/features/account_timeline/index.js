@@ -35,7 +35,11 @@ const mapStateToProps = (state, { params: { accountId, tagged }, about, withRepl
   const hideFeaturedTags = state.getIn(['settings', 'account', 'other', 'hideFeaturedTags'], false);
   const withoutReblogs = advancedMode && state.getIn(['settings', 'account', 'other', 'withoutReblogs'], false);
   const showPostsInAbout = state.getIn(['settings', 'account', 'other', 'showPostsInAbout'], true);
-  const hideRelation = state.getIn(['settings', 'account', 'other', 'hideRelation'], false);
+  const hidePostCount = state.getIn(['settings', 'account', 'other', 'hidePostCount'], false);
+  const hideFollowingCount = state.getIn(['settings', 'account', 'other', 'hideFollowingCount'], false);
+  const hideFollowerCount = state.getIn(['settings', 'account', 'other', 'hideFollowerCount'], false);
+  const hideSubscribingCount = state.getIn(['settings', 'account', 'other', 'hideSubscribingCount'], false);
+  const hideRelation = hidePostCount && hideFollowingCount && hideFollowerCount && (me !== accountId || hideSubscribingCount);
   const path = `${accountId}${withReplies ? ':with_replies' : ''}${withoutReblogs ? ':without_reblogs' : ''}${tagged ? `:${tagged}` : ''}`;
 
   return {
@@ -232,7 +236,7 @@ class AccountTimeline extends ImmutablePureComponent {
         </ColumnHeader>
 
         <StatusList
-          prepend={<HeaderContainer accountId={this.props.params.accountId} tagged={this.props.params.tagged} hideProfile={withReplies || posts || !!this.props.params.tagged} hideRelation={!about && hideRelation} hideFeaturedTags={hideFeaturedTags} />}
+          prepend={<HeaderContainer accountId={this.props.params.accountId} tagged={this.props.params.tagged} hideProfile={withReplies || posts || !!this.props.params.tagged} hideRelation={hideRelation} hideFeaturedTags={hideFeaturedTags} />}
           alwaysPrepend
           append={remoteMessage}
           scrollKey='account_timeline'

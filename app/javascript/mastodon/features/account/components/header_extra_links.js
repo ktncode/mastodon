@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -13,11 +14,23 @@ const messages = defineMessages({
   secret: { id: 'account.secret', defaultMessage: 'Secret' },
 });
 
-export default @injectIntl
+const mapStateToProps = (state) => ({
+  hidePostCount: state.getIn(['settings', 'account', 'other', 'hidePostCount'], false),
+  hideFollowingCount: state.getIn(['settings', 'account', 'other', 'hideFollowingCount'], false),
+  hideFollowerCount: state.getIn(['settings', 'account', 'other', 'hideFollowerCount'], false),
+  hideSubscribingCount: state.getIn(['settings', 'account', 'other', 'hideSubscribingCount'], false),
+});
+
+export default @connect(mapStateToProps)
+@injectIntl
 class HeaderExtraLinks extends ImmutablePureComponent {
 
   static propTypes = {
     account: ImmutablePropTypes.map,
+    hidePostCount: PropTypes.bool,
+    hideFollowingCount: PropTypes.bool,
+    hideFollowerCount: PropTypes.bool,
+    hideSubscribingCount: PropTypes.bool,
     intl: PropTypes.object.isRequired,
   };
 
@@ -30,7 +43,7 @@ class HeaderExtraLinks extends ImmutablePureComponent {
   }
 
   render () {
-    const { account, intl } = this.props;
+    const { account, hidePostCount, hideFollowingCount, hideFollowerCount, hideSubscribingCount, intl } = this.props;
 
     if (!account) {
       return null;
@@ -47,31 +60,37 @@ class HeaderExtraLinks extends ImmutablePureComponent {
         <div className='account__header__extra'>
           {!suspended && (
             <div className='account__header__extra__links'>
-              <NavLink isActive={this.isStatusesPageActive} activeClassName='active' to={`/accounts/${account.get('id')}/posts`} title={hide_statuses_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('statuses_count'))}>
-                <ShortNumber
-                  hide={hide_statuses_count}
-                  value={account.get('statuses_count')}
-                  renderer={counterRenderer('statuses')}
-                />
-              </NavLink>
+              {!hidePostCount &&
+                <NavLink isActive={this.isStatusesPageActive} activeClassName='active' to={`/accounts/${account.get('id')}/posts`} title={hide_statuses_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('statuses_count'))}>
+                  <ShortNumber
+                    hide={hide_statuses_count}
+                    value={account.get('statuses_count')}
+                    renderer={counterRenderer('statuses')}
+                  />
+                </NavLink>
+              }
 
-              <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/following`} title={hide_following_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('following_count'))}>
-                <ShortNumber
-                  hide={hide_following_count}
-                  value={account.get('following_count')}
-                  renderer={counterRenderer('following')}
-                />
-              </NavLink>
+              {!hideFollowingCount &&
+                <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/following`} title={hide_following_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('following_count'))}>
+                  <ShortNumber
+                    hide={hide_following_count}
+                    value={account.get('following_count')}
+                    renderer={counterRenderer('following')}
+                  />
+                </NavLink>
+              }
 
-              <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/followers`} title={hide_followers_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('followers_count'))}>
-                <ShortNumber
-                  hide={hide_followers_count}
-                  value={account.get('followers_count')}
-                  renderer={counterRenderer('followers')}
-                />
-              </NavLink>
+              {!hideFollowerCount &&
+                <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/followers`} title={hide_followers_count ? intl.formatMessage(messages.secret) : intl.formatNumber(account.get('followers_count'))}>
+                  <ShortNumber
+                    hide={hide_followers_count}
+                    value={account.get('followers_count')}
+                    renderer={counterRenderer('followers')}
+                  />
+                </NavLink>
+              }
 
-              { (me === account.get('id')) && (
+              {!hideSubscribingCount && (me === account.get('id')) && (
                 <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/subscribing`} title={intl.formatNumber(account.get('subscribing_count'))}>
                   <ShortNumber
                     value={account.get('subscribing_count')}

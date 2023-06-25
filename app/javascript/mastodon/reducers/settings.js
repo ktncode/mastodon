@@ -23,7 +23,10 @@ const initialState = ImmutableMap({
       withoutReblogs: false,
       showPostsInAbout: true,
       hideFeaturedTags: false,
-      hideRelation: false,
+      hidePostCount: false,
+      hideFollowingCount: false,
+      hideFollowerCount: false,
+      hideSubscribingCount: false,
     }),
   }),
 

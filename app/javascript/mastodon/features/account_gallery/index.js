@@ -16,7 +16,7 @@ import ScrollContainer from 'mastodon/containers/scroll_container';
 import LoadMore from 'mastodon/components/load_more';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import { openModal } from 'mastodon/actions/modal';
-import { new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
+import { me, new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { changeSetting } from '../../actions/settings';
 
@@ -24,17 +24,25 @@ const messages = defineMessages({
   title: { id: 'column.account', defaultMessage: 'Account' },
 });
 
-const mapStateToProps = (state, props) => ({
-  isAccount: !!state.getIn(['accounts', props.params.accountId]),
-  attachments: getAccountGallery(state, props.params.accountId),
-  isLoading: state.getIn(['timelines', `account:${props.params.accountId}:media`, 'isLoading']),
-  hasMore: state.getIn(['timelines', `account:${props.params.accountId}:media`, 'hasMore']),
-  suspended: state.getIn(['accounts', props.params.accountId, 'suspended'], false),
-  blockedBy: state.getIn(['relationships', props.params.accountId, 'blocked_by'], false),
-  advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
-  hideRelation: state.getIn(['settings', 'account', 'other', 'hideRelation'], false),
-  columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
-});
+const mapStateToProps = (state, { params: { accountId } }) => {
+  const hidePostCount = state.getIn(['settings', 'account', 'other', 'hidePostCount'], false);
+  const hideFollowingCount = state.getIn(['settings', 'account', 'other', 'hideFollowingCount'], false);
+  const hideFollowerCount = state.getIn(['settings', 'account', 'other', 'hideFollowerCount'], false);
+  const hideSubscribingCount = state.getIn(['settings', 'account', 'other', 'hideSubscribingCount'], false);
+  const hideRelation = hidePostCount && hideFollowingCount && hideFollowerCount && (me !== accountId || hideSubscribingCount);
+
+  return {
+    isAccount: !!state.getIn(['accounts', accountId]),
+    attachments: getAccountGallery(state, accountId),
+    isLoading: state.getIn(['timelines', `account:${accountId}:media`, 'isLoading']),
+    hasMore: state.getIn(['timelines', `account:${accountId}:media`, 'hasMore']),
+    suspended: state.getIn(['accounts', accountId, 'suspended'], false),
+    blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
+    advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
+    hideRelation,
+    columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
+  };
+};
 
 class LoadMoreMedia extends ImmutablePureComponent {
 

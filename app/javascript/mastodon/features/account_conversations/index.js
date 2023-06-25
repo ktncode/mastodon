@@ -17,7 +17,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { fetchAccountIdentityProofs } from '../../actions/identity_proofs';
 import MissingIndicator from 'mastodon/components/missing_indicator';
 import TimelineHint from 'mastodon/components/timeline_hint';
-import { new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
+import { me, new_features_policy, defaultColumnWidth } from 'mastodon/initial_state';
 import { changeSetting } from '../../actions/settings';
 
 const messages = defineMessages({
@@ -26,19 +26,27 @@ const messages = defineMessages({
 
 const emptyList = ImmutableList();
 
-const mapStateToProps = (state, { params: { accountId } }) => ({
-  remote: !!(state.getIn(['accounts', accountId, 'acct']) !== state.getIn(['accounts', accountId, 'username'])),
-  remoteUrl: state.getIn(['accounts', accountId, 'url']),
-  isAccount: !!state.getIn(['accounts', accountId]),
-  statusIds: state.getIn(['timelines', `account:${accountId}:conversations`, 'items'], emptyList),
-  isLoading: state.getIn(['timelines', `account:${accountId}:conversations`, 'isLoading']),
-  hasMore: state.getIn(['timelines', `account:${accountId}:conversations`, 'hasMore']),
-  suspended: state.getIn(['accounts', accountId, 'suspended'], false),
-  blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
-  advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
-  hideRelation: state.getIn(['settings', 'account', 'other', 'hideRelation'], false),
-  columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
-});
+const mapStateToProps = (state, { params: { accountId } }) => {
+  const hidePostCount = state.getIn(['settings', 'account', 'other', 'hidePostCount'], false);
+  const hideFollowingCount = state.getIn(['settings', 'account', 'other', 'hideFollowingCount'], false);
+  const hideFollowerCount = state.getIn(['settings', 'account', 'other', 'hideFollowerCount'], false);
+  const hideSubscribingCount = state.getIn(['settings', 'account', 'other', 'hideSubscribingCount'], false);
+  const hideRelation = hidePostCount && hideFollowingCount && hideFollowerCount && (me !== accountId || hideSubscribingCount);
+
+  return {
+    remote: !!(state.getIn(['accounts', accountId, 'acct']) !== state.getIn(['accounts', accountId, 'username'])),
+    remoteUrl: state.getIn(['accounts', accountId, 'url']),
+    isAccount: !!state.getIn(['accounts', accountId]),
+    statusIds: state.getIn(['timelines', `account:${accountId}:conversations`, 'items'], emptyList),
+    isLoading: state.getIn(['timelines', `account:${accountId}:conversations`, 'isLoading']),
+    hasMore: state.getIn(['timelines', `account:${accountId}:conversations`, 'hasMore']),
+    suspended: state.getIn(['accounts', accountId, 'suspended'], false),
+    blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
+    advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], new_features_policy === 'conservative' ? false : true),
+    hideRelation,
+    columnWidth: state.getIn(['settings', 'account', 'columnWidth'], defaultColumnWidth),
+  };
+};
 
 const RemoteHint = ({ url }) => (
   <TimelineHint url={url} resource={<FormattedMessage id='timeline_hint.resources.statuses' defaultMessage='Older toots' />} />
