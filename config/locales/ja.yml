@@ -1284,9 +1284,11 @@ ja:
     disable_actions_hint: 誤操作による事故を防いだり、用途を限定したアカウント向けに、特定の操作を無効化するための設定です。クライアントアプリに対しても有効です。
     fedibird_features: Fedibirdの機能
     other: その他
+    post_disclosure: 投稿の開示設定
     post_prohibite: 投稿の禁止
     posting_defaults: デフォルトの投稿設定
     public_timelines: 公開タイムライン
+    relationship_disclosure: フォロー関係の開示設定
     safety: 安全とプライバシー
     searching_defaults: デフォルトの検索設定
   reactions:
@@ -1404,6 +1406,8 @@ ja:
     featured_tags: 注目のハッシュタグ
     follow_and_subscriptions: フォロー・購読
     follow_tags: ハッシュタグのフォロー
+    followers: フォロワー
+    following: フォロー
     identity_proofs: Identity proofs
     import: データのインポート
     import_and_export: インポート・エクスポート

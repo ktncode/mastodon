@@ -22,13 +22,13 @@ class RelationshipsController < ApplicationController
   rescue Mastodon::NotPermittedError, ActiveRecord::RecordNotFound
     flash[:alert] = I18n.t('relationships.follow_failure') if action_from_button == 'follow'
   ensure
-    redirect_to relationships_path(filter_params)
+    redirect_to relationships_path(restricted_params)
   end
 
   private
 
   def set_accounts
-    @accounts = RelationshipFilter.new(current_account, filter_params).results.page(params[:page]).per(40)
+    @accounts = RelationshipFilter.new(current_account, restricted_params).results.page(params[:page]).per(40)
   end
 
   def set_relationships
@@ -40,19 +40,26 @@ class RelationshipsController < ApplicationController
   end
 
   def following_relationship?
-    params[:relationship].blank? || params[:relationship] == 'following'
+    restricted_params[:relationship].blank? || restricted_params[:relationship] == 'following'
   end
 
   def mutual_relationship?
-    params[:interrelationship] == 'mutual'
+    restricted_params[:interrelationship] == 'mutual'
   end
 
   def one_way_relationship?
-    params[:interrelationship] == 'one_way'
+    restricted_params[:interrelationship] == 'one_way'
   end
 
   def followed_by_relationship?
-    params[:relationship] == 'followed_by'
+    restricted_params[:relationship] == 'followed_by'
+  end
+
+  def restricted_params
+    filter_params.tap do |p|
+      p.merge!({relationship: nil,           interrelationship: 'one_way'}) if current_user&.setting_hide_followers_from_yourself
+      p.merge!({relationship: 'followed_by', interrelationship: 'one_way'}) if current_user&.setting_hide_following_from_yourself
+    end
   end
 
   def filter_params

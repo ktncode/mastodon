@@ -8,13 +8,12 @@
   = render 'shared/error_messages', object: current_user
 
   .fields-group
-    = f.input :setting_noindex, as: :boolean, wrapper: :with_label
+    = f.input :setting_aggregate_reblogs, as: :boolean, wrapper: :with_label, recommended: true
+
+  %h4= t 'preferences.relationship_disclosure'
 
   .fields-group
     = f.input :setting_hide_network, as: :boolean, wrapper: :with_label
-
-  .fields-group
-    = f.input :setting_hide_statuses_count, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   .fields-group
     = f.input :setting_hide_following_count, as: :boolean, wrapper: :with_label, fedibird_features: true
@@ -23,7 +22,30 @@
     = f.input :setting_hide_followers_count, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   .fields-group
-    = f.input :setting_aggregate_reblogs, as: :boolean, wrapper: :with_label, recommended: true
+    = f.input :setting_hide_following_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_followers_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_show_follow_button_on_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_show_subscribe_button_on_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_show_followed_by, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_follow_button_to_list_adder, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  %h4= t 'preferences.post_disclosure'
+
+  .fields-group
+    = f.input :setting_noindex, as: :boolean, wrapper: :with_label
+
+  .fields-group
+    = f.input :setting_hide_statuses_count, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   %h4= t 'preferences.posting_defaults'
 
@@ -58,18 +80,6 @@
   .fields-group
     %span.fedibird_features.float Fedibird
     = f.input :setting_new_features_policy, collection: ['conservative', 'default', 'tester'], label_method: lambda { |item| t("simple_form.labels.defaults.setting_new_features_policy_#{item}") }, hint: t("simple_form.hints.defaults.setting_new_features_policy"), as: :radio_buttons, collection_wrapper_tag: 'ul', item_wrapper_tag: 'li', wrapper: :with_floating_label
-
-  .fields-group
-    = f.input :setting_show_follow_button_on_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
-
-  .fields-group
-    = f.input :setting_show_subscribe_button_on_timeline, as: :boolean, wrapper: :with_label, fedibird_features: true
-
-  .fields-group
-    = f.input :setting_show_followed_by, as: :boolean, wrapper: :with_label, fedibird_features: true
-
-  .fields-group
-    = f.input :setting_follow_button_to_list_adder, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   .fields-group
     = f.input :setting_show_navigation_panel, as: :boolean, wrapper: :with_label, fedibird_features: true

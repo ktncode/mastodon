@@ -1,4 +1,8 @@
 # frozen_string_literal: true
+hide_followers     = current_user.setting_hide_followers_from_yourself
+hide_following     = current_user.setting_hide_following_from_yourself
+hide_relationships = hide_followers && hide_following
+relationship_title = if hide_followers then t('settings.following') elsif hide_following then t('settings.followers') else t('settings.relationships') end
 
 SimpleNavigation::Configuration.run do |navigation|
   navigation.items do |n|
@@ -19,8 +23,8 @@ SimpleNavigation::Configuration.run do |navigation|
       s.item :other, safe_join([fa_icon('cog fw'), t('preferences.other')]), settings_preferences_other_url
     end
 
-    n.item :follow_and_subscriptions, safe_join([fa_icon('users fw'), t('settings.follow_and_subscriptions')]), relationships_url, if: -> { current_user.functional? } do |s|
-      s.item :relationships, safe_join([fa_icon('users fw'), t('settings.relationships')]), relationships_url, highlights_on: %r{/relationships}
+    n.item :follow_and_subscriptions, safe_join([fa_icon('users fw'), t('settings.follow_and_subscriptions')]), hide_relationships ? settings_follow_tags_url : relationships_url, if: -> { current_user.functional? } do |s|
+      s.item :relationships, safe_join([fa_icon('users fw'), relationship_title]), relationships_url, highlights_on: %r{/relationships}, unless: -> { hide_relationships }
       s.item :follow_tags, safe_join([fa_icon('hashtag fw'), t('settings.follow_tags')]), settings_follow_tags_url, highlights_on: %r{/follow_tags}
       s.item :account_subscribes, safe_join([fa_icon('users fw'), t('settings.account_subscribes')]), settings_account_subscribes_url, highlights_on: %r{/account_subscribes}
       s.item :domain_subscribes, safe_join([fa_icon('server fw'), t('settings.domain_subscribes')]), settings_domain_subscribes_url, highlights_on: %r{/domain_subscribes}

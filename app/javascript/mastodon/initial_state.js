@@ -85,6 +85,8 @@ export const maxAttachments = initialState?.media_attachments?.max_attachments ?
 export const useLowResolutionThumbnails = getMeta('use_low_resolution_thumbnails');
 export const useFullsizeAvatarOnDetail = getMeta('use_fullsize_avatar_on_detail');
 export const useFullsizeHeaderOnDetail = getMeta('use_fullsize_header_on_detail');
+export const hideFollowingFromYourself = getMeta('hide_following_from_yourself');
+export const hideFollowersFromYourself = getMeta('hide_followers_from_yourself');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

@@ -152,6 +152,8 @@ defaults: &defaults
   use_low_resolution_thumbnails: false
   use_fullsize_avatar_on_detail: false
   use_fullsize_header_on_detail: false
+  hide_following_from_yourself: false
+  hide_followers_from_yourself: false
 
 development:
   <<: *defaults

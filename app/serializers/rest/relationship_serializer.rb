@@ -10,11 +10,11 @@ class REST::RelationshipSerializer < ActiveModel::Serializer
   end
 
   def following
-    instance_options[:relationships].following[object.id] ? true : false
+    instance_options[:relationships].following[object.id] && !current_user&.setting_hide_following_from_yourself ? true : false
   end
 
   def delivery_following
-    instance_options[:relationships].delivery_following[object.id] ? true : false
+    instance_options[:relationships].delivery_following[object.id] && !current_user&.setting_hide_following_from_yourself ? true : false
   end
 
   def showing_reblogs
@@ -26,7 +26,7 @@ class REST::RelationshipSerializer < ActiveModel::Serializer
   end
 
   def followed_by
-    instance_options[:relationships].followed_by[object.id] || false
+    instance_options[:relationships].followed_by[object.id] && !current_user&.setting_hide_followers_from_yourself || false
   end
 
   def account_subscribing

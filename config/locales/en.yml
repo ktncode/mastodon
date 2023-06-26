@@ -1345,9 +1345,11 @@ en:
     disable_actions_hint: This setting is used to prevent accidents due to mishandling or to disable certain actions in accounts with limited use. It also applies to client applications.
     fedibird_features: Fedibird features
     other: Other
+    post_disclosure: Post disclosure
     post_prohibite: Post prohibite
     posting_defaults: Posting defaults
     public_timelines: Public timelines
+    relationship_disclosure: Relationship desclosure
     safety: Safety & Privacy
     searching_defaults: Searching default
   reactions:
@@ -1467,6 +1469,8 @@ en:
     featured_tags: Featured hashtags
     follow_and_subscriptions: Follows and subscriptions
     follow_tags: Following hashtags
+    followers: Followers
+    following: Follows
     identity_proofs: Identity proofs
     import: Import
     import_and_export: Import and export

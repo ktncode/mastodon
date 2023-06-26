@@ -106,6 +106,8 @@ class UserSettingsDecorator
     use_low_resolution_thumbnails
     use_fullsize_avatar_on_detail
     use_fullsize_header_on_detail
+    hide_following_from_yourself
+    hide_followers_from_yourself
   ).freeze
 
   STRING_KEYS = %w(

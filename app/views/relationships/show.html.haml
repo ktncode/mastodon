@@ -1,26 +1,34 @@
 :ruby
   disable_follow   = current_user.setting_disable_follow
   disable_unfollow = current_user.setting_disable_unfollow
+  hide_followers   = current_user.setting_hide_followers_from_yourself
+  hide_following   = current_user.setting_hide_following_from_yourself
 
 - content_for :page_title do
-  = t('settings.relationships')
+  - if hide_followers
+    = t('settings.following')
+  - elsif hide_following
+    = t('settings.followers')
+  - else
+    = t('settings.relationships')
 
 - content_for :header_tags do
   = javascript_pack_tag 'admin', async: true, crossorigin: 'anonymous'
 
 .filters.wide
-  .filter-subset
-    %strong= t 'relationships.relationship'
-    %ul
-      %li= filter_link_to t('relationships.following'), relationship: nil
-      %li= filter_link_to t('relationships.followers'), relationship: 'followed_by'
+  - unless hide_followers || hide_following
+    .filter-subset
+      %strong= t 'relationships.relationship'
+      %ul
+        %li= filter_link_to t('relationships.following'), relationship: nil
+        %li= filter_link_to t('relationships.followers'), relationship: 'followed_by'
 
-  .filter-subset
-    %strong= t 'relationships.interrelationship'
-    %ul
-      %li= filter_link_to t('generic.all'), interrelationship: nil
-      %li= filter_link_to t('relationships.mutual'), interrelationship: 'mutual'
-      %li= filter_link_to t('relationships.one_way'), interrelationship: 'one_way'
+    .filter-subset
+      %strong= t 'relationships.interrelationship'
+      %ul
+        %li= filter_link_to t('generic.all'), interrelationship: nil
+        %li= filter_link_to t('relationships.mutual'), interrelationship: 'mutual'
+        %li= filter_link_to t('relationships.one_way'), interrelationship: 'one_way'
 
   .filter-subset
     %strong= t 'relationships.status'
