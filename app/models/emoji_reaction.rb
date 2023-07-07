@@ -17,7 +17,7 @@
 class EmojiReaction < ApplicationRecord
   include Paginable
 
-  after_commit :queue_publish
+  # after_commit :queue_publish
   after_commit :refresh_status
 
   belongs_to :account
