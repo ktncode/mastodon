@@ -10,7 +10,7 @@
 
 <%= t('sessions.ip') %>: <%= @remote_ip %>
 <%= t('sessions.browser') %>: <%= t('sessions.description', browser: t("sessions.browsers.#{@detection.id}", default: "#{@detection.id}"), platform: t("sessions.platforms.#{@detection.platform.id}", default: "#{@detection.platform.id}")) %>
-<%= l(@timestamp.in_time_zone(@resource.time_zone)) %>
+<%= l(@timestamp.in_time_zone(@resource.time_zone.presence)) %>
 
 <%= t 'user_mailer.sign_in_token.further_actions' %>
 
