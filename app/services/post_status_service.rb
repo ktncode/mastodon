@@ -36,6 +36,7 @@ class PostStatusService < BaseService
     @circle      = @options[:circle]
 
     return idempotency_duplicate if idempotency_given? && idempotency_duplicate?
+    return suspended_account     if @account.suspended?
 
     validate_media!
     validate_expires!
@@ -230,6 +231,10 @@ class PostStatusService < BaseService
 
   def idempotency_duplicate?
     @idempotency_duplicate = redis.get(idempotency_key)
+  end
+
+  def suspended_account
+    nil
   end
 
   def scheduled_in_the_past?

@@ -38,7 +38,7 @@ class GroupFeed < PublicFeed
   end
 
   def group_scope
-    group.permitted_group_statuses(account)
+    group.permitted_group_statuses(account).joins(:account).merge(Account.without_suspended)
   end
 
   def hashtag_scope
