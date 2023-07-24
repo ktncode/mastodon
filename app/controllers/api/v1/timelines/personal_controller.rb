@@ -13,7 +13,7 @@ class Api::V1::Timelines::PersonalController < Api::BaseController
     else
       account_ids = @statuses.filter(&:quote?).map { |status| status.quote.account_id }.uniq
 
-      render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(account_ids, current_user&.account_id), status: account_home_feed.regenerating? ? 206 : 200
+      render json: @statuses, each_serializer: REST::StatusSerializer, relationships: StatusRelationshipsPresenter.new(@statuses, current_user&.account_id), account_relationships: AccountRelationshipsPresenter.new(account_ids, current_user&.account_id)
     end
   end
 
