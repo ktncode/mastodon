@@ -38,6 +38,8 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
         emoji.uri              = uri
         emoji.image_remote_url = image_url
       end
+
+      return if emoji.disabled?
     end
 
     return if @account.reacted?(@original_status, shortcode, emoji)
