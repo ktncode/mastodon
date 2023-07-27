@@ -256,7 +256,7 @@ class MediaAttachment < ApplicationRecord
   end
 
   def needs_reprocess?(version)
-    !file_meta.key?(version.to_s)
+    file_meta.nil? || !file_meta.key?(version.to_s)
   end
 
   def larger_media_format?
