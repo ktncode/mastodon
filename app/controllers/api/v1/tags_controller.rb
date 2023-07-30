@@ -25,6 +25,6 @@ class Api::V1::TagsController < Api::BaseController
 
   def set_or_create_tag
     return not_found unless /\A(#{Tag::HASHTAG_NAME_RE})\z/.match?(params[:id])
-    @tag = Tag.find_normalized(params[:id]) || Tag.new(name: Tag.normalize(params[:id]), display_name: params[:id])
+    @tag = Tag.find_normalized(params[:id]) || Tag.new(name: Tag.normalize(params[:id]))
   end
 end
