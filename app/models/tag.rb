@@ -27,11 +27,18 @@ class Tag < ApplicationRecord
   has_many :passive_relationships, class_name: 'FollowTag', inverse_of: :tag, dependent: :destroy
   has_many :followers, through: :passive_relationships, source: :account
 
-  HASHTAG_SEPARATORS = "_\u00B7\u200c"
-  HASHTAG_NAME_RE    = "([[:word:]_][[:word:]#{HASHTAG_SEPARATORS}]*[[:alpha:]#{HASHTAG_SEPARATORS}][[:word:]#{HASHTAG_SEPARATORS}]*[[:word:]_])|([[:word:]_]*[[:alpha:]][[:word:]_]*)"
-  HASHTAG_RE         = /(?:^|[^\/\)\w])#(#{HASHTAG_NAME_RE})/i
+  HASHTAG_SEPARATORS = "_\u00B7\u30FB\u200c"
+  HASHTAG_FIRST_SEQUENCE_CHUNK_ONE = "[[:word:]_][[:word:]#{HASHTAG_SEPARATORS}]*[[:alpha:]#{HASHTAG_SEPARATORS}]"
+  HASHTAG_FIRST_SEQUENCE_CHUNK_TWO = "[[:word:]#{HASHTAG_SEPARATORS}]*[[:word:]_]"
+  HASHTAG_FIRST_SEQUENCE = "(#{HASHTAG_FIRST_SEQUENCE_CHUNK_ONE}#{HASHTAG_FIRST_SEQUENCE_CHUNK_TWO})"
+  HASHTAG_LAST_SEQUENCE = '([[:word:]_]*[[:alpha:]][[:word:]_]*)'
+  HASHTAG_NAME_PAT = "#{HASHTAG_FIRST_SEQUENCE}|#{HASHTAG_LAST_SEQUENCE}"
 
-  validates :name, presence: true, format: { with: /\A(#{HASHTAG_NAME_RE})\z/i }
+  HASHTAG_RE = %r{(?:^|[^/)\w])#(#{HASHTAG_NAME_PAT})}i
+  HASHTAG_NAME_RE = /\A(#{HASHTAG_NAME_PAT})\z/i
+  HASHTAG_INVALID_CHARS_RE = /[^[:alnum:]#{HASHTAG_SEPARATORS}]/
+
+  validates :name, presence: true, format: { with: HASHTAG_NAME_RE }
   # validates :display_name, format: { with: /\A(#{HASHTAG_NAME_RE})\z/i }
   # validate :validate_name_change, if: -> { !new_record? && name_changed? }
 
@@ -49,6 +56,10 @@ class Tag < ApplicationRecord
   update_index('tags', :self)
 
   def to_param
+    name
+  end
+
+  def display_name
     name
   end
 

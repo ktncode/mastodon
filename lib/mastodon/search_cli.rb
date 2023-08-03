@@ -18,6 +18,9 @@ module Mastodon
 
     option :concurrency, type: :numeric, default: 2, aliases: [:c], desc: 'Workload will be split between this number of threads'
     option :only, type: :array, enum: %w(accounts tags statuses), desc: 'Only process these indices'
+    option :min, type: :string
+    option :max, type: :string
+    option :verbose, type: :boolean, default: false, aliases: [:v]
     desc 'deploy', 'Create or upgrade ElasticSearch indices and populate them'
     long_desc <<~LONG_DESC
       If ElasticSearch is empty, this command will create the necessary indices
@@ -65,7 +68,7 @@ module Mastodon
 
       # Estimate the amount of data that has to be imported first
       indices.each do |index|
-        progress.total = (progress.total || 0) + index.adapter.default_scope.count
+        progress.total = (progress.total || 0) + index.adapter.default_scope.where(id: options[:min]..options[:max]).count
       end
 
       # Now import all the actual data. Mind that unlike chewy:sync, we don't
@@ -75,10 +78,10 @@ module Mastodon
       # is uneconomical. So we only ever add.
       indices.each do |index|
         progress.title = "Importing #{index} "
-        batch_size     = 1_000
+        batch_size     = 1000
         slice_size     = (batch_size / options[:concurrency]).ceil
 
-        index.adapter.default_scope.reorder(nil).find_in_batches(batch_size: batch_size) do |batch|
+        index.adapter.default_scope.where(id: options[:min]..options[:max]).reorder(nil).find_in_batches(batch_size: batch_size, order: :desc) do |batch|
           futures = []
 
           batch.each_slice(slice_size) do |records|
@@ -124,6 +127,7 @@ module Mastodon
                 end
 
                 Chewy::Index::Import::BulkRequest.new(index).perform(bulk_body)
+                progress.log "#{records.first.created_at} - #{records.last.created_at} ( max: #{records.first.id} - min: #{records.last.id} ) done." if options[:verbose]
 
                 progress.progress += records.size
 
@@ -132,7 +136,7 @@ module Mastodon
 
                 sleep 1
               rescue => e
-                progress.log pastel.red("Error importing #{index}: #{e}")
+                progress.log pastel.red("Error importing #{index}: #{e} #{records.first.created_at} - #{records.last.created_at} ( max: #{records.first.id} - min: #{records.last.id} )")
               end
             end
           end

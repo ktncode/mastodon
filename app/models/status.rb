@@ -39,6 +39,8 @@ class Status < ApplicationRecord
   include RateLimitable
   include Redisable
 
+  extend OrderAsSpecified
+
   rate_limit by: :account, family: :statuses
 
   self.discard_column = :deleted_at
@@ -141,6 +143,7 @@ class Status < ApplicationRecord
     end
   }
   scope :unset_searchability, -> { where(searchability: nil, reblog_of_id: nil) }
+  scope :indexable, -> { without_reblogs.where(visibility: :public).joins(:account).where(account: { indexable: true }) }
 
   cache_associated :application,
                    :media_attachments,
@@ -199,6 +202,24 @@ class Status < ApplicationRecord
     ids.uniq
   end
 
+  def searchable_properties
+    [].tap do |properties|
+      properties << 'image' if media_attachments.any?(&:image?)
+      properties << 'video' if media_attachments.any?(&:video?)
+      properties << 'audio' if media_attachments.any?(&:audio?)
+      properties << 'media' if with_media?
+      properties << 'poll' if with_poll?
+      properties << 'link' if with_preview_card?
+      properties << 'embed' if preview_cards.any?(&:video?)
+      properties << 'sensitive' if sensitive?
+      properties << 'reply' if reply?
+      properties << 'quote' if quote?
+      properties << 'ref' if ref?
+      properties << 'bot' if bot?
+      properties << visibility
+    end
+  end
+
   def compute_searchability
     searchability || Status.searchabilities.invert.fetch([Account.searchabilities[account.searchability], Status.visibilities[visibility] || 0].max, nil) || 'direct'
   end
@@ -241,6 +262,10 @@ class Status < ApplicationRecord
 
   def quote?
     !quote_id.nil? && quote
+  end
+
+  def ref?
+    references.present? && (!quote? || (references.map(&:url) - [quote.url])&.present?)
   end
 
   def emoji_reaction?
@@ -306,7 +331,15 @@ class Status < ApplicationRecord
   end
 
   def with_media?
-    media_attachments.any?
+    media_attachments.present?
+  end
+
+  def with_preview_card?
+    preview_cards.present?
+  end
+
+  def with_poll?
+    preloadable_poll.present?
   end
 
   def expired?
@@ -319,6 +352,14 @@ class Status < ApplicationRecord
 
   def expiry
     expires? && status_expire&.expires_mark? && status_expire&.expires_at || expired_at
+  end
+
+  def bookmarked?
+    bookmarks.present?
+  end
+
+  def bot?
+    account.bot?
   end
 
   def non_sensitive_with_media?
@@ -338,24 +379,21 @@ class Status < ApplicationRecord
     @emojis = CustomEmoji.from_text(fields.join(' '), account.domain) + (quote? ? CustomEmoji.from_text([quote.spoiler_text, quote.text].join(' '), quote.account.domain) : [])
   end
 
-  def index_text
-    @index_text ||= [spoiler_text, Formatter.instance.plaintext(self)].concat(media_attachments.map(&:description)).concat(preloadable_poll ? preloadable_poll.options : []).concat(quote? ? ["QT: [#{quote.url || ActivityPub::TagManager.instance.url_for(quote)}]"] : []).filter(&:present?).join("\n\n")
+  def urls
+    @urls ||= ProcessStatusReferenceService.new.call(self, urls: references.map(&:url), skip_process: true)
   end
 
-  def tag_id
-    tags.map(&:id)
+  def searchable_text
+    @searchable_text ||= [
+      spoiler_text.presence,
+      Formatter.instance.plaintext(self).gsub(Regexp.union(urls), ' '),
+      preloadable_poll ? preloadable_poll.options.join("\n\n") : nil,
+      media_attachments.map(&:description).join("\n\n"),
+    ].compact.join("\n\n")
   end
 
   def mentioned_account_id
     mentions.map(&:account_id)
-  end
-
-  def media_type
-    media_attachments&.first&.type
-  end
-
-  def reference_type
-    preview_card&.type
   end
 
   def replies_count
@@ -577,7 +615,7 @@ class Status < ApplicationRecord
       end
     end
 
-    def from_text(text)
+    def from_0(text)
       return [] if text.blank?
 
       text.scan(FetchLinkCardService::URL_PATTERN).map(&:first).uniq.filter_map do |url|

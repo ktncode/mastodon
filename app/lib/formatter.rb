@@ -10,6 +10,7 @@ class Formatter
   include StatusesHelper
 
   DISALLOWED_BOUNDING_REGEX = /[[:alnum:]:]/.freeze
+  NEWLINE_TAGS_RE = %r{(<br />|<br>|</p>)+}
 
   def format(status, **options)
     if status.reblog?
@@ -78,9 +79,11 @@ class Formatter
   def plaintext(status)
     return status.text if status.local?
 
-    text = status.text.gsub(/(<br \/>|<br>|<\/p>)+/) { |match| "#{match}\n" }
-    text = remove_reference_link(text)
-    strip_tags(text)
+    text = remove_reference_link(status.text)
+    node = Nokogiri::HTML.fragment(text.gsub(NEWLINE_TAGS_RE) { |match| "#{match}\n" })
+    # Elements that are entirely removed with our Sanitize config
+    node.xpath('.//iframe|.//math|.//noembed|.//noframes|.//noscript|.//plaintext|.//script|.//style|.//svg|.//xmp').remove
+    node.text.chomp
   end
 
   def simplified_format(account, **options)
@@ -136,6 +139,10 @@ class Formatter
   def add_original_link(html, url, summary)
     html = '<p></p>' if html.blank?
     html.sub(/<\/p>\z/, " <a href=\"#{url}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"unhandled-link\">[#{summary}]</a></p>")
+  end
+
+  def extract_inner_link(status)
+    Nokogiri::HTML.parse(format(status), nil, 'utf-8').css('a:not(.mention):not(.unhandled-link)').map { |x| x['href'].presence }.compact.uniq
   end
 
   private

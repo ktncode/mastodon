@@ -12,7 +12,7 @@ import {
   COMPOSE_DIRECT,
   COMPOSE_QUOTE,
 } from '../actions/compose';
-import { Map as ImmutableMap, List as ImmutableList, fromJS } from 'immutable';
+import { Map as ImmutableMap, OrderedSet as ImmutableOrderedSet, fromJS } from 'immutable';
 
 const initialState = ImmutableMap({
   value: '',
@@ -56,14 +56,14 @@ export default function search(state = initialState, action) {
     return state.set('hidden', true);
   case SEARCH_FETCH_SUCCESS:
     return state.set('results', ImmutableMap({
-      accounts: ImmutableList(action.results.accounts.map(item => item.id)),
-      statuses: ImmutableList(action.results.statuses.map(item => item.id)),
-      hashtags: fromJS(action.results.hashtags),
-      profiles: ImmutableList(action.results.profiles.map(item => item.id)),
+      accounts: ImmutableOrderedSet(action.results.accounts.map(item => item.id)),
+      statuses: ImmutableOrderedSet(action.results.statuses.map(item => item.id)),
+      hashtags: ImmutableOrderedSet(fromJS(action.results.hashtags)),
+      profiles: ImmutableOrderedSet(action.results.profiles.map(item => item.id)),
     })).set('submitted', true).set('searchTerm', action.searchTerm);
   case SEARCH_EXPAND_SUCCESS:
-    const results = action.searchType === 'hashtags' ? fromJS(action.results.hashtags) : action.results[action.searchType].map(item => item.id);
-    return state.updateIn(['results', action.searchType], list => list.concat(results));
+    const results = action.searchType === 'hashtags' ? ImmutableOrderedSet(fromJS(action.results.hashtags)) : action.results[action.searchType].map(item => item.id);
+    return state.updateIn(['results', action.searchType], list => list.union(results));
   default:
     return state;
   }

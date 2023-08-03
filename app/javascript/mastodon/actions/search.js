@@ -42,7 +42,7 @@ export function submitSearch() {
       params: {
         q: value,
         resolve: true,
-        limit: 5,
+        limit: 11,
         with_profiles: true,
         compact: true,
       },
@@ -99,19 +99,28 @@ export function fetchSearchFail(error) {
 
 export const expandSearch = type => (dispatch, getState) => {
   const value  = getState().getIn(['search', 'value']);
-  const offset = getState().getIn(['search', 'results', type]).size;
+  const result = getState().getIn(['search', 'results', type]);
+  const params = {
+    q: value,
+    type,
+    limit: 11,
+    with_profiles: true,
+    compact: true,
+  };
+
+  if (type == 'statuses') {
+    if (result.isEmpty() || result.first() >= result.last()) {
+      params.max_id = result.last();
+    } else {
+      params.min_id = result.last();
+    }
+  } else {
+    params.offset = result.size - 1;
+  }
 
   dispatch(expandSearchRequest());
 
-  api(getState).get('/api/v2/search', {
-    params: {
-      q: value,
-      type,
-      offset,
-      with_profiles: true,
-      compact: true,
-    },
-  }).then(({ data }) => {
+  api(getState).get('/api/v2/search', { params }).then(({ data }) => {
     if (data.accounts) {
       dispatch(importFetchedAccounts(data.accounts));
     }

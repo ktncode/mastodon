@@ -102,6 +102,15 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       status_references: {
         max_references: StatusReferenceValidator::LIMIT,
       },
+
+      search: {
+        enabled: Chewy.enabled?,
+        supported_prefix: SearchQueryTransformer::SUPPORTED_PREFIXES,
+        supported_properties: SearchQueryTransformer::SUPPORTED_PROPERTIES,
+        supported_operator: SearchQueryTransformer::SUPPORTED_OPERATOR,
+        supported_order: SearchQueryTransformer::SUPPORTED_ORDER,
+        supported_searchablity_filter: SearchQueryTransformer::SUPPORTED_SEARCHABLITY_FILTER,
+      },
     }
   end
 

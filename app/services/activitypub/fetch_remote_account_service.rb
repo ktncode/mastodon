@@ -53,7 +53,7 @@ class ActivityPub::FetchRemoteAccountService < BaseService
   end
 
   def split_acct(acct)
-    acct.gsub(/\Aacct:/, '').split('@')
+    acct&.gsub(/\Aacct:/, '')&.split('@')
   end
 
   def supported_context?

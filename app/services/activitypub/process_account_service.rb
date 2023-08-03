@@ -60,7 +60,7 @@ class ActivityPub::ProcessAccountService < BaseService
   private
 
   def update_node
-    UpdateNodeWorker.perform_async(@domain)
+    UpdateNodeService.new.call(@domain)
   end
 
   def create_account
@@ -253,7 +253,17 @@ class ActivityPub::ProcessAccountService < BaseService
 
   def searchability_from_audience
     if audience_searchable_by.nil?
-      :direct
+      if @account.note.match? /#(<.+?>)?searchable_?by_?all(_?users?)?\b/i
+        :public
+      elsif @account.note.match? /#(<.+?>)?searchable_?by_?followers?(_?only)?\b/i
+        :private
+      elsif @account.note.match? /#(<.+?>)?searchable_?by_?reacted_?users?_?(_?only)?\b/i
+        :direct
+      elsif Node.domain(@domain).first&.upstream == "misskey"
+        :public
+      else
+        :direct
+      end
     elsif audience_searchable_by.any? { |uri| ActivityPub::TagManager.instance.public_collection?(uri) }
       :public
     elsif audience_searchable_by.include?(@account.followers_url)

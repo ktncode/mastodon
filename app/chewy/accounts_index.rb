@@ -15,6 +15,10 @@ class AccountsIndex < Chewy::Index
         type: 'stemmer',
         language: 'possessive_english',
       },
+      search: {
+        type: 'sudachi_split',
+        mode: 'search',
+      },
     },
 
     char_filter: {
@@ -33,9 +37,11 @@ class AccountsIndex < Chewy::Index
         max_gram: 15,
       },
 
-      kuromoji_user_dict: {
-        type: 'kuromoji_tokenizer',
-        user_dictionary: 'userdic.txt',
+      sudachi_tokenizer: {
+        type: 'sudachi_tokenizer',
+        discard_punctuation: true,
+        resources_path: '/etc/elasticsearch/sudachi',
+        settings_path: '/etc/elasticsearch/sudachi/sudachi.json',
       },
 
       nori_user_dict: {
@@ -51,13 +57,17 @@ class AccountsIndex < Chewy::Index
       },
 
       ja_title: {
+        tokenizer: 'sudachi_tokenizer',
         type: 'custom',
-        char_filter: %w(
-          icu_normalizer
-          kuromoji_iteration_mark
+        filter: %w(
+          lowercase
+          asciifolding
+          cjk_width
+          sudachi_part_of_speech
+          sudachi_ja_stop
+          sudachi_baseform
+          search
         ),
-        tokenizer: 'kuromoji_user_dict',
-        filter: %w(lowercase asciifolding cjk_width),
       },
 
       ko_title: {
@@ -83,20 +93,17 @@ class AccountsIndex < Chewy::Index
       },
 
       ja_content: {
+        tokenizer: 'sudachi_tokenizer',
         type: 'custom',
-        char_filter: %w(
-          icu_normalizer
-          kuromoji_iteration_mark
-        ),
-        tokenizer: 'kuromoji_user_dict',
         filter: %w(
-          kuromoji_baseform
-          kuromoji_part_of_speech
-          ja_stop
-          kuromoji_stemmer
-          kuromoji_number
-          cjk_width
+          english_possessive_stemmer
           lowercase
+          asciifolding
+          cjk_width
+          sudachi_part_of_speech
+          sudachi_ja_stop
+          sudachi_baseform
+          search
         ),
       },
 
@@ -139,9 +146,9 @@ class AccountsIndex < Chewy::Index
 
     field :display_name, type: 'text', analyzer: 'title' do
       field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'title'
-      field :ja_stemmed, type: 'text', analyzer: 'ja_title', search_analyzer: 'title'
-      field :ko_stemmed, type: 'text', analyzer: 'ko_title', search_analyzer: 'title'
-      field :zh_stemmed, type: 'text', analyzer: 'zh_title', search_analyzer: 'title'
+      field :ja_stemmed, type: 'text', analyzer: 'ja_title'
+      field :ko_stemmed, type: 'text', analyzer: 'ko_title'
+      field :zh_stemmed, type: 'text', analyzer: 'zh_title'
     end
 
     field :acct, type: 'text', analyzer: 'title', value: ->(account) { [account.username, account.domain].compact.join('@') } do
@@ -150,7 +157,7 @@ class AccountsIndex < Chewy::Index
 
     field :actor_type, type: 'keyword', normalizer: 'keyword'
 
-    field :text, type: 'text', value: ->(account) { account.index_text } do
+    field :text, type: 'text', value: ->(account) { account.searchable_text } do
       field :en_stemmed, type: 'text', analyzer: 'content'
       field :ja_stemmed, type: 'text', analyzer: 'ja_content'
       field :ko_stemmed, type: 'text', analyzer: 'ko_content'

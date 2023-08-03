@@ -17,21 +17,6 @@ class TagsIndex < Chewy::Index
         filter: %w(lowercase asciifolding cjk_width),
       },
 
-      ja_content: {
-        type: 'custom',
-        char_filter: %w(icu_normalizer kuromoji_iteration_mark),
-        tokenizer: 'kuromoji_user_dict',
-        filter: %w(
-          kuromoji_baseform
-          kuromoji_part_of_speech
-          ja_stop
-          kuromoji_stemmer
-          kuromoji_number
-          cjk_width
-          lowercase
-        ),
-      },
-
       ko_content: {
         tokenizer: 'nori_user_dict',
         filter: %w(lowercase asciifolding cjk_width),
@@ -73,7 +58,6 @@ class TagsIndex < Chewy::Index
   root date_detection: false do
     field :name, type: 'text', analyzer: 'content' do
       field :edge_ngram, type: 'text', analyzer: 'edge_ngram', search_analyzer: 'content'
-      field :ja_stemmed, type: 'text', analyzer: 'ja_content', search_analyzer: 'content'
       field :ko_stemmed, type: 'text', analyzer: 'ko_content', search_analyzer: 'content'
       field :zh_stemmed, type: 'text', analyzer: 'zh_content', search_analyzer: 'content'
     end

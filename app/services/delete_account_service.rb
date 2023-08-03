@@ -236,6 +236,7 @@ class DeleteAccountService < BaseService
     @account.locked            = false
     @account.memorial          = false
     @account.discoverable      = false
+    @account.indexable         = false
     @account.display_name      = ''
     @account.note              = ''
     @account.fields            = []

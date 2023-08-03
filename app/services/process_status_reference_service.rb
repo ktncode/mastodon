@@ -4,7 +4,10 @@ class ProcessStatusReferenceService
   def call(status, **options)
     @status = status
 
-    urls = parse_urls(status, options).union(options[:urls]) - [ActivityPub::TagManager.instance.uri_for(status), ActivityPub::TagManager.instance.url_for(status)]
+    urls = (parse_urls(status, options).union(options[:urls]) - [ActivityPub::TagManager.instance.uri_for(status), ActivityPub::TagManager.instance.url_for(status)]).compact
+
+    return urls if options[:skip_process]
+
     process_reference(urls, (options[:status_reference_ids] || []).compact.uniq, status.id)
   end
 
@@ -49,8 +52,8 @@ class ProcessStatusReferenceService
     links = html.css(':not(.reference-link-inline) > a')
 
     links.filter_map do |anchor|
-      Addressable::URI.parse(anchor['href']).normalize.to_s unless skip_link?(anchor, mentions)
-    rescue Addressable::URI::InvalidURIError
+      Addressable::URI.parse(anchor['href'])&.normalize&.to_s unless skip_link?(anchor, mentions)
+    rescue Addressable::URI::InvalidURIError, IDN::Idna::IdnaError
       nil
     end
   end

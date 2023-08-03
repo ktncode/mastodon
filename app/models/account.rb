@@ -82,6 +82,9 @@ class Account < ApplicationRecord
   include DomainMaterializable
   include AccountMerging
   include AccountSettings
+  include AccountStatusesSearch
+
+  extend OrderAsSpecified
 
   TRUST_LEVELS = {
     untrusted: 0,
@@ -163,6 +166,11 @@ class Account < ApplicationRecord
   delegate :chosen_languages, to: :user, prefix: false, allow_nil: true
 
   update_index('accounts', :self)
+
+  # workaround
+  def user_time_zone
+    'Asia/Tokyo'
+  end
 
   def local?
     domain.nil?
@@ -450,7 +458,7 @@ class Account < ApplicationRecord
     end
   end
 
-  def index_text
+  def searchable_text
     ActionController::Base.helpers.strip_tags(note)
   end
 

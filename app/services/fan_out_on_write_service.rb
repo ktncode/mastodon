@@ -128,7 +128,7 @@ class FanOutOnWriteService < BaseService
 
     KeywordSubscribe.active.with_media(status.proper).without_local_followed_home(status.account).order(:account_id).each do |keyword_subscribe|
       next if match_accounts[-1] == keyword_subscribe.account_id
-      match_accounts << keyword_subscribe.account_id if keyword_subscribe.match?(status.index_text)
+      match_accounts << keyword_subscribe.account_id if keyword_subscribe.match?(status.searchable_text)
     end
 
     FeedInsertWorker.push_bulk(match_accounts) do |match_account|
@@ -141,7 +141,7 @@ class FanOutOnWriteService < BaseService
 
     KeywordSubscribe.active.with_media(status.proper).without_local_followed_list(status.account).order(:list_id).each do |keyword_subscribe|
       next if match_lists[-1] == keyword_subscribe.list_id
-      match_lists << keyword_subscribe.list_id if keyword_subscribe.match?(status.index_text)
+      match_lists << keyword_subscribe.list_id if keyword_subscribe.match?(status.searchable_text)
     end
 
     FeedInsertWorker.push_bulk(match_lists) do |match_list|
