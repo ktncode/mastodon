@@ -74,3 +74,8 @@ body.rtl {
         margin-left: 0;
     }
 }
+
+.reactions-bar__item__emoji {
+    width: var(--content-emoji-reaction-size, 16px);
+    height: var(--content-emoji-reaction-size, 16px);
+}
