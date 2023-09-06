@@ -13,6 +13,10 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       headers: :any,
       methods: [:get],
       credentials: false
+    resource '/nodeinfo/*',
+      headers: :any,
+      methods: [:get],
+      credentials: false
     resource '/@:username',
       headers: :any,
       methods: [:get],
