@@ -31,7 +31,7 @@ class StatusFilter
   end
 
   def blocking_domain?
-    @preloaded_account_relations[:domain_blocking_by_domain] ? @preloaded_account_relations[:domain_blocking_by_domain][status.account_domain] : account.domain_blocking?(status.account_domain)
+    @preloaded_account_relations[:domain_blocking_by_domain] ? @preloaded_account_relations[:domain_blocking_by_domain][status.account_id] : account.domain_blocking?(status.account_domain)
   end
 
   def muting_account?

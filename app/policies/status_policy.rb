@@ -102,9 +102,9 @@ class StatusPolicy < ApplicationPolicy
   end
 
   def author_blocking_domain?
-    return false if current_account.nil? || current_account.domain.nil?
+    return false if current_account.nil? || author.domain.nil?
 
-    author.domain_blocking?(current_account.domain)
+    current_account.domain_blocking?(author.domain)
   end
 
   def blocking_author?

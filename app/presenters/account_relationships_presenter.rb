@@ -44,7 +44,7 @@ class AccountRelationshipsPresenter
         (select string_agg(account_id::text, ',') from blocks where target_account_id = :current_account_id and account_id in (:account_ids)) as blocked_by,
         (select string_agg(target_account_id::text, ',') from filter_mutes) as muting,
         (select string_agg(target_account_id::text, ',') from filter_mutes where hide_notifications) as muting_notifications,
-        (select string_agg(adb.account_id::text, ',') from accounts a join account_domain_blocks adb on a.domain = adb.domain where adb.account_id = :current_account_id and a.id in (:account_ids)) as domain_blocking,
+        (select string_agg(a.id::text, ',') from accounts a join account_domain_blocks adb on a.domain = adb.domain where adb.account_id = :current_account_id and a.id in (:account_ids)) as domain_blocking,
         (select string_agg(target_account_id::text, ',') from account_pins where account_id = :current_account_id and target_account_id in (:account_ids)) as endorsed,
         (select json_object_agg(n.target_account_id, n.val)
           from (select target_account_id, json_object_agg('comment', comment) as val from account_notes where account_id = :current_account_id and target_account_id in (:account_ids) group by target_account_id) as n) as account_note
