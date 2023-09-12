@@ -53,6 +53,7 @@
 #  featured_tags_collection_url  :string
 #  avatar_thumbhash              :string
 #  header_thumbhash              :string
+#  indexable                     :boolean          default(FALSE), not null
 #
 
 class Account < ApplicationRecord

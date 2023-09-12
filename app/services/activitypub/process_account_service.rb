@@ -110,6 +110,7 @@ class ActivityPub::ProcessAccountService < BaseService
     @account.settings                     = defer_settings.merge(other_settings, birthday, address, is_cat, deny_subscribed)
     @account.also_known_as                = as_array(@json['alsoKnownAs'] || []).map { |item| value_or_id(item) }
     @account.discoverable                 = @json['discoverable'] || false
+    @account.indexable                    = @json['indexable'] || false
     @account.searchability                = searchability_from_audience
   end
 
@@ -259,6 +260,8 @@ class ActivityPub::ProcessAccountService < BaseService
         :private
       elsif @account.note.match? /#(<.+?>)?searchable_?by_?reacted_?users?_?(_?only)?\b/i
         :direct
+      elsif @json['indexable']
+        :public
       elsif Node.domain(@domain).first&.upstream == "misskey"
         :public
       else

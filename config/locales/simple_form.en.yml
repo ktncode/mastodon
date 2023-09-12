@@ -48,6 +48,7 @@ en:
         fields: You can have up to %{size} items displayed as a table on your profile
         header: PNG, GIF or JPG. At most %{size}. Will be downscaled to %{dimensions}px
         inbox_url: Copy the URL from the frontpage of the relay you want to use
+        indexable: This is a setting that is compatible with servers other than Fedibird. Servers that are compatible with Mastodon v4.2 or later can search for public posts. The advantage of enabling this setting is great, but the specifications of search possibilities for individual public posts are ignored. If you want to restrict the search possibilities individually, unlisted or followers only. When searching by Fedibird, FediBird search specifications are given priority and this setting is ignored.
         irreversible: Filtered posts will disappear irreversibly, even if filter is later removed
         locale: The language of the user interface, e-mails and push notifications
         location: Area of primary residence or activity
@@ -245,6 +246,7 @@ en:
         header: Header
         honeypot: "%{label} (do not fill in)"
         inbox_url: URL of the relay inbox
+        indexable: Allow everyone to search for your public post. If the server is compatible with Mastodon v4.2 (compatible settings)
         irreversible: Drop instead of hide
         locale: Interface language
         location: Location

@@ -9,13 +9,14 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
                      :moved_to, :property_value, :identity_proof,
                      :discoverable, :olm, :suspended, :other_setting,
                      :vcard,
+                     :indexable,
                      :searchable_by
 
   attributes :id, :type, :following, :followers,
              :inbox, :outbox, :featured, :featured_tags,
              :preferred_username, :name, :summary,
              :url, :manually_approves_followers,
-             :discoverable, :published,
+             :discoverable, :indexable, :published,
              :searchable_by
 
   has_one :public_key, serializer: ActivityPub::PublicKeySerializer
@@ -103,6 +104,10 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
 
   def discoverable
     object.suspended? || object.silenced? ? false : (object.discoverable || false)
+  end
+
+  def indexable
+    object.suspended? ? false : (object.indexable || false)
   end
 
   def name
