@@ -439,7 +439,7 @@ class Status < ApplicationRecord
       emoji_reactions.filter do |emoji_reaction|
         if account.present?
           emoji_reaction['me'] = emoji_reaction['account_ids'].include?(account.id.to_s)
-          emoji_reaction['account_ids'] -= (account.excluded_from_timeline_account_ids + (Account.excluded_silenced_account_ids - [account.id])).uniq.map(&:to_s)
+          emoji_reaction['account_ids'] -= (account.excluded_from_timeline_account_ids + Account.where(id: emoji_reaction['account_ids'], domain: account.excluded_from_timeline_domains).pluck(:id) + (Account.excluded_silenced_account_ids - [account.id])).uniq.map(&:to_s)
         else
           emoji_reaction['me'] = false
           emoji_reaction['account_ids'] -= Account.excluded_silenced_account_ids.map(&:to_s)

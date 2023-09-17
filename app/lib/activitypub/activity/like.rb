@@ -45,7 +45,7 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
     return if @account.reacted?(@original_status, shortcode, emoji)
 
     @original_status.emoji_reactions.create!(account: @account, name: shortcode, custom_emoji: emoji, uri: @json['id']).tap do |reaction|
-      if @original_status.account.local? && !@original_status.account.silenced?
+      if @original_status.account.local? && !@account.silenced? && !@original_status.account.excluded_from_timeline_account_ids.include?(@account.id) && !@original_status.account.excluded_from_timeline_domains.include?(@account.domain)
         NotifyService.new.call(@original_status.account, :emoji_reaction, reaction)
         forward_for_emoji_reaction
         relay_for_emoji_reaction
