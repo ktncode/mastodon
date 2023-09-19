@@ -154,6 +154,7 @@ defaults: &defaults
   use_fullsize_header_on_detail: false
   hide_following_from_yourself: false
   hide_followers_from_yourself: false
+  hide_joined_date_from_yourself: false
 
 development:
   <<: *defaults

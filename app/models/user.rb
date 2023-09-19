@@ -149,8 +149,7 @@ class User < ApplicationRecord
            :disable_relative_time, :hide_direct_from_timeline, :hide_personal_from_timeline, :hide_personal_from_account, :hide_privacy_meta,
            :hide_link_preview, :hide_photo_preview, :hide_video_preview,
            :unlocked_for_official_app, :use_low_resolution_thumbnails, :use_fullsize_avatar_on_detail, :use_fullsize_header_on_detail,
-           :hide_following_from_yourself, :hide_followers_from_yourself,
-
+           :hide_following_from_yourself, :hide_followers_from_yourself, :hide_joined_date_from_yourself,
 
            to: :settings, prefix: :setting, allow_nil: false
 

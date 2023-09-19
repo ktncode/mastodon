@@ -3,7 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me } from 'mastodon/initial_state';
+import { me, hideJoinedDateFromYourself } from 'mastodon/initial_state';
 import Icon from 'mastodon/components/icon';
 import AccountNoteContainer from '../containers/account_note_container';
 import age from 's-age';
@@ -141,10 +141,10 @@ class HeaderExtra extends ImmutablePureComponent {
                     <th><Icon id='birthday-cake' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.birthday' defaultMessage='Birthday' /></th>
                     <td>{birthday}</td>
                   </tr>}
-                  <tr>
+                  {!(hideJoinedDateFromYourself && account.get('id') === me) && <tr>
                     <th><Icon id='calendar' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.joined' defaultMessage='Joined' /></th>
                     <td><FormattedDate value={joined} hour12={false} year='numeric' month='short' day='2-digit' /></td>
-                  </tr>
+                  </tr>}
                 </tbody>
               </table>
             </div>

@@ -105,6 +105,7 @@ en:
         setting_hide_followers_from_yourself: Hide your followers from you so you don't have to worry about who's following you. Doesn't affect references from other accounts
         setting_hide_following_count: The number of following will be hidden in your profile
         setting_hide_following_from_yourself: Hide your following from you so you don't have to worry about who you're following. Doesn't affect references from other accounts
+        setting_hide_joined_date_from_yourself: Hide the joined date from yourself so that you don't have to be aware of it (WebUI only). Doesn't affect references from other accounts
         setting_hide_link_preview: Hide the content preview card linked to the post
         setting_hide_network: Who you follow and who follows you will be hidden on your profile
         setting_hide_personal_from_account: Hide personal posts from the account post lists
@@ -315,6 +316,7 @@ en:
         setting_hide_followers_from_yourself: Hide your followers from yourself
         setting_hide_following_count: Hide your following count
         setting_hide_following_from_yourself: Hide your following from yourself
+        setting_hide_joined_date_from_yourself: Hide joined date from yourself
         setting_hide_link_preview: Hide preview card (link)
         setting_hide_network: Hide your social graph
         setting_hide_personal_from_account: Hide personal posts from account posts

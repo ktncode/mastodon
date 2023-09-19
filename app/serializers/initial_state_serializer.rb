@@ -105,8 +105,9 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:use_low_resolution_thumbnails]     = object.current_account.user.setting_use_low_resolution_thumbnails
       store[:use_fullsize_avatar_on_detail]     = object.current_account.user.setting_use_fullsize_avatar_on_detail
       store[:use_fullsize_header_on_detail]     = object.current_account.user.setting_use_fullsize_header_on_detail
-      store[:hide_following_from_yourself]        = object.current_account.user.setting_hide_following_from_yourself
-      store[:hide_followers_from_yourself]        = object.current_account.user.setting_hide_followers_from_yourself
+      store[:hide_following_from_yourself]      = object.current_account.user.setting_hide_following_from_yourself
+      store[:hide_followers_from_yourself]      = object.current_account.user.setting_hide_followers_from_yourself
+      store[:hide_joined_date_from_yourself]    = object.current_account.user.setting_hide_joined_date_from_yourself
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

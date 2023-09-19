@@ -108,6 +108,7 @@ class UserSettingsDecorator
     use_fullsize_header_on_detail
     hide_following_from_yourself
     hide_followers_from_yourself
+    hide_joined_date_from_yourself
   ).freeze
 
   STRING_KEYS = %w(

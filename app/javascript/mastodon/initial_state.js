@@ -87,6 +87,7 @@ export const useFullsizeAvatarOnDetail = getMeta('use_fullsize_avatar_on_detail'
 export const useFullsizeHeaderOnDetail = getMeta('use_fullsize_header_on_detail');
 export const hideFollowingFromYourself = getMeta('hide_following_from_yourself');
 export const hideFollowersFromYourself = getMeta('hide_followers_from_yourself');
+export const hideJoinedDateFromYourself = getMeta('hide_joined_date_from_yourself');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

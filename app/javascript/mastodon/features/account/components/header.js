@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
 import Button from 'mastodon/components/button';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { autoPlayGif, me, isStaff, show_followed_by, follow_button_to_list_adder, disablePost, disableBlock, disableDomainBlock, disableFollow, disableUnfollow } from 'mastodon/initial_state';
+import { autoPlayGif, me, isStaff, show_followed_by, follow_button_to_list_adder, disablePost, disableBlock, disableDomainBlock, disableFollow, disableUnfollow, hideJoinedDateFromYourself } from 'mastodon/initial_state';
 import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import IconButton from 'mastodon/components/icon_button';
@@ -505,10 +505,10 @@ class Header extends ImmutablePureComponent {
                         <th><Icon id='birthday-cake' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.birthday' defaultMessage='Birthday' /></th>
                         <td>{birthday}</td>
                       </tr>}
-                      <tr>
+                      {!(hideJoinedDateFromYourself && account.get('id') === me) && <tr>
                         <th><Icon id='calendar' fixedWidth aria-hidden='true' /> <FormattedMessage id='account.joined' defaultMessage='Joined' /></th>
                         <td><FormattedDate value={joined} hour12={false} year='numeric' month='short' day='2-digit' /></td>
-                      </tr>
+                      </tr>}
                     </tbody>
                   </table>
                 </div>

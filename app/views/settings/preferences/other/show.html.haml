@@ -159,6 +159,9 @@
   .fields-group
     = f.input :setting_use_fullsize_header_on_detail, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  .fields-group
+    = f.input :setting_hide_joined_date_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
+
   %h4= t 'preferences.public_timelines'
 
   .fields-group
