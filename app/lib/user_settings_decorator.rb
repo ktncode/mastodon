@@ -109,6 +109,7 @@ class UserSettingsDecorator
     hide_following_from_yourself
     hide_followers_from_yourself
     hide_joined_date_from_yourself
+    hide_reaction_counter
   ).freeze
 
   STRING_KEYS = %w(

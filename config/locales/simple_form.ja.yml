@@ -108,6 +108,7 @@ ja:
         setting_hide_personal_from_timeline: ホームとリストタイムラインから個人限定投稿を隠します
         setting_hide_photo_preview: 投稿にリンクされた画像のプレビューカードを隠します
         setting_hide_privacy_meta: 公開範囲を選択するドロップダウンメニューから説明を隠し、名称のみ表示します
+        setting_hide_reaction_counter: 投稿に表示される絵文字リアクションの件数を隠します
         setting_hide_statuses_count: 投稿数をプロフィールページで見られないようにします
         setting_hide_video_preview: 投稿にリンクされた動画のプレビューカードを隠します
         setting_match_visibility_of_references: 参照先の投稿がフォロワー限定の場合、投稿の公開範囲をそれに合わせてフォロワー限定とする動作をデフォルトにします
@@ -319,6 +320,7 @@ ja:
         setting_hide_personal_from_timeline: 自分限定投稿をタイムラインから隠す
         setting_hide_photo_preview: プレビューカード（画像）を隠す
         setting_hide_privacy_meta: 公開範囲の説明を隠す
+        setting_hide_reaction_counter: リアクションの件数を隠す
         setting_hide_statuses_count: 投稿数を隠す
         setting_hide_video_preview: プレビューカード（動画）を隠す
         setting_info_font_size: 情報ヘッダのフォントサイズ

@@ -108,6 +108,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:hide_following_from_yourself]      = object.current_account.user.setting_hide_following_from_yourself
       store[:hide_followers_from_yourself]      = object.current_account.user.setting_hide_followers_from_yourself
       store[:hide_joined_date_from_yourself]    = object.current_account.user.setting_hide_joined_date_from_yourself
+      store[:hide_reaction_counter]             = object.current_account.user.setting_hide_reaction_counter
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

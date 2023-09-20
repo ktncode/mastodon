@@ -112,6 +112,7 @@ en:
         setting_hide_personal_from_timeline: Hide personal posts from the home and list timelines
         setting_hide_photo_preview: Hide the photo preview card linked to the post
         setting_hide_privacy_meta: Hide the description from the drop-down menu for selecting visibility, showing only the name
+        setting_hide_reaction_counter: Hide emoji reaction counter that appears on posts
         setting_hide_statuses_count: The number of post will be hidden in your profile
         setting_hide_video_preview: Hide the video preview card linked to the post
         setting_match_visibility_of_references: If the referenced post is private, default the visibility of the post to private behavior accordingly
@@ -323,6 +324,7 @@ en:
         setting_hide_personal_from_timeline: Hide personal posts from the timeline
         setting_hide_photo_preview: Hide preview card (photo)
         setting_hide_privacy_meta: Hide visibility description
+        setting_hide_reaction_counter: Hide reactions counter
         setting_hide_statuses_count: Hide your post count
         setting_hide_video_preview: Hide preview card (video)
         setting_info_font_size: Information header font size

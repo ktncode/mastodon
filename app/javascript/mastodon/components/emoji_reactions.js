@@ -58,6 +58,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
     removeEmojiReaction: PropTypes.func.isRequired,
     style: PropTypes.object,
     reactionLimitReached: PropTypes.bool,
+    hideCount: PropTypes.bool,
   };
 
   state = {
@@ -115,7 +116,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
   }
 
   render () {
-    const { style, emojiReaction, myReaction, reactionLimitReached } = this.props;
+    const { style, emojiReaction, myReaction, reactionLimitReached, hideCount } = this.props;
 
     if (!emojiReaction) {
       return <Fragment />;
@@ -132,7 +133,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
         <div className='reactions-bar__item-wrapper' ref={this.setTargetRef}>
           <button className={classNames('reactions-bar__item', { active: myReaction })} disabled={disableReactions || !myReaction && reactionLimitReached} onClick={this.handleClick} title={`:${shortCode}:`} style={style}>
             <span className='reactions-bar__item__emoji'><Emoji className='reaction' hovered={this.state.hovered} emoji={emojiReaction.get('name')} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} /></span>
-            <span className='reactions-bar__item__count'><AnimatedNumber value={emojiReaction.get('count')} /></span>
+            {!hideCount && <span className='reactions-bar__item__count'><AnimatedNumber value={emojiReaction.get('count')} /></span>}
           </button>
         </div>
         {!isUserTouching() &&

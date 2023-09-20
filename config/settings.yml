@@ -155,6 +155,7 @@ defaults: &defaults
   hide_following_from_yourself: false
   hide_followers_from_yourself: false
   hide_joined_date_from_yourself: false
+  hide_reaction_counter: false
 
 development:
   <<: *defaults

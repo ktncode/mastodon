@@ -5,7 +5,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { List } from 'immutable';
 import TransitionMotion from 'react-motion/lib/TransitionMotion';
-import { reduceMotion, me } from 'mastodon/initial_state';
+import { reduceMotion, me, hideReactionCounter } from 'mastodon/initial_state';
 import spring from 'react-motion/lib/spring';
 import EmojiReaction from './emoji_reactions';
 
@@ -72,6 +72,7 @@ export default class EmojiReactionsBar extends ImmutablePureComponent {
                 addEmojiReaction={addEmojiReaction}
                 removeEmojiReaction={removeEmojiReaction}
                 reactionLimitReached={reactionLimitReached}
+                hideCount={hideReactionCounter}
               />
             ))}
           </div>
