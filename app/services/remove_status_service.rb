@@ -46,7 +46,7 @@ class RemoveStatusService < BaseService
           remove_from_hashtags
           remove_from_group if @status.account.group?
           remove_from_public
-          remove_from_media
+          remove_from_media if @status.with_media?
           remove_media unless mark_expired?
         end
 
