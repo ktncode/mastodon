@@ -622,7 +622,9 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def generator
-    @generator ||= Generator.find_or_create_by!(
+    return @generator if defined?(@generator)
+
+    @generator = @object.dig('generator', 'name').nil? ? nil : Generator.find_or_create_by!(
       uri: @object.dig('generator', 'id') || '',
       type: @object.dig('generator', 'type')&.capitalize&.to_sym || :Application,
       name: @object.dig('generator', 'name') || '',
