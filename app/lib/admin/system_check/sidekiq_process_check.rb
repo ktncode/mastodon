@@ -8,6 +8,8 @@ class Admin::SystemCheck::SidekiqProcessCheck < Admin::SystemCheck::BaseCheck
     pull
     scheduler
     ingress
+    backup
+    ui
   ).freeze
 
   def pass?
