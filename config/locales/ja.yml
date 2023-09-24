@@ -1468,8 +1468,8 @@ ja:
       public: 公開
       public_long: 誰でもあなたの投稿を検索できます（外部検索サービスにも公開されます）
     show_more: もっと見る
-    show_newer: 新しいものから表示
-    show_older: 古いものから表示
+    show_newer: 新しいものを表示
+    show_older: 古いものを表示
     show_thread: スレッドを表示
     sign_in_to_participate: ログインして会話に参加
     thread_with_references: スレッドと参照
