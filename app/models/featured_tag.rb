@@ -29,7 +29,7 @@ class FeaturedTag < ApplicationRecord
 
   attr_writer :name
 
-  LIMIT = 10
+  LIMIT = 30
 
   def sign?
     true
