@@ -104,6 +104,8 @@ class ActivityPub::TagManager
       status.conversation_id.present? ? [uri_for(status.conversation)] : []
     when 'direct'
       mentions_uris(status)
+    else
+      []
     end
   end
 

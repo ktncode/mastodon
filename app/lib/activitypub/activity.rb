@@ -319,6 +319,8 @@ class ActivityPub::Activity
       :unlisted
     elsif audience_to.include?(@account.followers_url)
       :private
+    elsif audience_to.empty? && audience_cc.empty?
+      :personal
     else
       :direct
     end
