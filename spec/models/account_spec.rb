@@ -568,6 +568,11 @@ RSpec.describe Account, type: :model do
         expect(account).to model_have_error_on_field(:display_name)
       end
 
+      it 'is invalid if the display name is longer than 30 characters with custom emojis' do
+        account = Fabricate.build(:account, display_name: 'the admin :cava_green: :cava_yellow: :cava_red:')
+        expect(account.valid?).to be true
+      end
+
       it 'is invalid if the note is longer than 500 characters' do
         account = Fabricate.build(:account, note: Faker::Lorem.characters(number: 501))
         account.valid?
