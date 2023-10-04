@@ -307,6 +307,10 @@ export function submitCompose(routerHistory) {
         routerHistory.goBack();
       }
 
+      if (scheduled_status_id) {
+        dispatch(deleteScheduledStatus(scheduled_status_id));
+      }
+
       dispatch(insertIntoTagHistory(response.data.tags, status));
       dispatch(submitComposeSuccess({ ...response.data }));
 
