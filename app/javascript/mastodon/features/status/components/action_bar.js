@@ -5,7 +5,7 @@ import IconButton from '../../../components/icon_button';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
 import { defineMessages, injectIntl } from 'react-intl';
-import { me, isStaff, show_quote_button, enableReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock } from '../../../initial_state';
+import { me, isStaff, show_quote_button, enableReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock, hideListOfEmojiReactionsToPosts, hideListOfFavouritesToPosts, hideListOfReblogsToPosts, hideListOfReferredByToPosts } from '../../../initial_state';
 import classNames from 'classnames';
 import ReactionPickerDropdownContainer from 'mastodon/containers/reaction_picker_dropdown_container';
 import { openModal } from '../../../actions/modal';
@@ -307,6 +307,11 @@ class ActionBar extends React.PureComponent {
     const expires_date = expires_at && new Date(expires_at);
     const expired = expires_date && expires_date.getTime() < intl.now();
 
+    const showReblogCount = !hideListOfReblogsToPosts && reblogsCount > 0;
+    const showFavouritCount = !hideListOfFavouritesToPosts && favouritesCount > 0;
+    const showEmojiReactionCount = !hideListOfEmojiReactionsToPosts && enableReaction && !status.get('emoji_reactions').isEmpty();
+    const showStatusReferredByCount = !hideListOfReferredByToPosts && enableStatusReference && referredByCount > 0;
+
     let menu = [];
 
     if (publicStatus && !expired) {
@@ -314,23 +319,23 @@ class ActionBar extends React.PureComponent {
       menu.push({ text: intl.formatMessage(messages.embed), action: this.handleEmbed });
     }
 
-    if (reblogsCount > 0 || favouritesCount > 0 || !status.get('emoji_reactions').isEmpty()) {
+    if (showReblogCount || showFavouritCount || showEmojiReactionCount || showStatusReferredByCount) {
       menu.push(null);
     }
 
-    if (reblogsCount > 0) {
+    if (showReblogCount) {
       menu.push({ text: intl.formatMessage(messages.show_reblogs), action: this.handleReblogs });
     }
 
-    if (favouritesCount > 0) {
+    if (showFavouritCount) {
       menu.push({ text: intl.formatMessage(messages.show_favourites), action: this.handleFavourites });
     }
 
-    if (!status.get('emoji_reactions').isEmpty()) {
+    if (showEmojiReactionCount) {
       menu.push({ text: intl.formatMessage(messages.show_emoji_reactions), action: this.handleEmojiReactions });
     }
 
-    if (enableStatusReference && referredByCount > 0) {
+    if (showStatusReferredByCount) {
       menu.push({ text: intl.formatMessage(messages.show_referred_by_statuses), action: this.handleReferredByStatuses });
     }
 

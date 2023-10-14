@@ -89,6 +89,10 @@ export const hideFollowingFromYourself = getMeta('hide_following_from_yourself')
 export const hideFollowersFromYourself = getMeta('hide_followers_from_yourself');
 export const hideJoinedDateFromYourself = getMeta('hide_joined_date_from_yourself');
 export const hideReactionCounter = getMeta('hide_reaction_counter');
+export const hideListOfEmojiReactionsToPosts = getMeta('hide_list_of_emoji_reactions_to_posts');
+export const hideListOfFavouritesToPosts = getMeta('hide_list_of_favourites_to_posts');
+export const hideListOfReblogsToPosts = getMeta('hide_list_of_reblogs_to_posts');
+export const hideListOfReferredByToPosts = getMeta('hide_list_of_referred_by_to_posts');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

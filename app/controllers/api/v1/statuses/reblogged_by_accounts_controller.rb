@@ -21,6 +21,8 @@ class Api::V1::Statuses::RebloggedByAccountsController < Api::BaseController
   end
 
   def default_accounts
+    return Account.none if current_user&.setting_hide_list_of_reblogs_to_posts
+
     Account.without_suspended.includes(:statuses, :account_stat).references(:statuses)
   end
 

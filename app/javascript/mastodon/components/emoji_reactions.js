@@ -59,6 +59,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
     style: PropTypes.object,
     reactionLimitReached: PropTypes.bool,
     hideCount: PropTypes.bool,
+    hideAccountList: PropTypes.bool,
   };
 
   state = {
@@ -116,7 +117,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
   }
 
   render () {
-    const { style, emojiReaction, myReaction, reactionLimitReached, hideCount } = this.props;
+    const { style, emojiReaction, myReaction, reactionLimitReached, hideCount, hideAccountList } = this.props;
 
     if (!emojiReaction) {
       return <Fragment />;
@@ -136,7 +137,7 @@ export default class EmojiReaction extends ImmutablePureComponent {
             {!hideCount && <span className='reactions-bar__item__count'><AnimatedNumber value={emojiReaction.get('count')} /></span>}
           </button>
         </div>
-        {!isUserTouching() &&
+        {!hideAccountList && !isUserTouching() &&
         <Overlay show={this.state.hovered} placement={this.state.placement} target={this.findTarget}>
           <AccountPopup accountIds={emojiReaction.get('account_ids', List())} />
         </Overlay>

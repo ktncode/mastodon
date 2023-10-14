@@ -30,6 +30,8 @@ class Api::V1::Statuses::ReferredByStatusesController < Api::BaseController
   end
 
   def results
+    return Status.none if current_user&.setting_hide_list_of_referred_by_to_posts
+
     @_results ||= Status.where(id: referred_by_statuses).to_a_paginated_by_id(
       limit_param(DEFAULT_STATUSES_LIMIT),
       params_slice(:max_id, :since_id, :min_id)

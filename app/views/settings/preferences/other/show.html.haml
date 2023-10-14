@@ -165,6 +165,18 @@
   .fields-group
     = f.input :setting_hide_joined_date_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  .fields-group
+    = f.input :setting_hide_list_of_emoji_reactions_to_posts, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_list_of_favourites_to_posts, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_list_of_reblogs_to_posts, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_list_of_referred_by_to_posts, as: :boolean, wrapper: :with_label, fedibird_features: true
+
   %h4= t 'preferences.public_timelines'
 
   .fields-group

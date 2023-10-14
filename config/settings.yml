@@ -156,6 +156,10 @@ defaults: &defaults
   hide_followers_from_yourself: false
   hide_joined_date_from_yourself: false
   hide_reaction_counter: false
+  hide_list_of_emoji_reactions_to_posts: false
+  hide_list_of_favourites_to_posts: false
+  hide_list_of_reblogs_to_posts: false
+  hide_list_of_referred_by_to_posts: false
 
 development:
   <<: *defaults

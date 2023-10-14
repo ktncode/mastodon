@@ -110,6 +110,10 @@ class UserSettingsDecorator
     hide_followers_from_yourself
     hide_joined_date_from_yourself
     hide_reaction_counter
+    hide_list_of_emoji_reactions_to_posts
+    hide_list_of_favourites_to_posts
+    hide_list_of_reblogs_to_posts
+    hide_list_of_referred_by_to_posts    
   ).freeze
 
   STRING_KEYS = %w(

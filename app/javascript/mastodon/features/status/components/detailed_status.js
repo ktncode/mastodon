@@ -19,7 +19,7 @@ import Icon from 'mastodon/components/icon';
 import AnimatedNumber from 'mastodon/components/animated_number';
 import EmojiReactionsBar from 'mastodon/components/emoji_reactions_bar';
 import PictureInPicturePlaceholder from 'mastodon/components/picture_in_picture_placeholder';
-import { enableReaction, enableStatusReference } from 'mastodon/initial_state';
+import { enableReaction, enableStatusReference, hideListOfEmojiReactionsToPosts, hideListOfFavouritesToPosts, hideListOfReblogsToPosts, hideListOfReferredByToPosts } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   public_short: { id: 'privacy.public.short', defaultMessage: 'Public' },
@@ -198,7 +198,12 @@ class DetailedStatus extends ImmutablePureComponent {
     const reblogsCount = status.get('reblogs_count');
     const favouritesCount = status.get('favourites_count');
     const emojiReactionsCount = status.get('emoji_reactions_count');
-    const statusReferredByCount = status.get('status_referred_by_count');
+    const referredByCount = status.get('status_referred_by_count');
+
+    const showReblogCount = !hideListOfReblogsToPosts && reblogsCount > 0;
+    const showFavouritCount = !hideListOfFavouritesToPosts && favouritesCount > 0;
+    const showEmojiReactionCount = !hideListOfEmojiReactionsToPosts && enableReaction && emojiReactionsCount > 0;
+    const showStatusReferredByCount = !hideListOfReferredByToPosts && enableStatusReference && referredByCount > 0;
 
     if (this.props.measureHeight) {
       outerStyle.height = `${this.state.height}px`;
@@ -366,7 +371,7 @@ class DetailedStatus extends ImmutablePureComponent {
     const visibilityIcon = visibilityIconInfo[status.get('visibility')];
     const visibilityLink = <Fragment> · <Icon id={visibilityIcon.icon} title={visibilityIcon.text} /></Fragment>;
 
-    if (!(['public', 'unlisted'].includes(status.get('visibility')))) {
+    if (!showReblogCount || !(['public', 'unlisted'].includes(status.get('visibility')))) {
       reblogLink = '';
     } else if (this.context.router) {
       reblogLink = (
@@ -394,7 +399,9 @@ class DetailedStatus extends ImmutablePureComponent {
       );
     }
 
-    if (this.context.router) {
+    if (!showFavouritCount) {
+      favouriteLink = '';
+    } else if (this.context.router) {
       favouriteLink = (
         <Fragment>
           <Fragment> · </Fragment>
@@ -420,7 +427,9 @@ class DetailedStatus extends ImmutablePureComponent {
       );
     }
 
-    if (enableReaction && this.context.router) {
+    if (!showEmojiReactionCount) {
+      emojiReactionLink = '';
+    } else if (this.context.router) {
       emojiReactionLink = (
         <Fragment>
           <Fragment> · </Fragment>
@@ -434,14 +443,16 @@ class DetailedStatus extends ImmutablePureComponent {
       );
     }
 
-    if (enableStatusReference && this.context.router) {
+    if (!showStatusReferredByCount) {
+      statusReferredByLink = '';
+    } else if (this.context.router) {
       statusReferredByLink = (
         <Fragment>
           <Fragment> · </Fragment>
           <Link to={`/statuses/${status.get('id')}/referred_by`} className='detailed-status__link'>
             <Icon id='link' />
             <span className='detailed-status__status_referred_by'>
-              <AnimatedNumber value={statusReferredByCount} />
+              <AnimatedNumber value={referredByCount} />
             </span>
           </Link>
         </Fragment>

@@ -103,6 +103,10 @@ ja:
         setting_hide_following_from_yourself: 自身が誰をフォローしているか意識せずに済むよう、自分自身に対して隠します。他のアカウントからの参照には影響しません
         setting_hide_joined_date_from_yourself: 自身が登録日を意識せずに済むよう、自分自身に対して隠します（WebUIのみ）。他のアカウントからの参照には影響しません
         setting_hide_link_preview: 投稿にリンクされたコンテンツのプレビューカードを隠します
+        setting_hide_list_of_emoji_reactions_to_posts: 誰が投稿に絵文字リアクションしたのかわからないよう隠します
+        setting_hide_list_of_favourites_to_posts: 誰が投稿にお気に入りしたのかわからないよう隠します
+        setting_hide_list_of_reblogs_to_posts: 誰が投稿をブーストしたのかわからないよう隠します
+        setting_hide_list_of_referred_by_to_posts: 誰が投稿を参照したのかわからないよう隠します
         setting_hide_network: フォローとフォロワーの情報がプロフィールページで見られないようにします
         setting_hide_personal_from_account: アカウントの投稿一覧から個人限定投稿を隠します
         setting_hide_personal_from_timeline: ホームとリストタイムラインから個人限定投稿を隠します
@@ -315,6 +319,10 @@ ja:
         setting_hide_following_from_yourself: 自分に対し自分のフォローを隠す
         setting_hide_joined_date_from_yourself: 自分に対し自分の登録日を隠す
         setting_hide_link_preview: プレビューカード（リンク）を隠す
+        setting_hide_list_of_emoji_reactions_to_posts: 投稿に対する絵文字リアクションのリストを隠す
+        setting_hide_list_of_favourites_to_posts: 投稿に対するお気に入りのリストを隠す
+        setting_hide_list_of_reblogs_to_posts: 投稿に対するブーストのリストを隠す
+        setting_hide_list_of_referred_by_to_posts: 投稿に対する参照のリストを隠す
         setting_hide_network: 繋がりを隠す
         setting_hide_personal_from_account: 自分限定投稿をアカウントの投稿一覧から隠す
         setting_hide_personal_from_timeline: 自分限定投稿をタイムラインから隠す
