@@ -642,7 +642,7 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
-      map.set('dirty', false);
+      map.set('dirty', true);
       map.set('poll', action.status.get('poll', null));
       map.set('sensitive', action.status.get('sensitive', false));
       map.set('datetime_form', datetime_form);
