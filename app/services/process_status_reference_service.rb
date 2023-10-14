@@ -59,21 +59,32 @@ class ProcessStatusReferenceService
   end
 
   def urls_to_target_statuses(urls, status_id)
-    urls.uniq.filter_map do |url|
-      url_to_target_status(url).tap do |target_status|
-        if target_status.nil? && !TagManager.instance.local_url?(url)
-          StatusReferenceResolveWorker.perform_async(status_id, url)
+    urls.uniq!
+
+    domains      = urls.filter_map { |url| Addressable::URI.parse(url)&.normalized_host }.uniq
+    node_domains = domains.filter_map { |host| Node.resolve_domain(host)&.domain }
+    node_urls    = urls.filter { |url| node_domains.include?(Addressable::URI.parse(url)&.normalized_host) }
+
+    unresolved_urls = []
+
+    statuses = node_urls.filter_map do |url|
+      if TagManager.instance.local_url?(url)
+        ActivityPub::TagManager.instance.uri_to_resource(url, Status)
+      else
+        EntityCache.instance.holding_status(url).tap do |target_status|
+          unresolved_urls << url if target_status.nil?
         end
       end
     end
-  end
 
-  def url_to_target_status(url)
-    if TagManager.instance.local_url?(url)
-      ActivityPub::TagManager.instance.uri_to_resource(url, Status)
-    else
-      EntityCache.instance.holding_status(url)
+    if !unresolved_urls.empty?
+      ids = statuses.map(&:id)
+      Redis.current.sadd("status_references:#{status_id}", ids) if ids.present?
+      Redis.current.sadd("status_resolve:#{status_id}", unresolved_urls)
+      StatusReferenceResolveWorker.push_bulk(unresolved_urls) { |url| [status_id, url] }
     end
+
+    statuses
   end
 
   def mention_link?(anchor, mentions)

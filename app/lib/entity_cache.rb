@@ -78,7 +78,7 @@ class EntityCache
   end
 
   def update_holding_status(url, status)
-    Rails.cache.write(to_key(:holding_status, url), status, expires_in: status&.account.nil? ? MIN_EXPIRATION : MAX_EXPIRATION)
+    Rails.cache.write(to_key(:holding_status, url), Status.find_by(id: status&.id), expires_in: status&.account.nil? ? MIN_EXPIRATION : MAX_EXPIRATION)
   end
 
   def to_key(type, *ids)

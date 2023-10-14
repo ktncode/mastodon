@@ -6,7 +6,11 @@ class PublishStatusUpdateWorker
   include RoutingHelper
   include PublishScope
 
+  sidekiq_options queue: 'pull', retry: 0
+
   def perform(status_id)
+    return true # Pending until scroll range information is available
+
     @status  = Status.find(status_id)
 
     FeedManager.instance.active_accounts.merge(visibility_scope).find_each do |account|
