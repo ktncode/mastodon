@@ -10,6 +10,7 @@
   - [backup]
   - [maintenance]
   - [ui]
+  - [debug]
 :scheduler:
   :listened_queues_only: true
 :schedule:
