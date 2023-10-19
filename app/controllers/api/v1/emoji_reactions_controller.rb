@@ -67,6 +67,8 @@ class Api::V1::EmojiReactionsController < Api::BaseController
 
     emoji_reactions_params[:emojis].each do |emoji|
       shortcode, domain = emoji.split('@')
+                 domain = nil if domain == Rails.configuration.x.local_domain
+
       custom_emoji = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
 
       emoji_reactions = emoji_reactions.or(EmojiReaction.where(name: shortcode, custom_emoji: custom_emoji))

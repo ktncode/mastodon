@@ -135,9 +135,9 @@ module ApplicationHelper
     unicode_emoji_filename = UNICODE_EMOJIS[reaction['name']]
 
     if unicode_emoji_filename
-      image_tag("/emoji/#{unicode_emoji_filename}.svg", class: 'emojione', alt: "#{reaction['name']}", draggable: false)
+      image_tag("/emoji/#{unicode_emoji_filename}.svg", class: 'emojione reaction', alt: "#{reaction['name']}", draggable: false)
     elsif animate
-      image_tag(reaction['url'], class: 'emojione', alt: ":#{reaction['name']}:")
+      image_tag(reaction['url'], class: 'emojione reaction', alt: ":#{reaction['name']}:")
     else
       image_tag(reaction['static_url'], class: 'emojione custom-emoji reaction', alt: ":#{reaction['name']}", 'data-original' => full_asset_url(reaction['url']), 'data-static' => full_asset_url(reaction['static_url']))
     end

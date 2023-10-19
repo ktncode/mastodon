@@ -7,10 +7,14 @@ class EmojiReactionService < BaseService
   def call(account, status, emoji)
     @account          = account
     shortcode, domain = emoji.split("@")
+               domain = nil if domain == Rails.configuration.x.local_domain
 
     return if account.nil? || status.nil? || shortcode.nil?
 
-    custom_emoji   = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
+    custom_emoji = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
+
+    return if custom_emoji.present? && domain.present? && !EmojiReaction.where(status_id: status.id, custom_emoji_id: custom_emoji.id).present?
+
     emoji_reaction = EmojiReaction.find_or_create_by!(account_id: account.id, status_id: status.id, name: shortcode, custom_emoji: custom_emoji)
 
     emoji_reaction.tap do |emoji_reaction|

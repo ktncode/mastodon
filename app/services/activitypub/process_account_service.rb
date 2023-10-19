@@ -459,7 +459,7 @@ class ActivityPub::ProcessAccountService < BaseService
 
     return unless emoji.nil? || image_url != emoji.image_remote_url || (updated && updated >= emoji.updated_at)
 
-    emoji ||= CustomEmoji.new(domain: @account.domain, shortcode: shortcode, uri: uri)
+    emoji                ||= CustomEmoji.new(domain: @account.domain, shortcode: shortcode, uri: uri)
     emoji.copy_permission  = case copy_permission when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
     emoji.license          = license
     emoji.aliases          = aliases
@@ -468,7 +468,7 @@ class ActivityPub::ProcessAccountService < BaseService
     emoji.description      = description
     emoji.is_based_on      = is_based_on
     emoji.image_remote_url = image_url
-    emoji.updated_at       = updated   if updated
+    emoji.updated_at       = updated if updated
     emoji.save
   end
 

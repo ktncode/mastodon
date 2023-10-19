@@ -59,11 +59,11 @@ module Mastodon
             next
           end
 
-          custom_emoji ||= CustomEmoji.new(shortcode: shortcode, domain: nil)
-          custom_emoji.image = StringIO.new(entry.read)
-          custom_emoji.image_file_name = File.basename(entry.full_name)
+          custom_emoji                 ||= CustomEmoji.new(shortcode: shortcode, domain: nil)
+          custom_emoji.image             = StringIO.new(entry.read)
+          custom_emoji.image_file_name   = File.basename(entry.full_name)
           custom_emoji.visible_in_picker = !options[:unlisted]
-          custom_emoji.category = category
+          custom_emoji.category          = category
 
           if custom_emoji.save
             imported += 1

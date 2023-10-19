@@ -56,6 +56,7 @@ class CustomEmoji < ApplicationRecord
 
   has_attached_file :image, styles: ->(f) { file_styles(f) }, processors: [:lazy_thumbnail], convert_options: GLOBAL_CONVERT_OPTIONS
 
+  before_validation :self_domain
   before_validation :downcase_domain
 
   validates_attachment :image, content_type: { content_type: IMAGE_MIME_TYPES }, presence: true
@@ -204,6 +205,10 @@ class CustomEmoji < ApplicationRecord
 
   def remove_entity_cache
     Rails.cache.delete(EntityCache.instance.to_key(:emoji, shortcode, domain))
+  end
+
+  def self_domain
+    self.domain = nil if domain == Rails.configuration.x.local_domain
   end
 
   def downcase_domain

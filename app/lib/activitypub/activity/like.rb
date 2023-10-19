@@ -32,7 +32,8 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
 
       image_url = emoji_tag['icon']['url']
       uri       = emoji_tag['id']
-      domain    = URI.split(uri)[2]
+      domain    = Addressable::URI.parse(uri).normalized_host
+      domain    = nil if domain == Rails.configuration.x.local_domain
 
       emoji = CustomEmoji.find_or_create_by!(shortcode: shortcode, domain: domain) do |emoji|
         emoji.uri              = uri

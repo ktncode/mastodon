@@ -124,7 +124,10 @@ class ActivityPub::Activity::Undo < ActivityPub::Activity
       emoji_tag = @object['tag'].is_a?(Array) ? @object['tag']&.first : @object['tag']
 
       if emoji_tag.present? && emoji_tag['id'].present?
-        emoji = CustomEmoji.find_by(shortcode: shortcode, domain: @account.domain)
+        uri    = emoji_tag['id']
+        domain = Addressable::URI.parse(uri).normalized_host
+        domain = nil if domain == Rails.configuration.x.local_domain
+        emoji  = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
       end
 
       if @account.reacted?(@original_status, shortcode, emoji)

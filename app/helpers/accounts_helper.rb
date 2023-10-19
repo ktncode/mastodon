@@ -121,27 +121,25 @@ module AccountsHelper
   def account_theme_valiables(account)
     user = account&.user&.setting_theme_public && account&.user || current_user
 
-    return if user.nil?
-
     css = []
 
     css << <<-EOS
     :root {
-      --content-font-size: #{h(user.setting_content_font_size)}px;
-      --info-font-size: #{h(user.setting_info_font_size)}px;
-      --content-emoji-reaction-size: #{h(user.setting_content_emoji_reaction_size)}px;
-      --emoji-scale: #{h(user.setting_emoji_scale)};
+      --content-font-size: #{h(user&.setting_content_font_size || Setting.default_settings['content_font_size'])}px;
+      --info-font-size: #{h(user&.setting_info_font_size || Setting.default_settings['info_font_size'])}px;
+      --content-emoji-reaction-size: #{h(user&.setting_content_emoji_reaction_size || Setting.default_settings['content_emoji_reaction_size'])}px;
+      --emoji-scale: #{h(user&.setting_emoji_scale || Setting.default_settings['emoji_scale'])};
     }
     EOS
 
-    css << <<-EOS if user.setting_enable_wide_emoji
-    img.emojione.custom-emoji:not(.reaction) {
+    css << <<-EOS if user.nil? || user&.setting_enable_wide_emoji
+    img.emojione:not(.reaction) {
       width: unset !important;
       max-width: min(100%, 10em);
     }
     EOS
 
-    css << <<-EOS if user.setting_enable_wide_emoji_reaction
+    css << <<-EOS if user.nil? || user&.setting_enable_wide_emoji_reaction
     span.reactions-bar__item__emoji {
       width: unset !important;
     }
