@@ -134,7 +134,10 @@ else
 end
 
 Rails.application.reloader.to_prepare do
-  Paperclip.options[:content_type_mappings] = { csv: Import::FILE_TYPES }
+  Paperclip.options[:content_type_mappings] = {
+    csv: Import::FILE_TYPES,
+    apng: 'image/png',
+  }
 end
 
 # In some places in the code, we rescue this exception, but we don't always
