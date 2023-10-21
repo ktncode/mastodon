@@ -446,7 +446,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     return Formatter.instance.linkify([[text_from_name, text_from_summary.presence].compact.join("\n\n"), object_url || object_uri].join(' ')) if converted_object_type?
 
     if @object['quoteUri'].blank? && @object['_misskey_quote'].present?
-      Formatter.instance.linkify(@object['_misskey_content'])
+      Formatter.instance.remove_misskey_quote_link(@object['content'])
     elsif @object['content'].present?
       @object['content']
     elsif content_language_map?

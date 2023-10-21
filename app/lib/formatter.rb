@@ -145,6 +145,21 @@ class Formatter
     Nokogiri::HTML.parse(format(status), nil, 'utf-8').css('a:not(.mention):not(.unhandled-link)').map { |x| x['href'].presence }.compact.uniq
   end
 
+  def remove_misskey_quote_link(html)
+    tree     = Nokogiri::HTML.fragment(html)
+    children = tree.children.size == 1 ? tree.child.children : tree.children
+
+    if children.size >= 2 && children[-1].name == 'a' && children[-2].children[-1].class.name == 'Nokogiri::XML::Text' && children[-2].children[-1].content == 'RE: '
+      children[-2].children[-1].unlink
+      children[-2].children[-1].unlink if children[-2].children[-1]&.name == 'br'
+      children[-2].children[-1].unlink if children[-2].children[-1]&.name == 'br'
+      children[-2].unlink if children[-2].children.size == 0
+      children[-1].unlink
+    end
+
+    tree.to_html.html_safe
+  end
+
   private
 
   def html_entities
