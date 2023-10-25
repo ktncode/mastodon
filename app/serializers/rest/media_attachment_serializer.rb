@@ -30,6 +30,8 @@ class REST::MediaAttachmentSerializer < ActiveModel::Serializer
 
     if object.thumbnail.present?
       full_asset_url(object.thumbnail.url(:original))
+    elsif object.audio?
+      nil
     elsif object.needs_redownload? || object.needs_reprocess?(version)
       media_proxy_url(object.id, version)
     else
