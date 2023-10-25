@@ -34,7 +34,7 @@ class CustomEmoji < ApplicationRecord
   LIMIT       = [LOCAL_LIMIT, (ENV['MAX_REMOTE_EMOJI_SIZE'] || 256.kilobytes).to_i].max
   MAX_PIXELS  = 750_000 # 1500x500px
 
-  SHORTCODE_RE_FRAGMENT = '[a-zA-Z0-9_]{2,}'
+  SHORTCODE_RE_FRAGMENT = '[a-zA-Z0-9_]+'
 
   SCAN_RE = /(?<=[^[:alnum:]:]|\n|^)
     :(#{SHORTCODE_RE_FRAGMENT}):
@@ -62,7 +62,8 @@ class CustomEmoji < ApplicationRecord
   validates_attachment :image, content_type: { content_type: IMAGE_MIME_TYPES }, presence: true
   validates_attachment_size :image, less_than: LIMIT, unless: :local?
   validates_attachment_size :image, less_than: LOCAL_LIMIT, if: :local?
-  validates :shortcode, uniqueness: { scope: :domain }, format: { with: /\A#{SHORTCODE_RE_FRAGMENT}\z/ }, length: { minimum: 2 }
+  validates :shortcode, uniqueness: { scope: :domain }, format: { with: /\A#{SHORTCODE_RE_FRAGMENT}\z/ }, length: { minimum: 1 }, unless: :local?
+  validates :shortcode, uniqueness: { scope: :domain }, format: { with: /\A#{SHORTCODE_RE_FRAGMENT}\z/ }, length: { minimum: 2 }, if: :local?
 
   scope :local, -> { where(domain: nil) }
   scope :remote, -> { where.not(domain: nil) }
