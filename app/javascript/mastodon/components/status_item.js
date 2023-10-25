@@ -94,7 +94,7 @@ class StatusItem extends ImmutablePureComponent {
           </div>
 
           <div className='mini-status__content'>
-            <div className='mini-status__content__text translate' dangerouslySetInnerHTML={{ __html: status.get('shortHtml') }} />
+            <div className='mini-status__content__text translate' lang={status.get('language')} dangerouslySetInnerHTML={{ __html: status.get('shortHtml') }} />
             <Bundle fetchComponent={ThumbnailGallery} loading={this.renderLoadingMediaGallery}>
               {Component => (
                 <Component
