@@ -115,7 +115,7 @@ class Formatter
   end
 
   def format_field(account, str, **options)
-    html = account.local? ? encode_and_link_urls(str, me: true, with_domain: true) : reformat(str)
+    html = account.local? ? encode_and_link_urls(str, me: true, with_domain: true) : apply_inner_link(reformat(str))
     html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
