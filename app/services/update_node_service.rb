@@ -261,33 +261,4 @@ class UpdateNodeService < BaseService
 
     node.update!(instance_data: json) unless json.nil?
   end
-
-  def json_fetch(url, raise_error = false)
-    build_get_request(url).perform do |response|
-      raise Mastodon::UnexpectedResponseError, response unless response_successful?(response) || !raise_error
-
-      body_to_json(response.body_with_limit) if response.code == 200
-    end
-  end
-
-  def build_get_request(url)
-    Request.new(:get, url).tap do |request|
-      request.add_headers('Accept' => 'application/json')
-    end
-  end
-
-  def misskey_api_call(url, json)
-    build_post_request(url, json).perform do |response|
-      raise Mastodon::UnexpectedResponseError, response unless response_successful?(response)
-
-      body_to_json(response.body_with_limit) if response.code == 200
-    end
-  end
-
-  def build_post_request(url, json)
-    Request.new(:post, url, body: json).tap do |request|
-      request.add_headers('Accept' => 'application/json')
-      request.add_headers('Content-Type' => 'application/json')
-    end
-  end
 end

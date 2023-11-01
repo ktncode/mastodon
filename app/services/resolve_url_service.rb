@@ -26,6 +26,8 @@ class ResolveURLService < BaseService
       status = FetchRemoteStatusService.new.call(resource_url, body)
       authorize_with @on_behalf_of, status, :show? unless status.nil?
       status
+    elsif equals_or_includes_any?(type, %w(Emoji))
+      FetchRemoteCustomEmojiService.new.call(resource_url, body)
     end
   end
 
@@ -89,6 +91,8 @@ class ResolveURLService < BaseService
       check_local_status(status)
     elsif recognized_params[:controller] == 'accounts'
       Account.find_local(recognized_params[:username])
+    elsif recognized_params[:controller] == 'emojis'
+      CustomEmoji.find_by(shortcode: recognized_params[:id], domain: nil)
     end
   end
 

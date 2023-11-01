@@ -3,9 +3,10 @@
 class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   include RoutingHelper
 
-  context_extensions :emoji, :copy_permission, :license, :keywords, :usage_info, :is_based_on
+  context_extensions :emoji, :category, :copy_permission, :license, :keywords, :usage_info, :is_based_on, :sensitive
 
   attributes :id, :type, :name, :updated
+  attribute :category, if: :category_loaded?
   attribute :copy_permission, if: :copy_permission?
   attribute :license, if: :license?
   attribute :keywords, if: :keywords?
@@ -13,6 +14,7 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   attribute :author, if: :author?
   attribute :description, if: :description?
   attribute :is_based_on, if: :is_based_on?
+  attribute :sensitive, if: :sensitive?
 
   has_one :icon
 
@@ -55,8 +57,12 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
     ":#{object.shortcode}:"
   end
 
+  def category
+    object.category.name
+  end
+
   def license
-    object.meta['license']
+    object.license
   end
 
   def keywords
@@ -64,19 +70,27 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   end
 
   def usage_info
-    object.meta['usage_info']
+    object.usage_info
   end
 
   def author
-    object.meta['author']
+    object.author
   end
 
   def description
-    object.meta['description']
+    object.description
   end
 
   def is_based_on
-    object.meta['is_based_on']
+    object.is_based_on
+  end
+
+  def sensitive
+    object.sensitive
+  end
+
+  def category_loaded?
+    object.association(:category).loaded? && object.category.present?
   end
 
   def copy_permission?
@@ -84,7 +98,7 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   end
 
   def license?
-    object.meta['license'].present?
+    object.license.present?
   end
 
   def keywords?
@@ -92,18 +106,22 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   end
 
   def usage_info?
-    object.meta['usage_info'].present?
+    object.usage_info.present?
   end
 
   def author?
-    object.meta['author'].present?
+    object.author.present?
   end
 
   def description?
-    object.meta['description'].present?
+    object.description.present?
   end
 
   def is_based_on?
-    object.meta['is_based_on'].present?
+    object.is_based_on.present?
+  end
+
+  def sensitive?
+    object.sensitive.present?
   end
 end

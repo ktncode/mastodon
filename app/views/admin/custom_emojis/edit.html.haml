@@ -14,6 +14,11 @@
     %samp= ":#{@custom_emoji.shortcode}:"
     - if @custom_emoji.local?
       %span.account-role.bot= @custom_emoji.category&.name || t('admin.custom_emojis.uncategorized')
+  .fields-group.emoji-detail
+    - if @custom_emoji.is_based_on.present?
+      %span.keyword= @custom_emoji.is_based_on
+      - if @custom_emoji.org_category.present?
+        %span.account-role.bot= @custom_emoji.org_category
   .fields-group
     .input.with_label.integer.optional.custom_emoji_category_id
       .label_input
@@ -39,6 +44,8 @@
     = f.input :license, wrapper: :with_label, label: t('admin.custom_emojis.license.title'), hint: t('admin.custom_emojis.license.hint'), fedibird_features: true
   .fields-group
     = f.input :usage_info, wrapper: :with_label, label: t('admin.custom_emojis.usage_info.title'), hint: t('admin.custom_emojis.usage_info.hint'), fedibird_features: true
+  .fields-group
+    = f.input :sensitive, as: :boolean, wrapper: :with_label, label: t('admin.custom_emojis.sensitive.title'), hint: t('admin.custom_emojis.sensitive.hint'), fedibird_features: true
 
   .actions
     - if @custom_emoji.local?

@@ -16,6 +16,6 @@ class EmojisController < ApplicationController
   private
 
   def set_emoji
-    @emoji = CustomEmoji.local.find(params[:id])
+    @emoji = CustomEmoji.includes(:category).local.find(params[:id])
   end
 end

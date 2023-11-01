@@ -38,6 +38,8 @@
     = f.input :license, wrapper: :with_label, label: t('admin.custom_emojis.license.title'), hint: t('admin.custom_emojis.license.hint'), fedibird_features: true
   .fields-group
     = f.input :usage_info, wrapper: :with_label, label: t('admin.custom_emojis.usage_info.title'), hint: t('admin.custom_emojis.usage_info.hint'), fedibird_features: true
+  .fields-group
+    = f.input :sensitive, as: :boolean, wrapper: :with_label, label: t('admin.custom_emojis.sensitive.title'), hint: t('admin.custom_emojis.sensitive.hint'), fedibird_features: true
 
   .actions
     = f.button :button, t('admin.custom_emojis.upload_once_more'), name: :upload_once_more, type: :submit

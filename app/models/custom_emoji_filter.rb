@@ -10,6 +10,7 @@ class CustomEmojiFilter
     category
     by_domain
     shortcode
+    order
   ).freeze
 
   attr_reader :params
@@ -64,6 +65,12 @@ class CustomEmojiFilter
       CustomEmoji.where(domain: value.strip.downcase)
     when 'shortcode'
       CustomEmoji.search(value.strip)
+    when 'order'
+      if value == '0'
+        CustomEmoji.reorder(updated_at: :desc)
+      elsif value == '1'
+        CustomEmoji.reorder(updated_at: :asc)
+      end
     else
       raise "Unknown filter: #{key}"
     end

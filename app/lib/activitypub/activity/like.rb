@@ -35,12 +35,16 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
       domain    = Addressable::URI.parse(uri).normalized_host
       domain    = nil if domain == Rails.configuration.x.local_domain
 
-      emoji = CustomEmoji.find_or_create_by!(shortcode: shortcode, domain: domain) do |emoji|
-        emoji.uri              = uri
-        emoji.image_remote_url = image_url
+      if @account.domain == domain
+        emoji = CustomEmoji.find_or_create_by!(shortcode: shortcode, domain: domain) do |emoji|
+          emoji.uri              = uri
+          emoji.image_remote_url = image_url
+        end
+      else
+        emoji = ResolveURLService.new.call(emoji_tag['id'])
       end
 
-      return if emoji.disabled?
+      return if emoji&.disabled?
     end
 
     return if @account.reacted?(@original_status, shortcode, emoji)

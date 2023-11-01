@@ -30,6 +30,8 @@ class Form::CustomEmojiBatch
       copy!
     when 'delete'
       delete!
+    when 'fetch'
+      fetch!
     end
   end
 
@@ -134,6 +136,15 @@ class Form::CustomEmojiBatch
     custom_emojis.each do |custom_emoji|
       custom_emoji.destroy
       log_action :destroy, custom_emoji
+    end
+  end
+
+  def fetch!
+    custom_emojis.each { |custom_emoji| authorize(custom_emoji, :fetch?) }
+
+    custom_emojis.each do |custom_emoji|
+      custom_emoji.fetch
+      log_action :fetch, custom_emoji
     end
   end
 end

@@ -660,6 +660,10 @@ class Account < ApplicationRecord
     @emojis ||= CustomEmoji.from_text(emojifiable_text, domain)
   end
 
+  def emojis_with_category
+    emojis.tap { |emojis| ActiveRecord::Associations::Preloader.new.preload(emojis, :category) }
+  end
+
   before_create :generate_keys
   before_validation :prepare_contents, if: :local?
   before_validation :prepare_username, on: :create

@@ -125,6 +125,22 @@ class CustomEmoji < ApplicationRecord
     meta['is_based_on'] = val
   end
 
+  def sensitive
+    ActiveRecord::Type::Boolean.new.cast(meta['sensitive'])
+  end
+
+  def sensitive=(val)
+    meta['sensitive'] = ActiveRecord::Type::Boolean.new.cast(val)
+  end
+
+  def org_category
+    meta['org_category']
+  end
+
+  def org_category=(val)
+    meta['org_category'] = val
+  end
+
   def local?
     domain.nil?
   end
@@ -134,7 +150,7 @@ class CustomEmoji < ApplicationRecord
   end
 
   def copy!
-    copy = self.class.find_or_initialize_by(domain: nil, shortcode: shortcode)
+    copy = self.class.find_or_initialize_by(domain: nil, shortcode: shortcode) { |new_copy| new_copy.visible_in_picker = false }
     copy.image = image
     copy.width = self.width
     copy.height = self.height
@@ -143,6 +159,10 @@ class CustomEmoji < ApplicationRecord
     copy.aliases = self.aliases
     copy.meta = self.meta.merge({ is_based_on: self.uri })
     copy.tap(&:save!)
+  end
+
+  def fetch
+    ResolveURLService.new.call(uri) unless domain.nil?
   end
 
   class << self

@@ -101,7 +101,7 @@ class SearchService < BaseService
   end
 
   def default_results
-    { accounts: [], hashtags: [], statuses: [], profiles: [] }
+    { accounts: [], hashtags: [], statuses: [], profiles: [], custom_emojis: [] }
   end
 
   def url_query?
@@ -117,7 +117,7 @@ class SearchService < BaseService
   end
 
   def url_resource_symbol
-    url_resource.class.name.downcase.pluralize.to_sym
+    url_resource.class.name.underscore.pluralize.to_sym.then { |symbol| if symbol == :tags then :hashtags else symbol end }
   end
 
   def status_searchable?

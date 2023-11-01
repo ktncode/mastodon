@@ -151,7 +151,7 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   end
 
   def virtual_tags
-    object.suspended? ? [] : (object.emojis + object.tags)
+    object.suspended? ? [] : (object.emojis_with_category + object.tags)
   end
 
   def virtual_attachments

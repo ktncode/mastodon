@@ -28,4 +28,8 @@ class CustomEmojiPolicy < ApplicationPolicy
   def destroy?
     admin?
   end
+
+  def fetch?
+    admin?
+  end
 end

@@ -47,6 +47,13 @@
       %li= filter_link_to t('admin.custom_emojis.license.unset'), license: '0'
       %li= filter_link_to t('admin.custom_emojis.license.set'), license: '1'
 
+  .filter-subset
+    %strong= t('admin.custom_emojis.order.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.order.alphabetic'), order: nil
+      %li= filter_link_to t('admin.custom_emojis.order.newer'), order: '0'
+      %li= filter_link_to t('admin.custom_emojis.order.older'), order: '1'
+
 = form_tag admin_custom_emojis_url, method: 'GET', class: 'simple_form' do
   .fields-group
     - CustomEmojiFilter::KEYS.each do |key|
@@ -81,6 +88,9 @@
         = f.button safe_join([fa_icon('power-off'), t('admin.custom_emojis.enable')]), name: :enable, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
         = f.button safe_join([fa_icon('power-off'), t('admin.custom_emojis.disable')]), name: :disable, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
+
+        - if params[:local] != '1' && can?(:fetch, :custom_emoji)
+          = f.button safe_join([fa_icon('refresh'), t('admin.custom_emojis.fetch')]), name: :fetch, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
         - if can?(:destroy, :custom_emoji)
           = f.button safe_join([fa_icon('times'), t('admin.custom_emojis.delete')]), name: :delete, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }

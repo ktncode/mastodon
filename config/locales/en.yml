@@ -397,6 +397,7 @@ en:
       enable: Enable
       enabled: Enabled
       enabled_msg: Successfully enabled that emoji
+      fetch: Refetch
       go_to_index: Go to index
       image_hint: PNG up to 50KB
       keyword_action:
@@ -426,6 +427,9 @@ en:
       overwrite: Overwrite
       save_changes: Save changes
       save_changes_and_next: Save changes and next
+      sensitive:
+        hint: Mark emojis that need to be handled with care
+        title: Sensitive
       shortcode: Shortcode
       shortcode_hint: At least 2 characters, only alphanumeric characters and underscores
       title: Custom emojis

@@ -39,6 +39,7 @@ module ContextHelper
     emoji_reactions: { 'fedibird' => 'http://fedibird.com/ns#', 'emojiReactions' => { '@id' => "fedibird:emojiReactions", '@type' => '@id' } },
     searchable_by: { 'fedibird' => 'http://fedibird.com/ns#', 'searchableBy' => { '@id' => "fedibird:searchableBy", '@type' => '@id' } },
     thumbhash: { 'fedibird' => 'http://fedibird.com/ns#', 'thumbhash' => 'fedibird:thumbhash' },
+    category: { 'schema' => 'http://schema.org#', 'category' => 'schema:category' },
     keywords: { 'schema' => 'http://schema.org#', 'keywords' => 'schema:keywords' },
     license: { 'schema' => 'http://schema.org#', 'license' => 'schema:license' },
     usage_info: { 'schema' => 'http://schema.org#', 'usageInfo' => 'schema:usageInfo' },
