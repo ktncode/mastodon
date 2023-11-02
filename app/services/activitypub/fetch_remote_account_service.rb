@@ -26,6 +26,7 @@ class ActivityPub::FetchRemoteAccountService < BaseService
     @username = @json['preferredUsername']
     @domain   = Addressable::URI.parse(@uri).normalized_host
 
+    return if @uri.blank? || @username.blank? || TagManager.instance.local_domain?(@domain)
     return unless only_key || verified_webfinger?
 
     ActivityPub::ProcessAccountService.new.call(@username, @domain, @json, only_key: only_key, verified_webfinger: !only_key)
