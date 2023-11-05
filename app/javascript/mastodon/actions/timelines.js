@@ -153,17 +153,19 @@ export function expandTimeline(timelineId, path, params = {}, done = noOp) {
 
     api(getState).get(path, { params }).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      if ('statuses' in response.data && 'accounts' in response.data) {
-        const { statuses, referenced_statuses, accounts, relationships } = response.data;
-        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
-        dispatch(importFetchedAccounts(accounts));
-        dispatch(fetchRelationshipsSuccess(relationships));
-        dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
-      } else {
-        const statuses = response.data;
-        dispatch(importFetchedStatuses(statuses));
-        dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
+      if (response.data) {
+        if ('statuses' in response.data && 'accounts' in response.data) {
+          const { statuses, referenced_statuses, accounts, relationships } = response.data;
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+          dispatch(importFetchedAccounts(accounts));
+          dispatch(fetchRelationshipsSuccess(relationships));
+          dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
+        } else {
+          const statuses = response.data;
+          dispatch(importFetchedStatuses(statuses));
+          dispatch(fetchRelationshipsFromStatuses(statuses));
+          dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
+        }
       }
 
       if (timelineId === 'home') {

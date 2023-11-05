@@ -23,17 +23,19 @@ export function fetchBookmarkedStatuses({ onlyMedia, withoutMedia } = {}) {
 
     api(getState).get(`/api/v1/bookmarks?${param_string}`).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      if ('statuses' in response.data && 'accounts' in response.data) {
-        const { statuses, referenced_statuses, accounts, relationships } = response.data;
-        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
-        dispatch(importFetchedAccounts(accounts));
-        dispatch(fetchRelationshipsSuccess(relationships));
-        dispatch(fetchBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
-      } else {
-        const statuses = response.data;
-        dispatch(importFetchedStatuses(statuses));
-        dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(fetchBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
+      if (response.data) {
+        if ('statuses' in response.data && 'accounts' in response.data) {
+          const { statuses, referenced_statuses, accounts, relationships } = response.data;
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+          dispatch(importFetchedAccounts(accounts));
+          dispatch(fetchRelationshipsSuccess(relationships));
+          dispatch(fetchBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
+        } else {
+          const statuses = response.data;
+          dispatch(importFetchedStatuses(statuses));
+          dispatch(fetchRelationshipsFromStatuses(statuses));
+          dispatch(fetchBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
+        }
       }
     }).catch(error => {
       dispatch(fetchBookmarkedStatusesFail(error));
@@ -74,17 +76,19 @@ export function expandBookmarkedStatuses() {
 
     api(getState).get(url).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
-      if ('statuses' in response.data && 'accounts' in response.data) {
-        const { statuses, referenced_statuses, accounts, relationships } = response.data;
-        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
-        dispatch(importFetchedAccounts(accounts));
-        dispatch(fetchRelationshipsSuccess(relationships));
-        dispatch(expandBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
-      } else {
-        const statuses = response.data;
-        dispatch(importFetchedStatuses(statuses));
-        dispatch(fetchRelationshipsFromStatuses(statuses));
-        dispatch(expandBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
+      if (response.data) {
+        if ('statuses' in response.data && 'accounts' in response.data) {
+          const { statuses, referenced_statuses, accounts, relationships } = response.data;
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
+          dispatch(importFetchedAccounts(accounts));
+          dispatch(fetchRelationshipsSuccess(relationships));
+          dispatch(expandBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
+        } else {
+          const statuses = response.data;
+          dispatch(importFetchedStatuses(statuses));
+          dispatch(fetchRelationshipsFromStatuses(statuses));
+          dispatch(expandBookmarkedStatusesSuccess(statuses, next ? next.uri : null));
+        }
       }
     }).catch(error => {
       dispatch(expandBookmarkedStatusesFail(error));
