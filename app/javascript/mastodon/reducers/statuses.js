@@ -35,11 +35,11 @@ const importStatuses = (state, statuses) =>
   state.withMutations(mutable => statuses.forEach(status => importStatus(mutable, status)));
 
 const deleteStatus = (state, id, references, quotes) => {
-  references.forEach(ref => {
+  references?.forEach(ref => {
     state = deleteStatus(state, ref, []);
   });
 
-  quotes.forEach(ref => {
+  quotes?.forEach(ref => {
     state = state.setIn([ref, 'quote_id'], null).setIn([ref, 'quote'], null);
   });
 

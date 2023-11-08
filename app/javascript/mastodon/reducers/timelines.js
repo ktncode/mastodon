@@ -103,7 +103,7 @@ const deleteStatus = (state, id, references, exclude_account = null) => {
   });
 
   // Remove reblogs of deleted status
-  references.forEach(ref => {
+  references?.forEach(ref => {
     state = deleteStatus(state, ref, [], exclude_account);
   });
 
