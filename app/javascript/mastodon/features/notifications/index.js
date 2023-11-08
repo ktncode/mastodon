@@ -26,9 +26,11 @@ import LoadGap from '../../components/load_gap';
 import Icon from 'mastodon/components/icon';
 import compareId from 'mastodon/compare_id';
 import NotificationsPermissionBanner from './components/notifications_permission_banner';
-import { defaultColumnWidth } from 'mastodon/initial_state';
+import { defaultColumnWidth, showReloadButton } from 'mastodon/initial_state';
 import { changeSetting } from '../../actions/settings';
 import { changeColumnParams } from '../../actions/columns';
+import ReloadZone from 'mastodon/components/reload_zone';
+import { isIOS } from 'mastodon/is_mobile';
 
 const messages = defineMessages({
   title: { id: 'column.notifications', defaultMessage: 'Notifications' },
@@ -196,6 +198,10 @@ class Notifications extends React.PureComponent {
     }
   }
 
+  handleReload = () => {
+    location.reload();
+  }
+
   render () {
     const { intl, notifications, isLoading, isUnread, columnId, multiColumn, hasMore, numPending, showFilterBar, lastReadId, canMarkAsRead, needsNotificationPermission, columnWidth } = this.props;
     const pinned = !!columnId;
@@ -233,6 +239,13 @@ class Notifications extends React.PureComponent {
 
     this.scrollableContent = scrollableContent;
 
+    const prepend = (
+      <>
+        {needsNotificationPermission && <NotificationsPermissionBanner />}
+        {showReloadButton && isIOS() && <ReloadZone key='reload' onClick={this.handleReload} />}
+      </>
+    );
+
     const scrollContainer = (
       <ScrollableList
         scrollKey={`notifications-${columnId}`}
@@ -241,7 +254,7 @@ class Notifications extends React.PureComponent {
         showLoading={isLoading && notifications.size === 0}
         hasMore={hasMore}
         numPending={numPending}
-        prepend={needsNotificationPermission && <NotificationsPermissionBanner />}
+        prepend={prepend}
         alwaysPrepend
         emptyMessage={emptyMessage}
         onLoadMore={this.handleLoadOlder}
