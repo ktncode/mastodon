@@ -10,6 +10,7 @@ class Form::CustomEmojiBatch
                 :keyword_action, :keyword_action_value,
                 :description, :author, :copy_permission, :license, :usage_info
 
+  SHORTCODE_MATCH_TYPES   = %w(include start_with end_with match)
   KEYWORD_ACTIONS         = %w(apend prepend remove overwrite)
   LICENSE_ACTIONS         = %w(apend prepend remove overwrite)
   COPY_PERMISSION_ACTIONS = %w(prompt none allow deny conditional)

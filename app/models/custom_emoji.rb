@@ -24,7 +24,6 @@
 #  copy_permission              :integer          default(0), not null
 #  aliases                      :string           default([]), not null, is an Array
 #  meta                         :jsonb            default({}), not null
-#  combined_name                :text
 #
 
 class CustomEmoji < ApplicationRecord
@@ -176,8 +175,10 @@ class CustomEmoji < ApplicationRecord
       EntityCache.instance.emoji(shortcodes, domain)
     end
 
-    def search(shortcode)
-      where('"custom_emojis"."combined_name" ILIKE ?', "%#{shortcode}%")
+    def search(searchtext, type = :include)
+      prefix = %i(end_with include).include?(type) ? '%' : ''
+      suffix = %i(start_with include).include?(type) ? '%' : ''
+      where('custom_emojis.id IN (select distinct id from (select id, unnest(shortcode || aliases) as val from custom_emojis) e where val ilike :searchtext)', { searchtext: "#{prefix}#{searchtext}#{suffix}" })
     end
 
     private

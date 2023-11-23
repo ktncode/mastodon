@@ -380,7 +380,6 @@ ActiveRecord::Schema.define(version: 2023_08_14_223300) do
     t.integer "copy_permission", default: 0, null: false
     t.string "aliases", default: [], null: false, array: true
     t.jsonb "meta", default: "{}", null: false
-    t.text "combined_name", default: -> { "array_to_string_immutable(((aliases || shortcode))::text[], chr(10))" }
     t.index ["meta"], name: "index_custom_emoji_on_meta", using: :gin
     t.index ["shortcode", "domain"], name: "index_custom_emojis_on_shortcode_and_domain", unique: true
   end

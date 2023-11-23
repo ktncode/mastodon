@@ -432,6 +432,12 @@ en:
         title: Sensitive
       shortcode: Shortcode
       shortcode_hint: At least 2 characters, only alphanumeric characters and underscores
+      shortcode_match_type:
+        end_with: End with
+        include: Include
+        match: Match
+        prompt: Select Match Type
+        start_with: Start with
       title: Custom emojis
       uncategorized: Uncategorized
       unlist: Unlist
