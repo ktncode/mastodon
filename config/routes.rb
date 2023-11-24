@@ -368,8 +368,12 @@ Rails.application.routes.draw do
           resource :pin, only: :create
           post :unpin, to: 'pins#destroy'
 
-          resources :emoji_reactions, only: [:update, :destroy], constraints: { id: /[^\/]+/ }
+          resources :emoji_reactions, only: [:update, :destroy], constraints: { id: %r{[^/]+} }
           post :emoji_unreaction, to: 'emoji_reactions#destroy'
+
+          # compatibility for glitch social
+          post '/react/:id', to: 'emoji_reactions#update', constraints: { id: %r{[^/]+} }
+          post '/unreact/:id', to: 'emoji_reactions#destroy', constraints: { id: %r{[^/]+} }
 
           resource :history, only: :show
         end
