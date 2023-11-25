@@ -128,6 +128,8 @@ module AccountsHelper
       --content-font-size: #{h(user&.setting_content_font_size || Setting.default_settings['content_font_size'])}px;
       --info-font-size: #{h(user&.setting_info_font_size || Setting.default_settings['info_font_size'])}px;
       --content-emoji-reaction-size: #{h(user&.setting_content_emoji_reaction_size || Setting.default_settings['content_emoji_reaction_size'])}px;
+      --composer-font-size: #{h(user&.setting_composer_font_size || Setting.default_settings['composer_font_size'])}px;
+      --composer-min-height: #{h(user&.setting_composer_min_height || Setting.default_settings['composer_min_height'])}px;
       --emoji-scale: #{h(user&.setting_emoji_scale || Setting.default_settings['emoji_scale'])};
     }
     EOS

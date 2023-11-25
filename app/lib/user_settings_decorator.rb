@@ -126,6 +126,8 @@ class UserSettingsDecorator
     content_font_size
     info_font_size
     content_emoji_reaction_size
+    composer_font_size
+    composer_min_height
     emoji_scale
     picker_emoji_size
     default_search_searchability

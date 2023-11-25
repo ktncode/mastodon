@@ -482,7 +482,7 @@
     background: $simple-background-color;
     padding: 10px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--composer-font-size, 14px);
     resize: vertical;
     border: 0;
     outline: 0;
@@ -496,7 +496,7 @@
     }
 
     @media screen and (max-width: 600px) {
-      font-size: 16px;
+      font-size: calc(var(--composer-font-size, 14px)*1.143);
     }
   }
 
@@ -505,7 +505,7 @@
   }
 
   .autosuggest-textarea__textarea {
-    min-height: 100px;
+    min-height: var(--composer-min-height, 100px);
     border-radius: 4px 4px 0 0;
     padding-bottom: 0;
     padding-right: 10px + 22px;
@@ -2755,7 +2755,7 @@ a.account__display-name {
   }
 
   .autosuggest-textarea__textarea {
-    font-size: 16px;
+    font-size: calc(var(--composer-font-size, 14px)*1.143);
   }
 
   .search__input {
