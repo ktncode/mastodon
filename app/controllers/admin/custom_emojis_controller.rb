@@ -40,9 +40,11 @@ module Admin
     def update
       return redirect_to admin_custom_emojis_path(filter_params) if params[:go_to_index]
 
+      next_id = next_id(@custom_emoji.id)
+
       if @custom_emoji.update(resource_params)
-        if params[:update_and_next] && (id = next_id(@custom_emoji.id))
-          redirect_to edit_admin_custom_emoji_path(id, filter_params), notice: I18n.t('admin.custom_emojis.updated_msg')
+        if params[:update_and_next] && !next_id.nil?
+          redirect_to edit_admin_custom_emoji_path(next_id, filter_params), notice: I18n.t('admin.custom_emojis.updated_msg')
         else
           redirect_to admin_custom_emojis_path(filter_params), notice: I18n.t('admin.custom_emojis.updated_msg')
         end
