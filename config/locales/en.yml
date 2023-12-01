@@ -872,6 +872,8 @@ en:
     animations_and_accessibility: Animations and accessibility
     confirmation_dialogs: Confirmation dialogs
     discovery: Discovery
+    emoji_size: Emoji size
+    font_size: Font size
     joke: Joke features
     localization:
       body: Mastodon is translated by volunteers.

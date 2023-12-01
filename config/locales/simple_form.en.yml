@@ -88,6 +88,13 @@ en:
         setting_display_media_default: Hide media marked as sensitive
         setting_display_media_hide_all: Always hide media
         setting_display_media_show_all: Always show media
+        setting_emoji_size_in_mix_html: Mixed emojis and links
+        setting_emoji_size_in_multi_html: Multiple lined emojis
+        setting_emoji_size_in_other_html: emoji in text
+        setting_emoji_size_in_single_html: When emoji is single
+        setting_emoji_size_large: Large
+        setting_emoji_size_middle: Middle
+        setting_emoji_size_standard: Standard
         setting_enable_empty_column: The last column is initially hidden and can be closed at will
         setting_enable_federated_timeline: 'Enable a federated timeline (default: enable)'
         setting_enable_limited_timeline: Enable a limited home to display private and circle and direct message
@@ -304,7 +311,11 @@ en:
         setting_display_media_default: Default
         setting_display_media_hide_all: Hide all
         setting_display_media_show_all: Show all
-        setting_emoji_scale: Single emoji size
+        setting_emoji_scale: Scaling factor for emoji
+        setting_emoji_size_in_mix: Mix
+        setting_emoji_size_in_multi: Multi
+        setting_emoji_size_in_other: Other
+        setting_emoji_size_in_single: Single
         setting_enable_empty_column: Enable last column to be closed
         setting_enable_federated_timeline: Enable federated timeline
         setting_enable_limited_timeline: Enable limited timeline

@@ -129,6 +129,10 @@ class UserSettingsDecorator
     composer_font_size
     composer_min_height
     emoji_scale
+    emoji_size_in_single
+    emoji_size_in_multi
+    emoji_size_in_mix
+    emoji_size_in_other
     picker_emoji_size
     default_search_searchability
     default_column_width

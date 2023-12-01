@@ -850,6 +850,8 @@ ja:
     animations_and_accessibility: アニメーションとアクセシビリティー
     confirmation_dialogs: 確認ダイアログ
     discovery: 見つける
+    emoji_size: 絵文字サイズ
+    font_size: フォントサイズ
     joke: ジョーク機能
     localization:
       body: Mastodonは有志によって翻訳されています。

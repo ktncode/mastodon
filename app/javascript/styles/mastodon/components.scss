@@ -889,25 +889,32 @@
 
   .emoji-single {
     .emojione {
-      width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale, 1));
-      height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale, 1));
+      width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-single, 1));
+      height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-single, 1));
     }
   }
 
   .emoji-multi {
-    font-size: calc(var(--content-font-size, 15px) * (var(--emoji-scale, 1) / 3 + 0.67));
-    line-height: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+    font-size: calc(var(--content-font-size, 15px) * var(--emoji-scale-multi, 1));
+    line-height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-multi, 1));
 
     .emojione {
-      width: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
-      height: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+      width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-multi, 1));
+      height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-multi, 1));
     }
   }
 
   .emoji-mix {
     .emojione {
-      width: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
-      height: calc(var(--content-font-size, 15px) * 1.33 * (var(--emoji-scale, 1) / 3 + 0.67));
+      width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-mix, 1));
+      height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-mix, 1));
+    }
+  }
+
+  .emoji-other {
+    .emojione {
+      width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-other, 1));
+      height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-other, 1));
     }
   }
 
@@ -1427,25 +1434,32 @@
 
     .emoji-single {
       .emojione {
-        width: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale, 1));
-        height: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale, 1));
+        width: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-single, 1));
+        height: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-single, 1));
       }
     }
   
     .emoji-multi {
-      font-size: calc(var(--content-font-size, 15px) * 1.27 * (var(--emoji-scale, 1) / 3 + 0.67));
-      line-height: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+      font-size: calc(var(--content-font-size, 15px) * 1.27 * var(--emoji-scale-multi, 1));
+      line-height: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-multi, 1));
 
       .emojione {
-        width: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
-        height: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+        width: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-multi, 1));
+        height: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-multi, 1));
       }
     }
 
     .emoji-mix {
       .emojione {
-        width: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
-        height: calc(var(--content-font-size, 15px) * 1.6 * (var(--emoji-scale, 1) / 3 + 0.67));
+        width: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-mix, 1));
+        height: calc(var(--content-font-size, 15px) * 1.6 * var(--emoji-scale-mix, 1));
+      }
+    }
+
+    .emoji-other {
+      .emojione {
+        width: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-other, 1));
+        height: calc(var(--content-font-size, 15px) * 1.33 * var(--emoji-scale-other, 1));
       }
     }
 

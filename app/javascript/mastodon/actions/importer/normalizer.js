@@ -115,6 +115,8 @@ export function normalizeStatus(status, normalOldStatus) {
         p.classList.add('emoji-multi');
       } else if (mix && imgCount > 0) {
         p.classList.add('emoji-mix');
+      } else if (imgCount > 0){
+        p.classList.add('emoji-other');
       }
     });
 

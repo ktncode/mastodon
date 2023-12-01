@@ -84,6 +84,13 @@ ja:
         setting_display_media_default: 閲覧注意としてマークされたメディアは隠す
         setting_display_media_hide_all: メディアを常に隠す
         setting_display_media_show_all: メディアを常に表示する
+        setting_emoji_size_in_mix_html: 絵文字・リンクの混在
+        setting_emoji_size_in_multi_html: 複数並べた絵文字
+        setting_emoji_size_in_other_html: 本文中の絵文字
+        setting_emoji_size_in_single_html: 単独の絵文字
+        setting_emoji_size_large: 大
+        setting_emoji_size_middle: 中
+        setting_emoji_size_standard: 標準
         setting_enable_empty_column: 最後のカラムを初期状態で非表示にし、任意に閉じられるようにします
         setting_enable_federated_timeline: 連合タイムラインを有効にします（デフォルト）
         setting_enable_limited_timeline: フォロワー限定・サークル・ダイレクトメッセージを表示する限定ホームを有効にします
@@ -300,7 +307,11 @@ ja:
         setting_display_media_default: 標準
         setting_display_media_hide_all: 非表示
         setting_display_media_show_all: 表示
-        setting_emoji_scale: 単独絵文字のサイズ
+        setting_emoji_scale: 絵文字の拡大倍率
+        setting_emoji_size_in_mix: 混在
+        setting_emoji_size_in_multi: 複数
+        setting_emoji_size_in_other: その他
+        setting_emoji_size_in_single: 単独
         setting_enable_empty_column: 最終カラムを閉じられるようにする
         setting_enable_federated_timeline: 連合タイムラインを有効にする
         setting_enable_limited_timeline: 限定ホームを有効にする
