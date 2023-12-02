@@ -113,7 +113,8 @@ class UserSettingsDecorator
     hide_list_of_emoji_reactions_to_posts
     hide_list_of_favourites_to_posts
     hide_list_of_reblogs_to_posts
-    hide_list_of_referred_by_to_posts    
+    hide_list_of_referred_by_to_posts
+    hide_reblogged_by
   ).freeze
 
   STRING_KEYS = %w(

@@ -117,6 +117,8 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:hide_list_of_favourites_to_posts]      = object.current_account.user.setting_hide_list_of_favourites_to_posts
       store[:hide_list_of_reblogs_to_posts]         = object.current_account.user.setting_hide_list_of_reblogs_to_posts
       store[:hide_list_of_referred_by_to_posts]     = object.current_account.user.setting_hide_list_of_referred_by_to_posts
+      store[:hide_reblogged_by]                     = object.current_account.user.setting_hide_reblogged_by
+      
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

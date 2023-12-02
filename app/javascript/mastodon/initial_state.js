@@ -93,6 +93,7 @@ export const hideListOfEmojiReactionsToPosts = getMeta('hide_list_of_emoji_react
 export const hideListOfFavouritesToPosts = getMeta('hide_list_of_favourites_to_posts');
 export const hideListOfReblogsToPosts = getMeta('hide_list_of_reblogs_to_posts');
 export const hideListOfReferredByToPosts = getMeta('hide_list_of_referred_by_to_posts');
+export const hideRebloggedBy = getMeta('hide_reblogged_by');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 

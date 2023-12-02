@@ -20,7 +20,7 @@ import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import EmojiReactionsBar from 'mastodon/components/emoji_reactions_bar';
 import PictureInPicturePlaceholder from 'mastodon/components/picture_in_picture_placeholder';
-import { displayMedia, enableReaction, compactReaction, show_reply_tree_button, enableStatusReference, disableRelativeTime, hideLinkPreview, hidePhotoPreview, hideVideoPreview } from 'mastodon/initial_state';
+import { displayMedia, enableReaction, compactReaction, show_reply_tree_button, enableStatusReference, disableRelativeTime, hideLinkPreview, hidePhotoPreview, hideVideoPreview, hideRebloggedBy } from 'mastodon/initial_state';
 import { List as ImmutableList } from 'immutable';
 
 // We use the component (and not the container) since we do not want
@@ -471,21 +471,24 @@ class Status extends ImmutablePureComponent {
         </div>
       );
     } else if (status.get('reblog', null) !== null && typeof status.get('reblog') === 'object') {
-      const display_name_html = { __html: status.getIn(['account', 'display_name_html']) };
-      const visibilityReblogIcon = visibilityIconInfo[status.get('visibility')];
-      const visibilityReblogLink = <Icon id={visibilityReblogIcon.icon} className='status__prepend-icon' title={visibilityReblogIcon.text} />;
+      if (!hideRebloggedBy) {
+        const display_name_html = { __html: status.getIn(['account', 'display_name_html']) };
+        const visibilityReblogIcon = visibilityIconInfo[status.get('visibility')];
+        const visibilityReblogLink = <Icon id={visibilityReblogIcon.icon} className='status__prepend-icon' title={visibilityReblogIcon.text} />;
 
-      prepend = (
-        <div className='status__prepend'>
-          <div className='status__prepend-icon-wrapper'><Icon id='retweet' className='status__prepend-icon' fixedWidth /></div>
-          <FormattedMessage id='status.reblogged_by' defaultMessage='{name} boosted' values={{ name: <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} data-group={status.getIn(['account', 'group'])} href={status.getIn(['account', 'url'])} className='status__display-name muted'><bdi><strong dangerouslySetInnerHTML={display_name_html} /></bdi></a> }} />
-          {visibilityReblogLink}
-        </div>
-      );
+        prepend = (
+          <div className='status__prepend'>
+            <div className='status__prepend-icon-wrapper'><Icon id='retweet' className='status__prepend-icon' fixedWidth /></div>
+            <FormattedMessage id='status.reblogged_by' defaultMessage='{name} boosted' values={{ name: <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} data-group={status.getIn(['account', 'group'])} href={status.getIn(['account', 'url'])} className='status__display-name muted'><bdi><strong dangerouslySetInnerHTML={display_name_html} /></bdi></a> }} />
+            {visibilityReblogLink}
+          </div>
+        );
 
-      rebloggedByText = intl.formatMessage({ id: 'status.reblogged_by', defaultMessage: '{name} boosted' }, { name: status.getIn(['account', 'acct']) });
+        rebloggedByText = intl.formatMessage({ id: 'status.reblogged_by', defaultMessage: '{name} boosted' }, { name: status.getIn(['account', 'acct']) });
 
-      account = status.get('account');
+        account = status.get('account');
+      }
+
       status  = status.get('reblog');
     }
 
