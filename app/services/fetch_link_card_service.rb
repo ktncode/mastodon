@@ -49,7 +49,7 @@ class FetchLinkCardService < BaseService
     Request.new(:get, @url).add_headers('Accept' => 'text/html', 'User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
       if res.code == 200 && res.mime_type == 'text/html'
         @html_charset = res.charset
-        @html = res.body_with_limit
+        @html = res.body_with_limit(4.megabyte)
       else
         @html_charset = nil
         @html = nil
