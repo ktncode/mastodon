@@ -25,6 +25,7 @@
 #  image_storage_schema_version :integer
 #  blurhash                     :string
 #  thumbhash                    :string
+#  redirected_url               :string
 #
 
 class PreviewCard < ApplicationRecord

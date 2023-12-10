@@ -35,7 +35,7 @@ class Formatter
 
     unless status.local?
       html = reformat(raw_content)
-      html = apply_inner_link(html)
+      html = apply_inner_link(html, redirected_urls: redirected_urls(status))
       html = apply_reference_link(html, status)
       html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
       html = nyaize_html(html) if options[:nyaize]
@@ -47,7 +47,7 @@ class Formatter
 
     html = raw_content
     html = "RT @#{prepend_reblog} #{html}" if prepend_reblog
-    html = encode_and_link_urls(html, linkable_accounts)
+    html = encode_and_link_urls(html, linkable_accounts, redirected_urls: redirected_urls(status))
     html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
     html = simple_format(html, {}, sanitize: false)
     html = quotify(html, status) if status.quote? && !options[:escape_quotify]
@@ -161,6 +161,10 @@ class Formatter
   end
 
   private
+
+  def redirected_urls(status)
+    status.preview_cards.map { |preview_card| [preview_card.url, preview_card.redirected_url] if preview_card.redirected_url }.compact.to_h
+  end
 
   def html_entities
     @html_entities ||= HTMLEntities.new
@@ -337,14 +341,15 @@ class Formatter
   end
 
   def link_to_url(entity, options = {})
-    url        = Addressable::URI.parse(entity[:url])
+    entity_url = entity[:url]
+    url        = Addressable::URI.parse(entity_url).normalize.to_s
     html_attrs = { target: '_blank', rel: 'nofollow noopener noreferrer' }
 
     html_attrs[:rel] = "me #{html_attrs[:rel]}" if options[:me]
 
-    status  = url_to_holding_status(url.normalize.to_s)
+    status  = url_to_holding_status(url)
     account = status&.account
-    account = url_to_holding_account(url.normalize.to_s) if status.nil?
+    account = url_to_holding_account(url) if status.nil?
 
     if status.present? && account.present?
       html_attrs[:class]                      = class_append(html_attrs[:class], ['status-url-link'])
@@ -355,14 +360,18 @@ class Formatter
       html_attrs[:'data-account-id']         = account.id
       html_attrs[:'data-account-actor-type'] = account.actor_type
       html_attrs[:'data-account-acct']       = account.acct
+    elsif options[:redirected_urls]&.key?(url)
+      entity_url = url = options[:redirected_urls][url]
+    elsif (redirect_link = RedirectLink.find_by(url: url))
+      entity_url = url = redirect_link.redirected_url
     end
 
-    Twitter::TwitterText::Autolink.send(:link_to_text, entity, link_html(entity[:url]), url, html_attrs)
+    Twitter::TwitterText::Autolink.send(:link_to_text, entity, link_html(entity_url), url, html_attrs)
   rescue Addressable::URI::InvalidURIError, IDN::Idna::IdnaError
     encode(entity[:url])
   end
 
-  def apply_inner_link(html)
+  def apply_inner_link(html, options = {})
     doc = Nokogiri::HTML.parse(html, nil, 'utf-8')
     doc.css('a').map do |x|
       status  = url_to_holding_status(x['href'])
@@ -378,6 +387,12 @@ class Formatter
         x['data-account-id']         = account.id
         x['data-account-actor-type'] = account.actor_type
         x['data-account-acct']       = account.acct
+      elsif options[:redirected_urls]&.key?(x['href'])
+        x['href']    = options[:redirected_urls][x['href']]
+        x.inner_html = link_html(x['href']) if x.text.start_with?('https://')
+      elsif (redirect_link = RedirectLink.find_by(url: x['href']))
+        x['href']    = redirect_link.redirected_url
+        x.inner_html = link_html(x['href']) if x.text.start_with?('https://')
       end
     end
     html = doc.css('body')[0]&.inner_html || ''
@@ -484,11 +499,12 @@ class Formatter
   end
 
   def link_html(url)
-    url    = Addressable::URI.parse(url).to_s
-    prefix = url.match(/\A(https?:\/\/(www\.)?|xmpp:)/).to_s
-    text   = url[prefix.length, 30]
-    suffix = url[prefix.length + 30..-1]
-    cutoff = url[prefix.length..-1].length > 30
+    decoded_url = Addressable::URI.unencode(Addressable::URI.parse(url).to_s)
+    url         = decoded_url if decoded_url.valid_encoding?
+    prefix      = url.match(/\A(https?:\/\/(www\.)?|xmpp:)/).to_s
+    text        = url[prefix.length, 30]
+    suffix      = url[prefix.length + 30..-1]
+    cutoff      = url[prefix.length..-1].length > 30
 
     "<span class=\"invisible\">#{encode(prefix)}</span><span class=\"#{cutoff ? 'ellipsis' : ''}\">#{encode(text)}</span><span class=\"invisible\">#{encode(suffix)}</span>"
   end

@@ -31,6 +31,10 @@ class REST::PreviewCardSerializer < ActiveModel::Serializer
     account.id.to_s if account.present?
   end
 
+  def url
+    object.redirected_url || object.url
+  end
+
   def image
     if respond_to?(:current_user) && current_user&.setting_use_low_resolution_thumbnails
       object.image? ? full_asset_url(object.image.url(:tiny), ext: object.image_file_name) : nil

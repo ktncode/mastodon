@@ -13,12 +13,16 @@ class FetchLinkCardService < BaseService
   }iox
 
   def call(status, **options)
-    @status = status
-    @url    = parse_urls
+    @status      = status
+    @parse_urls  = parse_urls
+    @url         = @parse_urls.shift
+    @parse_urls -= RedirectLink.where(url: @parse_urls).pluck(:url)
+
+    RedirectLinkResolveWorker.push_bulk(@parse_urls) do |url|
+      [url.to_s, @status.id]
+    end
 
     return if @url.nil? || @status.preview_cards.any?
-
-    @url = @url.to_s
 
     RedisLock.acquire(lock_options.merge(options.slice(:retry))) do |lock|
       if lock.acquired?
@@ -38,7 +42,8 @@ class FetchLinkCardService < BaseService
   private
 
   def process_url
-    @card ||= PreviewCard.new(url: @url)
+    html
+    @card ||= PreviewCard.new(url: @url, redirected_url: @redirected_url)
 
     attempt_oembed || attempt_opengraph
   end
@@ -50,6 +55,10 @@ class FetchLinkCardService < BaseService
       if res.code == 200 && res.mime_type == 'text/html'
         @html_charset = res.charset
         @html = res.body_with_limit(4.megabyte)
+        if @url != res.uri.to_s
+          @redirected_url = res.uri.to_s
+          RedirectLink.create(url: @url, redirected_url: res.uri.to_s)
+        end
       else
         @html_charset = nil
         @html = nil
@@ -72,7 +81,7 @@ class FetchLinkCardService < BaseService
       urls  = links.filter_map { |a| Addressable::URI.parse(a['href']) unless skip_link?(a) }.filter_map(&:normalize)
     end
 
-    urls.reject { |uri| bad_url?(uri) }.first
+    urls.uniq.reject { |uri| bad_url?(uri) }.map(&:to_s)
   end
 
   def bad_url?(uri)

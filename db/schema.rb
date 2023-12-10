@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_14_223300) do
+ActiveRecord::Schema.define(version: 2023_12_11_005401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -878,6 +878,7 @@ ActiveRecord::Schema.define(version: 2023_08_14_223300) do
     t.integer "image_storage_schema_version"
     t.string "blurhash"
     t.string "thumbhash"
+    t.string "redirected_url"
     t.index ["url"], name: "index_preview_cards_on_url", unique: true
   end
 
@@ -893,6 +894,14 @@ ActiveRecord::Schema.define(version: 2023_08_14_223300) do
     t.boolean "enable", default: true, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "redirect_links", force: :cascade do |t|
+    t.string "url", null: false
+    t.string "redirected_url", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["url"], name: "index_redirect_links_on_url", unique: true
   end
 
   create_table "relays", force: :cascade do |t|
