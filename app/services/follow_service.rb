@@ -20,11 +20,19 @@ class FollowService < BaseService
     @target_account = target_account
     @options        = { bypass_locked: false, delivery: true, bypass_limit: false, with_rate_limit: false }.merge(options)
 
+    if options[:tracking_moved_account]
+      while @target_account.moved?
+        raise ActiveRecord::RecordNotFound if following_not_possible?
+        raise Mastodon::NotPermittedError  if following_not_allowed_without_move?
+
+        @target_account = Account.find(@target_account.moved_to_account_id)
+      end
+    end
+
     raise ActiveRecord::RecordNotFound if following_not_possible?
     raise Mastodon::NotPermittedError  if following_not_allowed?
 
     if @source_account.following?(@target_account)
-      UnmergeWorker.perform_async(@target_account.id, @source_account.id) if @source_account.delivery_following?(@target_account) && @options[:delivery]
       return change_follow_options!
     elsif @source_account.requested?(@target_account)
       return change_follow_request_options!
@@ -55,10 +63,19 @@ class FollowService < BaseService
   end
 
   def following_not_allowed?
-    domain_not_allowed?(@target_account.domain) || @target_account.blocking?(@source_account) || @source_account.blocking?(@target_account) || @target_account.moved? || (!@target_account.local? && @target_account.ostatus?) || @source_account.domain_blocking?(@target_account.domain)
+    following_not_allowed_without_move? || @target_account.moved?
+  end
+
+  def following_not_allowed_without_move?
+    domain_not_allowed?(@target_account.domain) || @target_account.blocking?(@source_account) || @source_account.blocking?(@target_account) || (!@target_account.local? && @target_account.ostatus?) || @source_account.domain_blocking?(@target_account.domain)
   end
 
   def change_follow_options!
+    if !@source_account.delivery_following?(@target_account) && @options[:delivery]
+      MergeWorker.perform_async(@target_account.id, @source_account.id)   if !@source_account.delivery_following?(@target_account) && @options[:delivery]
+    elsif @source_account.delivery_following?(@target_account) && !@options[:delivery]
+      UnmergeWorker.perform_async(@target_account.id, @source_account.id) if @source_account.delivery_following?(@target_account) && !@options[:delivery]
+    end
     @source_account.follow!(@target_account, reblogs: @options[:reblogs], notify: @options[:notify], delivery: @options[:delivery])
   end
 
