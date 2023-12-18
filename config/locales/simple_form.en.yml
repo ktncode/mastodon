@@ -101,6 +101,8 @@ en:
         setting_enable_local_timeline: 'Enable a local timeline (default: enable)'
         setting_enable_personal_timeline: Enable a personal home to display personal post
         setting_enable_reaction: Enable the reaction display on the timeline and display the reaction button
+        setting_enable_status_polling: Monitor and automatically reflect the completion of background processes, such as preview cards generated from links in posts
+        setting_enable_status_polling_intersection: Monitors posts that have recently changed among the posts displayed on the screen and automatically reflects the changes
         setting_enable_status_reference: Enable the feature where a post references another post
         setting_enable_wide_emoji: Displays wide emoji derived from Misskey in their original proportions (for content)
         setting_enable_wide_emoji_reaction: Displays wide emoji derived from Misskey in their original proportions (for reaction)
@@ -323,6 +325,8 @@ en:
         setting_enable_local_timeline: Enable local timeline
         setting_enable_personal_timeline: Enable personal timeline
         setting_enable_reaction: Enable reaction
+        setting_enable_status_polling: Enable automatic reflection of post updates
+        setting_enable_status_polling_intersection: Automatically reflect updates to the posts you are viewing
         setting_enable_status_reference: Enable reference
         setting_enable_wide_emoji: Enable wide emoji (for content)
         setting_enable_wide_emoji_reaction: Enable wide emoji (for reaction)

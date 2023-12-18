@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { HotKeys } from 'react-hotkeys';
 import { defineMessages, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
@@ -11,6 +12,7 @@ import ModalContainer from './containers/modal_container';
 import { layoutFromWindow } from 'mastodon/is_mobile';
 import { debounce } from 'lodash';
 import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
+import { updateProcessingStatuses, refreshIntersectionStatuses } from '../../actions/statuses';
 import { expandHomeTimeline } from '../../actions/timelines';
 import { expandNotifications } from '../../actions/notifications';
 import { fetchFilters } from '../../actions/filters';
@@ -93,6 +95,15 @@ const mapStateToProps = state => ({
   advancedMode: state.getIn(['settings', 'account', 'other', 'advancedMode'], false),
   openPostsFirst: state.getIn(['settings', 'account', 'other', 'openPostsFirst'], false),
   visibilities: getHomeVisibilities(state),
+  processingStatuses: state.get('processing_statuses'),
+  intersectionStatuses: state.get('intersection_statuses'),
+});
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => ({
+  ...ownProps,
+  ...stateProps,
+  ...dispatchProps,
+  pollingStatuses: stateProps.processingStatuses.merge(stateProps.intersectionStatuses),
 });
 
 const keyMap = {
@@ -238,7 +249,8 @@ class SwitchingColumnsArea extends React.PureComponent {
 
 }
 
-export default @connect(mapStateToProps)
+export default
+@connect(mapStateToProps, null, mergeProps)
 @injectIntl
 @withRouter
 class UI extends React.PureComponent {
@@ -262,6 +274,7 @@ class UI extends React.PureComponent {
     visibilities: PropTypes.arrayOf(PropTypes.string),
     advancedMode: PropTypes.bool,
     openPostsFirst: PropTypes.bool,
+    pollingStatuses: ImmutablePropTypes.map,
   };
 
   state = {
@@ -410,12 +423,20 @@ class UI extends React.PureComponent {
     dispatch(expandNotifications());
     setTimeout(() => this.props.dispatch(fetchFilters()), 500);
 
+    this._checkPolling(false, this.props.pollingStatuses);
+
     this.hotkeys.__mousetrap__.stopCallback = (e, element) => {
       return ['TEXTAREA', 'SELECT', 'INPUT'].includes(element.tagName);
     };
   }
 
+  componentDidUpdate (prevProps) {
+    this._checkPolling(prevProps.pollingStatuses, this.props.pollingStatuses);
+  }
+
   componentWillUnmount () {
+    this._stopPolling();
+
     window.removeEventListener('focus', this.handleWindowFocus);
     window.removeEventListener('blur', this.handleWindowBlur);
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
@@ -426,6 +447,27 @@ class UI extends React.PureComponent {
     document.removeEventListener('drop', this.handleDrop);
     document.removeEventListener('dragleave', this.handleDragLeave);
     document.removeEventListener('dragend', this.handleDragEnd);
+  }
+
+  _checkPolling (oldProcessingStatuses, newProcessingStatuses) {
+    const { dispatch, pollingStatuses } = this.props;
+
+    if (pollingStatuses.isEmpty()) {
+      this._stopPolling();
+    } else if (oldProcessingStatuses !== newProcessingStatuses || !this.polling) {
+      this._stopPolling();
+      this.polling = setInterval(() => {
+        dispatch(updateProcessingStatuses(pollingStatuses));
+        dispatch(refreshIntersectionStatuses());
+      }, 6000);
+    }
+  }
+
+  _stopPolling () {
+    if (this.polling) {
+      clearInterval(this.polling);
+      this.polling = null;
+    }
   }
 
   setRef = c => {

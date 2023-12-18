@@ -130,9 +130,13 @@ class ActivityPub::Activity
 
   def crawl_links(status)
     return if status.spoiler_text?
+    return unless FetchLinkCardService.new.need_fetch?(status)
 
     # Spread out crawling randomly to avoid DDoSing the link
-    LinkCrawlWorker.perform_in(rand(1..59).seconds, status.id)
+    random_seconds = rand(1..59).seconds
+    Redis.current.sadd("statuses/#{status.id}/processing", 'LinkCrawlWorker')
+    Redis.current.expire("statuses/#{status.id}/processing", random_seconds + 60.seconds)
+    LinkCrawlWorker.perform_in(random_seconds, status.id)
   end
 
   def distribute_to_followers(status)

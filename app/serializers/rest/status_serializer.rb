@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class REST::StatusSerializer < ActiveModel::Serializer
-  attributes :id, :created_at, :in_reply_to_id, :in_reply_to_account_id,
+  attributes :id, :created_at, :updated_at, :in_reply_to_id, :in_reply_to_account_id,
              :sensitive, :spoiler_text, :visibility, :language,
              :uri, :url, :replies_count, :reblogs_count,
              :favourites_count, :emoji_reactions, :emoji_reactions_count,
@@ -30,6 +30,8 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   attribute :account
   attribute :reblog
+
+  attribute :processing
 
   belongs_to :application, if: :show_application?
 
@@ -64,6 +66,14 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   def id
     object.id.to_s
+  end
+
+  def updated_at
+    object.status_stat_updated_at || object.updated_at
+  end
+
+  def processing
+    Redis.current.exists?("statuses/#{object.id}/processing")
   end
 
   def in_reply_to_id

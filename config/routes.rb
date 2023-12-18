@@ -346,6 +346,10 @@ Rails.application.routes.draw do
 
     # JSON / REST API
     namespace :v1 do
+      namespace :statuses do
+        get :updated
+      end
+
       resources :statuses, only: [:index, :create, :show, :destroy] do
         scope module: :statuses do
           resources :reblogged_by, controller: :reblogged_by_accounts, only: :index

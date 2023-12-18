@@ -46,6 +46,7 @@ class ScrollableList extends PureComponent {
     bindToDocument: PropTypes.bool,
     preventScroll: PropTypes.bool,
     tabIndex: PropTypes.string,
+    onIntersectionChange: PropTypes.func,
   };
 
   static defaultProps = {
@@ -291,7 +292,7 @@ class ScrollableList extends PureComponent {
   }
 
   render () {
-    const { children, scrollKey, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, emptyMessage, onLoadMore, tabIndex } = this.props;
+    const { children, scrollKey, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, emptyMessage, onLoadMore, tabIndex, onIntersectionChange } = this.props;
     const { fullscreen } = this.state;
     const childrenCount = React.Children.count(children);
 
@@ -328,6 +329,7 @@ class ScrollableList extends PureComponent {
                 intersectionObserverWrapper={this.intersectionObserverWrapper}
                 saveHeightKey={trackScroll ? `${this.context.router.route.location.key}:${scrollKey}` : null}
                 tabIndex={tabIndex}
+                onIntersectionChange={onIntersectionChange}
               >
                 {React.cloneElement(child, {
                   getScrollPosition: this.getScrollPosition,

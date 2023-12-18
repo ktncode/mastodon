@@ -18,6 +18,7 @@ export default class IntersectionObserverArticle extends React.Component {
     onHeightChange: PropTypes.func,
     children: PropTypes.node,
     tabIndex: PropTypes.string,
+    onIntersectionChange: PropTypes.func,
   };
 
   static defaultProps = {
@@ -63,6 +64,12 @@ export default class IntersectionObserverArticle extends React.Component {
   }
 
   handleIntersection = (entry) => {
+    const { id, onIntersectionChange } = this.props;
+
+    if (onIntersectionChange) {
+      onIntersectionChange(id, entry.isIntersecting);
+    }
+
     this.entry = entry;
 
     scheduleIdleTask(this.calculateHeight);

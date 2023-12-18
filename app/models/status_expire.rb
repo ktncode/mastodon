@@ -23,6 +23,7 @@ class StatusExpire < ApplicationRecord
   private
   
   def reset_parent_cache
-    Rails.cache.delete("statuses/#{status_id}")
+    return if status_id.nil?
+    StatusStat.find_by(status_id: status_id)&.touch || StatusStat.create!(status_id: status_id)
   end
 end

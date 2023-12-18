@@ -58,7 +58,7 @@ export function normalizeStatus(status, normalOldStatus) {
 
   // Only calculate these values when status first encountered
   // Otherwise keep the ones already in the reducer
-  if (normalOldStatus) {
+  if (normalOldStatus && normalStatus.updated_at === normalOldStatus.get('updated_at')) {
     normalStatus.search_index = normalOldStatus.get('search_index');
     normalStatus.shortHtml = normalOldStatus.get('shortHtml');
     normalStatus.contentHtml = normalOldStatus.get('contentHtml');

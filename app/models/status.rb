@@ -434,6 +434,10 @@ class Status < ApplicationRecord
     status_stat&.status_referred_by_count || 0
   end
 
+  def status_stat_updated_at
+    status_stat&.updated_at
+  end
+
   def account_ids(recursive: true)
     ids = [account_id.to_s]
 

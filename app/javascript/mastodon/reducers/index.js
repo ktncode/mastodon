@@ -12,6 +12,8 @@ import accounts from './accounts';
 import accounts_counters from './accounts_counters';
 import statuses from './statuses';
 import scheduled_statuses from './scheduled_statuses';
+import processing_statuses from './processing_statuses';
+import intersection_statuses from './intersection_statuses';
 import relationships from './relationships';
 import settings from './settings';
 import push_notifications from './push_notifications';
@@ -63,6 +65,8 @@ const reducers = {
   accounts_counters,
   statuses,
   scheduled_statuses,
+  processing_statuses,
+  intersection_statuses,
   relationships,
   settings,
   push_notifications,

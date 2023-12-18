@@ -115,6 +115,8 @@ class UserSettingsDecorator
     hide_list_of_reblogs_to_posts
     hide_list_of_referred_by_to_posts
     hide_reblogged_by
+    enable_status_polling
+    enable_status_polling_intersection
   ).freeze
 
   STRING_KEYS = %w(

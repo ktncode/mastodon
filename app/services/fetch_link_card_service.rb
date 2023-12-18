@@ -12,6 +12,11 @@ class FetchLinkCardService < BaseService
     )
   }iox
 
+  def need_fetch?(status)
+    @status = status
+    parse_urls.present?
+  end
+
   def call(status, **options)
     @status      = status
     @parse_urls  = parse_urls
@@ -19,6 +24,8 @@ class FetchLinkCardService < BaseService
     @parse_urls -= RedirectLink.where(url: @parse_urls).pluck(:url)
 
     RedirectLinkResolveWorker.push_bulk(@parse_urls) do |url|
+      Redis.current.sadd("statuses/#{@status.id}/processing", "RedirectLinkResolveWorker:#{url}")
+      Redis.current.expire("statuses/#{@status.id}/processing", 60.seconds)
       [url.to_s, @status.id]
     end
 
@@ -68,7 +75,7 @@ class FetchLinkCardService < BaseService
 
   def attach_card
     @status.preview_cards << @card
-    Rails.cache.delete(@status)
+    StatusStat.find_by(status_id: @status.id)&.touch || StatusStat.create!(status_id: @status.id)
   end
 
   def parse_urls

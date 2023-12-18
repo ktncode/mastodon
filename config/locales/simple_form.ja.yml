@@ -97,6 +97,8 @@ ja:
         setting_enable_local_timeline: ローカルタイムラインを有効にします（デフォルト）
         setting_enable_personal_timeline: 自分限定を表示する自分限定ホームを有効にします
         setting_enable_reaction: タイムラインでリアクションの表示を有効にし、リアクションボタンを表示する
+        setting_enable_status_polling: 投稿内のリンクから生成するプレビューカードなど、バックグラウンドで行う処理の完了を監視して自動反映させます
+        setting_enable_status_polling_intersection: 画面表示している投稿のうち、最近変更のあった投稿を監視して変化を自動反映させます
         setting_enable_status_reference: 投稿が別の投稿を参照する機能を有効にします
         setting_enable_wide_emoji: Misskey由来の横幅の広い絵文字を元の比率で表示します（本文）
         setting_enable_wide_emoji_reaction: Misskey由来の横幅の広い絵文字を元の比率で表示します（リアクション）
@@ -319,6 +321,8 @@ ja:
         setting_enable_local_timeline: ローカルタイムラインを有効にする
         setting_enable_personal_timeline: 自分限定ホームを有効にする
         setting_enable_reaction: リアクションを有効にする
+        setting_enable_status_polling: 投稿の更新を自動反映する
+        setting_enable_status_polling_intersection: 表示している投稿の更新を自動反映する
         setting_enable_status_reference: 参照を有効にする
         setting_enable_wide_emoji: ワイド絵文字を有効にする（本文）
         setting_enable_wide_emoji_reaction: ワイド絵文字を有効にする（リアクション）

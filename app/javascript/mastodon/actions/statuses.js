@@ -13,6 +13,14 @@ export const STATUSES_FETCH_REQUEST = 'STATUSES_FETCH_REQUEST';
 export const STATUSES_FETCH_SUCCESS = 'STATUSES_FETCH_SUCCESS';
 export const STATUSES_FETCH_FAIL    = 'STATUSES_FETCH_FAIL';
 
+export const PROCESSING_STATUSES_FETCH_REQUEST = 'PROCESSING_STATUSES_FETCH_REQUEST';
+export const PROCESSING_STATUSES_FETCH_SUCCESS = 'PROCESSING_STATUSES_FETCH_SUCCESS';
+export const PROCESSING_STATUSES_FETCH_FAIL    = 'PROCESSING_STATUSES_FETCH_FAIL';
+
+export const INTERSECTION_STATUS_ADD     = 'INTERSECTION_STATUS_ADD';
+export const INTERSECTION_STATUS_REMOVE  = 'INTERSECTION_STATUS_REMOVE';
+export const INTERSECTION_STATUS_REFRESH = 'INTERSECTION_STATUS_REFRESH';
+
 export const STATUS_DELETE_REQUEST = 'STATUS_DELETE_REQUEST';
 export const STATUS_DELETE_SUCCESS = 'STATUS_DELETE_SUCCESS';
 export const STATUS_DELETE_FAIL    = 'STATUS_DELETE_FAIL';
@@ -126,6 +134,89 @@ export function fetchStatusesFail(ids, error) {
     skipAlert: true,
   };
 };
+
+export function updateProcessingStatusesRequest() {
+  return {
+    type: PROCESSING_STATUSES_FETCH_REQUEST,
+  };
+};
+
+export function updateProcessingStatuses(processingStatuses) {
+  return (dispatch, getState) => {
+    if (processingStatuses.isEmpty()) {
+      return;
+    }
+
+    do {
+      const params = processingStatuses.take(28).keySeq().map(id => `d[][id]=${id}&d[][updated_at]=${processingStatuses.get(id)}`).join('&');
+
+      dispatch(updateProcessingStatusesRequest());
+
+      api(getState).get(`/api/v1/statuses/updated?${params}`).then(response => {
+        const statuses = response.data;
+        dispatch(importFetchedStatuses(statuses));
+        dispatch(fetchRelationshipsFromStatuses(statuses));
+        dispatch(updateProcessingStatusesSuccess());
+      }).catch(error => {
+        dispatch(updateProcessingStatusesFail(error));
+      });
+
+      processingStatuses = processingStatuses.skip(28);
+    } while (!processingStatuses.isEmpty());
+  };
+};
+
+export function updateProcessingStatusesSuccess() {
+  return {
+    type: PROCESSING_STATUSES_FETCH_SUCCESS,
+  };
+};
+
+export function updateProcessingStatusesFail(error) {
+  return {
+    type: PROCESSING_STATUSES_FETCH_FAIL,
+    error,
+    skipAlert: true,
+  };
+};
+
+export function addIntersectionStatus(status) {
+  return {
+    type: INTERSECTION_STATUS_ADD,
+    status: status,
+  }
+}
+
+export function removeIntersectionStatus(status) {
+  return {
+    type: INTERSECTION_STATUS_REMOVE,
+    status: status,
+  }
+}
+
+export function refreshIntersectionStatuses() {
+  return {
+    type: INTERSECTION_STATUS_REFRESH,
+  }
+}
+
+export function addIntersectionStatusId(id) {
+  return (dispatch, getState) => {
+    const status = getState().getIn(['statuses', id]);
+    if (status) {
+      dispatch(addIntersectionStatus(status));
+    }
+  }
+}
+
+export function removeIntersectionStatusId(id) {
+  return (dispatch, getState) => {
+    const status = getState().getIn(['statuses', id]);
+    if (status) {
+      dispatch(removeIntersectionStatus(status));
+    }
+  }
+}
 
 export function redraft(getState, status, replyStatus, raw_text) {
   return {

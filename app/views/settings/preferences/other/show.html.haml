@@ -180,6 +180,14 @@
   .fields-group
     = f.input :setting_hide_reblogged_by, as: :boolean, wrapper: :with_label, fedibird_features: true
 
+  - if current_user&.setting_new_features_policy == 'tester'
+    .fields-group
+      = f.input :setting_enable_status_polling, as: :boolean, wrapper: :with_label, beta_features: true
+
+  - if current_user&.setting_new_features_policy == 'tester'
+    .fields-group
+      = f.input :setting_enable_status_polling_intersection, as: :boolean, wrapper: :with_label, beta_features: true
+
   %h4= t 'preferences.public_timelines'
 
   .fields-group

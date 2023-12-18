@@ -98,7 +98,7 @@ class Poll < ApplicationRecord
 
   def reset_parent_cache
     return if status_id.nil?
-    Rails.cache.delete("statuses/#{status_id}")
+    StatusStat.find_by(status_id: status_id)&.touch || StatusStat.create!(status_id: status_id)
   end
 
   def last_fetched_before_expiration?

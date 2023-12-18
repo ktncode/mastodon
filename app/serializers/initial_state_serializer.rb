@@ -118,6 +118,8 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:hide_list_of_reblogs_to_posts]         = object.current_account.user.setting_hide_list_of_reblogs_to_posts
       store[:hide_list_of_referred_by_to_posts]     = object.current_account.user.setting_hide_list_of_referred_by_to_posts
       store[:hide_reblogged_by]                     = object.current_account.user.setting_hide_reblogged_by
+      store[:enable_status_polling]                 = object.current_account.user.setting_enable_status_polling
+      store[:enable_status_polling_intersection]    = object.current_account.user.setting_enable_status_polling_intersection
       
     else
       store[:auto_play_gif] = Setting.auto_play_gif

@@ -167,6 +167,8 @@ defaults: &defaults
   hide_list_of_reblogs_to_posts: false
   hide_list_of_referred_by_to_posts: false
   hide_reblogged_by: false
+  enable_status_polling: false
+  enable_status_polling_intersection: false
 
 development:
   <<: *defaults

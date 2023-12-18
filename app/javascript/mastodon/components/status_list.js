@@ -1,5 +1,6 @@
 import { debounce } from 'lodash';
 import React from 'react';
+import { connect } from 'react-redux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import StatusContainer from '../containers/status_container';
@@ -8,13 +9,16 @@ import ReloadZone from './reload_zone';
 import LoadGap from './load_gap';
 import ScrollableList from './scrollable_list';
 import RegenerationIndicator from 'mastodon/components/regeneration_indicator';
+import { addIntersectionStatusId, removeIntersectionStatusId } from 'mastodon/actions/statuses';
 import { isIOS } from 'mastodon/is_mobile';
 import { showReloadButton } from '../initial_state';
 import { List as ImmutableList } from 'immutable';
 
+@connect()
 export default class StatusList extends ImmutablePureComponent {
 
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     scrollKey: PropTypes.string.isRequired,
     statusIds: ImmutablePropTypes.list.isRequired,
     featuredStatusIds: ImmutablePropTypes.list,
@@ -65,6 +69,16 @@ export default class StatusList extends ImmutablePureComponent {
 
   handleReload = () => {
     location.reload();
+  }
+
+  handleIntersectionChange = (id, isIntersecting) => {
+    const { dispatch } = this.props;
+
+    if (isIntersecting) {
+      dispatch(addIntersectionStatusId(id));
+    } else {
+      dispatch(removeIntersectionStatusId(id));
+    }
   }
 
   _selectChild (index, align_top) {
@@ -135,7 +149,7 @@ export default class StatusList extends ImmutablePureComponent {
     }
 
     return (
-      <ScrollableList {...other} showLoading={isLoading && statusIds.size === 0} onLoadMore={onLoadMore && this.handleLoadOlder} ref={this.setRef}>
+      <ScrollableList {...other} showLoading={isLoading && statusIds.size === 0} onLoadMore={onLoadMore && this.handleLoadOlder} onIntersectionChange={this.handleIntersectionChange} ref={this.setRef}>
         {scrollableContent}
       </ScrollableList>
     );

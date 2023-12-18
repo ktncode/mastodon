@@ -5,13 +5,14 @@ class Api::V1::StatusesController < Api::BaseController
 
   before_action -> { authorize_if_got_token! :read, :'read:statuses' }, except: [:create, :destroy]
   before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only:   [:create, :destroy]
-  before_action :require_user!, except:  [:index, :show, :context]
-  before_action :set_statuses, only:     [:index]
-  before_action :set_status, only:       [:show, :context]
-  before_action :set_thread, only:       [:create]
-  before_action :set_circle, only:       [:create]
-  before_action :set_schedule, only:     [:create]
-  before_action :set_expire, only:       [:create]
+  before_action :require_user!, except:      [:index, :show, :context, :updated]
+  before_action :set_statuses, only:         [:index]
+  before_action :set_updated_statuses, only: [:updated]
+  before_action :set_status, only:           [:show, :context]
+  before_action :set_thread, only:           [:create]
+  before_action :set_circle, only:           [:create]
+  before_action :set_schedule, only:         [:create]
+  before_action :set_expire, only:           [:create]
 
   override_rate_limit_headers :create, family: :statuses
 
@@ -30,6 +31,11 @@ class Api::V1::StatusesController < Api::BaseController
   def show
     @status = cache_collection([@status], Status).first
     render json: @status, serializer: REST::StatusSerializer
+  end
+
+  def updated
+    @statuses = cache_collection(@statuses, Status)
+    render json: @statuses, each_serializer: REST::StatusSerializer
   end
 
   def context
@@ -99,6 +105,18 @@ class Api::V1::StatusesController < Api::BaseController
     @statuses = Status.permitted_statuses_from_ids(status_ids, current_account)
   end
 
+  def set_updated_statuses
+    updated_status_ids = ActiveRecord::Base.connection.select_values(ActiveRecord::Base.sanitize_sql_array([
+      "select s.id from statuses s join json_to_recordset(:json) u(id bigint, updated_at timestamp without time zone) on s.id = u.id left join status_stats st on s.id = st.status_id where date_trunc('milliseconds', coalesce(st.updated_at, s.updated_at)) > date_trunc('milliseconds', u.updated_at)",
+      json: Oj.dump(id_and_updated_at_pairs)]));
+    @statuses = updated_status_ids.present? ? Status.permitted_statuses_from_ids(updated_status_ids, current_account) : Status.none
+  end
+
+  def id_and_updated_at_pairs
+    default_updated_at = updated_statuses_params[:updated_at] || Time.now.utc.iso8601
+    updated_statuses_params[:d].map { |p| { updated_at: default_updated_at }.merge(p) }
+  end
+
   def set_status
     @status = Status.include_expired.find(status_params[:id])
     authorize @status, :show?
@@ -152,6 +170,10 @@ class Api::V1::StatusesController < Api::BaseController
 
   def statuses_params
     params.permit(ids: [])
+  end
+
+  def updated_statuses_params 
+    params.permit(:updated_at, d: [:id, :updated_at])
   end
 
   def status_params
