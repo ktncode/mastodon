@@ -553,10 +553,10 @@ class Status < ApplicationRecord
       StatusPin.select('status_id').where(status_id: status_ids).where(account_id: account_id).each_with_object({}) { |p, h| h[p.status_id] = true }
     end
 
-    def relations_map_for_account(account, account_ids)
-      return {} if account.nil?
+    def relations_map_for_account(account_id, account_ids)
+      return {} if account_id.nil?
 
-      presenter = AccountRelationshipsPresenter.new(account_ids, account)
+      presenter = AccountRelationshipsPresenter.new(account_ids, account_id)
       {
         blocking: presenter.blocking,
         blocked_by: presenter.blocked_by,
@@ -567,10 +567,10 @@ class Status < ApplicationRecord
       }
     end
 
-    def relations_map_for_status(account, statuses)
-      return {} if account.nil?
+    def relations_map_for_status(account_id, statuses)
+      return {} if account_id.nil?
 
-      presenter = StatusRelationshipsPresenter.new(statuses, account)
+      presenter = StatusRelationshipsPresenter.new(statuses, account_id)
       {
         reblogs_map: presenter.reblogs_map,
         favourites_map: presenter.favourites_map,
@@ -601,11 +601,12 @@ class Status < ApplicationRecord
       end
     end
 
-    def permitted_statuses_from_ids(ids, account)
+    def permitted_statuses_from_ids(ids, account_id)
       statuses          = Status.with_accounts(ids).to_a
       account_ids       = statuses.map(&:account_id).uniq
-      account_relations = relations_map_for_account(account, account_ids)
-      status_relations  = relations_map_for_status(account, statuses)
+      account_relations = relations_map_for_account(account_id, account_ids)
+      status_relations  = relations_map_for_status(account_id, statuses)
+      account           = Account.find_by(id: account_id)
 
       statuses.reject! { |status| StatusFilter.new(status, account, account_relations, status_relations).filtered? }
       statuses

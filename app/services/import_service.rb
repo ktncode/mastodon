@@ -139,7 +139,7 @@ class ImportService < BaseService
     end
 
     account_ids         = statuses.map(&:account_id)
-    preloaded_relations = relations_map_for_account(@account, account_ids)
+    preloaded_relations = relations_map_for_account(@account&.id, account_ids)
 
     statuses.keep_if { |status| StatusPolicy.new(@account, status, preloaded_relations).show? }
 
@@ -158,8 +158,8 @@ class ImportService < BaseService
     Paperclip.io_adapters.for(@import.data).read
   end
 
-  def relations_map_for_account(account, account_ids)
-    presenter = AccountRelationshipsPresenter.new(account_ids, account)
+  def relations_map_for_account(account_id, account_ids)
+    presenter = AccountRelationshipsPresenter.new(account_ids, account_id)
     {
       blocking: {},
       blocked_by: presenter.blocked_by,

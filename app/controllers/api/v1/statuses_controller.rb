@@ -39,9 +39,9 @@ class Api::V1::StatusesController < Api::BaseController
   end
 
   def context
-    ancestors_results   = @status.in_reply_to_id.nil? ? [] : @status.ancestors(CONTEXT_LIMIT, current_account)
-    descendants_results = @status.descendants(CONTEXT_LIMIT, current_account)
-    references_results  = @status.thread_references(CONTEXT_LIMIT, current_account)
+    ancestors_results   = @status.in_reply_to_id.nil? ? [] : @status.ancestors(CONTEXT_LIMIT, current_account&.id)
+    descendants_results = @status.descendants(CONTEXT_LIMIT, current_account&.id)
+    references_results  = @status.thread_references(CONTEXT_LIMIT, current_account&.id)
 
     unless ActiveModel::Type::Boolean.new.cast(status_params[:with_reference])
       ancestors_results   = (ancestors_results + references_results).sort_by {|status| status.id }
@@ -102,14 +102,14 @@ class Api::V1::StatusesController < Api::BaseController
   private
 
   def set_statuses
-    @statuses = Status.permitted_statuses_from_ids(status_ids, current_account)
+    @statuses = Status.permitted_statuses_from_ids(status_ids, current_account&.id)
   end
 
   def set_updated_statuses
     updated_status_ids = ActiveRecord::Base.connection.select_values(ActiveRecord::Base.sanitize_sql_array([
       "select s.id from statuses s join json_to_recordset(:json) u(id bigint, updated_at timestamp without time zone) on s.id = u.id left join status_stats st on s.id = st.status_id where date_trunc('milliseconds', coalesce(st.updated_at, s.updated_at)) > date_trunc('milliseconds', u.updated_at)",
       json: Oj.dump(id_and_updated_at_pairs)]));
-    @statuses = updated_status_ids.present? ? Status.permitted_statuses_from_ids(updated_status_ids, current_account) : Status.none
+    @statuses = updated_status_ids.present? ? Status.permitted_statuses_from_ids(updated_status_ids, current_account&.id) : Status.none
   end
 
   def id_and_updated_at_pairs

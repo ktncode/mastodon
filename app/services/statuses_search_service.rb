@@ -29,16 +29,16 @@ class StatusesSearchService < BaseService
       result_ids        = request.collapse(field: :id).limit(@limit).offset(@offset).pluck(:id).compact
       results           = Status.where(id: result_ids).reorder(nil).order_as_specified(id: result_ids)
       account_ids       = results.map(&:account_id)
-      account_relations = relations_map_for_account(@account, account_ids)
-      status_relations  = relations_map_for_status(@account, results)
+      account_relations = relations_map_for_account(@account&.id, account_ids)
+      status_relations  = relations_map_for_status(@account&.id, results)
   
       results.reject { |status| StatusFilter.new(status, @account, account_relations, status_relations, include_expired: true).filtered? }
     rescue Faraday::ConnectionFailed, Parslet::ParseFailed
       []
     end
   
-    def relations_map_for_account(account, account_ids)
-      presenter = AccountRelationshipsPresenter.new(account_ids, account)
+    def relations_map_for_account(account_id, account_ids)
+      presenter = AccountRelationshipsPresenter.new(account_ids, account_id)
       {
         blocking: presenter.blocking,
         blocked_by: presenter.blocked_by,
@@ -48,8 +48,8 @@ class StatusesSearchService < BaseService
       }
     end
   
-    def relations_map_for_status(account, statuses)
-      presenter = StatusRelationshipsPresenter.new(statuses, account)
+    def relations_map_for_status(account_id, statuses)
+      presenter = StatusRelationshipsPresenter.new(statuses, account_id)
       {
         reblogs_map: presenter.reblogs_map,
         favourites_map: presenter.favourites_map,

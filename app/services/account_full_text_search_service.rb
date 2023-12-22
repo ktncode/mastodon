@@ -21,15 +21,15 @@ class AccountFullTextSearchService < BaseService
     result_ids          = definition.limit(@limit).offset(@offset).pluck(:id).compact
     results             = Account.where(id: result_ids).reorder(nil).order_as_specified(id: result_ids)
     account_ids         = results.map(&:id)
-    preloaded_relations = relations_map_for_account(@account, account_ids)
+    preloaded_relations = relations_map_for_account(@account&.id, account_ids)
 
     results.reject { |target_account| AccountSearchFilter.new(target_account, @account, preloaded_relations).filtered? }
   rescue Faraday::ConnectionFailed, Parslet::ParseFailed
     []
   end
 
-  def relations_map_for_account(account, account_ids)
-    presenter = AccountRelationshipsPresenter.new(account_ids, account)
+  def relations_map_for_account(account_id, account_ids)
+    presenter = AccountRelationshipsPresenter.new(account_ids, account_id)
     {
       blocking: presenter.blocking,
       blocked_by: presenter.blocked_by,

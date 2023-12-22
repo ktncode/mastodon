@@ -3,16 +3,16 @@
 module StatusThreadingConcern
   extend ActiveSupport::Concern
 
-  def ancestors(limit, account = nil)
-    find_statuses_from_tree_path(ancestor_ids(limit, account), account)
+  def ancestors(limit, account_id = nil)
+    find_statuses_from_tree_path(ancestor_ids(limit), account_id)
   end
 
-  def descendants(limit, account = nil, max_child_id = nil, since_child_id = nil, depth = nil)
-    find_statuses_from_tree_path(descendant_ids(limit, max_child_id, since_child_id, depth), account, promote: true)
+  def descendants(limit, account_id = nil, max_child_id = nil, since_child_id = nil, depth = nil)
+    find_statuses_from_tree_path(descendant_ids(limit, max_child_id, since_child_id, depth), account_id, promote: true)
   end
 
-  def thread_references(limit, account = nil, max_child_id = nil, since_child_id = nil, depth = nil)
-    find_statuses_from_tree_path(references_ids(limit, account, max_child_id, since_child_id, depth), account)
+  def thread_references(limit, account_id = nil, max_child_id = nil, since_child_id = nil, depth = nil)
+    find_statuses_from_tree_path(references_ids(limit, max_child_id, since_child_id, depth), account_id)
   end
 
   def self_replies(limit)
@@ -21,16 +21,16 @@ module StatusThreadingConcern
 
   private
 
-  def ancestor_ids(limit, account)
-    ancestor_ids_account_ids(limit, account).map(&:first).reverse!
+  def ancestor_ids(limit)
+    ancestor_ids_account_ids(limit).map(&:first).reverse!
   end
 
   def descendant_ids(limit, max_child_id, since_child_id, depth)
     descendant_ids_account_ids(limit, max_child_id, since_child_id, depth).map(&:first)
   end
 
-  def references_ids(limit, account, max_child_id, since_child_id, depth)
-    ancestors      = ancestor_ids_account_ids(limit, account)
+  def references_ids(limit, max_child_id, since_child_id, depth)
+    ancestors      = ancestor_ids_account_ids(limit)
     descendants    = descendant_ids_account_ids(limit, max_child_id, since_child_id, depth)
     self_reply_ids = []
     self_reply_ids += ancestors  .take_while { |id, status_account_id| status_account_id == account_id }.map(&:first)
@@ -41,7 +41,7 @@ module StatusThreadingConcern
     reference_ids.sort!.reverse!
   end
 
-  def ancestor_ids_account_ids(limit, account)
+  def ancestor_ids_account_ids(limit)
     key = "ancestors:#{id}"
     ancestors = Rails.cache.fetch(key)
 
@@ -104,8 +104,8 @@ module StatusThreadingConcern
     descendants_with_self - [self]
   end
 
-  def find_statuses_from_tree_path(ids, account, promote: false)
-    statuses = Status.permitted_statuses_from_ids(ids, account)
+  def find_statuses_from_tree_path(ids, account_id, promote: false)
+    statuses = Status.permitted_statuses_from_ids(ids, account_id)
 
     # Order ancestors/descendants by tree path
     statuses.sort_by! { |status| ids.index(status.id) }

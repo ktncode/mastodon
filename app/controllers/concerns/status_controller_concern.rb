@@ -71,14 +71,14 @@ module StatusControllerConcern
   def set_ancestors
     @references = @status.thread_references(
       DESCENDANTS_LIMIT,
-      current_account,
+      current_account&.id,
       params[:max_descendant_thread_id]&.to_i,
       params[:since_descendant_thread_id]&.to_i,
       DESCENDANTS_DEPTH_LIMIT
     )
 
     @ancestors = cache_collection(
-      @status.ancestors(ANCESTORS_LIMIT, current_account) + @references,
+      @status.ancestors(ANCESTORS_LIMIT, current_account&.id) + @references,
       Status
     ).sort_by{|status| status.id}.take(ANCESTORS_LIMIT)
 
@@ -92,7 +92,7 @@ module StatusControllerConcern
     descendants = cache_collection(
       @status.descendants(
         DESCENDANTS_LIMIT,
-        current_account,
+        current_account&.id,
         @max_descendant_thread_id,
         @since_descendant_thread_id,
         DESCENDANTS_DEPTH_LIMIT
