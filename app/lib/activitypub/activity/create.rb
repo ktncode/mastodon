@@ -128,6 +128,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         poll: process_poll,
         quote: quote,
         generator: generator,
+        fetch: !@options[:delivery],
       }
     end
   end
@@ -574,6 +575,8 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def distribute_group(status)
+    return unless @options[:delivery]
+
     ActivityPub::GroupDistributionWorker.perform_async(status.id) if Account.local.groups.where(id: @status.mentions.select(:account_id)).joins(:passive_relationships).exists?
   end
 

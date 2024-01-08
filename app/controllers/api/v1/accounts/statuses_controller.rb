@@ -7,7 +7,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   after_action :insert_pagination_headers, unless: -> { truthy_param?(:pinned) }
 
   def index
-    @statuses = load_statuses
+    @statuses = truthy_param?(:fetch) ? fetch_statuses : load_statuses
 
     if compact?
       render json: CompactStatusesPresenter.new(statuses: @statuses), serializer: REST::CompactStatusesSerializer
@@ -43,6 +43,22 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
       limit_param(DEFAULT_STATUSES_LIMIT),
       params_slice(:max_id, :since_id, :min_id)
     )
+  end
+
+  def fetch_statuses
+    @account.suspended? || current_account.nil? || !current_account.following?(@account) ? [] : cached_fetch_account_statuses
+  end
+
+  def cached_fetch_account_statuses
+    statuses = ActivityPub::FetchOutboxService.new.call(@account, limit: limit_param(DEFAULT_STATUSES_LIMIT))&.permitted_for(@account, current_account) || Status.none
+
+    statuses.merge!(only_media_scope)  if truthy_param?(:only_media)
+    statuses.merge!(no_replies_scope)  if truthy_param?(:exclude_replies)
+    statuses.merge!(no_reblogs_scope)  if truthy_param?(:exclude_reblogs)
+    statuses.merge!(hashtag_scope)     if params[:tagged].present?
+    statuses.merge!(no_personal_scope) if current_user&.setting_hide_personal_from_account
+
+    cache_collection(statuses, Status)
   end
 
   def permitted_account_statuses

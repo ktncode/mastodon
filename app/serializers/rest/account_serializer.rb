@@ -12,11 +12,12 @@ class REST::AccountSerializer < ActiveModel::Serializer
 
   has_many :emojis, serializer: REST::CustomEmojiSerializer
 
-  attribute :suspended, if: :suspended?
+  attribute :suspended,          if: :suspended?
   attribute :avatar_full,        if: :with_fullsize_avatar?
   attribute :avatar_full_static, if: :with_fullsize_avatar?
   attribute :header_full,        if: :with_fullsize_header?
   attribute :header_full_static, if: :with_fullsize_header?
+  attribute :fetched,            if: :remote?
 
   class FieldSerializer < ActiveModel::Serializer
     attributes :name, :value, :verified_at
@@ -154,6 +155,14 @@ class REST::AccountSerializer < ActiveModel::Serializer
   end
 
   delegate :suspended?, to: :object
+
+  def remote?
+    !object.local?
+  end
+
+  def fetched
+    object.outbox_next_page_url == ''
+  end
 
   def moved_and_not_nested?
     object.moved? && object.moved_to_account.moved_to_account_id.nil?

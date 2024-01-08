@@ -48,7 +48,7 @@ class Status < ApplicationRecord
 
   # If `override_timestamps` is set at creation time, Snowflake ID creation
   # will be based on current time instead of `created_at`
-  attr_accessor :override_timestamps, :circle, :expires_at, :expires_action
+  attr_accessor :override_timestamps, :circle, :expires_at, :expires_action, :fetch
 
   update_index('statuses', :proper)
 
@@ -745,7 +745,7 @@ class Status < ApplicationRecord
   def increment_counter_caches
     return if uncount_visibility?
 
-    account&.increment_count!(:statuses_count)
+    account&.increment_count!(:statuses_count) unless fetch
     reblog&.increment_count!(:reblogs_count) if reblog?
     thread&.increment_count!(:replies_count) if in_reply_to_id.present? && distributable?
   end

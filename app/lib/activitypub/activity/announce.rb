@@ -55,6 +55,7 @@ class ActivityPub::Activity::Announce < ActivityPub::Activity
         visibility: visibility_from_audience_with_correction,
         expires_at: @json['expiry'],
         expires_action: :mark,
+        fetch: !@options[:delivery],
       }
     end
   end
@@ -97,7 +98,7 @@ class ActivityPub::Activity::Announce < ActivityPub::Activity
   end
 
   def related_to_local_activity?
-    followed_by_local_accounts? || requested_through_relay? || reblog_of_local_status?
+    fetch? || followed_by_local_accounts? || requested_through_relay? || reblog_of_local_status?
   end
 
   def requested_through_relay?

@@ -97,6 +97,8 @@ class ActivityPub::Activity
   def distribute(status)
     crawl_links(status)
 
+    return unless @options[:delivery]
+
     notify_about_reblog(status) if reblog_of_local_account?(status) && !reblog_by_following_group_account?(status)
     notify_about_mentions(status)
 
@@ -164,7 +166,7 @@ class ActivityPub::Activity
       actor_id = value_or_id(first_of_value(@object['attributedTo']))
 
       if actor_id == @account.uri
-        return ActivityPub::Activity.factory({ 'type' => 'Create', 'actor' => actor_id, 'object' => @object }, @account).perform
+        return ActivityPub::Activity.factory({ 'type' => 'Create', 'actor' => actor_id, 'object' => @object }, @account, **@options.merge(delivery: false)).perform
       end
     end
 

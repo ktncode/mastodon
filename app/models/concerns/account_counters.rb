@@ -19,6 +19,7 @@ module AccountCounters
            :subscribing_count,
            :subscribing_count=,
            :last_status_at,
+           :outbox_next_page_url,
            to: :account_stat
 
   # @param [Symbol] key

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { fetchAccount } from '../../actions/accounts';
-import { expandAccountFeaturedTimeline, expandAccountTimeline } from '../../actions/timelines';
+import { expandAccountFeaturedTimeline, expandAccountTimeline, fetchAccountTimeline } from '../../actions/timelines';
 import StatusList from '../../components/status_list';
 import LoadingIndicator from '../../components/loading_indicator';
 import Column from '../../components/column';
@@ -21,6 +21,7 @@ import { me, new_features_policy, defaultColumnWidth } from 'mastodon/initial_st
 import { connectTimeline, disconnectTimeline } from 'mastodon/actions/timelines';
 import { fetchFeaturedTags } from '../../actions/featured_tags';
 import { changeSetting } from '../../actions/settings';
+import Icon from 'mastodon/components/icon';
 
 const emptyList = ImmutableList();
 
@@ -45,6 +46,7 @@ const mapStateToProps = (state, { params: { accountId, tagged }, about, withRepl
   return {
     remote: !!(state.getIn(['accounts', accountId, 'acct']) !== state.getIn(['accounts', accountId, 'username'])),
     remoteUrl: state.getIn(['accounts', accountId, 'url']),
+    fetched: state.getIn(['accounts', accountId, 'fetched'], true),
     isAccount: !!state.getIn(['accounts', accountId]),
     statusIds: advancedMode && about && !showPostsInAbout ? emptyList : state.getIn(['timelines', `account:${path}`, 'items'], emptyList),
     featuredStatusIds: (withReplies || posts) ? emptyList : state.getIn(['timelines', `account:${accountId}:pinned${tagged ? `:${tagged}` : ''}`, 'items'], emptyList),
@@ -52,6 +54,7 @@ const mapStateToProps = (state, { params: { accountId, tagged }, about, withRepl
     hasMore: state.getIn(['timelines', `account:${path}`, 'hasMore']),
     suspended: state.getIn(['accounts', accountId, 'suspended'], false),
     blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
+    following: state.getIn(['relationships', accountId, 'following'], false),
     advancedMode,
     hideFeaturedTags,
     posts,
@@ -91,10 +94,12 @@ class AccountTimeline extends ImmutablePureComponent {
     hideFeaturedTags: PropTypes.bool,
     hideRelation: PropTypes.bool,
     blockedBy: PropTypes.bool,
+    following: PropTypes.bool,
     isAccount: PropTypes.bool,
     suspended: PropTypes.bool,
     remote: PropTypes.bool,
     remoteUrl: PropTypes.string,
+    fetched: PropTypes.bool,
     multiColumn: PropTypes.bool,
     columnWidth: PropTypes.string,
   };
@@ -168,6 +173,12 @@ class AccountTimeline extends ImmutablePureComponent {
     }
   }
 
+  handleFetchMore = () => {
+    const { dispatch, params: { accountId, tagged }, withReplies, withoutReblogs } = this.props;
+
+    dispatch(fetchAccountTimeline(accountId, { withReplies, tagged, withoutReblogs }));
+  }
+
   handleLoadMore = maxId => {
     this.props.dispatch(expandAccountTimeline(this.props.params.accountId, { maxId, withReplies: this.props.withReplies, tagged: this.props.params.tagged, withoutReblogs: this.props.withoutReblogs }));
   }
@@ -185,7 +196,7 @@ class AccountTimeline extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, statusIds, featuredStatusIds, isLoading, hasMore, blockedBy, suspended, isAccount, multiColumn, remote, remoteUrl, about, withReplies, posts, advancedMode, hideFeaturedTags, showPostsInAbout, hideRelation, columnWidth } = this.props;
+    const { params: { accountId, tagged }, intl, statusIds, featuredStatusIds, isLoading, hasMore, blockedBy, following, suspended, isAccount, multiColumn, remote, remoteUrl, fetched, about, withReplies, posts, advancedMode, hideFeaturedTags, showPostsInAbout, hideRelation, columnWidth } = this.props;
 
     if (!isAccount) {
       return (
@@ -204,6 +215,20 @@ class AccountTimeline extends ImmutablePureComponent {
       );
     }
 
+    const remoteMessage = (!fetched && remote) && (following ? (
+      <div className='timeline-hint'>
+        <strong><FormattedMessage id='timeline_hint.remote_resource_not_fetched' defaultMessage='{resource} from other servers has not yet been fetched.' values={{ resource: <FormattedMessage id='timeline_hint.resources.statuses' defaultMessage='Older toots' /> }} /></strong>
+        <br />
+        <button className='load-more' onClick={this.handleFetchMore} disabled={isLoading} >
+          {isLoading ? (
+            <FormattedMessage id='loading_indicator.label' defaultMessage='Loading...' />
+          ) : (<>
+            <Icon id='refresh' /> <FormattedMessage id='account.fetch_more_on_origin_server' defaultMessage='Fetch more on ther original profile' />
+          </>)}
+        </button>
+      </div>
+    ) : <RemoteHint url={remoteUrl} />);
+
     let emptyMessage;
 
     if (suspended) {
@@ -212,13 +237,13 @@ class AccountTimeline extends ImmutablePureComponent {
       emptyMessage = <FormattedMessage id='empty_column.account_unavailable' defaultMessage='Profile unavailable' />;
     } else if (about && advancedMode && featuredStatusIds.isEmpty()) {
       emptyMessage = <FormattedMessage id='empty_column.pinned_unavailable' defaultMessage='Pinned posts unavailable' />;
-    } else if (remote && statusIds.isEmpty()) {
+    } else if (remote && !following && statusIds.isEmpty()) {
       emptyMessage = <RemoteHint url={remoteUrl} />;
+    } else if (remote && remoteMessage) {
+      emptyMessage = remoteMessage;
     } else {
       emptyMessage = <FormattedMessage id='empty_column.account_timeline' defaultMessage='No toots here!' />;
     }
-
-    const remoteMessage = (!about && remote) ? <RemoteHint url={remoteUrl} /> : null;
 
     return (
       <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)} columnWidth={columnWidth}>
@@ -236,7 +261,7 @@ class AccountTimeline extends ImmutablePureComponent {
         </ColumnHeader>
 
         <StatusList
-          prepend={<HeaderContainer accountId={this.props.params.accountId} tagged={this.props.params.tagged} hideProfile={withReplies || posts || !!this.props.params.tagged} hideRelation={hideRelation} hideFeaturedTags={hideFeaturedTags} />}
+          prepend={<HeaderContainer accountId={accountId} tagged={tagged} hideProfile={withReplies || posts || !!tagged} hideRelation={hideRelation} hideFeaturedTags={hideFeaturedTags} />}
           alwaysPrepend
           append={remoteMessage}
           scrollKey='account_timeline'

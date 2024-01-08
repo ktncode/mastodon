@@ -20,7 +20,7 @@ class ActivityPub::FetchRemoteStatusService < BaseService
 
     return if actor.nil? || actor.suspended?
 
-    ActivityPub::Activity.factory(activity_json, actor).perform
+    ActivityPub::Activity.factory(activity_json, actor, delivery: false).perform
   end
 
   private
