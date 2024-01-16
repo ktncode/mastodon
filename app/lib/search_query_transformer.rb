@@ -382,9 +382,9 @@ class SearchQueryTransformer < Parslet::Transform
     operator = clause[:operator]&.to_s
     term =
       if clause[:phrases]
-        clause[:phrases].map { |phrase| phrase[:phrase].map { |phrase| phrase[:term].to_s }.join(' ') }
+        clause[:phrases].map { |phrase| clause[:phrase].is_a?(Array) ? phrase[:phrase].map { |phrase| phrase[:term].to_s }.join(' ') : nil }.compact
       elsif clause[:phrase]
-        clause[:phrase].map { |term| term[:term].to_s }.join(' ')
+        clause[:phrase].is_a?(Array) ? clause[:phrase].map { |term| term[:term].to_s }.join(' ') : nil
       elsif clause[:terms]
         clause[:terms].map { |term| term[:term].to_s }
       elsif clause[:term]
@@ -393,7 +393,9 @@ class SearchQueryTransformer < Parslet::Transform
         nil
       end
 
-    if clause[:prefix] && SUPPORTED_FILTER_PREFIXES.include?(prefix)
+    if term.blank?
+      nil
+    elsif clause[:prefix] && SUPPORTED_FILTER_PREFIXES.include?(prefix)
       PrefixClause.new(prefix, operator, term, current_account: current_account)
     elsif clause[:prefix] && SUPPORTED_ORDER_PREFIXES.include?(prefix)
       OrderPrefixClause.new(prefix, operator, term, current_account: current_account)
