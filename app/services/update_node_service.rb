@@ -6,17 +6,17 @@ class UpdateNodeService < BaseService
   NODEINFO_2_1_REL = 'http://nodeinfo.diaspora.software/ns/schema/2.1'
   NODEINFO_2_0_REL = 'http://nodeinfo.diaspora.software/ns/schema/2.0'
 
-  attr_reader :domain, :options, :node
+  attr_reader :node
   
   def call(domain, **options)
-    @domain   = domain
+    @domain   = Addressable::URI.parse(domain).normalize.to_s
     @options  = { fetch: true, process: false }.merge(options)
-    @node     = Node.find_or_create_by!(domain: domain)
+    @node     = Node.find_or_create_by!(domain: @domain)
 
     last_fetched_at = node.last_fetched_at
 
-    fetch_all     if options[:fetch]
-    proccess_info if options[:process] || last_fetched_at != node.last_fetched_at
+    fetch_all     if @options[:fetch]
+    proccess_info if @options[:process] || last_fetched_at != node.last_fetched_at
   end
 
   private
@@ -40,7 +40,7 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_all
-    return unless options[:force] || node.node? && node.possibly_stale? && node.available?
+    return unless @options[:force] || node.node? && node.possibly_stale? && node.available?
 
     fetch_nodeinfo
 
@@ -152,7 +152,7 @@ class UpdateNodeService < BaseService
     remote_url = instance('thumbnail') || instance('bannerUrl')
     remote_url = remote_url&.dig('url') if remote_url.is_a?(Hash)
 
-    node.thumbnail_remote_url = nil if options[:force]
+    node.thumbnail_remote_url = nil if @options[:force]
     node.thumbnail_remote_url = remote_url
   rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
   end
@@ -160,7 +160,7 @@ class UpdateNodeService < BaseService
   def process_icon
     remote_url = instance('iconUrl') || fetch_icon_url
 
-    node.icon_remote_url = nil if options[:force]
+    node.icon_remote_url = nil if @options[:force]
     node.icon_remote_url = remote_url
   rescue Mastodon::UnexpectedResponseError, Mastodon::LengthValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
   end
@@ -188,7 +188,7 @@ class UpdateNodeService < BaseService
     end
 
     uri.path   = "/#{uri.path}" unless uri.path.start_with?('/')
-    uri.host   = domain         unless uri.host
+    uri.host   = @domain        unless uri.host
     uri.scheme = 'https'        unless uri.scheme
 
     uri.normalize.to_s
@@ -203,9 +203,9 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_nodeinfo
-    Resolv::DNS.open.getaddress(domain)
+    Resolv::DNS.open.getaddress(@domain)
  
-    well_known_nodeinfo = json_fetch("https://#{domain}/.well-known/nodeinfo", true)
+    well_known_nodeinfo = json_fetch("https://#{@domain}/.well-known/nodeinfo", true)
 
     if well_known_nodeinfo.present?
       nodeinfo_url   = well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_1_REL }&.fetch('href', nil)
@@ -245,8 +245,8 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_mastodon_instance_data
-    instance_v2 = "https://#{domain}/api/v2/instance"
-    instance_v1 = "https://#{domain}/api/v1/instance"
+    instance_v2 = "https://#{@domain}/api/v2/instance"
+    instance_v1 = "https://#{@domain}/api/v1/instance"
 
     major, minor, patch = node.upstream_version&.split('.')&.map(&:to_i)
 
@@ -257,7 +257,7 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_misskey_instance_data
-    json = misskey_api_call("https://#{domain}/api/meta", '{"detail":true}')
+    json = misskey_api_call("https://#@domain}/api/meta", '{"detail":true}')
 
     node.update!(instance_data: json) unless json.nil?
   end

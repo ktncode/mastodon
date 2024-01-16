@@ -40,7 +40,7 @@ class Node < ApplicationRecord
 
   has_many :accounts, primary_key: :domain, foreign_key: :domain, inverse_of: :node
 
-  scope :domain, ->(domain) { where(domain: domain.downcase) if domain.present? }
+  scope :domain, ->(domain) { where(domain: Addressable::URI.parse(domain).normalize.to_s.downcase) if domain.present? }
   scope :software, ->(name) { where("nodeinfo->'software'->>'name' = ?", name.downcase) if name.present? }
   scope :available, -> { where(status: :up).has_nodeinfo }
   scope :has_nodeinfo, -> { where("not(nodeinfo ? 'error' and nodeinfo->>'error' = 'missing')") }
@@ -160,10 +160,11 @@ class Node < ApplicationRecord
 
   class << self
     def find_domain(domain)
-      self.find_by(domain: domain)
+      self.find_by(domain: Addressable::URI.parse(domain).normalize.to_s)
     end
 
     def resolve_domain(domain, **options)
+      domain = Addressable::URI.parse(domain).normalize.to_s
       UpdateNodeService.new.call(domain, **options)
       find_domain(domain)
     rescue
