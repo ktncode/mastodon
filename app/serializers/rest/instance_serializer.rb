@@ -72,7 +72,7 @@ class REST::InstanceSerializer < ActiveModel::Serializer
 
       statuses: {
         max_characters: StatusLengthValidator::MAX_CHARS,
-        max_media_attachments: 4,
+        max_media_attachments: Setting.attachments_max,
         characters_reserved_per_url: StatusLengthValidator::URL_PLACEHOLDER_CHARS,
         min_expiration: TimeLimit::VALID_DURATION.min,
         max_expiration: TimeLimit::VALID_DURATION.max,
