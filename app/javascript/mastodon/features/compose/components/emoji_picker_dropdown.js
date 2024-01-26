@@ -8,7 +8,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
-import { pickerEmojiSize } from 'mastodon/initial_state';
+import { pickerEmojiSize, disableAutoFocusToEmojiSearch } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -283,7 +283,7 @@ class EmojiPickerMenu extends React.PureComponent {
           showSkinTones={false}
           backgroundImageFn={backgroundImageFn}
           notFound={notFoundFn}
-          autoFocus
+          autoFocus={!disableAutoFocusToEmojiSearch}
           emojiTooltip
         />
 

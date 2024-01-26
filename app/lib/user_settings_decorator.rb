@@ -117,6 +117,7 @@ class UserSettingsDecorator
     hide_reblogged_by
     enable_status_polling
     enable_status_polling_intersection
+    disable_auto_focus_to_emoji_search
   ).freeze
 
   STRING_KEYS = %w(

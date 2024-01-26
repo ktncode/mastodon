@@ -169,6 +169,7 @@ defaults: &defaults
   hide_reblogged_by: false
   enable_status_polling: false
   enable_status_polling_intersection: false
+  disable_auto_focus_to_emoji_search: false
 
 development:
   <<: *defaults

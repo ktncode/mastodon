@@ -75,6 +75,7 @@ en:
         setting_default_search_searchability: For clients that do not support advanced range settings, switch the settings here. Mastodon's standard behavior is "Reacted-users-only". Targeting "Public" makes it easier to discover unknown information, but if the results are noisy, narrowing the search range is effective.
         setting_default_sensitive: Sensitive media is hidden by default and can be revealed with a click
         setting_disable_account_delete: Restrict account deletion due to temporary hesitation
+        setting_disable_auto_focus_to_emoji_search: Disable autofocus on the search field of the emoji picker to deal with cases where autocomplete candidates appear and interfere with the search
         setting_disable_block: Restricts you from accidentally blocking
         setting_disable_clear_all_notifications: Restrict clearing all notifications
         setting_disable_domain_block: Restrict domain blocking
@@ -299,6 +300,7 @@ en:
         setting_delete_modal: Show confirmation dialog before deleting a post
         setting_delete_scheduled_status_modal: Show confirmation dialog before removing a scheduled status
         setting_disable_account_delete: Disable account delete
+        setting_disable_auto_focus_to_emoji_search: Disable autofocus on the search field in the emoji picker
         setting_disable_block: Disable block
         setting_disable_clear_all_notifications: Disable clear all notifications
         setting_disable_domain_block: Disable domain block

@@ -153,7 +153,7 @@ class User < ApplicationRecord
            :unlocked_for_official_app, :use_low_resolution_thumbnails, :use_fullsize_avatar_on_detail, :use_fullsize_header_on_detail,
            :hide_following_from_yourself, :hide_followers_from_yourself, :hide_joined_date_from_yourself, :hide_reaction_counter,
            :hide_list_of_emoji_reactions_to_posts, :hide_list_of_favourites_to_posts, :hide_list_of_reblogs_to_posts, :hide_list_of_referred_by_to_posts,    
-           :hide_reblogged_by, :enable_status_polling, :enable_status_polling_intersection,
+           :hide_reblogged_by, :enable_status_polling, :enable_status_polling_intersection, :disable_auto_focus_to_emoji_search,
 
            to: :settings, prefix: :setting, allow_nil: false
 

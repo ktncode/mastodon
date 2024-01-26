@@ -188,6 +188,9 @@
     .fields-group
       = f.input :setting_enable_status_polling_intersection, as: :boolean, wrapper: :with_label, beta_features: true
 
+  .fields-group
+    = f.input :setting_disable_auto_focus_to_emoji_search, as: :boolean, wrapper: :with_label, fedibird_features: true
+
   %h4= t 'preferences.public_timelines'
 
   .fields-group

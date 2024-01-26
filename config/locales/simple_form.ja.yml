@@ -71,6 +71,7 @@ ja:
         setting_default_search_searchability: 範囲の詳細設定に対応していないクライアントでは、ここで設定を切り替えてください。Mastodonの標準動作は『リアクション限定』です。『公開』を対象にすると未知の情報を発見しやすくなりますが、結果にノイズが多い場合は検索範囲を狭めると効果的です。
         setting_default_sensitive: 閲覧注意状態のメディアはデフォルトでは内容が伏せられ、クリックして初めて閲覧できるようになります
         setting_disable_account_delete: 一時的な迷いでアカウント削除することを防ぎます
+        setting_disable_auto_focus_to_emoji_search: オートコンプリート候補が出て邪魔をするケースに対応するため、絵文字ピッカーの検索欄へのオートフォーカスを無効にします
         setting_disable_block: 誤ってブロックすることを防ぎます
         setting_disable_clear_all_notifications: 通知の全消去を防ぎます
         setting_disable_domain_block: 誤ってドメインブロックを実行することを防ぎます
@@ -295,6 +296,7 @@ ja:
         setting_delete_modal: 投稿を削除する前に確認ダイアログを表示する
         setting_delete_scheduled_status_modal: 予約投稿を削除する前に確認ダイアログを表示する
         setting_disable_account_delete: アカウント削除を無効にする
+        setting_disable_auto_focus_to_emoji_search: 絵文字ピッカーの検索欄へのオートフォーカスを無効にする
         setting_disable_block: ブロックを無効にする
         setting_disable_clear_all_notifications: 通知の全消去を無効にする
         setting_disable_domain_block: ドメインブロックを無効にする

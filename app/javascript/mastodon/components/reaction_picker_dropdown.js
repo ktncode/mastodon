@@ -9,7 +9,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { EmojiPicker as EmojiPickerAsync } from '../features/ui/util/async-components';
 import { buildCustomEmojis, categoriesFromEmojis } from '../features/emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
-import { pickerEmojiSize } from 'mastodon/initial_state';
+import { pickerEmojiSize, disableAutoFocusToEmojiSearch } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -173,7 +173,7 @@ class ReactionPicker extends React.PureComponent {
         showPreview={false}
         showSkinTones={false}
         notFound={notFoundFn}
-        autoFocus
+        autoFocus={!disableAutoFocusToEmojiSearch}
         emojiTooltip
       />
     );

@@ -96,6 +96,7 @@ export const hideListOfReferredByToPosts = getMeta('hide_list_of_referred_by_to_
 export const hideRebloggedBy = getMeta('hide_reblogged_by');
 export const enableStatusPolling = getMeta('enable_status_polling');
 export const enableStatusPollingIntersection = getMeta('enable_status_polling_intersection');
+export const disableAutoFocusToEmojiSearch = getMeta('disable_auto_focus_to_emoji_search');
 
 export const maxChars = initialState?.max_toot_chars ?? 500;
 
