@@ -653,6 +653,7 @@ ja:
         create_and_unresolve: 書き込み、未解決に戻す
         delete: 削除
         placeholder: どのような措置が取られたか、または関連する更新を記述してください…
+      processing: 実行中
       reopen: 未解決に戻す
       report: 通報#%{id}
       reported_account: 報告対象アカウント
@@ -1065,6 +1066,14 @@ ja:
       title: フィルター
     new:
       title: 新規フィルターを追加
+  first_aid:
+    hint_html: 設定の初期化や正常化を行います。
+    reset_counters: フォロー数・投稿数・注目のハッシュタグ使用数を再計算する
+    reset_frequently_used_emojis: よく使う絵文字を初期設定に戻す
+    reset_home_feed: ホームタイムラインを再構築する
+    reset_server_settings: サーバー設定を初期設定に戻す
+    reset_web_settings: WebUIの設定を初期設定に戻す
+    title: 応急処置
   footer:
     developers: 開発者向け
     more: さらに…

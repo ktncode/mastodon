@@ -45,6 +45,8 @@ SimpleNavigation::Configuration.run do |navigation|
       s.item :export, safe_join([fa_icon('cloud-download fw'), t('settings.export')]), settings_export_url
     end
 
+    n.item :first_aid, safe_join([fa_icon('medkit fw'), t('first_aid.title')]), first_aid_url, if: -> { current_user.functional? }
+
     n.item :invites, safe_join([fa_icon('user-plus fw'), t('invites.title')]), invites_path, if: proc { Setting.min_invite_role == 'user' && current_user.functional? }
     n.item :development, safe_join([fa_icon('code fw'), t('settings.development')]), settings_applications_url, if: -> { current_user.functional? }
 

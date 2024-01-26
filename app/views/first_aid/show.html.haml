@@ -1,0 +1,22 @@
+- content_for :page_title do
+  = t('first_aid.title')
+
+%p
+  = t('first_aid.hint_html')
+  %span.fedibird_features Fedibird
+
+.simple_form
+  .fields-group
+    = button_to t('first_aid.reset_server_settings'), { action: :reset_server_settings }, class: 'button', data: { confirm: t('admin.reports.are_you_sure'), disable_with: t('admin.reports.processing') }
+
+  .fields-group
+    = button_to t('first_aid.reset_web_settings'), { action: :reset_web_settings }, class: 'button', data: { confirm: t('admin.reports.are_you_sure'), disable_with: t('admin.reports.processing') }
+
+  .fields-group
+    = button_to t('first_aid.reset_frequently_used_emojis'), { action: :reset_frequently_used_emojis }, class: 'button', data: { confirm: t('admin.reports.are_you_sure'), disable_with: t('admin.reports.processing') }
+
+  .fields-group
+    = button_to t('first_aid.reset_counters'), { action: :reset_counters }, class: 'button', data: { confirm: t('admin.reports.are_you_sure'), disable_with: t('admin.reports.processing') }
+
+  .fields-group
+    = button_to t('first_aid.reset_home_feed'), { action: :reset_home_feed }, class: 'button', data: { confirm: t('admin.reports.are_you_sure'), disable_with: t('admin.reports.processing') }

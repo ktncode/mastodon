@@ -668,6 +668,7 @@ en:
         create_and_unresolve: Reopen with note
         delete: Delete
         placeholder: Describe what actions have been taken, or any other related updates...
+      processing: Processing
       reopen: Reopen report
       report: 'Report #%{id}'
       reported_account: Reported account
@@ -1097,6 +1098,14 @@ en:
       title: Filters
     new:
       title: Add new filter
+  first_aid:
+    hint_html: Reset or normalize settings.
+    reset_counters: Reset the number of follows, posts, featured tags
+    reset_frequently_used_emojis: Reset frequently used emojis
+    reset_home_feed: Reset home timeline
+    reset_server_settings: Reset server settings to default
+    reset_web_settings: Reset web settings to default
+    title: First Aid
   follow_tags:
     add_new: Add
     edit:

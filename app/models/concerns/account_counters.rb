@@ -80,6 +80,15 @@ module AccountCounters
     super || build_account_stat
   end
 
+  def reset_data
+    following_count   = active_relationships.count
+    followers_count   = passive_relationships.count
+    subscribing_count = active_subscribes.count
+    statuses_count    = statuses.counting_visibility.count
+
+    account_stat.save
+  end
+
   private
 
   def save_account_stat
