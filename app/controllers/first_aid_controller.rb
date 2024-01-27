@@ -33,8 +33,8 @@ class FirstAidController < ApplicationController
   end
 
   def reset_counters
-    current_account.reset_data
-    current_account.featured_tags.map(&:reset_data)
+    current_account.recount
+    current_account.featured_tags.map(&:recount)
     redirect_to first_aid_path, notice: I18n.t('generic.changes_saved_msg')
   end
 

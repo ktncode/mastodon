@@ -33,7 +33,7 @@ module Mastodon
       case type
       when 'accounts'
         processed, = parallelize_with_progress(Account.local.includes(:account_stat)) do |account|
-          account.reset_data
+          account.recount
         end
       when 'statuses'
         statuses = Status.includes(:status_stat)

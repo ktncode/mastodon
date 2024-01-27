@@ -80,7 +80,7 @@ module AccountCounters
     super || build_account_stat
   end
 
-  def reset_data
+  def recount
     following_count   = active_relationships.count
     followers_count   = passive_relationships.count
     subscribing_count = active_subscribes.count

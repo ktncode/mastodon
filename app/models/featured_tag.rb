@@ -47,9 +47,8 @@ class FeaturedTag < ApplicationRecord
     update(statuses_count: [0, statuses_count - 1].max, last_status_at: account.statuses.where(visibility: %i(public unlisted)).tagged_with(tag).where.not(id: deleted_status_id).select(:created_at).first&.created_at)
   end
 
-  def reset_data
-    self.statuses_count = account.statuses.where(visibility: %i(public unlisted)).tagged_with(tag).count
-    self.last_status_at = account.statuses.where(visibility: %i(public unlisted)).tagged_with(tag).select(:created_at).first&.created_at
+  def recount
+    reset_data
     save
   end
 
@@ -57,6 +56,11 @@ class FeaturedTag < ApplicationRecord
 
   def set_tag
     self.tag = Tag.find_or_create_by_names(@name)&.first
+  end
+
+  def reset_data
+    self.statuses_count = account.statuses.where(visibility: %i(public unlisted)).tagged_with(tag).count
+    self.last_status_at = account.statuses.where(visibility: %i(public unlisted)).tagged_with(tag).select(:created_at).first&.created_at
   end
 
   def validate_featured_tags_limit
