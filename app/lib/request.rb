@@ -4,22 +4,14 @@ require 'ipaddr'
 require 'socket'
 require 'resolv'
 
-# Use our own timeout class to avoid using HTTP.rb's timeout block
+# Monkey-patch the HTTP.rb timeout class to avoid using a timeout block
 # around the Socket#open method, since we use our own timeout blocks inside
 # that method
 #
 # Also changes how the read timeout behaves so that it is cumulative (closer
 # to HTTP::Timeout::Global, but still having distinct timeouts for other
 # operation types)
-class PerOperationWithDeadline < HTTP::Timeout::PerOperation
-  READ_DEADLINE = 30
-
-  def initialize(*args)
-    super
-
-    @read_deadline = options.fetch(:read_deadline, READ_DEADLINE)
-  end
-
+class HTTP::Timeout::PerOperation
   def connect(socket_class, host, port, nodelay = false)
     @socket = socket_class.open(host, port)
     @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if nodelay
@@ -32,7 +24,7 @@ class PerOperationWithDeadline < HTTP::Timeout::PerOperation
 
   # Read data from the socket
   def readpartial(size, buffer = nil)
-    @deadline ||= Process.clock_gettime(Process::CLOCK_MONOTONIC) + @read_deadline
+    @deadline ||= Process.clock_gettime(Process::CLOCK_MONOTONIC) + @read_timeout
 
     timeout = false
     loop do
@@ -41,8 +33,7 @@ class PerOperationWithDeadline < HTTP::Timeout::PerOperation
       return :eof if result.nil?
 
       remaining_time = @deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      raise HTTP::TimeoutError, "Read timed out after #{@read_timeout} seconds" if timeout
-      raise HTTP::TimeoutError, "Read timed out after a total of #{@read_deadline} seconds" if remaining_time <= 0
+      raise HTTP::TimeoutError, "Read timed out after #{@read_timeout} seconds" if timeout || remaining_time <= 0
       return result if result != :wait_readable
 
       # marking the socket for timeout. Why is this not being raised immediately?
@@ -55,7 +46,7 @@ class PerOperationWithDeadline < HTTP::Timeout::PerOperation
       # timeout. Else, the first timeout was a proper timeout.
       # This hack has to be done because io/wait#wait_readable doesn't provide a value for when
       # the socket is closed by the server, and HTTP::Parser doesn't provide the limit for the chunks.
-      timeout = true unless @socket.to_io.wait_readable([remaining_time, @read_timeout].min)
+      timeout = true unless @socket.to_io.wait_readable(remaining_time)
     end
   end
 end
@@ -76,11 +67,8 @@ class Request
     @verb        = verb
     @url         = Addressable::URI.parse(url).normalize
     @http_client = options.delete(:http_client)
-    @allow_local = options.delete(:allow_local)
-    @full_path   = options.delete(:with_query_string)
-    @options     = options.merge(socket_class: use_proxy? || @allow_local ? ProxySocket : Socket)
-    @options     = @options.merge(timeout_class: PerOperationWithDeadline, timeout_options: TIMEOUT)
-    @options     = @options.merge(proxy_url) if use_proxy?
+    @options     = options.merge(socket_class: use_proxy? ? ProxySocket : Socket)
+    @options     = @options.merge(Rails.configuration.x.http_client_proxy) if use_proxy?
     @headers     = {}
 
     raise Mastodon::HostValidationError, 'Instance does not support hidden service connections' if block_hidden_service?
@@ -150,7 +138,7 @@ class Request
   private
 
   def set_common_headers!
-    @headers[REQUEST_TARGET]    = request_target
+    @headers[REQUEST_TARGET]    = "#{@verb} #{@url.path}"
     @headers['User-Agent']      = Mastodon::Version.user_agent
     @headers['Host']            = @url.host
     @headers['Date']            = Time.now.utc.httpdate
@@ -159,14 +147,6 @@ class Request
 
   def set_digest!
     @headers['Digest'] = "SHA-256=#{Digest::SHA256.base64digest(@options[:body])}"
-  end
-
-  def request_target
-    if @url.query.nil? || !@full_path
-      "#{@verb} #{@url.path}"
-    else
-      "#{@verb} #{@url.path}?#{@url.query}"
-    end
   end
 
   def signature
@@ -199,14 +179,6 @@ class Request
 
   def use_proxy?
     Rails.configuration.x.http_client_proxy.present?
-  end
-
-  def proxy_url
-    if hidden_service? && Rails.configuration.x.http_client_hidden_proxy.present?
-      Rails.configuration.x.http_client_hidden_proxy
-    else
-      Rails.configuration.x.http_client_proxy
-    end
   end
 
   def block_hidden_service?

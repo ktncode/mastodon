@@ -83,24 +83,15 @@ module SignatureVerification
     raise SignatureVerificationError, "Public key not found for key #{signature_params['keyId']}" if account.nil?
 
     signature             = Base64.decode64(signature_params['signature'])
-    compare_signed_string = build_signed_string(include_query_string: true)
+    compare_signed_string = build_signed_string
 
     return account unless verify_signature(account, signature, compare_signed_string).nil?
 
-    # Compatibility quirk with older Mastodon versions
-    compare_signed_string = build_signed_string(include_query_string: false)
-    return actor unless verify_signature(actor, signature, compare_signed_string).nil?
-
-    actor = stoplight_wrap_request { actor_refresh_key!(actor) }
+    account = stoplight_wrap_request { account.possibly_stale? ? account.refresh! : account_refresh_key(account) }
 
     raise SignatureVerificationError, "Public key not found for key #{signature_params['keyId']}" if account.nil?
 
-    compare_signed_string = build_signed_string(include_query_string: true)
-    return actor unless verify_signature(actor, signature, compare_signed_string).nil?
-
-    # Compatibility quirk with older Mastodon versions
-    compare_signed_string = build_signed_string(include_query_string: false)
-    return actor unless verify_signature(actor, signature, compare_signed_string).nil?
+    return account unless verify_signature(account, signature, compare_signed_string).nil?
 
     @signature_verification_failure_reason = "Verification failed for #{account.username}@#{account.domain} #{account.uri} using rsa-sha256 (RSASSA-PKCS1-v1_5 with SHA-256)"
     @signed_request_account = nil
@@ -159,24 +150,16 @@ module SignatureVerification
     nil
   end
 
-  def build_signed_string(include_query_string: true)
+  def build_signed_string
     signed_headers.map do |signed_header|
-      case signed_header
-      when Request::REQUEST_TARGET
-        if include_query_string
-          "#{Request::REQUEST_TARGET}: #{request.method.downcase} #{request.original_fullpath}"
-        else
-          # Current versions of Mastodon incorrectly omit the query string from the (request-target) pseudo-header.
-          # Therefore, temporarily support such incorrect signatures for compatibility.
-          # TODO: remove eventually some time after release of the fixed version
-          "#{Request::REQUEST_TARGET}: #{request.method.downcase} #{request.path}"
-        end
-      when '(created)'
+      if signed_header == Request::REQUEST_TARGET
+        "#{Request::REQUEST_TARGET}: #{request.method.downcase} #{request.path}"
+      elsif signed_header == '(created)'
         raise SignatureVerificationError, 'Invalid pseudo-header (created) for rsa-sha256' unless signature_algorithm == 'hs2019'
         raise SignatureVerificationError, 'Pseudo-header (created) used but corresponding argument missing' if signature_params['created'].blank?
 
         "(created): #{signature_params['created']}"
-      when '(expires)'
+      elsif signed_header == '(expires)'
         raise SignatureVerificationError, 'Invalid pseudo-header (expires) for rsa-sha256' unless signature_algorithm == 'hs2019'
         raise SignatureVerificationError, 'Pseudo-header (expires) used but corresponding argument missing' if signature_params['expires'].blank?
 
