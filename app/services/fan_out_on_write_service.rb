@@ -13,9 +13,11 @@ class FanOutOnWriteService < BaseService
       return
     elsif status.direct_visibility?
       deliver_to_mentioned_followers(status)
+      deliver_to_mentioned_lists(status)
       deliver_to_own_conversation(status)
     elsif status.limited_visibility?
       deliver_to_mentioned_followers(status)
+      deliver_to_mentioned_lists(status)
     else
       deliver_to_followers(status)
       deliver_to_lists(status)
@@ -159,12 +161,32 @@ class FanOutOnWriteService < BaseService
     end
   end
 
+  def hide_direct_account_ids
+    User.where(id: Setting.unscoped.where(thing_type: 'User', var: 'hide_direct_from_timeline', value: YAML.dump(true)).select(:thing_id)).select(:account_id)
+  end
+
   def deliver_to_mentioned_followers(status)
     Rails.logger.debug "Delivering status #{status.id} to limited followers"
 
-    status.mentions.joins(:account).merge(status.account.followers_for_local_distribution).select(:id, :account_id).reorder(nil).find_in_batches do |mentions|
+    mentions = status.mentions.joins(:account).merge(status.account.followers_for_local_distribution)
+    mentions = mentions.where.not(account_id: hide_direct_account_ids) if status.direct_visibility?
+
+    mentions.select(:id, :account_id).reorder(nil).find_in_batches do |mentions|
       FeedInsertWorker.push_bulk(mentions) do |mention|
         [status.id, mention.account_id, :home]
+      end
+    end
+  end
+
+  def deliver_to_mentioned_lists(status)
+    Rails.logger.debug "Delivering status #{status.id} to lists in limited followers"
+
+    lists = status.account.lists_for_mentioned_local_distribution(status)
+    lists = lists.where.not(account_id: hide_direct_account_ids) if status.direct_visibility?
+
+    lists.select(:id).reorder(nil).find_in_batches do |lists|
+      FeedInsertWorker.push_bulk(lists) do |list|
+        [status.id, list.id, :list]
       end
     end
   end

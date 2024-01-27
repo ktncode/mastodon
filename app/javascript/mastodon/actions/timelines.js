@@ -60,7 +60,7 @@ export function updateTimeline(timeline, status, accept) {
     const limitedVisibilities = getLimitedVisibilities(getState());
 
     if (timeline === 'home') {
-      if (homeVisibilities.length || homeVisibilities.includes(visibility)) {
+      if (homeVisibilities.includes(visibility)) {
         insertTimeline('home');
         dispatch(submitMarkers());
       }

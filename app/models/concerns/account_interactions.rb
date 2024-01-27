@@ -240,6 +240,12 @@ module AccountInteractions
          .where('users.current_sign_in_at > ?', User::ACTIVE_DURATION.ago)
   end
 
+  def lists_for_mentioned_local_distribution(status)
+    lists.where(account_id: status.mentions.pluck(:account_id) + [id])
+         .joins(account: :user)
+         .where('users.current_sign_in_at > ?', User::ACTIVE_DURATION.ago)
+  end
+
   def list_subscribers_for_local_distribution
     AccountSubscribe.list
                     .joins(account: :user)
