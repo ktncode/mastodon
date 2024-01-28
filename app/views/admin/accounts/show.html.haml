@@ -106,6 +106,14 @@
               = table_link_to 'angle-double-down', t('admin.accounts.demote'), demote_admin_account_role_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:demote, @account.user)
 
           %tr
+            %th= t('admin.accounts.priority')
+            %td= t("admin.accounts.priorities.#{@account.priority}")
+            %td
+              = table_link_to 'angle-double-up', t('admin.accounts.change_priorities.high'), high_admin_account_priority_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_high_priority, @account)
+              = table_link_to 'angle-double-right', t('admin.accounts.change_priorities.default'), default_admin_account_priority_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_default_priority, @account)
+              = table_link_to 'angle-double-down', t('admin.accounts.change_priorities.low'), low_admin_account_priority_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_low_priority, @account)
+
+          %tr
             %th{ rowspan: can?(:create, :email_domain_block) ? 3 : 2 }= t('admin.accounts.email')
             %td{ rowspan: can?(:create, :email_domain_block) ? 3 : 2 }= @account.user_email
             %td= table_link_to 'edit', t('admin.accounts.change_email.label'), admin_account_change_email_path(@account.id) if can?(:change_email, @account.user)
@@ -200,6 +208,14 @@
             %td
               - if @domain_block.nil?
                 = table_link_to 'ban', t('admin.domain_blocks.add_new'), new_admin_domain_block_path(_domain: @account.domain)
+
+          %tr
+            %th= t('admin.accounts.priority')
+            %td= t("admin.accounts.priorities.#{@account.priority}")
+            %td
+              = table_link_to 'angle-double-up', t('admin.accounts.change_priorities.high'), high_admin_account_priority_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_high_priority, @account)
+              = table_link_to 'angle-double-right', t('admin.accounts.change_priorities.default'), default_admin_account_priority_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_default_priority, @account)
+              = table_link_to 'angle-double-down', t('admin.accounts.change_priorities.low'), low_admin_account_priority_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_low_priority, @account)
 
   - if @account.suspended?
     %hr.spacer/

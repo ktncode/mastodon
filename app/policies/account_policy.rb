@@ -61,6 +61,18 @@ class AccountPolicy < ApplicationPolicy
     admin?
   end
 
+  def change_default_priority?
+    admin? && !record.default_priority?
+  end
+
+  def change_high_priority?
+    admin? && !record.high_priority?
+  end
+
+  def change_low_priority?
+    admin? && !record.low_priority?
+  end
+
   def memorialize?
     admin? && !record.user&.admin? && !record.instance_actor?
   end

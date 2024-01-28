@@ -115,9 +115,14 @@ ja:
         new_email: 新しいメールアドレス
         submit: メールアドレスの変更
         title: "%{username} さんのメールアドレスを変更"
+      change_priorities:
+        default: 優先度（通常）へ変更
+        high: 優先度（高）へ変更
+        low: 優先度（低）へ変更
       confirm: 確認
       confirmed: 確認済み
       confirming: 確認中
+      default_priority_msg: "%{username} を優先度（通常）に更新しました"
       delete: データを削除する
       deleted: 削除済み
       demote: 降格
@@ -138,6 +143,7 @@ ja:
       hard_silence: ハードサイレンス
       hard_silenced: ハードサイレンス済み
       header: ヘッダー
+      high_priority_msg: "%{username} を優先度（高）に更新しました"
       inbox_url: Inbox URL
       invite_request_text: 意気込み
       invited_by: 招待した人
@@ -149,6 +155,7 @@ ja:
         remote: リモート
         title: ロケーション
       login_status: ログイン
+      low_priority_msg: "%{username} を優先度（低）に更新しました"
       media_attachments: 添付されたメディア
       memorialize: 追悼アカウント化
       memorialized: 追悼化済み
@@ -171,6 +178,11 @@ ja:
       pending: 承認待ち
       perform_full_suspension: 活動を完全に停止させる
       promote: 昇格
+      priority: 優先度
+      priorities:
+        default: 通常
+        high: 高
+        low: 低
       protocol: プロトコル
       public: パブリック
       push_subscription_expires: PuSH購読期限
@@ -240,6 +252,7 @@ ja:
         create_email_domain_block: メールドメインブロックを作成
         create_ip_block: IPルールを作成
         create_unavailable_domain: 配送できないドメインを作成
+        default_priority_account: アカウントを優先度（通常）に変更
         demote_user: ユーザーを降格
         destroy_announcement: お知らせを削除
         destroy_custom_emoji: カスタム絵文字を削除
@@ -256,6 +269,8 @@ ja:
         enable_user: ユーザーを有効化
         expire_status: 投稿を公開終了
         hard_silence_account: アカウントをハードサイレンス
+        high_priority_account: アカウントを優先度（高）に変更
+        low_priority_account: アカウントを優先度（低）に変更
         memorialize_account: 追悼アカウント化
         promote_user: ユーザーを昇格
         remove_avatar_user: アイコンを削除
@@ -285,6 +300,7 @@ ja:
         create_email_domain_block_html: "%{name} さんが %{target} をメールドメインブロックに追加しました"
         create_ip_block_html: "%{name} さんが IP %{target} のルールを作成しました"
         create_unavailable_domain_html: "%{name} がドメイン %{target} への配送を停止しました"
+        default_priority_account_html: "%{name} さんが %{target} さんを優先度（通常）に変更しました"
         demote_user_html: "%{name} さんが %{target} さんを降格しました"
         destroy_announcement_html: "%{name} さんがお知らせ %{target} を削除しました"
         destroy_custom_emoji_html: "%{name} さんがカスタム絵文字 %{target} を削除しました"
@@ -301,6 +317,8 @@ ja:
         enable_user_html: "%{name} さんが %{target} さんのログインを有効化しました"
         expire_status_html: "%{name} さんが %{target} さんの投稿を公開終了しました"
         hard_silence_account_html: "%{name} さんが %{target} さんをハードサイレンスにしました"
+        high_priority_account_html: "%{name} さんが %{target} さんを優先度（高）に変更しました"
+        low_priority_account_html: "%{name} さんが %{target} さんを優先度（低）に変更しました"
         memorialize_account_html: "%{name} さんが %{target} さんを追悼アカウントページに登録しました"
         promote_user_html: "%{name} さんが %{target} さんを昇格しました"
         remove_avatar_user_html: "%{name} さんが %{target} さんのアイコンを削除しました"

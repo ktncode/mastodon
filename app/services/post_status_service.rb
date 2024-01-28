@@ -153,7 +153,9 @@ class PostStatusService < BaseService
   end
 
   def postprocess_status!
-    DistributionWorker.perform_async(@status.id)
+    @account.high_priority? ?
+      PriorityDistributionWorker.perform_async(@status.id) :
+      DistributionWorker.perform_async(@status.id)
     ActivityPub::DistributionWorker.perform_async(@status.id) unless @status.personal_visibility?
     PollExpirationNotifyWorker.perform_at(@status.poll.expires_at, @status.poll.id) if @status.poll
     @status.status_expire.queue_action if expires_soon?

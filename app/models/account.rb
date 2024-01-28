@@ -54,6 +54,7 @@
 #  avatar_thumbhash              :string
 #  header_thumbhash              :string
 #  indexable                     :boolean          default(FALSE), not null
+#  priority                      :integer          default(0), not null
 #
 
 class Account < ApplicationRecord
@@ -96,6 +97,7 @@ class Account < ApplicationRecord
   enum suspension_origin: [:local, :remote], _prefix: true
   enum silence_mode: { soft: 0, hard: 1 }, _suffix: :silence_mode
   enum searchability: { public: 0, unlisted: 1, private: 2, direct: 3, limited: 4, mutual: 100, personal: 200 }, _suffix: :searchability
+  enum priority: { default: 0, high: 1, low: 2 }, _suffix: true
 
   validates :username, presence: true
   validates_with UniqueUsernameValidator, if: -> { will_save_change_to_username? }

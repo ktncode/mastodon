@@ -296,6 +296,14 @@ Rails.application.routes.draw do
           post :demote
         end
       end
+
+      resource :priority, only: [] do
+        member do
+          post :default
+          post :high
+          post :low
+        end
+      end
     end
 
     resources :pending_accounts, only: [:index] do

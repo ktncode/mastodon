@@ -142,7 +142,9 @@ class ActivityPub::Activity
   end
 
   def distribute_to_followers(status)
-    ::DistributionWorker.perform_async(status.id)
+    status.account.high_priority? ?
+      PriorityDistributionWorker.perform_async(status.id) :
+      DistributionWorker.perform_async(status.id)
   end
 
   def delete_arrived_first?(uri)
@@ -315,7 +317,9 @@ class ActivityPub::Activity
 
     return unless delivered_to_account.following?(@account)
 
-    FeedInsertWorker.perform_async(@status.id, delivered_to_account.id, :home)
+    @account.high_priority? ?
+      PriorityFeedInsertWorker.perform_async(@status.id, delivered_to_account.id, :home) :
+      FeedInsertWorker.perform_async(@status.id, delivered_to_account.id, :home)
   end
 
   def visibility_from_audience

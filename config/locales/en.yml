@@ -121,9 +121,14 @@ en:
         new_email: New email
         submit: Change email
         title: Change email for %{username}
+      change_priorities:
+        default: Change default priority
+        high: Change high priority
+        low: Change low priority
       confirm: Confirm
       confirmed: Confirmed
       confirming: Confirming
+      default_priority_msg: Successfully changed %{username} to default priority
       delete: Delete data
       deleted: Deleted
       demote: Demote
@@ -146,6 +151,7 @@ en:
       hard_silence: Hard limit
       hard_silenced: Hard limited
       header: Header
+      high_priority_msg: Successfully changed %{username} to high priority
       inbox_url: Inbox URL
       invite_request_text: Reasons for joining
       invited_by: Invited by
@@ -157,6 +163,7 @@ en:
         remote: Remote
         title: Location
       login_status: Login status
+      low_priority_msg: Successfully changed %{username} to low priority
       media_attachments: Media attachments
       memorialize: Turn into memoriam
       memorialized: Memorialized
@@ -178,6 +185,11 @@ en:
       pending: Pending review
       perform_full_suspension: Suspend
       promote: Promote
+      priority: Priority
+      priorities:
+        default: Default
+        high: High
+        low: Low
       protocol: Protocol
       public: Public
       push_subscription_expires: PuSH subscription expires
@@ -251,6 +263,7 @@ en:
         create_email_domain_block: Create E-mail Domain Block
         create_ip_block: Create IP rule
         create_unavailable_domain: Create Unavailable Domain
+        default_priority_account: Change Account default priority
         demote_user: Demote User
         destroy_announcement: Delete Announcement
         destroy_custom_emoji: Delete Custom Emoji
@@ -269,6 +282,8 @@ en:
         enable_user: Enable User
         expire_status: Close Post
         hard_silence_account: Hard limit Account
+        high_priority_account: Change Account high priority
+        low_priority_account: Change Account low priority
         memorialize_account: Memorialize Account
         promote_user: Promote User
         remove_avatar_user: Remove Avatar
@@ -298,6 +313,7 @@ en:
         create_email_domain_block_html: "%{name} blocked e-mail domain %{target}"
         create_ip_block_html: "%{name} created rule for IP %{target}"
         create_unavailable_domain_html: "%{name} stopped delivery to domain %{target}"
+        default_priority_account_html: "%{name} changed default priority %{target}'s account"
         demote_user_html: "%{name} demoted user %{target}"
         destroy_announcement_html: "%{name} deleted announcement %{target}"
         destroy_custom_emoji_html: "%{name} destroyed emoji %{target}"
@@ -316,6 +332,8 @@ en:
         enable_user_html: "%{name} enabled login for user %{target}"
         expire_status_html: "%{name} closed post by %{target}"
         hard_silence_account_html: "%{name} hard limited %{target}'s account"
+        high_priority_account_html: "%{name} changed high priority %{target}'s account"
+        low_priority_account_html: "%{name} changed low priority %{target}'s account"
         memorialize_account_html: "%{name} turned %{target}'s account into a memoriam page"
         promote_user_html: "%{name} promoted user %{target}"
         remove_avatar_user_html: "%{name} removed %{target}'s avatar"

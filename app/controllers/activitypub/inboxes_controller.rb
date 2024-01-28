@@ -71,6 +71,8 @@ class ActivityPub::InboxesController < ActivityPub::BaseController
   end
 
   def process_payload
-    ActivityPub::ProcessingWorker.perform_async(signed_request_account.id, body, @account&.id)
+    signed_request_account.high_priority? ? 
+      ActivityPub::PriorityProcessingWorker.perform_async(signed_request_account.id, body, @account&.id) :
+      ActivityPub::ProcessingWorker.perform_async(signed_request_account.id, body, @account&.id)
   end
 end
