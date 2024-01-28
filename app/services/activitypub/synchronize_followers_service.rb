@@ -59,9 +59,9 @@ class ActivityPub::SynchronizeFollowersService < BaseService
 
     case collection['type']
     when 'Collection', 'CollectionPage'
-      as_array(collection['items'])
+      as_array(collection['items'].presence || collection['orderedItems'].presence || [])
     when 'OrderedCollection', 'OrderedCollectionPage'
-      as_array(collection['orderedItems'])
+      as_array(collection['orderedItems'].presence || collection['items'].presence || [])
     end
   end
 
