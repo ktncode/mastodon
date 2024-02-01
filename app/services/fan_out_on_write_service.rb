@@ -210,7 +210,7 @@ class FanOutOnWriteService < BaseService
   def deliver_to_hashtags(status)
     Rails.logger.debug "Delivering status #{status.id} to hashtags"
 
-    status.tags.pluck(:name).each do |hashtag|
+    status.tags_without_mute.pluck(:name).each do |hashtag|
       Redis.current.publish("timeline:hashtag:#{hashtag.mb_chars.downcase}", @payload)
       Redis.current.publish("timeline:hashtag:nobot:#{hashtag.mb_chars.downcase}", @payload) unless status.account.bot?
     end
@@ -224,13 +224,13 @@ class FanOutOnWriteService < BaseService
   end
 
   def deliver_to_hashtag_followers_home(status)
-    @feedInsertWorker.push_bulk(FollowTag.home.where(tag: status.tags).with_media(status.proper).pluck(:account_id).uniq) do |follower|
+    @feedInsertWorker.push_bulk(FollowTag.home.where(tag: status.tags_without_mute).with_media(status.proper).pluck(:account_id).uniq) do |follower|
       [status.id, follower, :home]
     end
   end
 
   def deliver_to_hashtag_followers_list(status)
-    @feedInsertWorker.push_bulk(FollowTag.list.where(tag: status.tags).with_media(status.proper).pluck(:list_id).uniq) do |list_id|
+    @feedInsertWorker.push_bulk(FollowTag.list.where(tag: status.tags_without_mute).with_media(status.proper).pluck(:list_id).uniq) do |list_id|
       [status.id, list_id, :list]
     end
   end

@@ -87,6 +87,10 @@ module AccountAssociations
 
     # Node
     belongs_to :node, primary_key: :domain, foreign_key: :domain, inverse_of: :accounts, optional: true
+
+    # TagAccountMute
+    has_many :tag_account_mute_relationships, class_name: 'TagAccountMute', inverse_of: :tag, dependent: :destroy
+    has_many :mute_tags, through: :tag_account_mute_relationships, source: :tag
   end
 
   def permitted_group_statuses(account)

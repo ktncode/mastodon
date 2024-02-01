@@ -27,6 +27,7 @@ class TagFeed < PublicFeed
   def get(limit, max_id = nil, since_id = nil, min_id = nil)
     scope = public_scope
 
+    scope.merge!(tag_account_mute_scope)
     scope.merge!(tagged_with_any_scope)
     scope.merge!(tagged_with_all_scope)
     scope.merge!(tagged_with_none_scope)
@@ -40,6 +41,10 @@ class TagFeed < PublicFeed
   end
 
   private
+
+  def tag_account_mute_scope
+    Status.where.not(account: @tag.mute_accounts)
+  end
 
   def tagged_with_any_scope
     Status.group(:id).tagged_with(tags_for(Array(@tag.name) | Array(options[:any])))

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_01_28_004949) do
+ActiveRecord::Schema.define(version: 2024_02_01_030756) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -1104,6 +1104,15 @@ ActiveRecord::Schema.define(version: 2024_01_28_004949) do
     t.float "max_score"
     t.datetime "max_score_at"
     t.index "lower((name)::text) text_pattern_ops", name: "index_tags_on_name_lower_btree", unique: true
+  end
+
+  create_table "tag_account_mutes", force: :cascade do |t|
+    t.bigint "tag_id"
+    t.bigint "account_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id"], name: "index_tag_account_mutes_on_account_id"
+    t.index ["tag_id"], name: "index_tag_account_mutes_on_tag_id"
   end
 
   create_table "tombstones", force: :cascade do |t|

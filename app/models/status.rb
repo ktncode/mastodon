@@ -653,6 +653,10 @@ class Status < ApplicationRecord
     super || build_status_stat
   end
 
+  def tags_without_mute
+    tags.merge(Tag.where.not(id: account.mute_tags.select(:id)))
+  end
+
   private
 
   def set_status_expire

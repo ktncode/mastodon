@@ -26,6 +26,8 @@ class Tag < ApplicationRecord
   has_many :follow_tags, dependent: :destroy, inverse_of: :tag
   has_many :passive_relationships, class_name: 'FollowTag', inverse_of: :tag, dependent: :destroy
   has_many :followers, through: :passive_relationships, source: :account
+  has_many :tag_account_mute_relationships, class_name: 'TagAccountMute', inverse_of: :tag, dependent: :destroy
+  has_many :mute_accounts, through: :tag_account_mute_relationships, source: :account
 
   HASHTAG_SEPARATORS = "_\u00B7\u30FB\u200c"
   HASHTAG_FIRST_SEQUENCE_CHUNK_ONE = "[[:word:]_][[:word:]#{HASHTAG_SEPARATORS}]*[[:alpha:]#{HASHTAG_SEPARATORS}]"
