@@ -68,6 +68,9 @@ class Node < ApplicationRecord
       koyuspace
       ecko
       brighteon
+      kmyblue
+      yoiyami
+      glitchcafe
     ),
     'misskey' => %w(
       meisskey
@@ -76,9 +79,25 @@ class Node < ApplicationRecord
       foundkey
       groundpolis
       groundpolis-milkey
+      firefish
+      sharkey
+      iceshrimp
+      cherrypick
+      catodon
+      incestoma
+      nexkey
+      rosekey
+      hajkey
+      rumisskey
+      noyaskey
+      goblin
+      magnetar
+      lycheebridge
     ),
     'pleroma' => %w(
       akkoma
+      incestoma
+      pleroma_anni
     ),
   }
 
