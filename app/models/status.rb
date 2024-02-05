@@ -222,27 +222,31 @@ class Status < ApplicationRecord
   end
 
   def compute_searchability
-    searchability || Status.searchabilities.invert.fetch([Account.searchabilities[account.searchability], Status.visibilities[visibility] || 0].max, nil) || 'direct'
+    searchability || Status.searchabilities.invert.fetch([Account.searchabilities[account.searchability], Status.visibilities[compatible_visibility] || 0].max, nil) || 'direct'
   end
 
   def standard_visibility?
     STANDARD_VISIBILITY.include?(visibility)
   end
-  
+
   def follower_visibility?
     FOLLOWER_VISIBILITY.include?(visibility)
   end
-  
+
   def extra_visibility?
     EXTRA_VISIBILITY.include?(visibility)
   end
-  
+
   def pseudo_visibility?
     PSEUDO_VISIBILITY.include?(visibility)
   end
-  
+
   def uncount_visibility?
     UNCOUNT_VISIBILITY.include?(visibility)
+  end
+
+  def compatible_visibility
+    account.node&.info&.fetch('upstream_name', '') == 'misskey' && unlisted_visibility? ? 'public' : visibility
   end
 
   def reply?
