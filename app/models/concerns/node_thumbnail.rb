@@ -57,9 +57,9 @@ module NodeThumbnail
         styles[:tiny_static] = styles[:static].merge({
           pixels: 40_000, # 200x200px
         })
-
-        styles
       end
+
+      styles
     end
 
     private :thumbnail_styles
