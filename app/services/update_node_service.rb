@@ -73,21 +73,21 @@ class UpdateNodeService < BaseService
 
     if build.blank?
       {
-        'upstream_name'    => nodeinfo('metadata', 'upstream', 'name')&.downcase || Node.upstream(software) || software,
+        'upstream_name'    => nodeinfo('metadata', 'upstream', 'name')&.downcase || Node.upstreams(software) || software,
         'upstream_version' => nodeinfo('metadata', 'upstream', 'version') || core,
         'software_name'    => software,
         'software_version' => core,
       }
     elsif /^[\d\.]$/i.match?(build)
       {
-        'upstream_name'    => Node.upstream(software) || software,
+        'upstream_name'    => Node.upstreams(software) || software,
         'upstream_version' => build,
         'software_name'    => software,
         'software_version' => core,
       }
     else
       {
-        'upstream_name'    => Node.upstream(software) || software,
+        'upstream_name'    => Node.upstreams(software) || software,
         'upstream_version' => core,
         'software_name'    => software,
         'software_version' => version,
@@ -266,7 +266,7 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_misskey_instance_data
-    json = misskey_api_call("https://#@domain}/api/meta", '{"detail":true}')
+    json = misskey_api_call("https://#{@domain}/api/meta", '{"detail":true}')
 
     node.update!(instance_data: json) unless json.nil?
   end

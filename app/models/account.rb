@@ -142,6 +142,8 @@ class Account < ApplicationRecord
   scope :by_domain_and_subdomains, ->(domain) { where(domain: domain).or(where(arel_table[:domain].matches('%.' + domain))) }
   scope :not_excluded_by_account, ->(account) { where.not(id: account.excluded_from_timeline_account_ids) }
   scope :not_domain_blocked_by_account, ->(account) { where(arel_table[:domain].eq(nil).or(arel_table[:domain].not_in(account.excluded_from_timeline_domains))) }
+  scope :software, ->(name) { where(domain: Node.software(name).select(:domain)) }
+  scope :upstream, ->(name) { where(domain: Node.upstream(name).select(:domain)) }
 
   delegate :email,
            :unconfirmed_email,
