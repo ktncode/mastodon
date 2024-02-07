@@ -28,6 +28,11 @@ module AccountCounters
   end
 
   # @param [Symbol] key
+  def touch_count!(key)
+    update_count!(key, 0)
+  end
+
+  # @param [Symbol] key
   def decrement_count!(key)
     update_count!(key, -1)
   end
@@ -45,7 +50,7 @@ module AccountCounters
     # not seem to support writing expressions in the UPDATE clause, but only
     # re-insert the provided values instead.
     # Even ARel seem to be missing proper handling of upserts.
-    sql = if value.positive? && key == :statuses_count
+    sql = if !value.negative? && key == :statuses_count
             <<-SQL.squish
               INSERT INTO account_stats(account_id, #{key}, created_at, updated_at, last_status_at)
                 VALUES (:account_id, :default_value, now(), now(), now())
@@ -85,6 +90,9 @@ module AccountCounters
     followers_count   = passive_relationships.count
     subscribing_count = active_subscribes.count
     statuses_count    = statuses.counting_visibility.count
+    last_status_at    = statuses.counting_visibility.first&.updated_at
+    created_at        = last_status_at
+    updated_at        = last_status_at
 
     account_stat.save
   end

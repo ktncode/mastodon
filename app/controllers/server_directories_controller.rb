@@ -20,6 +20,6 @@ class ServerDirectoriesController < ApplicationController
   end
 
   def set_servers
-    @servers = Node.available.page(params[:page]).per(15)
+    @servers = Node.available.order(Arel.sql("info->'last_week_active_users_in_cache' desc nulls last")).page(params[:page]).per(15)
   end
 end

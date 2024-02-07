@@ -753,6 +753,7 @@ class Status < ApplicationRecord
   def increment_counter_caches
     return if uncount_visibility?
 
+    account&.touch_count!(:statuses_count) if fetch
     account&.increment_count!(:statuses_count) unless fetch
     reblog&.increment_count!(:reblogs_count) if reblog?
     thread&.increment_count!(:replies_count) if in_reply_to_id.present? && distributable?

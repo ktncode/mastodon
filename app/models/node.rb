@@ -39,6 +39,7 @@ class Node < ApplicationRecord
   enum status: { up: 0, gone: 1, reject: 2, busy: 3, not_found: 4, error: 5, no_address: 6 }, _suffix: :status
 
   has_many :accounts, primary_key: :domain, foreign_key: :domain, inverse_of: :node
+  has_one :instance, primary_key: :domain, foreign_key: :domain, inverse_of: :node
 
   scope :domain, ->(domain) { where(domain: Addressable::URI.parse(domain).normalize.to_s.downcase) if domain.present? }
   scope :software, ->(name) { where("nodeinfo->'software'->>'name' = ?", name.downcase) if name.present? }

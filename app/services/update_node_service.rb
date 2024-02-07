@@ -116,12 +116,17 @@ class UpdateNodeService < BaseService
       'languages'         => info('languages').presence || instance('languages').presence || instance('langs').presence || [],
       'registrations'     => nodeinfo('openRegistrations') || (instance('registrations').is_a?(Hash) ? instance('registrations', 'enabled') : instance('registrations')) || instance('features', 'registration'),
       'approval_required' => instance('registrations').is_a?(Hash) ? instance('registrations', 'approval_required') : nil,
-      'total_users'       => nodeinfo('usage', 'users', 'total') || instance('stats', 'user_count'),
+      'total_users'       => nodeinfo('usage', 'users', 'total') || instance('stats', 'user_count') || Instance.find(@domain)&.accounts_count,
       'last_week_users'   => nodeinfo('usage', 'users', 'activeMonth') || instance('usage', 'users', 'active_month') || instance('pleroma', 'stats', 'mau'),
+      'last_week_active_users_in_cache' => last_week_users_local,
       'name'              => nodeinfo('metadata', 'nodeName').presence || instance('name').presence || instance('title').presence || instance('name').presence,
       'url'               => full_uri(instance('domain').presence || instance('uri').presence || @domain),
       'theme_color'       => nodeinfo('metadata', 'themeColor').presence || instance('themeColor').presence,
     })
+  end
+
+  def last_week_users_local
+    Account.joins(:account_stat).where(domain: @domain == Rails.configuration.x.local_domain ? nil : @domain).group(:domain).order(total_active_posters: :desc).without_suspended.without_silenced.without_instance_actor.without_bots.where(account_stat: {last_status_at: 1.week.ago..}).select('domain, count(*) total_active_posters').take&.total_active_posters
   end
 
   def full_uri(domain)
@@ -154,7 +159,9 @@ class UpdateNodeService < BaseService
 
     node.thumbnail_remote_url = nil if @options[:force]
     node.thumbnail_remote_url = remote_url
-  rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
+    raise Mastodon::ValidationError if node.errors[:thumbnail].present?
+  rescue Mastodon::UnexpectedResponseError, Mastodon::ValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
+    node.thumbnail = nil
   end
 
   def process_icon
@@ -162,7 +169,9 @@ class UpdateNodeService < BaseService
 
     node.icon_remote_url = nil if @options[:force]
     node.icon_remote_url = remote_url
-  rescue Mastodon::UnexpectedResponseError, Mastodon::LengthValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
+    raise Mastodon::ValidationError if node.errors[:icon].present?
+  rescue Mastodon::UnexpectedResponseError, Mastodon::ValidationError, Mastodon::LengthValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
+    node.icon = nil
   end
 
   def process_override
