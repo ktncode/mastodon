@@ -178,8 +178,12 @@ class UpdateNodeService < BaseService
     node.info.merge!(node.info_override || {})
   end
 
+  def replace_api_domain(url)
+    url.sub(@domain, @api_domain) if @domain != @api_domain
+  end
+
   def fetch_icon_url
-    doc = Nokogiri::HTML(html_fetch(info('url')))
+    doc = Nokogiri::HTML(html_fetch(replace_api_domain(info('url'))) || html_fetch(info('url')))
     uri = Addressable::URI.parse(
             doc.css("meta[itemprop*=image]")&.first&.attributes&.fetch('content', nil)&.value ||
             doc.css("link[rel*=apple-touch-icon]")&.first&.attributes&.fetch('href', nil)&.value ||
@@ -221,6 +225,8 @@ class UpdateNodeService < BaseService
       nodeinfo_url ||= well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_0_REL }&.fetch('href', nil)
     end
 
+    @api_domain = Addressable::URI.parse(nodeinfo_url).normalize.host
+
     node.nodeinfo        = nodeinfo_url.present? ? json_fetch(nodeinfo_url, true) : Node::ERROR_MISSING
     node.info            = process_software
     node.status          = :up
@@ -254,8 +260,8 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_mastodon_instance_data
-    instance_v2 = "https://#{@domain}/api/v2/instance"
-    instance_v1 = "https://#{@domain}/api/v1/instance"
+    instance_v2 = "https://#{@api_domain}/api/v2/instance"
+    instance_v1 = "https://#{@api_domain}/api/v1/instance"
 
     major, minor, patch = node.upstream_version&.split('.')&.map(&:to_i)
 
@@ -266,7 +272,7 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_misskey_instance_data
-    json = misskey_api_call("https://#{@domain}/api/meta", '{"detail":true}')
+    json = misskey_api_call("https://#{@api_domain}/api/meta", '{"detail":true}')
 
     node.update!(instance_data: json) unless json.nil?
   end
