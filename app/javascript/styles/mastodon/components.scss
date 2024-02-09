@@ -6562,6 +6562,7 @@ a.status-card.compact:hover {
       align-items: center;
       background: lighten($ui-base-color, 4%);
       padding: 10px;
+      min-height: 56px;
 
       &__name {
         flex: 1 1 auto;

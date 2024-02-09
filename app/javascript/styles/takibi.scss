@@ -61,7 +61,9 @@ a.column-link,
 .public-layout .public-account-bio,
 .search__input,
 .status.status-direct,
-.status-card .status-card__content {
+.status-card .status-card__content,
+.public-layout .directory__list.server .directory__card,
+.columns-area--mobile .directory__list.server .directory__card {
   background-color: #EEEEEB;
   border: none; /* 縁の線をなくす */
 }
