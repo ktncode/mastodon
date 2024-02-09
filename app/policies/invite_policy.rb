@@ -24,6 +24,10 @@ class InvitePolicy < ApplicationPolicy
   end
 
   def min_required_role?
-    current_user&.role?(Setting.min_invite_role)
+    current_user&.role?(Setting.min_invite_role) && un_silenced?
+  end
+
+  def un_silenced?
+    !current_user&.account&.silenced?
   end
 end
