@@ -9,7 +9,7 @@ class UpdateNodeService < BaseService
   attr_reader :node
   
   def call(domain, **options)
-    @domain   = Addressable::URI.parse(domain).normalize.to_s
+    @domain   = Addressable::URI.parse(domain)&.normalize&.to_s
     @options  = { fetch: true, process: false }.merge(options)
     @node     = Node.find_or_create_by!(domain: @domain)
 
@@ -20,24 +20,6 @@ class UpdateNodeService < BaseService
   end
 
   private
-
-  def nodeinfo(*args)
-    node&.nodeinfo&.dig(*args)
-  rescue
-    nil
-  end
-
-  def instance(*args)
-    node&.instance_data&.dig(*args)
-  rescue
-    nil
-  end
-
-  def info(*args)
-    node&.info&.dig(*args)
-  rescue
-    nil
-  end
 
   def fetch_all
     return unless @options[:force] || node.node? && node.possibly_stale? && node.available?
@@ -53,15 +35,52 @@ class UpdateNodeService < BaseService
     end
   end
 
-  def proccess_info
-    preprocess_info
-    process_features
-    process_icon
-    process_thumbnail
-    process_software_specific_override
-    process_override
+  def fetch_nodeinfo
+    Resolv::DNS.open.getaddress(@domain)
+ 
+    well_known_nodeinfo = json_fetch("https://#{@domain}/.well-known/nodeinfo", true)
+
+    if well_known_nodeinfo.present?
+      nodeinfo_url   = well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_1_REL }&.fetch('href', nil)
+      nodeinfo_url ||= well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_0_REL }&.fetch('href', nil)
+    end
+
+    @api_domain = Addressable::URI.parse(nodeinfo_url)&.normalize&.host
+
+    node.info ||= {}
+    node.info.merge!(process_software)
+    node.info.merge!(last_week_users_local)
+
+    node.nodeinfo        = nodeinfo_url.present? ? json_fetch(nodeinfo_url, true) : Node::ERROR_MISSING
+    node.status          = :up
+    node.last_fetched_at = Time.now.utc
 
     node.save!
+  rescue Mastodon::UnexpectedResponseError => e
+    case e.response.code
+    when 401
+      node.update!(status: :reject)
+    when 404
+      node.update!(status: :not_found)
+    when 410
+      node.update!(status: :gone)
+    when 408, 429
+      node.update!(status: :busy)
+    when 400...500
+      node.update!(status: :error)
+      raise
+    else
+      node.update!(status: :error)
+    end
+  rescue Resolv::ResolvError
+    node.update!(status: :no_address)
+    raise
+  rescue OpenSSL::SSL::SSLError
+    node.update!(status: :error)
+    raise
+  rescue HTTP::TimeoutError, HTTP::ConnectionError
+    node.update!(status: :busy)
+    raise
   end
 
   def process_software
@@ -95,6 +114,53 @@ class UpdateNodeService < BaseService
     end
   end
 
+  def last_week_users_local
+    {
+      'last_week_active_users_in_cache' => Account
+                                            .joins(:account_stat)
+                                            .group(:domain)
+                                            .order(total_active_posters: :desc)
+                                            .without_suspended
+                                            .without_silenced
+                                            .without_instance_actor
+                                            .without_bots
+                                            .where(domain: @domain == Rails.configuration.x.local_domain ? nil : @domain)
+                                            .where(account_stat: {last_status_at: 1.week.ago..})
+                                            .select('domain, count(*) total_active_posters')
+                                            .take
+                                            &.total_active_posters
+    }
+  end
+
+  def fetch_mastodon_instance_data
+    instance_v2 = "https://#{@api_domain}/api/v2/instance"
+    instance_v1 = "https://#{@api_domain}/api/v1/instance"
+
+    major, minor, patch = node.upstream_version&.split('.')&.map(&:to_i)
+
+    json = json_fetch(instance_v2) if major.nil? || major >= 4
+    json = json_fetch(instance_v1) if json.nil? || json.dig('error').present?
+
+    node.update!(instance_data: json) unless json.nil?
+  end
+
+  def fetch_misskey_instance_data
+    json = misskey_api_call("https://#{@api_domain}/api/meta", '{"detail":true}')
+
+    node.update!(instance_data: json) unless json.nil?
+  end
+
+  def proccess_info
+    preprocess_info
+    process_features
+    process_icon
+    process_thumbnail
+    process_software_specific_override
+    process_override
+
+    node.save!
+  end
+
   def preprocess_info
     node.info ||= {}
   end
@@ -118,50 +184,15 @@ class UpdateNodeService < BaseService
       'approval_required' => instance('registrations').is_a?(Hash) ? instance('registrations', 'approval_required') : nil,
       'total_users'       => nodeinfo('usage', 'users', 'total') || instance('stats', 'user_count') || Instance.find(@domain)&.accounts_count,
       'last_week_users'   => nodeinfo('usage', 'users', 'activeMonth') || instance('usage', 'users', 'active_month') || instance('pleroma', 'stats', 'mau'),
-      'last_week_active_users_in_cache' => last_week_users_local,
       'name'              => nodeinfo('metadata', 'nodeName').presence || instance('name').presence || instance('title').presence || instance('name').presence,
       'url'               => full_uri(instance('domain').presence || instance('uri').presence || @domain),
       'theme_color'       => nodeinfo('metadata', 'themeColor').presence || instance('themeColor').presence,
     })
   end
 
-  def last_week_users_local
-    Account.joins(:account_stat).where(domain: @domain == Rails.configuration.x.local_domain ? nil : @domain).group(:domain).order(total_active_posters: :desc).without_suspended.without_silenced.without_instance_actor.without_bots.where(account_stat: {last_status_at: 1.week.ago..}).select('domain, count(*) total_active_posters').take&.total_active_posters
-  end
-
   def full_uri(domain)
     domain = "https://#{domain}" unless domain.start_with?(%r(http[s]?://))
-    Addressable::URI.parse(domain).normalize.to_s
-  end
-
-  def process_software_specific_override
-    node.info.merge!(
-      if info('upstream_name') == 'birdsitelive'
-        {
-          'resolve_account'     => false,
-          'quote'               => false,
-          'emoji_reaction_type' => 'none',
-          'emoji_reaction_max'  => 0,
-          'reference'           => 'none',
-          'favourite'           => 'none',
-          'reply'               => 'none',
-          'reblog'              => 'none',
-        }
-      else
-        {}
-      end
-    )
-  end
-
-  def process_thumbnail
-    remote_url = instance('thumbnail') || instance('bannerUrl')
-    remote_url = remote_url&.dig('url') if remote_url.is_a?(Hash)
-
-    node.thumbnail_remote_url = nil if @options[:force]
-    node.thumbnail_remote_url = remote_url
-    raise Mastodon::ValidationError if node.errors[:thumbnail].present?
-  rescue Mastodon::UnexpectedResponseError, Mastodon::ValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
-    node.thumbnail = nil
+    Addressable::URI.parse(domain)&.normalize&.to_s
   end
 
   def process_icon
@@ -172,14 +203,6 @@ class UpdateNodeService < BaseService
     raise Mastodon::ValidationError if node.errors[:icon].present?
   rescue Mastodon::UnexpectedResponseError, Mastodon::ValidationError, Mastodon::LengthValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
     node.icon = nil
-  end
-
-  def process_override
-    node.info.merge!(node.info_override || {})
-  end
-
-  def replace_api_domain(url)
-    url.sub(@domain, @api_domain) if @domain != @api_domain
   end
 
   def fetch_icon_url
@@ -208,6 +231,8 @@ class UpdateNodeService < BaseService
   end
 
   def html_fetch(url, raise_error = false)
+    return if url.blank?
+
     Request.new(:get, url).perform do |response|
       raise Mastodon::UnexpectedResponseError, response unless response_successful?(response) || !raise_error
 
@@ -215,65 +240,59 @@ class UpdateNodeService < BaseService
     end
   end
 
-  def fetch_nodeinfo
-    Resolv::DNS.open.getaddress(@domain)
- 
-    well_known_nodeinfo = json_fetch("https://#{@domain}/.well-known/nodeinfo", true)
-
-    if well_known_nodeinfo.present?
-      nodeinfo_url   = well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_1_REL }&.fetch('href', nil)
-      nodeinfo_url ||= well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_0_REL }&.fetch('href', nil)
-    end
-
-    @api_domain = Addressable::URI.parse(nodeinfo_url).normalize.host
-
-    node.nodeinfo        = nodeinfo_url.present? ? json_fetch(nodeinfo_url, true) : Node::ERROR_MISSING
-    node.info            = process_software
-    node.status          = :up
-    node.last_fetched_at = Time.now.utc
-    node.save!
-  rescue Mastodon::UnexpectedResponseError => e
-    case e.response.code
-    when 401
-      node.update!(status: :reject)
-    when 404
-      node.update!(status: :not_found)
-    when 410
-      node.update!(status: :gone)
-    when 408, 429
-      node.update!(status: :busy)
-    when 400...500
-      node.update!(status: :error)
-      raise
-    else
-      node.update!(status: :error)
-    end
-  rescue Resolv::ResolvError
-    node.update!(status: :no_address)
-    raise
-  rescue OpenSSL::SSL::SSLError
-    node.update!(status: :error)
-    raise
-  rescue HTTP::TimeoutError, HTTP::ConnectionError
-    node.update!(status: :busy)
-    raise
+  def replace_api_domain(url)
+    url.sub(@domain, @api_domain) if url.present? && @api_domain.present? && @domain != @api_domain
   end
 
-  def fetch_mastodon_instance_data
-    instance_v2 = "https://#{@api_domain}/api/v2/instance"
-    instance_v1 = "https://#{@api_domain}/api/v1/instance"
+  def process_thumbnail
+    remote_url = instance('thumbnail') || instance('bannerUrl')
+    remote_url = remote_url&.dig('url') if remote_url.is_a?(Hash)
 
-    major, minor, patch = node.upstream_version&.split('.')&.map(&:to_i)
-
-    json = json_fetch(instance_v2) if major.nil? || major >= 4
-    json = json_fetch(instance_v1) if json.nil? || json.dig('error').present?
-
-    node.update!(instance_data: json) unless json.nil?
+    node.thumbnail_remote_url = nil if @options[:force]
+    node.thumbnail_remote_url = remote_url
+    raise Mastodon::ValidationError if node.errors[:thumbnail].present?
+  rescue Mastodon::UnexpectedResponseError, Mastodon::ValidationError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError, HTTP::Redirector::TooManyRedirectsError
+    node.thumbnail = nil
   end
 
-  def fetch_misskey_instance_data
-    json = misskey_api_call("https://#{@api_domain}/api/meta", '{"detail":true}')
+  def process_software_specific_override
+    node.info.merge!(
+      if info('upstream_name') == 'birdsitelive'
+        {
+          'resolve_account'     => false,
+          'quote'               => false,
+          'emoji_reaction_type' => 'none',
+          'emoji_reaction_max'  => 0,
+          'reference'           => 'none',
+          'favourite'           => 'none',
+          'reply'               => 'none',
+          'reblog'              => 'none',
+        }
+      else
+        {}
+      end
+    )
+  end
 
-    node.update!(instance_data: json) unless json.nil?
+  def process_override
+    node.info.merge!(node.info_override || {})
+  end
+
+  def nodeinfo(*args)
+    node&.nodeinfo&.dig(*args)
+  rescue
+    nil
+  end
+
+  def instance(*args)
+    node&.instance_data&.dig(*args)
+  rescue
+    nil
+  end
+
+  def info(*args)
+    node&.info&.dig(*args)
+  rescue
+    nil
   end
 end
