@@ -35,6 +35,8 @@ class FanOutOnWriteService < BaseService
       deliver_to_group(status)
     end
 
+    deliver_to_keyword_subscribers(status)
+
     return if status.account.silenced? || !status.public_visibility?
 
     render_anonymous_payload(status)
@@ -57,7 +59,6 @@ class FanOutOnWriteService < BaseService
 
     deliver_to_hashtags(status)
     deliver_to_hashtag_followers(status)
-    deliver_to_keyword_subscribers(status)
   end
 
   private
@@ -121,36 +122,39 @@ class FanOutOnWriteService < BaseService
   end
 
   def deliver_to_keyword_subscribers(status)
-    Rails.logger.debug "Delivering status #{status.id} to keyword subscribers"
+    return if status.reblog?
 
     deliver_to_keyword_subscribers_home(status)
     deliver_to_keyword_subscribers_list(status)
   end
 
   def deliver_to_keyword_subscribers_home(status)
-    match_accounts = []
+    keyword_subscribes = KeywordSubscribe.active.with_media(status).without_local_followed_home(status.account).order(:account_id).merge(visibility_scope(status, KeywordSubscribe))
+    match_ids          = keyword_subscribes.chunk(&:account_id).filter_map { |id, subscribes| id if subscribes.any? { |s| s.match?(status.searchable_text) } }
 
-    KeywordSubscribe.active.with_media(status.proper).without_local_followed_home(status.account).order(:account_id).each do |keyword_subscribe|
-      next if match_accounts[-1] == keyword_subscribe.account_id
-      match_accounts << keyword_subscribe.account_id if keyword_subscribe.match?(status.searchable_text)
-    end
-
-    @feedInsertWorker.push_bulk(match_accounts) do |match_account|
-      [status.id, match_account, :home]
+    @feedInsertWorker.push_bulk(match_ids) do |account_id|
+      [status.id, account_id, :home]
     end
   end
 
   def deliver_to_keyword_subscribers_list(status)
-    match_lists = []
+    keyword_subscribes = KeywordSubscribe.active.with_media(status).without_local_followed_list(status.account).order(:list_id).merge(visibility_scope(status, KeywordSubscribe))
+    match_ids          = keyword_subscribes.chunk(&:list_id).filter_map { |id, subscribes| id if subscribes.any? { |s| s.match?(status.searchable_text) } }
 
-    KeywordSubscribe.active.with_media(status.proper).without_local_followed_list(status.account).order(:list_id).each do |keyword_subscribe|
-      next if match_lists[-1] == keyword_subscribe.list_id
-      match_lists << keyword_subscribe.list_id if keyword_subscribe.match?(status.searchable_text)
+    @feedInsertWorker.push_bulk(match_ids) do |list_id|
+      [status.id, list_id, :list]
     end
+  end
 
-    @feedInsertWorker.push_bulk(match_lists) do |match_list|
-      [status.id, match_list, :list]
-    end
+  def visibility_scope(status, klass)
+    @visibility_scope ||=
+      if status.public_visibility? && !status.account.silenced?
+        klass.all
+      else
+        scope = klass.where(account_id: status.account_id).or(klass.where(account_id: status.mentions.select(:account_id)))
+        scope = scope.or(klass.where(account_id: status.account.followers.local.select(:id))) unless %w(limited direct).include?(status.visibility)
+        scope
+      end
   end
 
   def deliver_to_lists(status)
