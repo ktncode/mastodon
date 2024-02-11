@@ -443,6 +443,8 @@ class Formatter
     uri = Addressable::URI.parse(url).normalize
     uri.fragment = nil
     uri.to_s
+  rescue
+    nil
   end
 
   def url_to_holding_account(url)
