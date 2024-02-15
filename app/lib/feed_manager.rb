@@ -387,7 +387,7 @@ class FeedManager
       return !!should_filter
     else
       if status.reply?                                                                                                           # Filter out a reply
-        should_filter   = !crutches[:following][status.in_reply_to_account_id]                                                   # and I'm not following the person it's a reply to
+        should_filter   = !crutches[:following_reply_to][status.in_reply_to_account_id]                                          # and I'm not following the person it's a reply to
         should_filter &&= receiver_id != status.in_reply_to_account_id                                                           # and it's not a reply to me
         should_filter &&= status.account_id != status.in_reply_to_account_id                                                     # and it's not a self-reply
         should_filter &&= !status.tags.any? { |tag| crutches[:following_tag_by][tag.id] }                                        # and It's not follow tag
@@ -614,16 +614,17 @@ class FeedManager
       arr
     end
 
-    crutches[:following]         = Follow.where(account_id: receiver_id, target_account_id: statuses.map(&:in_reply_to_account_id).compact).pluck(:target_account_id).index_with(true)
-    crutches[:hiding_reblogs]    = Follow.where(account_id: receiver_id, target_account_id: statuses.map { |s| s.account_id if s.reblog? }.compact, show_reblogs: false).pluck(:target_account_id).index_with(true)
-    crutches[:blocking]          = Block.where(account_id: receiver_id, target_account_id: check_for_blocks).pluck(:target_account_id).index_with(true)
-    crutches[:muting]            = Mute.where(account_id: receiver_id, target_account_id: check_for_blocks).pluck(:target_account_id).index_with(true)
-    crutches[:domain_blocking]   = AccountDomainBlock.where(account_id: receiver_id, domain: statuses.map { |s| s.account&.domain }.compact).pluck(:domain).index_with(true)
-    crutches[:domain_blocking_r] = AccountDomainBlock.where(account_id: receiver_id, domain: statuses.map { |s| s.reblog&.account&.domain }.compact).pluck(:domain).index_with(true)
-    crutches[:blocked_by]        = Block.where(target_account_id: receiver_id, account_id: statuses.flat_map { |s| [s&.account_id, s.reblog&.account_id] }.compact).pluck(:account_id).index_with(true)
-    crutches[:following_tag_by]  = FollowTag.where(account_id: receiver_id, tag: statuses.map { |s| s.tags }.flatten.uniq.compact).pluck(:tag_id).index_with(true)
-    crutches[:domain_subscribe]  = DomainSubscribe.where(account_id: receiver_id, list_id: nil, domain: statuses.map { |s| s&.account&.domain }.compact).pluck(:domain).index_with(true)
-    crutches[:account_subscribe] = AccountSubscribe.where(account_id: receiver_id, target_account_id: statuses.map(&:account_id).compact).pluck(:target_account_id).index_with(true)
+    crutches[:following]          = Follow.where(account_id: receiver_id, target_account_id: statuses.map(&:account_id).compact).pluck(:target_account_id).index_with(true)
+    crutches[:following_reply_to] = Follow.where(account_id: receiver_id, target_account_id: statuses.map(&:in_reply_to_account_id).compact).pluck(:target_account_id).index_with(true)
+    crutches[:hiding_reblogs]     = Follow.where(account_id: receiver_id, target_account_id: statuses.map { |s| s.account_id if s.reblog? }.compact, show_reblogs: false).pluck(:target_account_id).index_with(true)
+    crutches[:blocking]           = Block.where(account_id: receiver_id, target_account_id: check_for_blocks).pluck(:target_account_id).index_with(true)
+    crutches[:muting]             = Mute.where(account_id: receiver_id, target_account_id: check_for_blocks).pluck(:target_account_id).index_with(true)
+    crutches[:domain_blocking]    = AccountDomainBlock.where(account_id: receiver_id, domain: statuses.map { |s| s.account&.domain }.compact).pluck(:domain).index_with(true)
+    crutches[:domain_blocking_r]  = AccountDomainBlock.where(account_id: receiver_id, domain: statuses.map { |s| s.reblog&.account&.domain }.compact).pluck(:domain).index_with(true)
+    crutches[:blocked_by]         = Block.where(target_account_id: receiver_id, account_id: statuses.flat_map { |s| [s&.account_id, s.reblog&.account_id] }.compact).pluck(:account_id).index_with(true)
+    crutches[:following_tag_by]   = FollowTag.where(account_id: receiver_id, tag: statuses.map { |s| s.tags }.flatten.uniq.compact).pluck(:tag_id).index_with(true)
+    crutches[:domain_subscribe]   = DomainSubscribe.where(account_id: receiver_id, list_id: nil, domain: statuses.map { |s| s&.account&.domain }.compact).pluck(:domain).index_with(true)
+    crutches[:account_subscribe]  = AccountSubscribe.where(account_id: receiver_id, target_account_id: statuses.map(&:account_id).compact).pluck(:target_account_id).index_with(true)
     crutches
   end
 end
