@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class InstancePresenter
+  include Redisable
+
   delegate(
     :site_contact_email,
     :site_title,
@@ -25,7 +27,7 @@ class InstancePresenter
   end
 
   def active_user_count(weeks = 4)
-    Rails.cache.fetch("active_user_count/#{weeks}") { Redis.current.pfcount(*(0...weeks).map { |i| "activity:logins:#{i.weeks.ago.utc.to_date.cweek}" }) }
+    Rails.cache.fetch("active_user_count/#{weeks}") { redis.pfcount(*(0...weeks).map { |i| "activity:logins:#{i.weeks.ago.utc.to_date.cweek}" }) }
   end
 
   def status_count

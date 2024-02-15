@@ -3,6 +3,7 @@
 class RedirectLinkResolveWorker
   include Sidekiq::Worker
   include ExponentialBackoff
+  include Redisable
 
   sidekiq_options queue: 'pull', retry: 3
 
@@ -32,8 +33,8 @@ class RedirectLinkResolveWorker
   private
 
   def done_process(url, status_id)
-    Redis.current.srem("statuses/#{status_id}/processing", "RedirectLinkResolveWorker:#{url}")
-    Redis.current.del("statuses/#{status_id}/processing") if Redis.current.scard("statuses/#{status_id}/processing") <= 0
+    redis.srem("statuses/#{status_id}/processing", "RedirectLinkResolveWorker:#{url}")
+    redis.del("statuses/#{status_id}/processing") if redis.scard("statuses/#{status_id}/processing") <= 0
     StatusStat.find_by(status_id: status_id)&.touch || StatusStat.create!(status_id: status_id)
   end
 end

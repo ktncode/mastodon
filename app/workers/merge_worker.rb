@@ -2,6 +2,7 @@
 
 class MergeWorker
   include Sidekiq::Worker
+  include Redisable
 
   def perform(from_account_id, into_account_id, options = {})
     options.symbolize_keys!
@@ -14,6 +15,6 @@ class MergeWorker
   rescue ActiveRecord::RecordNotFound
     true
   ensure
-    Redis.current.del("account:#{into_account_id}:regeneration")
+    redis.del("account:#{into_account_id}:regeneration")
   end
 end

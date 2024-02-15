@@ -18,6 +18,8 @@
 #
 
 class Tag < ApplicationRecord
+  include Redisable
+
   has_and_belongs_to_many :statuses
   has_and_belongs_to_many :accounts
 
@@ -115,8 +117,8 @@ class Tag < ApplicationRecord
 
       days << {
         day: day.to_s,
-        uses: Redis.current.get("activity:tags:#{id}:#{day}") || '0',
-        accounts: Redis.current.pfcount("activity:tags:#{id}:#{day}:accounts").to_s,
+        uses: redis.get("activity:tags:#{id}:#{day}") || '0',
+        accounts: redis.pfcount("activity:tags:#{id}:#{day}:accounts").to_s,
       }
     end
 

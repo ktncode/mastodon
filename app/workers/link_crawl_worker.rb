@@ -2,6 +2,7 @@
 
 class LinkCrawlWorker
   include Sidekiq::Worker
+  include Redisable
 
   sidekiq_options queue: 'pull', retry: 0
 
@@ -16,8 +17,8 @@ class LinkCrawlWorker
   private
 
   def done_process(status_id)
-    Redis.current.srem("statuses/#{status_id}/processing", 'LinkCrawlWorker')
-    Redis.current.del("statuses/#{status_id}/processing") if Redis.current.scard("statuses/#{status_id}/processing") <= 0
+    redis.srem("statuses/#{status_id}/processing", 'LinkCrawlWorker')
+    redis.del("statuses/#{status_id}/processing") if redis.scard("statuses/#{status_id}/processing") <= 0
     StatusStat.find_by(status_id: status_id)&.touch || StatusStat.create!(status_id: status_id)
   end
 end

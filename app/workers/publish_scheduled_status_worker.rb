@@ -2,6 +2,7 @@
 
 class PublishScheduledStatusWorker
   include Sidekiq::Worker
+  include Redisable
 
   sidekiq_options lock: :until_executed
 
@@ -28,6 +29,6 @@ class PublishScheduledStatusWorker
   end
 
   def remove_scheduled_status(scheduled_status)
-    Redis.current.publish("timeline:#{scheduled_status.account.id}", Oj.dump(event: :scheduled_status, payload: scheduled_status.id.to_s))
+    redis.publish("timeline:#{scheduled_status.account.id}", Oj.dump(event: :scheduled_status, payload: scheduled_status.id.to_s))
   end
 end

@@ -14,7 +14,7 @@ RSpec.describe MuteService, type: :service do
     let(:home_timeline_key) { FeedManager.instance.key(:home, account.id) }
 
     before do
-      Redis.current.del(home_timeline_key)
+      redis.del(home_timeline_key)
     end
 
     it "clears account's statuses" do
@@ -22,7 +22,7 @@ RSpec.describe MuteService, type: :service do
       FeedManager.instance.push_to_home(account, other_account_status)
 
       is_expected.to change {
-        Redis.current.zrange(home_timeline_key, 0, -1)
+        redis.zrange(home_timeline_key, 0, -1)
       }.from([status.id.to_s, other_account_status.id.to_s]).to([other_account_status.id.to_s])
     end
   end

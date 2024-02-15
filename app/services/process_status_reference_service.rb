@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProcessStatusReferenceService
+  include Redisable
+
   def call(status, **options)
     @status = status
 
@@ -79,8 +81,8 @@ class ProcessStatusReferenceService
 
     if !unresolved_urls.empty?
       ids = statuses.map(&:id)
-      Redis.current.sadd("status_references:#{status_id}", ids) if ids.present?
-      Redis.current.sadd("status_resolve:#{status_id}", unresolved_urls)
+      redis.sadd("status_references:#{status_id}", ids) if ids.present?
+      redis.sadd("status_resolve:#{status_id}", unresolved_urls)
       StatusReferenceResolveWorker.push_bulk(unresolved_urls) { |url| [status_id, url] }
     end
 

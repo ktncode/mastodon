@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class NotifyService < BaseService
+  include Redisable
+
   def call(recipient, type, activity)
     @recipient    = recipient
     @activity     = activity
@@ -223,7 +225,7 @@ class NotifyService < BaseService
   def push_notification!
     return if @notification.activity.nil?
 
-    Redis.current.publish("timeline:#{@recipient.id}", Oj.dump(event: :notification, payload: InlineRenderer.render(@notification, @recipient, :notification)))
+    redis.publish("timeline:#{@recipient.id}", Oj.dump(event: :notification, payload: InlineRenderer.render(@notification, @recipient, :notification)))
     send_push_notifications!
   end
 

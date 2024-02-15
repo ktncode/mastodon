@@ -2,6 +2,8 @@
 
 module Admin
   class TagsController < BaseController
+    include Redisable
+
     before_action :set_tag, except: [:index, :batch, :approve_all, :reject_all]
     before_action :set_usage_by_domain, except: [:index, :batch, :approve_all, :reject_all]
     before_action :set_counters, except: [:index, :batch, :approve_all, :reject_all]
@@ -65,7 +67,7 @@ module Admin
 
     def set_counters
       @accounts_today = @tag.history.first[:accounts]
-      @accounts_week  = Redis.current.pfcount(*current_week_days.map { |day| "activity:tags:#{@tag.id}:#{day}:accounts" })
+      @accounts_week  = redis.pfcount(*current_week_days.map { |day| "activity:tags:#{@tag.id}:#{day}:accounts" })
     end
 
     def filtered_tags

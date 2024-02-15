@@ -3,6 +3,7 @@
 class ActivityPub::ProcessCustomEmojiService < BaseService
   include JsonLdHelper
   include DomainControlHelper
+  include Redisable
 
   # Should be called with confirmed valid JSON
   def call(shortcode, domain, json, options = {})
@@ -40,7 +41,7 @@ class ActivityPub::ProcessCustomEmojiService < BaseService
   end
 
   def lock_options
-    { redis: Redis.current, key: "process_custom_emoji:#{@uri}", autorelease: 15.minutes.seconds }
+    { redis: redis, key: "process_custom_emoji:#{@uri}", autorelease: 15.minutes.seconds }
   end
 
   def process_emoji

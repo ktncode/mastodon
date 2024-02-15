@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class FetchLinkCardService < BaseService
+  include Redisable
+
   URL_PATTERN = %r{
     (#{Twitter::TwitterText::Regex[:valid_url_preceding_chars]})                                                                #   $1 preceeding chars
     (                                                                                                                           #   $2 URL
@@ -24,8 +26,8 @@ class FetchLinkCardService < BaseService
     @parse_urls -= RedirectLink.where(url: @parse_urls).pluck(:url)
 
     RedirectLinkResolveWorker.push_bulk(@parse_urls) do |url|
-      Redis.current.sadd("statuses/#{@status.id}/processing", "RedirectLinkResolveWorker:#{url}")
-      Redis.current.expire("statuses/#{@status.id}/processing", 60.seconds)
+      redis.sadd("statuses/#{@status.id}/processing", "RedirectLinkResolveWorker:#{url}")
+      redis.expire("statuses/#{@status.id}/processing", 60.seconds)
       [url.to_s, @status.id]
     end
 
@@ -197,6 +199,6 @@ class FetchLinkCardService < BaseService
   end
 
   def lock_options
-    { redis: Redis.current, key: "fetch:#{@url}", autorelease: 15.minutes.seconds }
+    { redis: redis, key: "fetch:#{@url}", autorelease: 15.minutes.seconds }
   end
 end

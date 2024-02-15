@@ -3,6 +3,7 @@
 class StatusReferenceResolveWorker
   include Sidekiq::Worker
   include ExponentialBackoff
+  include Redisable
 
   sidekiq_options queue: 'pull', retry: 3
 
@@ -18,12 +19,12 @@ class StatusReferenceResolveWorker
   rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid
     true
   ensure
-    Redis.current.srem("status_resolve:#{status_id}", reference_url)
+    redis.srem("status_resolve:#{status_id}", reference_url)
 
-    if Redis.current.scard("status_resolve:#{status_id}") == 0
-      PublishStatusUpdateWorker.perform_async(status_id) unless !status.nil? && Redis.current.smembers("status_references:#{status_id}") == status.references.map(&:id)
-      Redis.current.del("status_resolve:#{status_id}")
-      Redis.current.del("status_references:#{status_id}")
+    if redis.scard("status_resolve:#{status_id}") == 0
+      PublishStatusUpdateWorker.perform_async(status_id) unless !status.nil? && redis.smembers("status_references:#{status_id}") == status.references.map(&:id)
+      redis.del("status_resolve:#{status_id}")
+      redis.del("status_references:#{status_id}")
     end
   end
 end

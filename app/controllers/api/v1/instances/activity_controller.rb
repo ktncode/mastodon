@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::Instances::ActivityController < Api::BaseController
+  include Redisable
+
   before_action :require_enabled_api!
 
   skip_before_action :set_cache_headers
@@ -23,9 +25,9 @@ class Api::V1::Instances::ActivityController < Api::BaseController
 
       weeks << {
         week: week.to_time.to_i.to_s,
-        statuses: Redis.current.get("activity:statuses:local:#{week_id}") || '0',
-        logins: Redis.current.pfcount("activity:logins:#{week_id}").to_s,
-        registrations: Redis.current.get("activity:accounts:local:#{week_id}") || '0',
+        statuses: redis.get("activity:statuses:local:#{week_id}") || '0',
+        logins: redis.pfcount("activity:logins:#{week_id}").to_s,
+        registrations: redis.get("activity:accounts:local:#{week_id}") || '0',
       }
     end
 

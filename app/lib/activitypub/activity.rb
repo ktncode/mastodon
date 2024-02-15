@@ -136,8 +136,8 @@ class ActivityPub::Activity
 
     # Spread out crawling randomly to avoid DDoSing the link
     random_seconds = rand(1..59).seconds
-    Redis.current.sadd("statuses/#{status.id}/processing", 'LinkCrawlWorker')
-    Redis.current.expire("statuses/#{status.id}/processing", random_seconds + 60.seconds)
+    redis.sadd("statuses/#{status.id}/processing", 'LinkCrawlWorker')
+    redis.expire("statuses/#{status.id}/processing", random_seconds + 60.seconds)
     LinkCrawlWorker.perform_in(random_seconds, status.id)
   end
 
@@ -237,7 +237,7 @@ class ActivityPub::Activity
   end
 
   def lock_or_fail(key, expire_after = 15.minutes.seconds)
-    RedisLock.acquire({ redis: Redis.current, key: key, autorelease: expire_after }) do |lock|
+    RedisLock.acquire({ redis: redis, key: key, autorelease: expire_after }) do |lock|
       if lock.acquired?
         yield
       else

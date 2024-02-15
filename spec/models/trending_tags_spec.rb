@@ -12,7 +12,7 @@ RSpec.describe TrendingTags do
     let!(:tag3) { Fabricate(:tag, name: 'OCs', trendable: true) }
 
     before do
-      allow(Redis.current).to receive(:pfcount) do |key|
+      allow(redis).to receive(:pfcount) do |key|
         case key
         when "activity:tags:#{tag1.id}:#{(at_time - 1.day).beginning_of_day.to_i}:accounts"
           2
@@ -27,8 +27,8 @@ RSpec.describe TrendingTags do
         end
       end
 
-      Redis.current.zadd('trending_tags', 0.9, tag3.id)
-      Redis.current.sadd("trending_tags:used:#{at_time.beginning_of_day.to_i}", [tag1.id, tag2.id])
+      redis.zadd('trending_tags', 0.9, tag3.id)
+      redis.sadd("trending_tags:used:#{at_time.beginning_of_day.to_i}", [tag1.id, tag2.id])
 
       tag3.update(max_score: 0.9, max_score_at: (at_time - 1.day).beginning_of_day + 12.hours)
 
@@ -44,7 +44,7 @@ RSpec.describe TrendingTags do
     end
 
     it 'decays scores' do
-      expect(Redis.current.zscore('trending_tags', tag3.id)).to be < 0.9
+      expect(redis.zscore('trending_tags', tag3.id)).to be < 0.9
     end
   end
 
@@ -52,16 +52,16 @@ RSpec.describe TrendingTags do
     let(:tag) { Fabricate(:tag) }
 
     before do
-      10.times { |i| Redis.current.zadd('trending_tags', i + 1, Fabricate(:tag).id) }
+      10.times { |i| redis.zadd('trending_tags', i + 1, Fabricate(:tag).id) }
     end
 
     it 'returns true if the hashtag is within limit' do
-      Redis.current.zadd('trending_tags', 11, tag.id)
+      redis.zadd('trending_tags', 11, tag.id)
       expect(described_class.trending?(tag)).to be true
     end
 
     it 'returns false if the hashtag is outside the limit' do
-      Redis.current.zadd('trending_tags', 0, tag.id)
+      redis.zadd('trending_tags', 0, tag.id)
       expect(described_class.trending?(tag)).to be false
     end
   end

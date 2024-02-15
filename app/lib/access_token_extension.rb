@@ -4,6 +4,8 @@ module AccessTokenExtension
   extend ActiveSupport::Concern
 
   included do
+    include Redisable
+
     after_commit :push_to_streaming_api
   end
 
@@ -12,6 +14,6 @@ module AccessTokenExtension
   end
 
   def push_to_streaming_api
-    Redis.current.publish("timeline:access_token:#{id}", Oj.dump(event: :kill)) if revoked? || destroyed?
+    redis.publish("timeline:access_token:#{id}", Oj.dump(event: :kill)) if revoked? || destroyed?
   end
 end

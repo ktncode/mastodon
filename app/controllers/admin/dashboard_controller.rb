@@ -3,13 +3,15 @@ require 'sidekiq/api'
 
 module Admin
   class DashboardController < BaseController
+    include Redisable
+
     def index
       @system_checks         = Admin::SystemCheck.perform
       @users_count           = User.count
       @pending_users_count   = User.pending.count
-      @registrations_week    = Redis.current.get("activity:accounts:local:#{current_week}") || 0
-      @logins_week           = Redis.current.pfcount("activity:logins:#{current_week}")
-      @interactions_week     = Redis.current.get("activity:interactions:#{current_week}") || 0
+      @registrations_week    = redis.get("activity:accounts:local:#{current_week}") || 0
+      @logins_week           = redis.pfcount("activity:logins:#{current_week}")
+      @interactions_week     = redis.get("activity:interactions:#{current_week}") || 0
       @relay_enabled         = Relay.enabled.exists?
       @single_user_mode      = Rails.configuration.x.single_user_mode
       @registrations_enabled = Setting.registrations_mode != 'none'
@@ -47,10 +49,10 @@ module Admin
 
     def redis_info
       @redis_info ||= begin
-        if Redis.current.is_a?(Redis::Namespace)
-          Redis.current.redis.info
+        if redis.is_a?(Redis::Namespace)
+          redis.redis.info
         else
-          Redis.current.info
+          redis.info
         end
       end
     end

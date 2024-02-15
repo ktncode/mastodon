@@ -2,6 +2,7 @@
 
 class UnfollowService < BaseService
   include Payloadable
+  include Redisable
 
   # Unfollow and notify the remote user
   # @param [Account] source_account Where to unfollow from
@@ -13,7 +14,7 @@ class UnfollowService < BaseService
     @target_account = target_account
     @options        = options
 
-    RedisLock.acquire(redis: Redis.current, key: "relationship:#{[source_account.id, target_account.id].sort.join(':')}", autorelease: 90.seconds) do |lock|
+    RedisLock.acquire(redis: redis, key: "relationship:#{[source_account.id, target_account.id].sort.join(':')}", autorelease: 90.seconds) do |lock|
       if lock.acquired?
         unfollow! || undo_follow_request!
       else

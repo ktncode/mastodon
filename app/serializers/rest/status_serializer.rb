@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class REST::StatusSerializer < ActiveModel::Serializer
+  include Redisable
+
   attributes :id, :created_at, :updated_at, :in_reply_to_id, :in_reply_to_account_id,
              :sensitive, :spoiler_text, :visibility, :language,
              :uri, :url, :replies_count, :reblogs_count,
@@ -73,7 +75,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def processing
-    Redis.current.exists?("statuses/#{object.id}/processing")
+    redis.exists?("statuses/#{object.id}/processing")
   end
 
   def in_reply_to_id
@@ -168,7 +170,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def circle_id
-    Redis.current.get("statuses/#{object.id}/circle_id")
+    redis.get("statuses/#{object.id}/circle_id")
   end
 
   def uri
