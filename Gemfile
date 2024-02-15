@@ -83,13 +83,13 @@ gem 'ruby-progressbar', '~> 1.11'
 gem 'sanitize', '~> 6.0'
 gem 'scenic', '~> 1.5'
 gem 'sidekiq', '~> 6.2'
-gem 'sidekiq-scheduler', '~> 3.1'
+gem 'sidekiq-scheduler', '~> 4.0'
 gem 'sidekiq-unique-jobs', '~> 7.1'
 gem 'sidekiq-bulk', '~>0.2.0'
 gem 'simple-navigation', '~> 4.3'
 gem 'simple_form', '~> 5.1'
 gem 'sprockets-rails', '~> 3.2', require: 'sprockets/railtie'
-gem 'stoplight', '~> 2.2.1'
+gem 'stoplight', '~> 3.0.1'
 gem 'strong_migrations', '~> 0.7'
 gem 'tty-prompt', '~> 0.23', require: false
 gem 'twitter-text', '~> 3.1.0'
@@ -139,7 +139,7 @@ group :development do
   gem 'letter_opener_web', '~> 1.4'
   gem 'memory_profiler'
   gem 'rubocop', '~> 1.18', require: false
-  gem 'parser', '~> 3.0.2.0', require: false
+  gem 'parser', '~> 3.2.2.0', require: false
   gem 'rubocop-rails', '~> 2.11', require: false
   gem 'brakeman', '~> 5.1', require: false
   gem 'bundler-audit', '~> 0.8', require: false

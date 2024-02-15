@@ -133,15 +133,15 @@ class Rack::Attack
     req.session[:attempt_user_id] || req.params.dig('user', 'email').presence if req.post? && req.path_matches?('/auth/sign_in')
   end
 
-  self.throttled_response = lambda do |env|
+  self.throttled_responder = lambda do |request|
     now        = Time.now.utc
-    match_data = env['rack.attack.match_data']
+    match_data = request.env['rack.attack.match_data']
 
     headers = {
-      'Content-Type'          => 'application/json',
-      'X-RateLimit-Limit'     => match_data[:limit].to_s,
+      'Content-Type' => 'application/json',
+      'X-RateLimit-Limit' => match_data[:limit].to_s,
       'X-RateLimit-Remaining' => '0',
-      'X-RateLimit-Reset'     => (now + (match_data[:period] - now.to_i % match_data[:period])).iso8601(6),
+      'X-RateLimit-Reset' => (now + (match_data[:period] - (now.to_i % match_data[:period]))).iso8601(6),
     }
 
     [429, headers, [{ error: I18n.t('errors.429') }.to_json]]
