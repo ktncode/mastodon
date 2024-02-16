@@ -33,7 +33,7 @@ RSpec.describe ActivityPub::Activity::Announce do
     context 'when sender is followed by a local account' do
       before do
         Fabricate(:account).follow!(sender)
-        stub_request(:get, 'https://example.com/actor/hello-world').to_return(body: Oj.dump(unknown_object_json))
+        stub_request(:get, 'https://example.com/actor/hello-world').to_return(body: Oj.dump(unknown_object_json), headers: { 'Content-Type': 'application/activity+json' })
         subject.perform
       end
 
@@ -113,7 +113,13 @@ RSpec.describe ActivityPub::Activity::Announce do
       let!(:relay_account) { Fabricate(:account, inbox_url: 'https://relay.example.com/inbox') }
       let!(:relay) { Fabricate(:relay, inbox_url: 'https://relay.example.com/inbox') }
 
-      subject { described_class.new(json, sender, relayed_through_account: relay_account) }
+      let(:object_json) { 'https://example.com/actor/hello-world' }
+
+      subject { described_class.new(json, sender, relayed_through_actor: relay_account) }
+
+      before do
+        stub_request(:get, 'https://example.com/actor/hello-world').to_return(body: Oj.dump(unknown_object_json), headers: { 'Content-Type': 'application/activity+json' })
+      end
 
       context 'and the relay is enabled' do
         before do
