@@ -741,6 +741,9 @@ en:
       mascot:
         desc_html: Displayed on multiple pages. At least 293×205px recommended. When not set, falls back to default mascot
         title: Mascot image
+      reject_pattern:
+        desc_html: Set a regular expression pattern to inspect Create Activity content, and refuse Activity if you match
+        title: Reject Pattern
       peers_api_enabled:
         desc_html: Domain names this server has encountered in the fediverse
         title: Publish list of discovered servers in the API
@@ -912,6 +915,7 @@ en:
   applications:
     created: Application successfully created
     destroyed: Application successfully deleted
+    invalid_regexp: "The provided Regexp is invalid: %{message}"
     invalid_url: The provided URL is invalid
     regenerate_token: Regenerate access token
     token_regenerated: Access token successfully regenerated

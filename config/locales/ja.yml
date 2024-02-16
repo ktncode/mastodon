@@ -725,6 +725,9 @@ ja:
       mascot:
         desc_html: 複数のページに表示されます。サイズは293x205px以上推奨です。未設定の場合、標準のマスコットが使用されます
         title: マスコットイメージ
+      reject_pattern:
+        desc_html: Create Activityのcontentを検査する正規表現パターンを設定し、一致する場合はActivityを拒否します
+        title: 拒否パターン
       peers_api_enabled:
         desc_html: 連合内でこのサーバーが遭遇したドメインの名前
         title: 接続しているサーバーのリストを公開する
@@ -890,6 +893,7 @@ ja:
   applications:
     created: アプリが作成されました
     destroyed: アプリが削除されました
+    invalid_regexp: "正規表現が無効です: %{message}"
     invalid_url: URLが無効です
     regenerate_token: アクセストークンの再生成
     token_regenerated: アクセストークンが再生成されました

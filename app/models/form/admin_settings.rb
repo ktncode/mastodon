@@ -40,6 +40,7 @@ class Form::AdminSettings
     poll_max_options
     reaction_max_per_account
     attachments_max
+    reject_pattern
   ).freeze
 
   BOOLEAN_KEYS = %i(
@@ -86,6 +87,7 @@ class Form::AdminSettings
   validates :poll_max_options, numericality: { greater_than: 2, less_than_or_equal_to: PollValidator::MAX_OPTIONS_LIMIT }
   validates :reaction_max_per_account, numericality: { greater_than_or_equal: 1, less_than_or_equal_to: EmojiReactionValidator::MAX_PER_ACCOUNT_LIMIT }
   validates :attachments_max, numericality: { greater_than_or_equal: 1, less_than_or_equal_to: MediaAttachment::ATTACHMENTS_LIMIT }
+  validates :reject_pattern, regexp_syntax: true
 
   def initialize(_attributes = {})
     super
