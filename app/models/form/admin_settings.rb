@@ -41,6 +41,7 @@ class Form::AdminSettings
     reaction_max_per_account
     attachments_max
     reject_pattern
+    reject_blurhash
   ).freeze
 
   BOOLEAN_KEYS = %i(

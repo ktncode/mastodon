@@ -741,6 +741,9 @@ en:
       mascot:
         desc_html: Displayed on multiple pages. At least 293×205px recommended. When not set, falls back to default mascot
         title: Mascot image
+      reject_blurhash:
+        desc_html: Set a blurhashes to inspect Create Activity media attachments, and refuse Activity if you match
+        title: Reject blurhash
       reject_pattern:
         desc_html: Set a regular expression pattern to inspect Create Activity content, and refuse Activity if you match
         title: Reject Pattern
