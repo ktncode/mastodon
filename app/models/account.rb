@@ -187,7 +187,7 @@ class Account < ApplicationRecord
   end
 
   def newcommer?
-    created_at > Time.current.ago(3.days)
+    created_at > 3.days.ago
   end
 
   def bot?
@@ -457,10 +457,18 @@ class Account < ApplicationRecord
   end
 
   def conversation_statuses(account)
+    ids = Account.without_suspended.where.not(id: excluded_from_timeline_account_ids).where(Account.arel_table[:domain].eq(nil).or(Account.arel_table[:domain].not_in(excluded_from_timeline_domains))).select(:id)
+
     if account.nil? || account.class.name == 'Account' && account.id == id
-      Status.unscoped.recent.union_all(Status.include_expired.joins(:mentions).where(account_id: id, mentions: {silent: false})).union_all(Status.include_expired.joins(:mentions).where(mentions: {account_id: id, silent: false}))
+      Status.unscoped.recent
+      .union_all(Status.include_expired.joins(:mentions).where(account_id: id,  mentions: {account_id: ids, silent: false}))
+      .union_all(Status.include_expired.joins(:mentions).where(account_id: ids, mentions: {account_id: id,  silent: false}))
+    elsif account.suspended? || excluded_from_timeline_account_ids.include?(account.id) || account.domain.present? && excluded_from_timeline_domains.include?(account.domain)
+      Status.none
     else
-      Status.unscoped.recent.union_all(Status.include_expired.joins(:mentions).where(account_id: id, mentions: {account_id: account.id, silent: false})).union_all(Status.include_expired.joins(:mentions).where(account_id: account.id, mentions: {account_id: id, silent: false}))
+      Status.unscoped.recent
+      .union_all(Status.include_expired.joins(:mentions).where(account_id: id, mentions: {silent: false, account_id: account.id}))
+      .union_all(Status.include_expired.joins(:mentions).where(account_id: account.id, mentions: {account_id: id, silent: false}))
     end
   end
 
