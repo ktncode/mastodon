@@ -187,7 +187,7 @@ class Account < ApplicationRecord
   end
 
   def newcommer?
-    created_at > 3.days.ago
+    created_at > 7.days.ago
   end
 
   def bot?
