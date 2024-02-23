@@ -416,6 +416,7 @@ namespace :mastodon do
 
           user = User.new(admin: true, email: email, password: password, confirmed_at: Time.now.utc, account_attributes: { username: username }, bypass_invite_request_check: true)
           user.save(validate: false)
+          user.approve!
 
           prompt.ok "You can login with the password: #{password}"
           prompt.warn 'You can change your password once you login.'
