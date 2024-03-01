@@ -116,6 +116,7 @@ class Status < ApplicationRecord
   scope :remote, -> { where(local: false).where.not(uri: nil) }
   scope :local,  -> { where(local: true).or(where(uri: nil)) }
 
+  scope :expired, -> { where.not(expired_at: nil) }
   scope :not_expired, -> { where(expired_at: nil) }
   scope :include_expired, -> { unscoped.recent.kept }
   scope :with_accounts, ->(ids) { where(id: ids).includes(:account) }
@@ -217,6 +218,7 @@ class Status < ApplicationRecord
       properties << 'quote' if quote?
       properties << 'ref' if ref?
       properties << 'bot' if bot?
+      properties << 'expired' if expired?
       properties << visibility
     end
   end

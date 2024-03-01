@@ -70,7 +70,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   end
 
   def only_media_scope
-    Status.include_expired.joins(:media_attachments).merge(@account.media_attachments.reorder(nil)).group(:id)
+    Status.include_expired.joins(:media_attachments).merge(@account.media_attachments.reorder(nil)).distinct
   end
 
   def pinned_scope
@@ -96,7 +96,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   end
 
   def no_personal_scope
-    Status.without_personal_visibility
+    Status.include_expired.without_personal_visibility
   end
 
   def pagination_params(core_params)

@@ -30,7 +30,7 @@ class StatusPolicy < ApplicationPolicy
   end
 
   def expired_show?
-    !expired? || owned? || favourited_status? || bookmarked_status? || emoji_reactioned_status?
+    !expired? || owned? || favourited_status? || bookmarked_status? || emoji_reactioned_status? || mention_exists?
   end
 
   def reblog?

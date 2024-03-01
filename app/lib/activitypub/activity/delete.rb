@@ -4,7 +4,7 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
   def perform
     if @account.uri == object_uri
       delete_person
-    elsif @json['expiry'].present?
+    elsif @json['_:expiry'].present?
       expire_note
     else
       delete_note

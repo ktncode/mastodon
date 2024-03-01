@@ -27,7 +27,7 @@ class StatusesSearchService < BaseService
     def status_search_results
       request           = parsed_query.request
       result_ids        = request.collapse(field: :id).limit(@limit).offset(@offset).pluck(:id).compact
-      results           = Status.where(id: result_ids).reorder(nil).order_as_specified(id: result_ids)
+      results           = Status.include_expired.where(id: result_ids).reorder(nil).order_as_specified(id: result_ids)
       account_ids       = results.map(&:account_id)
       account_relations = relations_map_for_account(@account&.id, account_ids)
       status_relations  = relations_map_for_status(@account&.id, results)
