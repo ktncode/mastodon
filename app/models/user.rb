@@ -91,6 +91,7 @@ class User < ApplicationRecord
   validates_with BlacklistedEmailValidator, if: -> { !confirmed? }
   validates_with EmailMxValidator, if: :validate_email_dns?
   validates :agreement, acceptance: { allow_nil: false, accept: [true, 'true', '1'] }, on: :create
+  validates :setting_max_frequently_used_emojis, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: CustomEmoji::FREQUENTLY_USED_EMOJIS_LIMIT }
 
   # Honeypot/anti-spam fields
   attr_accessor :registration_form_time, :website, :confirm_password
@@ -155,6 +156,7 @@ class User < ApplicationRecord
            :hide_following_from_yourself, :hide_followers_from_yourself, :hide_joined_date_from_yourself, :hide_reaction_counter,
            :hide_list_of_emoji_reactions_to_posts, :hide_list_of_favourites_to_posts, :hide_list_of_reblogs_to_posts, :hide_list_of_referred_by_to_posts,    
            :hide_reblogged_by, :enable_status_polling, :enable_status_polling_intersection, :disable_auto_focus_to_emoji_search,
+           :max_frequently_used_emojis,
 
            to: :settings, prefix: :setting, allow_nil: false
 

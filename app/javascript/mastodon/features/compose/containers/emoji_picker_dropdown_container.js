@@ -4,9 +4,7 @@ import { changeSetting } from '../../../actions/settings';
 import { createSelector } from 'reselect';
 import { Map as ImmutableMap } from 'immutable';
 import { useEmoji } from '../../../actions/emojis';
-
-const perLine = 8;
-const lines   = 2;
+import { maxFrequentlyUsedEmojis } from 'mastodon/initial_state';
 
 const DEFAULTS = [
   '+1',
@@ -34,12 +32,12 @@ const getFrequentlyUsedEmojis = createSelector([
     .keySeq()
     .sort((a, b) => emojiCounters.get(a) - emojiCounters.get(b))
     .reverse()
-    .slice(0, perLine * lines)
+    .slice(0, maxFrequentlyUsedEmojis)
     .toArray();
 
-  if (emojis.length < DEFAULTS.length) {
+  if (emojis.length < maxFrequentlyUsedEmojis) {
     let uniqueDefaults = DEFAULTS.filter(emoji => !emojis.includes(emoji));
-    emojis = emojis.concat(uniqueDefaults.slice(0, DEFAULTS.length - emojis.length));
+    emojis = emojis.concat(uniqueDefaults.slice(0, maxFrequentlyUsedEmojis - emojis.length));
   }
 
   return emojis;

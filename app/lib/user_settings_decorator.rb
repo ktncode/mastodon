@@ -144,6 +144,10 @@ class UserSettingsDecorator
     default_expires_action
     prohibited_visibilities
     prohibited_words
+    max_frequently_used_emojis
+  ).freeze
+
+  INTEGER_KEYS = %w(
   ).freeze
 
   def profile_change?

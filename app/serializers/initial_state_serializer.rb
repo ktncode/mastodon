@@ -121,6 +121,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:enable_status_polling]                 = object.current_account.user.setting_enable_status_polling
       store[:enable_status_polling_intersection]    = object.current_account.user.setting_enable_status_polling_intersection
       store[:disable_auto_focus_to_emoji_search]    = object.current_account.user.setting_disable_auto_focus_to_emoji_search
+      store[:max_frequently_used_emojis]            = object.current_account.user.setting_max_frequently_used_emojis
       
     else
       store[:auto_play_gif] = Setting.auto_play_gif

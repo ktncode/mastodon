@@ -33,6 +33,8 @@ class CustomEmoji < ApplicationRecord
   LIMIT       = [LOCAL_LIMIT, (ENV['MAX_REMOTE_EMOJI_SIZE'] || 256.kilobytes).to_i].max
   MAX_PIXELS  = 750_000 # 1500x500px
 
+  FREQUENTLY_USED_EMOJIS_LIMIT = 100
+
   SHORTCODE_RE_FRAGMENT = '[a-zA-Z0-9_]+'
 
   SCAN_RE = /(?<=[^[:alnum:]:]|\n|^)

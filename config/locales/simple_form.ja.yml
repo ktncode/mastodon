@@ -127,6 +127,7 @@ ja:
         setting_hide_statuses_count: 投稿数をプロフィールページで見られないようにします
         setting_hide_video_preview: 投稿にリンクされた動画のプレビューカードを隠します
         setting_match_visibility_of_references: 参照先の投稿がフォロワー限定の場合、投稿の公開範囲をそれに合わせてフォロワー限定とする動作をデフォルトにします
+        setting_max_frequently_used_emojis: 絵文字ピッカーに表示する『よく使う絵文字』の最大表示数を指定します（最大%{count}件）
         setting_new_features_policy: Fedibirdに新しい機能が追加された時の受け入れポリシーを設定します。推奨設定は多くの新機能を有効にするので、望ましくない場合は無効に設定してください
         setting_noindex: 公開プロフィールおよび各投稿ページに影響します
         setting_place_tab_bar_at_bottom: タッチデバイス使用時に、タブの操作を指の届く範囲で行えます
@@ -354,6 +355,7 @@ ja:
         setting_hide_video_preview: プレビューカード（動画）を隠す
         setting_info_font_size: 情報ヘッダのフォントサイズ
         setting_match_visibility_of_references: 投稿の公開範囲を参照先に合わせる
+        setting_max_frequently_used_emojis: よく使う絵文字の表示数
         setting_new_features_policy: 新機能へのポリシー
         setting_new_features_policy_conservative: 無効にしておき、自分で判断する
         setting_new_features_policy_default: 推奨に従う（デフォルト）

@@ -131,6 +131,7 @@ en:
         setting_hide_statuses_count: The number of post will be hidden in your profile
         setting_hide_video_preview: Hide the video preview card linked to the post
         setting_match_visibility_of_references: If the referenced post is private, default the visibility of the post to private behavior accordingly
+        setting_max_frequently_used_emojis: Specify the maximum number of "frequently used emojis" to be displayed in the emoji picker (max %{count})
         setting_new_features_policy: Set the acceptance policy when new features are added to Fedibird. The recommended setting will enable many new features, so set it to disabled if it is not desirable
         setting_noindex: Affects your public profile and post pages
         setting_place_tab_bar_at_bottom: When using a touch device, you can operate tabs within the reach of your fingers.
@@ -358,6 +359,7 @@ en:
         setting_hide_video_preview: Hide preview card (video)
         setting_info_font_size: Information header font size
         setting_match_visibility_of_references: Match the visibility of the post to the references
+        setting_max_frequently_used_emojis: Number of frequently used emojis displayed
         setting_new_features_policy: Policy for new features
         setting_new_features_policy_tester: Participate in the beta test
         setting_new_features_policy_conservative: Leave it disabled. I use it if necessary
