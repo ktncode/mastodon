@@ -73,6 +73,18 @@ class AccountPolicy < ApplicationPolicy
     admin? && !record.low_priority?
   end
 
+  def change_person_type?
+    admin? && !record.person_type?
+  end
+
+  def change_service_type?
+    admin? && !record.service_type?
+  end
+
+  def change_group_type?
+    admin? && !record.group_type?
+  end
+
   def memorialize?
     admin? && !record.user&.admin? && !record.instance_actor?
   end

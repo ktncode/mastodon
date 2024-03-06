@@ -106,6 +106,14 @@
               = table_link_to 'angle-double-down', t('admin.accounts.demote'), demote_admin_account_role_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:demote, @account.user)
 
           %tr
+            %th= t('admin.accounts.type')
+            %td= t("admin.accounts.types.#{@account.actor_type&.downcase || 'person'}")
+            %td
+              = table_link_to 'user', t('admin.accounts.change_types.person'), person_admin_account_type_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_person_type, @account)
+              = table_link_to 'android', t('admin.accounts.change_types.service'), service_admin_account_type_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_service_type, @account)
+              = table_link_to 'users', t('admin.accounts.change_types.group'), group_admin_account_type_path(@account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:change_group_type, @account)
+
+          %tr
             %th= t('admin.accounts.priority')
             %td= t("admin.accounts.priorities.#{@account.priority}")
             %td

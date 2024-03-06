@@ -125,6 +125,10 @@ en:
         default: Change default priority
         high: Change high priority
         low: Change low priority
+      change_types:
+        group: Change group type
+        person: Change person type
+        service: Change service type
       confirm: Confirm
       confirmed: Confirmed
       confirming: Confirming
@@ -148,6 +152,7 @@ en:
       enabled_msg: Successfully unfroze %{username}'s account
       followers: Followers
       follows: Follows
+      group_type_msg: Successfully changed %{username} to group type
       hard_silence: Hard limit
       hard_silenced: Hard limited
       header: Header
@@ -184,6 +189,7 @@ en:
       not_subscribed: Not subscribed
       pending: Pending review
       perform_full_suspension: Suspend
+      person_type_msg: Successfully changed %{username} to person type
       promote: Promote
       priority: Priority
       priorities:
@@ -224,6 +230,7 @@ en:
         password_and_sign_in_token: Password and e-mail token
       sensitive: Force-sensitive
       sensitized: Marked as sensitive
+      service_type_msg: Successfully changed %{username} to service type
       shared_inbox_url: Shared inbox URL
       show:
         created_reports: Made reports
@@ -238,6 +245,11 @@ en:
       suspension_reversible_hint_html: The account has been suspended, and the data will be fully removed on %{date}. Until then, the account can be restored without any ill effects. If you wish to remove all of the account's data immediately, you can do so below.
       time_in_queue: Waiting in queue %{time}
       title: Accounts
+      type: Actor Type
+      types:
+        group: Group
+        person: Person
+        service: Service
       unconfirmed_email: Unconfirmed email
       undo_sensitized: Undo force-sensitive
       undo_silenced: Undo limit
@@ -281,16 +293,19 @@ en:
         enable_sign_in_token_auth_user: Enable E-mail Token Authentication for User
         enable_user: Enable User
         expire_status: Close Post
+        group_type_account: Change Account Group type
         hard_silence_account: Hard limit Account
         high_priority_account: Change Account high priority
         low_priority_account: Change Account low priority
         memorialize_account: Memorialize Account
+        person_type_account: Change Account Person type
         promote_user: Promote User
         remove_avatar_user: Remove Avatar
         reopen_report: Reopen Report
         reset_password_user: Reset Password
         resolve_report: Resolve Report
         sensitive_account: Force-Sensitive Account
+        service_type_account: Change Account service type
         silence_account: Limit Account
         suspend_account: Suspend Account
         unassigned_report: Unassign Report

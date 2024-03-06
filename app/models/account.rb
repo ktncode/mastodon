@@ -194,6 +194,30 @@ class Account < ApplicationRecord
     %w(Application Service).include? actor_type
   end
 
+  def person_type?
+    actor_type.blank? || actor_type == 'Person'
+  end
+
+  def service_type?
+    actor_type == 'Service'
+  end
+
+  def group_type?
+    actor_type == 'Group'
+  end
+
+  def person_type!
+    update!(actor_type: 'Person')
+  end
+
+  def service_type!
+    update!(actor_type: 'Service')
+  end
+
+  def group_type!
+    update!(actor_type: 'Group')
+  end
+
   def instance_actor?
     id == -99
   end
@@ -201,6 +225,8 @@ class Account < ApplicationRecord
   alias bot bot?
 
   def bot=(val)
+    return if group?
+
     self.actor_type = ActiveModel::Type::Boolean.new.cast(val) ? 'Service' : 'Person'
   end
 

@@ -119,6 +119,10 @@ ja:
         default: 優先度（通常）へ変更
         high: 優先度（高）へ変更
         low: 優先度（低）へ変更
+      change_types:
+        group: Groupへ変更
+        person: Personへ変更
+        service: Serviceへ変更
       confirm: 確認
       confirmed: 確認済み
       confirming: 確認中
@@ -140,6 +144,7 @@ ja:
       enabled_msg: "%{username} の無効化を解除しました"
       followers: フォロワー数
       follows: フォロー数
+      group_type_msg: "%{username} をGroup Actorに更新しました"
       hard_silence: ハードサイレンス
       hard_silenced: ハードサイレンス済み
       header: ヘッダー
@@ -177,6 +182,7 @@ ja:
       not_subscribed: 購読していない
       pending: 承認待ち
       perform_full_suspension: 活動を完全に停止させる
+      person_type_msg: "%{username} Person Actorに更新しました"
       promote: 昇格
       priority: 優先度
       priorities:
@@ -213,6 +219,7 @@ ja:
       search_same_ip: 同じ IP のユーザーを検索
       sensitive: 閲覧注意
       sensitized: 閲覧注意済み
+      service_type_msg: "%{username} をService Actorに更新しました"
       shared_inbox_url: Shared inbox URL
       show:
         created_reports: このアカウントで作られた通報
@@ -227,6 +234,11 @@ ja:
       suspension_reversible_hint_html: アカウントは停止されており、データは %{date} に完全に削除されます。それまではアカウントを元に戻すことができます。今すぐ完全に削除したい場合は以下から行うことができます。
       time_in_queue: "%{time} 待ち"
       title: アカウント
+      type: Actorタイプ
+      types:
+        group: グループ
+        person: 人間
+        service: サービス
       unconfirmed_email: 確認待ちのメールアドレス
       undo_sensitized: 閲覧注意から戻す
       undo_silenced: サイレンスから戻す
@@ -268,16 +280,19 @@ ja:
         enable_custom_emoji: カスタム絵文字を有効化
         enable_user: ユーザーを有効化
         expire_status: 投稿を公開終了
+        group_type_account: アカウントをGroup Actorに変更
         hard_silence_account: アカウントをハードサイレンス
         high_priority_account: アカウントを優先度（高）に変更
         low_priority_account: アカウントを優先度（低）に変更
         memorialize_account: 追悼アカウント化
+        person_type_account: アカウントをPerson Actorに変更
         promote_user: ユーザーを昇格
         remove_avatar_user: アイコンを削除
         reopen_report: 未解決に戻す
         reset_password_user: パスワードをリセット
         resolve_report: 通報を解決済みにする
         sensitive_account: アカウントのメディアを閲覧注意にマーク
+        service_type_account: アカウントをService Actorに変更
         silence_account: アカウントをサイレンス
         suspend_account: アカウントを停止
         unassigned_report: 通報の担当を解除

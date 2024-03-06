@@ -304,6 +304,14 @@ Rails.application.routes.draw do
           post :low
         end
       end
+
+      resource :type, only: [] do
+        member do
+          post :person
+          post :service
+          post :group
+        end
+      end
     end
 
     resources :pending_accounts, only: [:index] do
