@@ -19,7 +19,7 @@ class Api::V1::GroupDirectoriesController < Api::BaseController
       scope.merge!(Account.order(id: :desc))                               if params[:order] == 'new'
       scope.merge!(Account.not_excluded_by_account(current_account))       if current_account
       scope.merge!(Account.not_domain_blocked_by_account(current_account)) if current_account
-      scope.merge!(Account.joins(:node).where.not(node: {info: nil}))
+      scope.merge!(Account.or(Account.local).or(Account.where(domain: Node.has_nodeinfo.select(:domain))))
     end
   end
 end
