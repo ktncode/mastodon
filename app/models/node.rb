@@ -154,7 +154,7 @@ class Node < ApplicationRecord
   end
 
   def missing?
-    nodeinfo&.dig('error') == 'missing'
+    nodeinfo.nil? || nodeinfo['error'] == 'missing'
   end
 
   def available?

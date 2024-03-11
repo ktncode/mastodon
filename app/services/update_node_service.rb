@@ -152,10 +152,14 @@ class UpdateNodeService < BaseService
 
   def proccess_info
     preprocess_info
-    process_features
-    process_icon
-    process_thumbnail
-    process_software_specific_override
+
+    if node.node?
+      process_features
+      process_icon
+      process_thumbnail
+      process_software_specific_override
+    end
+
     process_override
 
     node.save!
