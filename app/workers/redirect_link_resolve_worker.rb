@@ -18,7 +18,7 @@ class RedirectLinkResolveWorker
     parsed_url = Addressable::URI.parse(url)
     return if parsed_url.blank? || !%w(http https).include?(parsed_url.scheme) || parsed_url.host.blank? || RedirectLink.where(url: url).present?
 
-    Request.new(:head, url).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
+    Request.new(:get, url).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
       if res.code == 200 && url != res.uri.to_s
         RedirectLink.create(url: url, redirected_url: res.uri.to_s)
       end
