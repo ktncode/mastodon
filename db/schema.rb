@@ -381,7 +381,7 @@ ActiveRecord::Schema.define(version: 2024_02_01_030756) do
     t.string "thumbhash"
     t.integer "copy_permission", default: 0, null: false
     t.string "aliases", default: [], null: false, array: true
-    t.jsonb "meta", default: "{}", null: false
+    t.jsonb "meta", default: {}, null: false
     t.index ["meta"], name: "index_custom_emoji_on_meta", using: :gin
     t.index ["shortcode", "domain"], name: "index_custom_emojis_on_shortcode_and_domain", unique: true
   end
