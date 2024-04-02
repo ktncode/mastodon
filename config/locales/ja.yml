@@ -789,9 +789,18 @@ ja:
       show_moderator_badge:
         desc_html: ユーザーページにモデレーターのバッジを表示します
         title: モデレーターバッジを表示する
+      show_only_media_at_about_page:
+        desc_html: チェックすると、ランディングページからリンクされた公開タイムラインにメディア付き公開投稿のみ表示します。
+        title: 公開タイムラインにメディアのみ表示
       show_staff_badge:
         desc_html: ユーザーページにスタッフのバッジを表示します
         title: スタッフバッジを表示する
+      show_without_bot_at_about_page:
+        desc_html: チェックすると、ランディングページからリンクされた公開タイムラインからBotによる公開投稿を除外します。
+        title: 公開タイムラインからBotを除外
+      show_without_media_at_about_page:
+        desc_html: チェックすると、ランディングページからリンクされた公開タイムラインからメディア付き公開投稿を除外します。
+        title: 公開タイムラインからメディアを除外
       site_description:
         desc_html: フロントページへの表示に使用される紹介文です。このMastodonサーバーを特徴付けることやその他重要なことを記述してください。HTMLタグ、特に<code>&lt;a&gt;</code> と <code>&lt;em&gt;</code>が使えます。
         title: サーバーの説明

@@ -117,6 +117,9 @@ defaults: &defaults
   activity_api_enabled: true
   peers_api_enabled: true
   show_known_fediverse_at_about_page: true
+  show_only_media_at_about_page: false
+  show_without_media_at_about_page: false
+  show_without_bot_at_about_page: true
   show_domain_blocks: 'disabled'
   show_domain_blocks_rationale: 'disabled'
   require_invite_text: false

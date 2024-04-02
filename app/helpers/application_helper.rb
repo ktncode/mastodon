@@ -202,6 +202,9 @@ module ApplicationHelper
     state_params = {
       settings: {
         known_fediverse: Setting.show_known_fediverse_at_about_page,
+        only_media: Setting.show_only_media_at_about_page,
+        without_media: Setting.show_without_media_at_about_page,
+        without_bot: Setting.show_without_bot_at_about_page,
       },
 
       text: [params[:title], params[:text], params[:url]].compact.join(' '),

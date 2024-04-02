@@ -9,8 +9,8 @@ import DetailedStatusContainer from 'mastodon/features/status/containers/detaile
 import { debounce } from 'lodash';
 import LoadingIndicator from 'mastodon/components/loading_indicator';
 
-const mapStateToProps = (state) => {
-  const timeline = state.getIn(['timelines', 'public'], ImmutableMap());
+const mapStateToProps = (state, {onlyMedia, withoutMedia, withoutBot}) => {
+  const timeline = state.getIn(['timelines', `public${withoutBot ? ':nobot' : ':bot'}${withoutMedia ? ':nomedia' : ''}${onlyMedia ? ':media' : ''}`], ImmutableMap());
 
   return {
     statusIds: timeline.get('items', ImmutableList()),
@@ -27,6 +27,9 @@ class PublicTimeline extends React.PureComponent {
     statusIds: ImmutablePropTypes.list.isRequired,
     isLoading: PropTypes.bool.isRequired,
     hasMore: PropTypes.bool.isRequired,
+    onlyMedia: PropTypes.bool,
+    withoutMedia: PropTypes.bool,
+    withoutBot: PropTypes.bool,
   };
 
   componentDidMount () {
@@ -37,17 +40,17 @@ class PublicTimeline extends React.PureComponent {
   }
 
   _connect () {
-    const { dispatch } = this.props;
+    const { dispatch, onlyMedia, withoutMedia, withoutBot } = this.props;
 
-    dispatch(expandPublicTimeline());
+    dispatch(expandPublicTimeline({ onlyMedia, withoutMedia, withoutBot }));
   }
 
   handleLoadMore = () => {
-    const { dispatch, statusIds } = this.props;
+    const { dispatch, statusIds, onlyMedia, withoutMedia, withoutBot } = this.props;
     const maxId = statusIds.last();
 
     if (maxId) {
-      dispatch(expandPublicTimeline({ maxId }));
+      dispatch(expandPublicTimeline({ maxId, onlyMedia, withoutMedia, withoutBot }));
     }
   }
 

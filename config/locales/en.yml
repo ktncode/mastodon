@@ -805,9 +805,18 @@ en:
       show_moderator_badge:
         desc_html: Show a moderator badge on a user page
         title: Show moderator badge
+      show_only_media_at_about_page:
+        desc_html: When enabled, restricts the public timeline linked from the landing page to showing only the public post with the media
+        title: 公開タイムラインにメディアのみ表示
       show_staff_badge:
         desc_html: Show a staff badge on a user page
         title: Show staff badge
+      show_without_bot_at_about_page:
+        desc_html: When enabled, restricts the public timeline linked from the landing page to showing only the public post without by bot
+        title: 公開タイムラインからBotを除外
+      show_without_media_at_about_page:
+        desc_html: When enabled, restricts the public timeline linked from the landing page to showing only the public post without the media
+        title: 公開タイムラインからメディアを除外
       site_description:
         desc_html: Introductory paragraph on the API. Describe what makes this Mastodon server special and anything else important. You can use HTML tags, in particular <code>&lt;a&gt;</code> and <code>&lt;em&gt;</code>.
         title: Server description

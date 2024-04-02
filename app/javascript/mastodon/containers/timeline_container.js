@@ -26,21 +26,27 @@ export default class TimelineContainer extends React.PureComponent {
     locale: PropTypes.string.isRequired,
     hashtag: PropTypes.string,
     local: PropTypes.bool,
+    onlyMedia: PropTypes.bool,
+    withoutMedia: PropTypes.bool,
+    withoutBot: PropTypes.bool,
   };
 
   static defaultProps = {
     local: !initialState.settings.known_fediverse,
+    onlyMedia: initialState.settings.only_media,
+    withoutMedia: initialState.settings.without_media,
+    withoutBot: initialState.settings.without_bot,
   };
 
   render () {
-    const { locale, hashtag, local } = this.props;
+    const { locale, hashtag, local, onlyMedia, withoutMedia, withoutBot } = this.props;
 
     let timeline;
 
     if (hashtag) {
-      timeline = <HashtagTimeline hashtag={hashtag} local={local} />;
+      timeline = <HashtagTimeline hashtag={hashtag} local={local} onlyMedia={onlyMedia} withoutMedia={withoutMedia} withoutBot={withoutBot} />;
     } else {
-      timeline = <PublicTimeline local={local} />;
+      timeline = <PublicTimeline local={local} onlyMedia={onlyMedia} withoutMedia={withoutMedia} withoutBot={withoutBot} />;
     }
 
     return (
