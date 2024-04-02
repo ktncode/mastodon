@@ -20,7 +20,11 @@ class RedirectLinkResolveWorker
 
     Request.new(:get, url).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
       if res.code == 200 && url != res.uri.to_s
-        RedirectLink.create(url: url, redirected_url: res.uri.to_s)
+        Request.new(:get, res.uri.to_s).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res2|
+          if res2.code == 200 && res.body == res2.body
+            RedirectLink.create(url: url, redirected_url: res.uri.to_s)
+          end
+        end
       end
     end
 
