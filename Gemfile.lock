@@ -766,7 +766,8 @@ DEPENDENCIES
   letter_opener (~> 1.7)
   letter_opener_web (~> 1.4)
   link_header (~> 0.0)
-  lograge (~> 0.11)
+  lograge (~> 0.12)
+  mail (~> 2.8)
   makara (~> 0.5)
   mario-redis-lock (~> 1.2)
   memory_profiler

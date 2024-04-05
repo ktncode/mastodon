@@ -88,7 +88,10 @@ class User < ApplicationRecord
   validates :invite_request, presence: true, on: :create, if: :invite_text_required?
 
   validates :locale, inclusion: I18n.available_locales.map(&:to_s), if: :locale?
-  validates_with BlacklistedEmailValidator, if: -> { !confirmed? }
+
+  validates :email, presence: true, email_address: true
+
+  validates_with BlacklistedEmailValidator, if: -> { ENV['EMAIL_DOMAIN_LISTS_APPLY_AFTER_CONFIRMATION'] == 'true' || !confirmed? }
   validates_with EmailMxValidator, if: :validate_email_dns?
   validates :agreement, acceptance: { allow_nil: false, accept: [true, 'true', '1'] }, on: :create
   validates :setting_max_frequently_used_emojis, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: CustomEmoji::FREQUENTLY_USED_EMOJIS_LIMIT }
