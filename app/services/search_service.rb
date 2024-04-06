@@ -125,11 +125,11 @@ class SearchService < BaseService
   end
 
   def account_searchable?
-    !@profile && account_search? || profiles_search?
+    account_search?
   end
 
   def profile_searchable?
-    Chewy.enabled? && @account.present? && !@profile && account_search? || profiles_search?
+    Chewy.enabled? && profile_search? && @account.present?
   end
 
   def hashtag_searchable?
@@ -148,7 +148,7 @@ class SearchService < BaseService
     @options[:type].blank? || @options[:type] == 'statuses'
   end
 
-  def profiles_search?
+  def profile_search?
     @options[:type].blank? || @options[:type] == 'profiles'
   end
 end
