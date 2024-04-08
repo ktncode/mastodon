@@ -31,7 +31,7 @@ class Feed
     statuses = Status.where(id: unhydrated)
     statuses = statuses.joins(:account).merge(Account.without_suspended)
     statuses = statuses.where(visibility: visibilities).limit(limit) unless visibilities.empty?
-    statuses.cache_ids
+    statuses
   end
 
   def key
