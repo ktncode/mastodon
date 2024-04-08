@@ -37,7 +37,7 @@ class TagFeed < PublicFeed
     scope.merge!(without_media_scope) if without_media?
     scope.merge!(without_bot_scope) if without_bot?
 
-    scope.cache_ids.to_a_paginated_by_id(limit, max_id: max_id, since_id: since_id, min_id: min_id)
+    scope.to_a_paginated_by_id(limit, max_id: max_id, since_id: since_id, min_id: min_id)
   end
 
   private

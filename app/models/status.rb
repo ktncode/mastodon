@@ -607,26 +607,6 @@ class Status < ApplicationRecord
       }
     end
 
-    def reload_stale_associations!(cached_items)
-      account_ids = []
-
-      cached_items.each do |item|
-        account_ids << item.account_id
-        account_ids << item.reblog.account_id if item.reblog?
-      end
-
-      account_ids.uniq!
-
-      return if account_ids.empty?
-
-      accounts = Account.where(id: account_ids).includes(:account_stat, :user).index_by(&:id)
-
-      cached_items.each do |item|
-        item.account = accounts[item.account_id]
-        item.reblog.account = accounts[item.reblog.account_id] if item.reblog?
-      end
-    end
-
     def permitted_statuses_from_ids(ids, account_id)
       statuses          = Status.with_accounts(ids).to_a
       account_ids       = statuses.map(&:account_id).uniq
@@ -660,7 +640,7 @@ class Status < ApplicationRecord
       end
     end
 
-    def from_0(text)
+    def from_text(text)
       return [] if text.blank?
 
       text.scan(FetchLinkCardService::URL_PATTERN).map(&:first).uniq.filter_map do |url|
