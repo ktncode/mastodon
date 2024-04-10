@@ -497,7 +497,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
     url_candidate = url_to_href(@object['url'], 'text/html')
 
-    if invalid_origin?(url_candidate)
+    if unsupported_uri_scheme?(url_candidate)
       nil
     else
       url_candidate
