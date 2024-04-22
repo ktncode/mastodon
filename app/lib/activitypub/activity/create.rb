@@ -45,7 +45,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def reject_pattern?
-    Setting.reject_pattern.present? && @object['content']&.match?(Setting.reject_pattern)
+    Setting.reject_pattern.present? && content&.match?(Setting.reject_pattern)
   end
 
   def create_status
@@ -75,11 +75,12 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def process_status
-    @tags     = []
-    @mentions = []
-    @params   = {}
+    @tags         = []
+    @mentions     = []
+    @params       = {}
+    @object_links = []
 
-    process_quote
+    process_link_tags
     process_status_params
 
     raise Mastodon::RejectPayload if MediaAttachment.where(id: @params[:media_attachment_ids]).where(blurhash: Setting.reject_blurhash.split(/\r\n/).filter(&:present?).uniq).present?
@@ -169,6 +170,22 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
       mention.status = status
       mention.save
     end
+  end
+
+  def process_link_tags
+    return if @object['tag'].nil?
+
+    as_array(@object['tag']).each do |tag|
+      if equals_or_includes?(tag['type'], 'Link')
+        process_link tag
+      end
+    end
+  end
+
+  def process_link(tag)
+    return if tag['mediaType'] != 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"' || tag['rel'] != "https://misskey-hub.net/ns#_misskey_quote" || tag['href'].blank?
+    
+    @object_links << tag['href']
   end
 
   def process_tags
@@ -444,15 +461,33 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     value_or_id(@object['inReplyTo'])
   end
 
+  def content
+    return @content if defined?(@content)
+
+    @content =
+      if @object['content'].present?
+        @object['content']
+      elsif content_language_map?
+        @object['contentMap'].values.first
+      else
+        ''
+      end
+
+    if quote.nil? && md = @content.match(/QT:\s*\[<a href=\"([^\"]+).*?\]/)
+      @quote = quote_from_url(md[1])
+      @content.sub!(/QT:\s*\[.*?\]/, '<span class="quote-inline"><br/>\0</span>') if @quote.present?
+    end
+
+    @content
+  end
+
   def text_from_content
     return Formatter.instance.linkify([[text_from_name, text_from_summary.presence].compact.join("\n\n"), object_url || object_uri].join(' ')) if converted_object_type?
 
-    if @object['quoteUri'].blank? && @object['_misskey_quote'].present?
-      Formatter.instance.remove_misskey_quote_link(@object['content'])
-    elsif @object['content'].present?
-      @object['content']
-    elsif content_language_map?
-      @object['contentMap'].values.first
+    if @object_links.present? || @object['quoteUri'].blank? && @object['_misskey_quote'].present?
+      Formatter.instance.remove_compatible_object_link(content)
+    else
+      content
     end
   end
 
@@ -606,14 +641,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def quote
-    @quote ||= quote_from_url(@object['quoteUri'] || @object['_misskey_quote'])
-  end
-
-  def process_quote
-    if quote.nil? && md = @object['content']&.match(/QT:\s*\[<a href=\"([^\"]+).*?\]/)
-      @quote = quote_from_url(md[1])
-      @object['content'] = @object['content'].sub(/QT:\s*\[.*?\]/, '<span class="quote-inline"><br/>\1</span>')
-    end
+    @quote ||= quote_from_url(@object_links&.first || @object['quoteUri'] || @object['_misskey_quote'])
   end
 
   def quote_from_url(url)

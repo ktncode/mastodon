@@ -148,7 +148,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   def virtual_tags
-    object.active_mentions.to_a.sort_by(&:id) + object.tags_without_mute + object.emojis_with_category
+    object.active_mentions.to_a.sort_by(&:id) + object.tags_without_mute + object.emojis_with_category + object.object_link
   end
 
   def atom_uri
@@ -329,6 +329,9 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   class CustomEmojiSerializer < ActivityPub::EmojiSerializer
+  end
+
+  class ObjectLinkPresenterSerializer < ActivityPub::ObjectLinkSerializer
   end
 
   class OptionSerializer < ActivityPub::Serializer

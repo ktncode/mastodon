@@ -663,6 +663,10 @@ class Status < ApplicationRecord
     tags.merge(Tag.where.not(id: account.mute_tags.select(:id)))
   end
 
+  def object_link
+    quote? ? [ActivityPub::ObjectLinkPresenter.new(href: ActivityPub::TagManager.instance.uri_for(quote), name: "QT: #{ActivityPub::TagManager.instance.url_for(quote)}")] : []
+  end
+
   private
 
   def set_status_expire
