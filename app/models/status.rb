@@ -204,6 +204,30 @@ class Status < ApplicationRecord
     ids.uniq
   end
 
+  def mentioned_account_id(preloaded = nil)
+    if preloaded.nil?
+      mentions.pluck(:account_id)
+    else
+      preloaded.mentioned_account_ids[id] || []
+    end
+  end
+
+  def public_reblogged_by_account_id(preloaded = nil)
+    if preloaded.nil?
+      reblogs.where(visibility: 'public').map(&:account_id)
+    else
+      preloaded.public_reblogged_by_account_ids[id] || []
+    end
+  end
+
+  def private_reblogged_by_account_id(preloaded = nil)
+    if preloaded.nil?
+      reblogs.where(visibility: ['unlisted', 'private']).map(&:account_id)
+    else
+      preloaded.private_reblogged_by_account_ids[id] || []
+    end
+  end
+
   def searchable_properties
     [].tap do |properties|
       properties << 'image' if media_attachments.any?(&:image?)
@@ -401,10 +425,6 @@ class Status < ApplicationRecord
       preloadable_poll ? preloadable_poll.options.join("\n\n") : nil,
       media_attachments.map(&:description).join("\n\n"),
     ].compact.join("\n\n")
-  end
-
-  def mentioned_account_id
-    mentions.map(&:account_id)
   end
 
   def ordered_media_attachments

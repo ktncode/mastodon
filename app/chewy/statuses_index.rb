@@ -167,10 +167,28 @@ class StatusesIndex < Chewy::Index
     data.each.with_object({}) { |(id, name), result| (result[id] ||= []).push(name) }
   end
 
+  crutch :mentioned_account_ids do |collection|
+    data = ::Mention.where(status_id: collection.map(&:id)).pluck(:status_id, :account_id)
+    data.each.with_object({}) { |(id, name), result| (result[id] ||= []).push(name) }
+  end
+
+  crutch :public_reblogged_by_account_ids do |collection|
+    data = ::Status.where(reblog_of_id: collection.map(&:id)).where(visibility: 'public').pluck(:reblog_of_id, :account_id)
+    data.each.with_object({}) { |(id, name), result| (result[id] ||= []).push(name) }
+  end
+
+  crutch :private_reblogged_by_account_ids do |collection|
+    data = ::Status.where(reblog_of_id: collection.map(&:id)).where(visibility: ['unlisted', 'private']).pluck(:reblog_of_id, :account_id)
+    data.each.with_object({}) { |(id, name), result| (result[id] ||= []).push(name) }
+  end
+
   root date_detection: false do
     field :id, type: 'long'
     field :account_id, type: 'long'
-    field :mentioned_account_id, type: 'long'
+    field :mentioned_account_id, type: 'long', value: ->(status, crutches) { status.mentioned_account_id(crutches) }
+
+    field :public_reblogged_by_account_id, type: 'long', value: ->(status, crutches) { status.public_reblogged_by_account_id(crutches) }
+    field :private_reblogged_by_account_id, type: 'long', value: ->(status, crutches) { status.private_reblogged_by_account_id(crutches) }
     field :domain, type: 'keyword', value: ->(status) { status.account_domain || Rails.configuration.x.local_domain }
     field :created_at, type: 'date'
 
