@@ -14,6 +14,11 @@ class FetchLinkCardService < BaseService
     )
   }iox
 
+  IGNORE_REDIRECT_HOST = %w(
+    link.parallelgame.com
+    audon.space
+  )
+
   def need_fetch?(status)
     @status = status
     parse_urls.present?
@@ -64,9 +69,12 @@ class FetchLinkCardService < BaseService
       if res.code == 200 && res.mime_type == 'text/html'
         @html_charset = res.charset
         @html = res.body_with_limit(4.megabyte)
-        if @url != res.uri.to_s
-          @redirected_url = res.uri.to_s
-          RedirectLink.create(url: @url, redirected_url: res.uri.to_s)
+
+        parsed_url = Addressable::URI.parse(@url)
+        res_uri = Addressable::URI.parse(res.uri.to_s)
+        if !IGNORE_REDIRECT_HOST.include?(parsed_url.host) && @url != res_uri.to_s && !(parsed_url.normalized_host.casecmp(res_uri.normalized_host)&.zero? && res_uri.path.match?(/^$|^\/[A-Za-z]{2,}([_\-][A-Za-z]{2,})?$/))
+          @redirected_url = res_uri.to_s
+          RedirectLink.create(url: @url, redirected_url: res_uri.to_s)
         end
       else
         @html_charset = nil

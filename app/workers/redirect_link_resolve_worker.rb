@@ -17,12 +17,14 @@ class RedirectLinkResolveWorker
   def perform(url, status_id)
     parsed_url = Addressable::URI.parse(url)
     return if parsed_url.blank? || !%w(http https).include?(parsed_url.scheme) || parsed_url.host.blank? || RedirectLink.where(url: url).present?
+    return if !FetchLinkCardService::IGNORE_REDIRECT_HOST.include?(parsed_url.host)
 
     Request.new(:get, url).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
-      if res.code == 200 && url != res.uri.to_s
-        Request.new(:get, res.uri.to_s).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res2|
+      res_uri = Addressable::URI.parse(res.uri.to_s)
+      if res.code == 200 && url != res_uri.to_s && !(parsed_url.normalized_host.casecmp(res_uri.normalized_host)&.zero? && res_uri.path.match?(/^$|^\/[A-Za-z]{2,}([_\-][A-Za-z]{2,})?$/))
+        Request.new(:get, res_uri.to_s).add_headers('User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res2|
           if res2.code == 200 && res.body == res2.body
-            RedirectLink.create(url: url, redirected_url: res.uri.to_s)
+            RedirectLink.create(url: url, redirected_url: res_uri.to_s)
           end
         end
       end
