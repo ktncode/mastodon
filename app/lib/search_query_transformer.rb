@@ -9,6 +9,8 @@ class SearchQueryTransformer < Parslet::Transform
     lang
     from
     to
+    by
+    boosted_by
     before
     since
     after
@@ -266,6 +268,13 @@ class SearchQueryTransformer < Parslet::Transform
         @filter = :mentioned_account_id
         @type = term.is_a?(Array) ? :terms : :term
         @term = account_id_from_term(term)
+      when 'by', 'boosted_by'
+        @public_ids  = account_id_from_term(term, only_private: false)
+        @private_ids = account_id_from_term(term, only_private: true)
+        @term = { bool: { should: [
+          {@public_ids.is_a?(Array)  ? :terms : :term => { public_reblogged_by_account_id: @public_ids }},
+          {@private_ids.is_a?(Array) ? :terms : :term => { private_reblogged_by_account_id: @private_ids }},
+        ] }}
       when 'url'
         if term.is_a?(Array)
           @term = { bool: { should: term.map { |term| { prefix: { urls: { value: "#{term.start_with?('https://') ? '' : 'https://'}#{term}" } } } }, minimum_should_match: 1 } }
@@ -323,8 +332,8 @@ class SearchQueryTransformer < Parslet::Transform
 
     private
 
-    def account_id_from_term(term)
-      return term.map { |term| account_id_from_term(term) } if term.is_a?(Array)
+    def account_id_from_term(term, only_private: nil)
+      return term.map { |term| account_id_from_term(term, only_private: only_private) } if term.is_a?(Array)
 
       return @options[:current_account]&.id || -1 if term == 'me'
 
@@ -332,9 +341,11 @@ class SearchQueryTransformer < Parslet::Transform
       domain = nil if TagManager.instance.local_domain?(domain)
       account = Account.find_remote(username, domain)
 
-      # If the account is not found, we want to return empty results, so return
-      # an ID that does not exist
-      account&.id || -1
+      return -1 if account.nil? ||
+        only_private == true  && !(@options[:current_account]&.id == account.id || %w(public unlisted private).include?(account.searchability) && @options[:current_account]&.following?(account)) ||
+        only_private == false && !(@options[:current_account]&.id == account.id || %w(public).include?(account.searchability))
+
+      account.id
     end
 
     def language_code_from_term(term)
