@@ -231,7 +231,7 @@ class PostStatusService < BaseService
 
   def idempotency_duplicate
     if scheduled?
-      @account.schedule_statuses.find(@idempotency_duplicate)
+      @account.scheduled_statuses.find(@idempotency_duplicate)
     else
       @account.statuses.find(@idempotency_duplicate)
     end
@@ -292,12 +292,12 @@ class PostStatusService < BaseService
   end
 
   def scheduled_options
-    @options.tap do |options_hash|
-      options_hash[:in_reply_to_id]       = options_hash.delete(:thread)&.id&.to_s
+    @options.dup.tap do |options_hash|
+      options_hash[:in_reply_to_id]       = options_hash.delete(:thread)&.id
       options_hash[:application_id]       = options_hash.delete(:application)&.id
       options_hash[:scheduled_at]         = nil
       options_hash[:idempotency]          = nil
-      options_hash[:status_reference_ids] = options_hash[:status_reference_ids]&.map(&:to_s)&.filter{ |id| id != options_hash[:quote_id] }
+      options_hash[:status_reference_ids] = options_hash.delete(:status_reference_ids)&.map(&:to_s)&.filter{ |id| id != options_hash[:quote_id] }
       options_hash[:with_rate_limit]      = false
     end
   end
