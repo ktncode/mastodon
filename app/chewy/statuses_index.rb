@@ -197,6 +197,7 @@ class StatusesIndex < Chewy::Index
       field :ja_stemmed, type: 'text', analyzer: 'ja_content'
       field :ko_stemmed, type: 'text', analyzer: 'ko_content'
       field :zh_stemmed, type: 'text', analyzer: 'zh_content'
+      field :wildcard, type: 'wildcard' 
     end
 
     field :language, type: 'keyword'

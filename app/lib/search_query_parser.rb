@@ -4,6 +4,7 @@ class SearchQueryParser < Parslet::Parser
   rule(:term)      { match('[^[:space:]"]').repeat(1).as(:term) }
   rule(:aterm)     { match('[^[:space:],"]').repeat(1).as(:term) }
   rule(:quote)     { str('"') }
+  rule(:squote)    { str("'") }
   rule(:colon)     { str(':') }
   rule(:comma)     { str(',') }
   rule(:space)     { match('[[:space:]]').repeat(1) }
@@ -13,7 +14,9 @@ class SearchQueryParser < Parslet::Parser
   rule(:shortcode) { (colon >> term >> colon.maybe).as(:shortcode) }
   rule(:phrase)    { (quote >> (match('[^[:space:]"]').repeat(1).as(:term) >> space.maybe).repeat >> quote).as(:phrase) }
   rule(:phrases)   { (phrase >> comma.maybe).repeat(2).as(:phrases) }
-  rule(:clause)    { (operator.maybe >> prefix.maybe.as(:prefix) >> (phrases | phrase | terms | term | shortcode)).as(:clause) | prefix.as(:clause) | quote.as(:junk) }
+  rule(:wildcard)  { (squote >> (match("[^[:space:]']").repeat(1).as(:term) >> space.maybe).repeat >> squote).as(:wildcard) }
+  rule(:wildcards) { (wildcard >> comma.maybe).repeat(2).as(:wildcards) }
+  rule(:clause)    { (operator.maybe >> prefix.maybe.as(:prefix) >> (phrases | phrase | wildcards | wildcard | terms | term | shortcode)).as(:clause) | prefix.as(:clause) | quote.as(:junk) }
   rule(:query)     { (clause >> space.maybe).repeat.as(:query) }
   root(:query)
 end
