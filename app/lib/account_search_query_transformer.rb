@@ -109,6 +109,23 @@ class AccountSearchQueryTransformer < Parslet::Transform
     end
   end
 
+  class WildcardClause
+    attr_reader :operator, :wildcard
+
+    def initialize(operator, wildcard)
+      @operator = Operator.symbol(operator)
+      @wildcard = wildcard
+    end
+
+    def to_query(field)
+      if @wildcard.is_a?(Array)
+        { bool: { must: { bool: { should: @wildcard.map { |wildcard| { wildcard: { 'text.wildcard': { value: "*#{@wildcard}*", case_insensitive: true } } } }, minimum_should_match: 1 } } } }
+      else
+        { wildcard: { 'text.wildcard': { value: "*#{@wildcard}*", case_insensitive: true } } }
+      end
+    end
+  end
+
   class PrefixClause
     attr_reader :operator, :prefix, :term
 
@@ -175,6 +192,10 @@ class AccountSearchQueryTransformer < Parslet::Transform
       PhraseClause.new(operator, clause[:phrases].map { |phrase| phrase[:phrase].is_a?(Array) ? phrase[:phrase].map { |p| p[:term].to_s }.join(' ') : clause[:phrase].to_s })
     elsif clause[:phrase]
       PhraseClause.new(operator, clause[:phrase].is_a?(Array) ? clause[:phrase].map { |p| p[:term].to_s }.join(' ') : clause[:phrase].to_s)
+    elsif clause[:wildcards]
+      WildcardClause.new(operator, clause[:wildcards].map { |wildcard| clause[:wildcard].is_a?(Array) ? wildcard[:wildcard].map { |wildcard| wildcard[:term].to_s }.join(' ') : nil }.compact)
+    elsif clause[:wildcard]
+      WildcardClause.new(operator, clause[:wildcard].is_a?(Array) ? clause[:wildcard].map { |term| term[:term].to_s }.join(' ') : nil)
     else
       raise "Unexpected clause type: #{clause}"
     end

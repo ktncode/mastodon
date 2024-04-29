@@ -221,6 +221,23 @@ class SearchQueryTransformer < Parslet::Transform
     end
   end
 
+  class WildcardClause
+    attr_reader :operator, :wildcard
+
+    def initialize(operator, wildcard)
+      @operator = Operator.symbol(operator)
+      @wildcard = wildcard
+    end
+
+    def to_query(field)
+      if @wildcard.is_a?(Array)
+        { bool: { must: { bool: { should: @wildcard.map { |wildcard| { wildcard: { 'text.wildcard': { value: "*#{@wildcard}*", case_insensitive: true } } } }, minimum_should_match: 1 } } } }
+      else
+        { wildcard: { 'text.wildcard': { value: "*#{@wildcard}*", case_insensitive: true } } }
+      end
+    end
+  end
+
   class PrefixClause
     attr_reader :operator, :prefix, :term
 
@@ -397,6 +414,10 @@ class SearchQueryTransformer < Parslet::Transform
         clause[:phrases].map { |phrase| clause[:phrase].is_a?(Array) ? phrase[:phrase].map { |phrase| phrase[:term].to_s }.join(' ') : nil }.compact
       elsif clause[:phrase]
         clause[:phrase].is_a?(Array) ? clause[:phrase].map { |term| term[:term].to_s }.join(' ') : nil
+      elsif clause[:wildcards]
+        clause[:wildcards].map { |wildcard| clause[:wildcard].is_a?(Array) ? wildcard[:wildcard].map { |wildcard| wildcard[:term].to_s }.join(' ') : nil }.compact
+      elsif clause[:wildcard]
+        clause[:wildcard].is_a?(Array) ? clause[:wildcard].map { |term| term[:term].to_s }.join(' ') : nil
       elsif clause[:terms]
         clause[:terms].map { |term| term[:term].to_s }
       elsif clause[:term]
@@ -415,6 +436,8 @@ class SearchQueryTransformer < Parslet::Transform
       TermClause.new(operator, "#{prefix} #{Array(term).join(' ')}")
     elsif clause[:phrases] || clause[:phrase]
       PhraseClause.new(operator, term)
+    elsif clause[:wildcards] || clause[:wildcard]
+      WildcardClause.new(operator, term)
     elsif term.present?
       TermClause.new(operator, term)
     else
