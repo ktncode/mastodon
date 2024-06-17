@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
 import Button from 'mastodon/components/button';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { autoPlayGif, me, isStaff, show_followed_by, follow_button_to_list_adder, disablePost, disableBlock, disableDomainBlock, disableFollow, disableUnfollow, hideJoinedDateFromYourself } from 'mastodon/initial_state';
+import { autoPlayGif, me, isStaff, show_followed_by, follow_button_to_list_adder, disablePost, disableBlock, disableDomainBlock, disableFollow, disableUnfollow, hideJoinedDateFromYourself, hideStatusesCountFromYourself, hideFollowingCountFromYourself, hideFollowersCountFromYourself, hideSubscribingCountFromYourself } from 'mastodon/initial_state';
 import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import IconButton from 'mastodon/components/icon_button';
@@ -444,9 +444,10 @@ class Header extends ImmutablePureComponent {
       buttons = <Fragment>{subscribing_buttons}{following_buttons}</Fragment>;
     }
 
-    const hide_statuses_count = account.getIn(['other_settings', 'hide_statuses_count'], false);
-    const hide_following_count = account.getIn(['other_settings', 'hide_following_count'], false);
-    const hide_followers_count = account.getIn(['other_settings', 'hide_followers_count'], false);
+    const hide_statuses_count = account.get('id') === me && hideStatusesCountFromYourself || account.getIn(['other_settings', 'hide_statuses_count'], false);
+    const hide_following_count = account.get('id') === me && hideFollowingCountFromYourself || account.getIn(['other_settings', 'hide_following_count'], false);
+    const hide_followers_count = account.get('id') === me && hideFollowersCountFromYourself || account.getIn(['other_settings', 'hide_followers_count'], false);
+    const hide_subscribing_count = account.get('id') === me && hideSubscribingCountFromYourself;
 
     const location = account.getIn(['other_settings', 'location']);
     const joined = account.get('created_at');
@@ -616,6 +617,7 @@ class Header extends ImmutablePureComponent {
                 { (me === account.get('id')) && (
                   <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/subscribing`} title={intl.formatNumber(account.get('subscribing_count'))}>
                     <ShortNumber
+                      hide={hide_subscribing_count}
                       value={account.get('subscribing_count')}
                       renderer={counterRenderer('subscribers')}
                     />

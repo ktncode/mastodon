@@ -4,7 +4,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me } from 'mastodon/initial_state';
+import { me, hideStatusesCountFromYourself, hideFollowingCountFromYourself, hideFollowersCountFromYourself, hideSubscribingCountFromYourself } from 'mastodon/initial_state';
 import { counterRenderer } from 'mastodon/components/common_counter';
 import ShortNumber from 'mastodon/components/short_number';
 import { NavLink } from 'react-router-dom';
@@ -51,9 +51,10 @@ class HeaderExtraLinks extends ImmutablePureComponent {
 
     const suspended = account.get('suspended');
 
-    const hide_statuses_count = account.getIn(['other_settings', 'hide_statuses_count'], false);
-    const hide_following_count = account.getIn(['other_settings', 'hide_following_count'], false);
-    const hide_followers_count = account.getIn(['other_settings', 'hide_followers_count'], false);
+    const hide_statuses_count = account.get('id') === me && hideStatusesCountFromYourself || account.getIn(['other_settings', 'hide_statuses_count'], false);
+    const hide_following_count = account.get('id') === me && hideFollowingCountFromYourself || account.getIn(['other_settings', 'hide_following_count'], false);
+    const hide_followers_count = account.get('id') === me && hideFollowersCountFromYourself || account.getIn(['other_settings', 'hide_followers_count'], false);
+    const hide_subscribing_count = account.get('id') === me && hideSubscribingCountFromYourself;
 
     return (
       <div className={classNames('account__header', 'advanced', { inactive: !!account.get('moved') })}>
@@ -93,6 +94,7 @@ class HeaderExtraLinks extends ImmutablePureComponent {
               {!hideSubscribingCount && (me === account.get('id')) && (
                 <NavLink exact activeClassName='active' to={`/accounts/${account.get('id')}/subscribing`} title={intl.formatNumber(account.get('subscribing_count'))}>
                   <ShortNumber
+                    hide={hide_subscribing_count}
                     value={account.get('subscribing_count')}
                     renderer={counterRenderer('subscribers')}
                   />

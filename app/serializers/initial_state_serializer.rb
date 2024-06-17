@@ -111,6 +111,10 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:use_fullsize_header_on_detail]         = object.current_account.user.setting_use_fullsize_header_on_detail
       store[:hide_following_from_yourself]          = object.current_account.user.setting_hide_following_from_yourself
       store[:hide_followers_from_yourself]          = object.current_account.user.setting_hide_followers_from_yourself
+      store[:hide_statuses_count_from_yourself]     = object.current_account.user.setting_hide_statuses_count_from_yourself
+      store[:hide_following_count_from_yourself]    = object.current_account.user.setting_hide_following_count_from_yourself
+      store[:hide_followers_count_from_yourself]    = object.current_account.user.setting_hide_followers_count_from_yourself
+      store[:hide_subscribing_count_from_yourself]  = object.current_account.user.setting_hide_subscribing_count_from_yourself
       store[:hide_joined_date_from_yourself]        = object.current_account.user.setting_hide_joined_date_from_yourself
       store[:hide_reaction_counter]                 = object.current_account.user.setting_hide_reaction_counter
       store[:hide_list_of_emoji_reactions_to_posts] = object.current_account.user.setting_hide_list_of_emoji_reactions_to_posts
