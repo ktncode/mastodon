@@ -108,8 +108,10 @@ ja:
         setting_hide_bot_on_public_timeline: 連合・ハッシュタグ・ドメイン・グループタイムライン上にBotアカウントが表示されないようにします（※カラム設定を優先）
         setting_hide_direct_from_timeline: ホームとリストタイムラインからダイレクトメッセージを隠します
         setting_hide_followers_count: フォロワー数をプロフィールページで見られないようにします
+        setting_hide_followers_count_from_yourself: 自分が何人にフォローされているか意識せずに済むよう、自分自身に対して隠します。他のアカウントからの参照には影響しません
         setting_hide_followers_from_yourself: 自分が誰にフォローされているか意識せずに済むよう、自分自身に対して隠します。他のアカウントからの参照には影響しません
         setting_hide_following_count: フォロー数をプロフィールページで見られないようにします
+        setting_hide_following_count_from_yourself: 自分が何人をフォローしているか意識せずに済むよう、自分自身に対して隠します。他のアカウントからの参照には影響しません
         setting_hide_following_from_yourself: 自身が誰をフォローしているか意識せずに済むよう、自分自身に対して隠します。他のアカウントからの参照には影響しません
         setting_hide_joined_date_from_yourself: 自身が登録日を意識せずに済むよう、自分自身に対して隠します（WebUIのみ）。他のアカウントからの参照には影響しません
         setting_hide_link_preview: 投稿にリンクされたコンテンツのプレビューカードを隠します
@@ -125,6 +127,8 @@ ja:
         setting_hide_reaction_counter: 投稿に表示される絵文字リアクションの件数を隠します
         setting_hide_reblogged_by: 見出しがなくなり、通常の投稿として表示されるようになります
         setting_hide_statuses_count: 投稿数をプロフィールページで見られないようにします
+        setting_hide_statuses_count_from_yourself: 自分が何件投稿したか意識せずに済むよう、自分自身に対して隠します。他のアカウントからの参照には影響しません
+        setting_hide_subscribing_count_from_yourself: 自分が何人を購読しているか意識せずに済むよう、自分自身に対して隠します
         setting_hide_video_preview: 投稿にリンクされた動画のプレビューカードを隠します
         setting_match_visibility_of_references: 参照先の投稿がフォロワー限定の場合、投稿の公開範囲をそれに合わせてフォロワー限定とする動作をデフォルトにします
         setting_max_frequently_used_emojis: 絵文字ピッカーに表示する『よく使う絵文字』の最大表示数を指定します（最大%{count}件）
@@ -335,8 +339,10 @@ ja:
         setting_hide_bot_on_public_timeline: 公開タイムラインのBotアカウントを非表示
         setting_hide_direct_from_timeline: ダイレクトメッセージをタイムラインから隠す
         setting_hide_followers_count: フォロワー数を隠す
+        setting_hide_followers_count_from_yourself: 自分に対し自分のフォロワー数を隠す
         setting_hide_followers_from_yourself: 自分に対し自分のフォロワーを隠す
         setting_hide_following_count: フォロー数を隠す
+        setting_hide_following_count_from_yourself: 自分に対し自分のフォロー数を隠す
         setting_hide_following_from_yourself: 自分に対し自分のフォローを隠す
         setting_hide_joined_date_from_yourself: 自分に対し自分の登録日を隠す
         setting_hide_link_preview: プレビューカード（リンク）を隠す
@@ -352,6 +358,8 @@ ja:
         setting_hide_reaction_counter: リアクションの件数を隠す
         setting_hide_reblogged_by: ブーストされた投稿の見出しを隠す
         setting_hide_statuses_count: 投稿数を隠す
+        setting_hide_statuses_count_from_yourself: 自分に対し自分の投稿数を隠す
+        setting_hide_subscribing_count_from_yourself: 自分に対し自分の購読数を隠す
         setting_hide_video_preview: プレビューカード（動画）を隠す
         setting_info_font_size: 情報ヘッダのフォントサイズ
         setting_match_visibility_of_references: 投稿の公開範囲を参照先に合わせる

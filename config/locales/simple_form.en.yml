@@ -112,8 +112,10 @@ en:
         setting_hide_bot_on_public_timeline: Disable Bot accounts from appearing on federation & hashtag & domain & group timelines (overridden by column setting)
         setting_hide_direct_from_timeline: Hide direct messages from the home and list timelines
         setting_hide_followers_count: The number of followers will be hidden in your profile
+        setting_hide_followers_count_from_yourself: Hide your number of followers so that you don't have to worry about how many followers you follow. Doesn't affect references from other accounts
         setting_hide_followers_from_yourself: Hide your followers from you so you don't have to worry about who's following you. Doesn't affect references from other accounts
         setting_hide_following_count: The number of following will be hidden in your profile
+        setting_hide_following_count_from_yourself: Hide your number of following so that you don't have to worry about how many following. Doesn't affect references from other accounts
         setting_hide_following_from_yourself: Hide your following from you so you don't have to worry about who you're following. Doesn't affect references from other accounts
         setting_hide_joined_date_from_yourself: Hide the joined date from yourself so that you don't have to be aware of it (WebUI only). Doesn't affect references from other accounts
         setting_hide_link_preview: Hide the content preview card linked to the post
@@ -129,6 +131,8 @@ en:
         setting_hide_reaction_counter: Hide emoji reaction counter that appears on posts
         setting_hide_reblogged_by: The headline will be hidden and will appear as a normal post
         setting_hide_statuses_count: The number of post will be hidden in your profile
+        setting_hide_statuses_count_from_yourself: Hide the number of posts to yourself so that you do not have to be aware of the number of posts
+        setting_hide_subscribing_count_from_yourself: Hide your number of subscribing so that you don't have to worry about how many subscribing
         setting_hide_video_preview: Hide the video preview card linked to the post
         setting_match_visibility_of_references: If the referenced post is private, default the visibility of the post to private behavior accordingly
         setting_max_frequently_used_emojis: Specify the maximum number of "frequently used emojis" to be displayed in the emoji picker (max %{count})
@@ -339,8 +343,10 @@ en:
         setting_hide_bot_on_public_timeline: Hide bot account on public timeline
         setting_hide_direct_from_timeline: Hide direct messages from the timeline
         setting_hide_followers_count: Hide your followers count
+        setting_hide_following_count_from_yourself: Hide your followers count from yourself
         setting_hide_followers_from_yourself: Hide your followers from yourself
         setting_hide_following_count: Hide your following count
+        setting_hide_following_count_from_yourself: Hide your following count from yourself
         setting_hide_following_from_yourself: Hide your following from yourself
         setting_hide_joined_date_from_yourself: Hide joined date from yourself
         setting_hide_link_preview: Hide preview card (link)
@@ -356,6 +362,8 @@ en:
         setting_hide_reblogged_by: Hide boost post headlines
         setting_hide_reaction_counter: Hide reactions counter
         setting_hide_statuses_count: Hide your post count
+        setting_hide_statuses_count_from_yourself: Hide your post count from yourself
+        setting_hide_subscribing_count_from_yourself: Hide your subscribing count from yourself
         setting_hide_video_preview: Hide preview card (video)
         setting_info_font_size: Information header font size
         setting_match_visibility_of_references: Match the visibility of the post to the references

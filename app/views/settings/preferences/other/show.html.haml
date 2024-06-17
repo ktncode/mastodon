@@ -22,6 +22,15 @@
     = f.input :setting_hide_followers_count, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   .fields-group
+    = f.input :setting_hide_following_count_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_followers_count_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_subscribing_count_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
     = f.input :setting_hide_following_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   .fields-group
@@ -46,6 +55,9 @@
 
   .fields-group
     = f.input :setting_hide_statuses_count, as: :boolean, wrapper: :with_label, fedibird_features: true
+
+  .fields-group
+    = f.input :setting_hide_statuses_count_from_yourself, as: :boolean, wrapper: :with_label, fedibird_features: true
 
   %h4= t 'preferences.posting_defaults'
 

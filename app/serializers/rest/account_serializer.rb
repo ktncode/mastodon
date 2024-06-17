@@ -103,15 +103,19 @@ class REST::AccountSerializer < ActiveModel::Serializer
   end
 
   def statuses_count
-    object.public_statuses_count
+    respond_to?(:current_user) && current_user && current_user.account_id == object.id && current_user&.setting_hide_statuses_count_from_yourself ? 0 : object.public_statuses_count
   end
 
   def following_count
-    object.public_following_count
+    respond_to?(:current_user) && current_user && current_user.account_id == object.id && current_user&.setting_hide_following_count_from_yourself ? 0 : object.public_following_count
   end
 
   def followers_count
-    object.public_followers_count
+    respond_to?(:current_user) && current_user && current_user.account_id == object.id && current_user&.setting_hide_followers_count_from_yourself ? 0 : object.public_followers_count
+  end
+
+  def subscribing_count
+    respond_to?(:current_user) && current_user && current_user.account_id == object.id && current_user&.setting_hide_subscribing_count_from_yourself ? 0 : object.subscribing_count
   end
 
   def display_name

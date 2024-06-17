@@ -79,17 +79,17 @@ module AccountsHelper
 
   def account_description(account)
     prepend_str = [
-      account.hide_statuses_count? ? nil : [
+      account.hide_statuses_count? || respond_to?(:current_account) && account.id == current_account&.id && account.user_hide_statuses_count_from_yourself? ? nil : [
         number_to_human(account.public_statuses_count, precision: 3, strip_insignificant_zeros: true),
         I18n.t('accounts.posts', count: account.public_statuses_count),
       ].join(' '),
 
-      account.hide_following_count? ? nil : [
+      account.hide_following_count? || respond_to?(:current_account) && account.id == current_account&.id && account.user_hide_following_count_from_yourself? ? nil : [
         number_to_human(account.public_following_count, precision: 3, strip_insignificant_zeros: true),
         I18n.t('accounts.following', count: account.public_following_count),
       ].join(' '),
 
-      account.hide_followers_count? ? nil : [
+      account.hide_followers_count? || respond_to?(:current_account) && account.id == current_account&.id && account.user_hide_followers_count_from_yourself? ? nil : [
         number_to_human(account.public_followers_count, precision: 3, strip_insignificant_zeros: true),
         I18n.t('accounts.followers', count: account.public_followers_count),
       ].join(' '),

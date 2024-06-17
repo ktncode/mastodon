@@ -106,6 +106,10 @@ class UserSettingsDecorator
     use_low_resolution_thumbnails
     use_fullsize_avatar_on_detail
     use_fullsize_header_on_detail
+    hide_statuses_count_from_yourself
+    hide_following_count_from_yourself
+    hide_followers_count_from_yourself
+    hide_subscribing_count_from_yourself
     hide_following_from_yourself
     hide_followers_from_yourself
     hide_joined_date_from_yourself

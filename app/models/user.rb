@@ -139,6 +139,7 @@ class User < ApplicationRecord
            :enable_reaction, :compact_reaction, :disable_reaction_streaming,
            :show_reply_tree_button,
            :hide_statuses_count, :hide_following_count, :hide_followers_count, :disable_joke_appearance,
+           :hide_statuses_count_from_yourself, :hide_following_count_from_yourself, :hide_followers_count_from_yourself, :hide_subscribing_count_from_yourself,
            :new_features_policy,
            :theme_instance_ticker, :theme_public,
            :enable_status_reference, :match_visibility_of_references,
@@ -318,6 +319,22 @@ class User < ApplicationRecord
 
   def hide_followers_count?
     @hide_followers_count ||= settings.hide_followers_count
+  end
+
+  def hide_statuses_count_from_yourself?
+    @hide_statuses_count_from_yourself ||= settings.hide_statuses_count_from_yourself
+  end
+
+  def hide_following_count_from_yourself?
+    @hide_following_count_from_yourself ||= settings.hide_following_count_from_yourself
+  end
+
+  def hide_followers_count_from_yourself?
+    @hide_followers_count_from_yourself ||= settings.hide_followers_count_from_yourself
+  end
+
+  def hide_subscribing_count_from_yourself?
+    @hide_subscribing_count_from_yourself ||= settings.hide_subscribing_count_from_yourself
   end
 
   def aggregates_reblogs?
