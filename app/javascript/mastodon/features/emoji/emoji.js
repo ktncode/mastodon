@@ -2,6 +2,9 @@ import { autoPlayGif } from '../../initial_state';
 import unicodeMapping from './emoji_unicode_mapping_light';
 import { assetHost } from 'mastodon/utils/config';
 import Trie from 'substring-trie';
+import { List as ImmutableList } from 'immutable';
+
+const { toHiragana } = require('@koozaki/romaji-conv');
 
 const trie = new Trie(Object.keys(unicodeMapping));
 
@@ -114,7 +117,9 @@ export const buildCustomEmojis = (customEmojis) => {
     const shortcode = emoji.get('shortcode');
     const url       = autoPlayGif ? emoji.get('url') : emoji.get('static_url');
     const name      = shortcode.replace(':', '');
-    const keywords  = emoji.get('aliases', null)?.toArray() ?? [shortcode.replace(':', '')];
+    const aliases   = emoji.get('aliases', null) ?? ImmutableList();
+    const hiragana  = aliases.isEmpty() ? toHiragana(name) : null;
+    const keywords  = hiragana && name !== hiragana && !aliases.includes(hiragana) ? [name, hiragana] : [name, ...aliases.toArray()];
 
     emojis.push({
       id: name,
