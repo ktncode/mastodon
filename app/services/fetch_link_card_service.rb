@@ -19,6 +19,11 @@ class FetchLinkCardService < BaseService
     audon.space
   )
 
+  PRESET_ENDPOINTS = {
+    'www.youtube.com' => {:endpoint=>"https://www.youtube.com/oembed?format=json&url={url}", :format=>:json},
+    'youtu.be'        => {:endpoint=>"https://www.youtube.com/oembed?format=json&url={url}", :format=>:json},
+  }
+
   def need_fetch?(status)
     @status = status
     parse_urls.present?
@@ -127,7 +132,7 @@ class FetchLinkCardService < BaseService
   def attempt_oembed
     service         = FetchOEmbedService.new
     url_domain      = Addressable::URI.parse(@url).normalized_host
-    cached_endpoint = Rails.cache.read("oembed_endpoint:#{url_domain}")
+    cached_endpoint = Rails.cache.read("oembed_endpoint:#{url_domain}") || PRESET_ENDPOINTS[url_domain]
 
     embed   = service.call(@url, cached_endpoint: cached_endpoint) unless cached_endpoint.nil?
     embed ||= service.call(@url, html: html) unless html.nil?
