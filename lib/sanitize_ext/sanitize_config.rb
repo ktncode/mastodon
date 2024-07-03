@@ -64,8 +64,8 @@ class Sanitize
       current_node.wrap('<p></p>')
     end
 
-    MASTODON_STRICT ||= freeze_config(
-      elements: %w(p br span a del pre blockquote code b strong u i em ul ol li),
+    MASTODON_STRICT = freeze_config(
+      elements: %w(p br span a del pre blockquote code b strong u i em ul ol li ruby rt rp),
 
       attributes: {
         'a'    => %w(href rel class),
