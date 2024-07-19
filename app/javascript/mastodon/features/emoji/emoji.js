@@ -119,7 +119,10 @@ export const buildCustomEmojis = (customEmojis) => {
     const name      = shortcode.replace(':', '');
     const aliases   = emoji.get('aliases', null) ?? ImmutableList();
     const hiragana  = aliases.isEmpty() ? toHiragana(name) : null;
-    const keywords  = hiragana && name !== hiragana && !aliases.includes(hiragana) ? [name, hiragana] : [name, ...aliases.toArray()];
+    let keywords    = hiragana && name !== hiragana && !aliases.includes(hiragana) ? [name, hiragana] : [name, ...aliases.toArray()];
+    if (emoji.get('category')) {
+      keywords.push(emoji.get('category'))
+    }
 
     emojis.push({
       id: name,
