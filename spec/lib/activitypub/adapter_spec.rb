@@ -49,7 +49,7 @@ RSpec.describe ActivityPub::Adapter do
       let(:serializer_class) { TestWithBasicContextSerializer }
 
       it 'renders a basic @context' do
-        expect(subject).to include({ '@context' => 'https://www.w3.org/ns/activitystreams' })
+        expect(subject).to include({ '@context': 'https://www.w3.org/ns/activitystreams' })
       end
     end
 
@@ -57,7 +57,7 @@ RSpec.describe ActivityPub::Adapter do
       let(:serializer_class) { TestWithNamedContextSerializer }
 
       it 'renders a @context with both items' do
-        expect(subject).to include({ '@context' => ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'] })
+        expect(subject).to include({ '@context': ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'] })
       end
     end
 
@@ -65,7 +65,7 @@ RSpec.describe ActivityPub::Adapter do
       let(:serializer_class) { TestWithNestedNamedContextSerializer }
 
       it 'renders a @context with both items' do
-        expect(subject).to include({ '@context' => ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'] })
+        expect(subject).to include({ '@context': ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'] })
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe ActivityPub::Adapter do
       let(:serializer_class) { TestWithContextExtensionSerializer }
 
       it 'renders a @context with the extension' do
-        expect(subject).to include({ '@context' => ['https://www.w3.org/ns/activitystreams', { 'sensitive' => 'as:sensitive' }] })
+        expect(subject).to include({ '@context': ['https://www.w3.org/ns/activitystreams', { 'sensitive' => 'as:sensitive' }] })
       end
     end
 
@@ -81,7 +81,7 @@ RSpec.describe ActivityPub::Adapter do
       let(:serializer_class) { TestWithNestedContextExtensionSerializer }
 
       it 'renders a @context with both extensions' do
-        expect(subject).to include({ '@context' => ['https://www.w3.org/ns/activitystreams', { 'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers', 'sensitive' => 'as:sensitive' }] })
+        expect(subject).to include({ '@context': ['https://www.w3.org/ns/activitystreams', { 'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers', 'sensitive' => 'as:sensitive' }] })
       end
     end
   end
