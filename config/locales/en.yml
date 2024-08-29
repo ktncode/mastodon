@@ -1771,6 +1771,8 @@ en:
   themes:
     contrast: Mastodon (High contrast)
     default: Mastodon (Dark)
+    hmt-mint: hanubeki (mint)
+    hmt-pink: hanubeki (pink)
     mastodon-material: Material (v1-light)
     mastodon-material-google-plus: Material (google-plus)
     mastodon-material-mastodon-dark: Material (mastodon-dark)
