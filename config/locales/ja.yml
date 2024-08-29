@@ -1671,6 +1671,8 @@ ja:
   themes:
     contrast: Mastodon (ハイコントラスト)
     default: Mastodon (ダーク)
+    hmt-mint: hanubeki (ミント) 
+    hmt-pink: hanubeki (ピンク) 
     mastodon-light: Mastodon (ライト)
     mastodon-material: マテリアル (v1-light)
     mastodon-material-google-plus: マテリアル (google-plus)
