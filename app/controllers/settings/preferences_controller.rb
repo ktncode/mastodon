@@ -67,6 +67,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_show_navigation_panel,
       :setting_show_quote_button,
       :setting_show_bookmark_button,
+      :setting_show_share_button,
       :setting_place_tab_bar_at_bottom,
       :setting_show_tab_bar_label,
       :setting_show_target,

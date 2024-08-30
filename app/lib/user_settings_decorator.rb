@@ -61,6 +61,7 @@ class UserSettingsDecorator
     show_navigation_panel
     show_quote_button
     show_bookmark_button
+    show_share_button
     show_target
     place_tab_bar_at_bottom
     show_tab_bar_label

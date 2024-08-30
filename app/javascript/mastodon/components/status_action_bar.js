@@ -6,7 +6,7 @@ import IconButton from './icon_button';
 import DropdownMenuContainer from '../containers/dropdown_menu_container';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, isStaff, show_bookmark_button, show_quote_button, enableReaction, compactReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock } from '../initial_state';
+import { me, isStaff, show_bookmark_button, show_quote_button, show_share_button, enableReaction, compactReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock } from '../initial_state';
 import classNames from 'classnames';
 import { openModal } from '../actions/modal';
 
@@ -473,7 +473,7 @@ class StatusActionBar extends ImmutablePureComponent {
       reblogTitle = intl.formatMessage(messages.cannot_reblog);
     }
 
-    const shareButton = ('share' in navigator) && publicStatus && (
+    const shareButton = ('share' in navigator) && show_share_button && publicStatus && (
       <IconButton className='status__action-bar-button' disabled={expired} title={intl.formatMessage(messages.share)} icon='share-alt' onClick={this.handleShareClick} />
     );
 

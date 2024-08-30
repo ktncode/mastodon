@@ -50,6 +50,7 @@ defaults: &defaults
   follow_button_to_list_adder: false
   show_navigation_panel: true
   show_bookmark_button: true
+  show_share_button: true
   show_quote_button: true
   show_target: false
   place_tab_bar_at_bottom: false

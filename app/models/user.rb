@@ -133,7 +133,7 @@ class User < ApplicationRecord
            :disable_swiping, :confirm_domain_block,
            :show_follow_button_on_timeline, :show_subscribe_button_on_timeline, :show_target,
            :show_follow_button_on_timeline, :show_subscribe_button_on_timeline, :show_followed_by, :show_target,
-           :follow_button_to_list_adder, :show_navigation_panel, :show_quote_button, :show_bookmark_button,
+           :follow_button_to_list_adder, :show_navigation_panel, :show_quote_button, :show_bookmark_button, :show_share_button,
            :place_tab_bar_at_bottom,:show_tab_bar_label,
            :enable_local_timeline, :enable_federated_timeline, :enable_limited_timeline, :enable_personal_timeline,
            :enable_reaction, :compact_reaction, :disable_reaction_streaming,

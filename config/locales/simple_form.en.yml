@@ -148,6 +148,7 @@ en:
         setting_show_quote_button: Selects whether to display the button on the action bar. It does not enable/disable the citation function.
         setting_show_reload_button: Show reload button at the top of the iPhone / iPad timeline
         setting_show_reply_tree_button: Blue marker for replies to another post, yellow marker for posts with replies, and green marker for both
+        setting_show_share_button: If you are using a browser that supports sharing, the share button will be displayed on the action bar.
         setting_show_subscribe_button_on_timeline: You can easily check the status of your subscriptions and quickly build a subscription list
         setting_show_tab_bar_label: When adding a list etc. to the tab bar, it is recommended to display the label because it is not possible to distinguish by the icon alone
         setting_show_followed_by: "The color of the follow button changes according to the follow status (gray: no follow relationship, yellow: followed, blue: following, green: mutual follow)"
@@ -387,6 +388,7 @@ en:
         setting_show_quote_button: Show the quote button on the action bar
         setting_show_reload_button: Show reload button
         setting_show_reply_tree_button: Show markers on posts where a reply relationship exists
+        setting_show_share_button: Show the share button on the action bar
         setting_show_subscribe_button_on_timeline: Show subscribe button on timeline
         setting_show_tab_bar_label: Show labels in the tab bar
         setting_show_followed_by: Reflect the following status on the follow button

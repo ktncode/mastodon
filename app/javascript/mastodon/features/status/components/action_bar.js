@@ -5,7 +5,7 @@ import IconButton from '../../../components/icon_button';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
 import { defineMessages, injectIntl } from 'react-intl';
-import { me, isStaff, show_quote_button, enableReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock, hideListOfEmojiReactionsToPosts, hideListOfFavouritesToPosts, hideListOfReblogsToPosts, hideListOfReferredByToPosts } from '../../../initial_state';
+import { me, isStaff, show_quote_button, show_share_button, enableReaction, enableStatusReference, maxReferences, matchVisibilityOfReferences, addReferenceModal, disablePost, disableReactions, disableBlock, disableDomainBlock, hideListOfEmojiReactionsToPosts, hideListOfFavouritesToPosts, hideListOfReblogsToPosts, hideListOfReferredByToPosts } from '../../../initial_state';
 import classNames from 'classnames';
 import ReactionPickerDropdownContainer from 'mastodon/containers/reaction_picker_dropdown_container';
 import { openModal } from '../../../actions/modal';
@@ -405,7 +405,7 @@ class ActionBar extends React.PureComponent {
       }
     }
 
-    const shareButton = ('share' in navigator) && publicStatus && (
+    const shareButton = ('share' in navigator) && show_share_button && publicStatus && (
       <div className='detailed-status__button'><IconButton disabled={expired} title={intl.formatMessage(messages.share)} icon='share-alt' onClick={this.handleShare} /></div>
     );
 
