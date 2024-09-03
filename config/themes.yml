@@ -16,5 +16,7 @@ mastodon-material-google-plus: styles/mastodon-material-google-plus.scss
 modern-dark: styles/modern-dark.scss
 modern-light: styles/modern-light.scss
 takibi: styles/takibi.scss
+hmt-blue: styles/hmt-blue.scss
+hmt-cream: styles/hmt-cream.scss
 hmt-mint: styles/hmt-mint.scss
 hmt-pink: styles/hmt-pink.scss

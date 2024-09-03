@@ -1672,6 +1672,8 @@ ja:
   themes:
     contrast: Mastodon (ハイコントラスト)
     default: Mastodon (ダーク)
+    hmt-blue: hanubeki (ブルー) 
+    hmt-cream: hanubeki (クリーム) 
     hmt-mint: hanubeki (ミント) 
     hmt-pink: hanubeki (ピンク) 
     mastodon-light: Mastodon (ライト)

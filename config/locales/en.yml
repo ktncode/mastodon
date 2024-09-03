@@ -1772,6 +1772,8 @@ en:
   themes:
     contrast: Mastodon (High contrast)
     default: Mastodon (Dark)
+    hmt-blue: hanubeki (blue) 
+    hmt-cream: hanubeki (cream)
     hmt-mint: hanubeki (mint)
     hmt-pink: hanubeki (pink)
     mastodon-material: Material (v1-light)
