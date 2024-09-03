@@ -107,32 +107,38 @@ class Compose extends React.PureComponent {
 
     if (!columns.some(column => column.get('id') === id)) {
       const tabParams = {
-        'START':         { to: '/getting-started',        title: formatMessage(messages.start),            label: formatMessage(messages.short_start),            icon_id: 'bars' },
-        'HOME':          { to: '/timelines/home',         title: formatMessage(messages.home_timeline),    label: formatMessage(messages.short_home_timeline),    icon_id: 'home' },
-        'LIMITED':       { to: '/timelines/limited',      title: formatMessage(messages.limited_timeline), label: formatMessage(messages.short_limited_timeline), icon_id: 'lock' },
-        'NOTIFICATIONS': { to: '/notifications',          title: formatMessage(messages.notifications),    label: formatMessage(messages.short_notifications),    icon_id: 'bell' },
-        'COMMUNITY':     { to: '/timelines/public/local', title: formatMessage(messages.community),        label: formatMessage(messages.short_community),        icon_id: 'users' },
-        'PUBLIC':        { to: '/timelines/public',       title: formatMessage(messages.public),           label: formatMessage(messages.short_public),           icon_id: 'globe' },
-        'LIST':          { to: '/lists',                  title: formatMessage(messages.lists),            label: formatMessage(messages.short_lists),            icon_id: 'list-ul' },
-        'PREFERENCES':   { href: '/settings/preferences', title: formatMessage(messages.preferences),      label: formatMessage(messages.short_preferences),      icon_id: 'cog' },
-        'SIGN_OUT':      { href: '/auth/sign_out',        title: formatMessage(messages.logout),           label: formatMessage(messages.short_logout),           icon_id: 'sign-out', method: 'delete' },
+        'START':         { to: '/getting-started',        title: formatMessage(messages.start),            label: formatMessage(messages.short_start),            icon_id: 'bars',     type: 'link' },
+        'HOME':          { to: '/timelines/home',         title: formatMessage(messages.home_timeline),    label: formatMessage(messages.short_home_timeline),    icon_id: 'home',     type: 'link' },
+        'LIMITED':       { to: '/timelines/limited',      title: formatMessage(messages.limited_timeline), label: formatMessage(messages.short_limited_timeline), icon_id: 'lock',     type: 'link' },
+        'NOTIFICATIONS': { to: '/notifications',          title: formatMessage(messages.notifications),    label: formatMessage(messages.short_notifications),    icon_id: 'bell',     type: 'link' },
+        'COMMUNITY':     { to: '/timelines/public/local', title: formatMessage(messages.community),        label: formatMessage(messages.short_community),        icon_id: 'users',    type: 'link' },
+        'PUBLIC':        { to: '/timelines/public',       title: formatMessage(messages.public),           label: formatMessage(messages.short_public),           icon_id: 'globe',    type: 'link' },
+        'LIST':          { to: '/lists',                  title: formatMessage(messages.lists),            label: formatMessage(messages.short_lists),            icon_id: 'list-ul',  type: 'link' },
+        'PREFERENCES':   { to: '/settings/preferences',   title: formatMessage(messages.preferences),      label: formatMessage(messages.short_preferences),      icon_id: 'cog',      type: 'a' },
+        'SIGN_OUT':      { to: '/auth/sign_out',          title: formatMessage(messages.logout),           label: formatMessage(messages.short_logout),           icon_id: 'sign-out', type: 'logout' },
       };
 
-      const { href, to, title, label, icon_id, method } = tabParams[id];
+      const { href, to, title, label, icon_id, method, type } = tabParams[id];
 
       const icon = (id === 'NOTIFICATIONS') ? <NotificationsCounterIcon /> : <Icon id={icon_id} fixedWidth />;
 
-      if (href) {
-        return (
-          <a href={href} className={classNames('drawer__tab', { 'short-label': show_tab_bar_label })} title={title} aria-label={title} data-method={method}>{icon}<span className='drawer__tab__short-label'>{label}</span></a>
-        );
-      } else {
+      switch (type) {
+      case 'link':
         return (
           <Link to={to} className={classNames('drawer__tab', { 'short-label': show_tab_bar_label })} title={title} aria-label={title}>{icon}<span className='drawer__tab__short-label'>{label}</span></Link>
         );
+      case 'a':
+        return (
+          <a href={to} className={classNames('drawer__tab', { 'short-label': show_tab_bar_label })} title={title} aria-label={title}>{icon}<span className='drawer__tab__short-label'>{label}</span></a>
+        );
+      case 'logout':
+        return (
+          <a href={to} className={classNames('drawer__tab', { 'short-label': show_tab_bar_label })} title={title} aria-label={title} onClick={this.handleLogoutClick}>{icon}<span className='drawer__tab__short-label'>{label}</span></a>
+        );
+      default:
+        return null;
       }
     }
-    return null;
   }
 
   render () {

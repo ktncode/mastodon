@@ -967,6 +967,7 @@ en:
     link_to_webauth: Use your security key device
     login: Log in
     logout: Logout
+    logout_confirmation: Are you sure you want to log out?
     migrate_account: Move to a different account
     migrate_account_html: If you wish to redirect this account to a different one, you can <a href="%{path}">configure it here</a>.
     or_log_in_with: Or log in with
