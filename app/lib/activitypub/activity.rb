@@ -366,12 +366,14 @@ class ActivityPub::Activity
   end
 
   def searchability_from_audience
-    if audience_searchable_by.nil?
+    if audience_searchable_by.blank?
       nil
     elsif audience_searchable_by.any? { |uri| ActivityPub::TagManager.instance.public_collection?(uri) }
       :public
     elsif audience_searchable_by.include?(@account.followers_url)
       :private
+    elsif audience_searchable_by == [ActivityPub::TagManager.instance.uri_for(@account)]
+      :direct
     else
       :direct
     end
