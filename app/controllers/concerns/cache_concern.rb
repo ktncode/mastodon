@@ -11,7 +11,7 @@ module CacheConcern
     body       = Rails.cache.read(key, raw: true)
 
     if body
-      render(options.except(:json, :serializer, :each_serializer, :adapter, :fields).merge(json: body))
+      render(**options.except(:json, :serializer, :each_serializer, :adapter, :fields).merge(json: body))
     else
       if block_given?
         options[:json] = yield
@@ -19,7 +19,7 @@ module CacheConcern
         options[:json] = send(options[:json])
       end
 
-      render(options)
+      render(**options)
       Rails.cache.write(key, response.body, expires_in: expires_in, raw: true)
     end
   end

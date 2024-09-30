@@ -75,30 +75,30 @@ class RemoveStatusService < BaseService
   end
 
   def remove_from_self
-    FeedManager.instance.unpush_from_home(@account, @status, @options)
+    FeedManager.instance.unpush_from_home(@account, @status, **@options)
   end
 
   def remove_from_followers
     @account.followers_for_local_distribution.includes(:user).reorder(nil).find_each do |follower|
-      FeedManager.instance.unpush_from_home(follower, @status, @options)
+      FeedManager.instance.unpush_from_home(follower, @status, **@options)
     end
   end
 
   def remove_from_lists
     @account.lists_for_local_distribution.select(:id, :account_id).includes(account: :user).reorder(nil).find_each do |list|
-      FeedManager.instance.unpush_from_list(list, @status, @options)
+      FeedManager.instance.unpush_from_list(list, @status, **@options)
     end
   end
 
   def remove_from_subscribers
     @account.subscribers_for_local_distribution.with_reblog(@status.reblog?).with_media(@status.proper).includes(account: :user).reorder(nil).find_each do |subscribing|
-      FeedManager.instance.unpush_from_home(subscribing.account, @status, @options)
+      FeedManager.instance.unpush_from_home(subscribing.account, @status, **@options)
     end
   end
 
   def remove_from_subscribers_lists
     @account.list_subscribers_for_local_distribution.with_reblog(@status.reblog?).with_media(@status.proper).includes(account: :user).reorder(nil).find_each do |subscribing|
-      FeedManager.instance.unpush_from_list(subscribing.list, @status, @options)
+      FeedManager.instance.unpush_from_list(subscribing.list, @status, **@options)
     end
   end
 

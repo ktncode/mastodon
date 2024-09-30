@@ -30,7 +30,7 @@ module ApplicationHelper
   end
 
   def active_link_to(label, path, **options)
-    link_to label, path, options.merge(class: active_nav_class(path))
+    link_to label, path, **options.merge(class: active_nav_class(path))
   end
 
   def show_landing_strip?

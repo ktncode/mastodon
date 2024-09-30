@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '>= 2.5.0', '< 3.1.0'
+ruby '>= 2.5.0', '< 3.2.0'
 
 gem 'pkg-config', '~> 1.4'
 
@@ -33,7 +33,7 @@ gem 'browser'
 gem 'charlock_holmes', '~> 0.7.7'
 gem 'iso-639'
 gem 'chewy', '~> 7.2'
-gem 'cld3', '~> 3.4.2'
+gem 'cld3', '~> 3.5.3'
 gem 'devise', '~> 4.8'
 gem 'devise-two-factor', '~> 4.0'
 
@@ -95,8 +95,8 @@ gem 'tty-prompt', '~> 0.23', require: false
 gem 'twitter-text', '~> 3.1.0'
 gem 'tzinfo-data', '~> 1.2021'
 gem 'webpacker', '~> 5.4'
-gem 'webpush', '~> 0.3'
-gem 'webauthn', '~> 3.0.0.alpha1'
+gem 'webpush', git: 'https://github.com/ClearlyClaire/webpush.git', ref: 'f14a4d52e201128b1b00245d11b6de80d6cfdcd9'
+gem 'webauthn', '~> 2.5'
 gem 'rubyzip'
 
 gem 'json-ld'
@@ -164,5 +164,9 @@ gem 'cocoon', '~> 1.2'
 gem 'mail', '2.7.1'
 
 gem "net-http", "~> 0.4.1"
+gem 'net-pop'
+gem 'net-imap'
 
 gem "globalid", "~> 1.0"
+
+gem 'psych', '~> 3.1'

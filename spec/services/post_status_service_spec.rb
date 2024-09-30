@@ -283,6 +283,6 @@ RSpec.describe PostStatusService, type: :service do
   end
 
   def create_status_with_options(**options)
-    subject.call(Fabricate(:account), options.merge(text: 'test'))
+    subject.call(Fabricate(:account), **options.merge(text: 'test'))
   end
 end
