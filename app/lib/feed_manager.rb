@@ -47,7 +47,8 @@ class FeedManager
     when :home
       filter_from_home?(status, receiver.id, build_crutches(receiver.id, [status]))
     when :list
-      filter_from_list?(status, receiver) || filter_from_home?(status, receiver.account_id, build_crutches(receiver.account_id, [status]))
+      crutches = build_crutches(receiver.account_id, [status], receiver)
+      filter_from_list?(status, receiver, crutches) || filter_from_home?(status, receiver.account_id, crutches, receiver)
     when :mentions
       filter_from_mentions?(status, receiver.id)
     when :status_references
@@ -85,7 +86,7 @@ class FeedManager
   # @param [Status] status
   # @return [Boolean]
   def push_to_list(list, status)
-    return false if filter_from_list?(status, list) || !add_to_feed(:list, list.id, status, list.account.user&.aggregates_reblogs?)
+    return false if filter_from_list?(status, list, build_crutches(list.account_id, [status], list)) || !add_to_feed(:list, list.id, status, list.account.user&.aggregates_reblogs?)
 
     trim(:list, list.id)
     PushUpdateWorker.perform_async(list.account_id, status.id, "timeline:list:#{list.id}") if push_update_required?("timeline:list:#{list.id}")
@@ -145,11 +146,11 @@ class FeedManager
     end
 
     statuses = query.to_a
-    crutches = build_crutches(into_account.id, statuses)
+    crutches = build_crutches(into_account.id, statuses, list&.id)
 
     statuses.each do |status|
-      next if filter_from_home?(status, into_account.id, crutches)
-      next if !list.nil? && filter_from_list?(status, list)
+      next if filter_from_home?(status, into_account.id, crutches, list&.id)
+      next if !list.nil? && filter_from_list?(status, list, crutches)
 
       add_to_feed(type, id, status, aggregate)
     end
@@ -362,7 +363,7 @@ class FeedManager
   # @param [Integer] receiver_id
   # @param [Hash] crutches
   # @return [Boolean]
-  def filter_from_home?(status, receiver_id, crutches)
+  def filter_from_home?(status, receiver_id, crutches, list_id = nil)
     return false if receiver_id == status.account_id
     return true  if status.reply? && (status.in_reply_to_id.nil? || status.in_reply_to_account_id.nil?)
     return true  if phrase_filtered?(status, receiver_id, :home)
@@ -391,7 +392,7 @@ class FeedManager
         should_filter &&= receiver_id != status.in_reply_to_account_id                                                           # and it's not a reply to me
         should_filter &&= status.account_id != status.in_reply_to_account_id                                                     # and it's not a self-reply
         should_filter &&= !status.tags.any? { |tag| crutches[:following_tag_by][tag.id] }                                        # and It's not follow tag
-        should_filter &&= !KeywordSubscribe.match?(status.searchable_text, account_id: receiver_id)                              # and It's not subscribe keywords
+        should_filter &&= !KeywordSubscribe.match?(status.searchable_text, account_id: receiver_id, list_id: list_id)            # and It's not subscribe keywords
         should_filter &&= !crutches[:domain_subscribe][status.account.domain]                                                    # and It's not domain subscribes
         
         return true if should_filter
@@ -400,7 +401,7 @@ class FeedManager
       should_filter   = crutches[:domain_blocking][status.account.domain]
       should_filter &&= !crutches[:following][status.account_id]
       should_filter &&= !crutches[:account_subscribe][status.account_id]
-      should_filter &&= !KeywordSubscribe.match?(status.searchable_text, account_id: receiver_id, as_ignore_block: true)
+      should_filter &&= !KeywordSubscribe.match?(status.searchable_text, account_id: receiver_id, as_ignore_block: true, list_id: list_id)
 
       return !!should_filter
     end
@@ -453,11 +454,14 @@ class FeedManager
   # @param [Status] status
   # @param [List] list
   # @return [Boolean]
-  def filter_from_list?(status, list)
+  def filter_from_list?(status, list, crutches)
     if status.reply? && status.in_reply_to_account_id != status.account_id
-      should_filter = status.in_reply_to_account_id != list.account_id
+      should_filter   = status.in_reply_to_account_id != list.account_id
       should_filter &&= !list.show_followed?
       should_filter &&= !(list.show_list? && ListAccount.where(list_id: list.id, account_id: status.in_reply_to_account_id).exists?)
+      should_filter &&= !status.tags.any? { |tag| crutches[:following_tag_by][tag.id] }                                        # and It's not follow tag
+      should_filter &&= !KeywordSubscribe.match?(status.searchable_text, account_id: list.account_id, list_id: list.id)        # and It's not subscribe keywords
+      should_filter &&= !crutches[:domain_subscribe][status.account.domain]                                                    # and It's not domain subscribes
 
       return !!should_filter
     end
@@ -597,7 +601,7 @@ class FeedManager
   # @param [Integer] receiver_id
   # @param [Array<Status>] statuses
   # @return [Hash]
-  def build_crutches(receiver_id, statuses)
+  def build_crutches(receiver_id, statuses, list_id = nil)
     crutches = {}
 
     crutches[:active_mentions] = Mention.active.where(status_id: statuses.flat_map { |s| [s.id, s.reblog_of_id] }.compact).pluck(:status_id, :account_id).each_with_object({}) { |(id, account_id), mapping| (mapping[id] ||= []).push(account_id) }
@@ -622,9 +626,9 @@ class FeedManager
     crutches[:domain_blocking]    = AccountDomainBlock.where(account_id: receiver_id, domain: statuses.map { |s| s.account&.domain }.compact).pluck(:domain).index_with(true)
     crutches[:domain_blocking_r]  = AccountDomainBlock.where(account_id: receiver_id, domain: statuses.map { |s| s.reblog&.account&.domain }.compact).pluck(:domain).index_with(true)
     crutches[:blocked_by]         = Block.where(target_account_id: receiver_id, account_id: statuses.flat_map { |s| [s&.account_id, s.reblog&.account_id] }.compact).pluck(:account_id).index_with(true)
-    crutches[:following_tag_by]   = FollowTag.where(account_id: receiver_id, tag: statuses.map { |s| s.tags }.flatten.uniq.compact).pluck(:tag_id).index_with(true)
-    crutches[:domain_subscribe]   = DomainSubscribe.where(account_id: receiver_id, list_id: nil, domain: statuses.map { |s| s&.account&.domain }.compact).pluck(:domain).index_with(true)
-    crutches[:account_subscribe]  = AccountSubscribe.where(account_id: receiver_id, target_account_id: statuses.map(&:account_id).compact).pluck(:target_account_id).index_with(true)
+    crutches[:following_tag_by]   = FollowTag.where(account_id: receiver_id, tag: statuses.map { |s| s.tags }.flatten.uniq.compact, list_id: list_id).pluck(:tag_id).index_with(true)
+    crutches[:domain_subscribe]   = DomainSubscribe.where(account_id: receiver_id, list_id: list_id, domain: statuses.map { |s| s&.account&.domain }.compact).pluck(:domain).index_with(true)
+    crutches[:account_subscribe]  = AccountSubscribe.where(account_id: receiver_id, target_account_id: statuses.map(&:account_id).compact, list_id: list_id).pluck(:target_account_id).index_with(true)
     crutches
   end
 end

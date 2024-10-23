@@ -56,8 +56,8 @@ class KeywordSubscribe < ApplicationRecord
   end
 
   class << self
-    def match?(text, account_id: account_id = nil, as_ignore_block: as_ignore_block = false)
-      target = KeywordSubscribe.active
+    def match?(text, account_id: account_id = nil, as_ignore_block: as_ignore_block = false, list_id: nil)
+      target = KeywordSubscribe.active.where(list_id: list_id)
       target = target.where(account_id: account_id) if account_id.present?
       target = target.ignore_block                  if as_ignore_block
       !target.find{ |t| t.match?(text) }.nil?
