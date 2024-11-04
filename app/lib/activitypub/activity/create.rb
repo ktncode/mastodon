@@ -44,12 +44,12 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     )
   end
 
-  def reject_pattern?
-    Setting.reject_pattern.present? && content&.match?(Setting.reject_pattern)
+  def reject_pattern?(text)
+    Setting.reject_pattern.present? && text&.match?(Setting.reject_pattern)
   end
 
   def create_status
-    return reject_payload! if unsupported_object_type? || invalid_origin?(object_uri) || tombstone_exists? || !related_to_local_activity? || reject_pattern?
+    return reject_payload! if unsupported_object_type? || invalid_origin?(object_uri) || tombstone_exists? || !related_to_local_activity? || reject_pattern?(content)
 
     lock_or_fail("create:#{object_uri}") do
       return if delete_arrived_first?(object_uri) || poll_vote?
@@ -84,6 +84,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     process_status_params
 
     raise Mastodon::RejectPayload if MediaAttachment.where(id: @params[:media_attachment_ids]).where(blurhash: Setting.reject_blurhash.split(/\r\n/).filter(&:present?).uniq).present?
+    raise Mastodon::RejectPayload if reject_pattern?(MediaAttachment.where(id: @params[:media_attachment_ids]).pluck(:description).join('\n'))
 
     process_expiry_params
     process_tags
