@@ -485,7 +485,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def text_from_content
     return Formatter.instance.linkify([[text_from_name, text_from_summary.presence].compact.join("\n\n"), object_url || object_uri].join(' ')) if converted_object_type?
 
-    if @object_links.present? || @object['quoteUri'].blank? && @object['_misskey_quote'].present?
+    if quote.present? && (@object_links.present? || @object['quoteUri'].blank? && @object['_misskey_quote'].present?)
       Formatter.instance.remove_compatible_object_link(content)
     else
       content
