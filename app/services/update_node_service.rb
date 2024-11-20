@@ -22,7 +22,7 @@ class UpdateNodeService < BaseService
   private
 
   def fetch_all
-    return unless @options[:force] || node.node? && node.possibly_stale? && node.available?
+    return unless @options[:force] || node.possibly_stale?
 
     fetch_nodeinfo
 
@@ -36,51 +36,53 @@ class UpdateNodeService < BaseService
   end
 
   def fetch_nodeinfo
+    node.last_fetched_at = Time.now.utc
+
     Resolv::DNS.open.getaddress(@domain)
  
     well_known_nodeinfo = json_fetch("https://#{@domain}/.well-known/nodeinfo", true)
 
     if well_known_nodeinfo.present?
-      nodeinfo_url   = well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_1_REL }&.fetch('href', nil)
-      nodeinfo_url ||= well_known_nodeinfo['links'].find { |link| link&.fetch('rel', nil) == NODEINFO_2_0_REL }&.fetch('href', nil)
+      nodeinfo_url   = well_known_nodeinfo['links']&.find { |link| link&.fetch('rel', nil) == NODEINFO_2_1_REL }&.fetch('href', nil)
+      nodeinfo_url ||= well_known_nodeinfo['links']&.find { |link| link&.fetch('rel', nil) == NODEINFO_2_0_REL }&.fetch('href', nil)
     end
 
     @api_domain = Addressable::URI.parse(nodeinfo_url)&.normalize&.host
 
-    node.nodeinfo        = nodeinfo_url.present? ? json_fetch(nodeinfo_url, true) : Node::ERROR_MISSING
-    node.status          = :up
-    node.last_fetched_at = Time.now.utc
+    node.nodeinfo = nodeinfo_url.present? ? json_fetch(nodeinfo_url, true) : Node::ERROR_MISSING
 
     node.info ||= {}
     node.info.merge!(process_software)
     node.info.merge!(last_week_users_local)
 
-    node.save!
+    node.status          = :up
   rescue Mastodon::UnexpectedResponseError => e
     case e.response.code
     when 401
-      node.update!(status: :reject)
+      node.status = :reject
     when 404
-      node.update!(status: :not_found)
+      node.status = :not_found
     when 410
-      node.update!(status: :gone)
+      node.status = :gone
     when 408, 429
-      node.update!(status: :busy)
+      node.status = :busy
     when 400...500
-      node.update!(status: :error)
+      node.status = :error
       raise
     else
-      node.update!(status: :error)
+      node.status = :error
     end
   rescue Resolv::ResolvError
-    node.update!(status: :no_address)
+    node.status = :no_address
     raise
   rescue OpenSSL::SSL::SSLError
-    node.update!(status: :error)
+    node.status = :erro
     raise
   rescue HTTP::TimeoutError, HTTP::ConnectionError
-    node.update!(status: :busy)
+    node.status = :busy
     raise
+  ensure
+    node.save!
   end
 
   def process_software
