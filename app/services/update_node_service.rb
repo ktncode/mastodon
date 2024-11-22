@@ -76,7 +76,7 @@ class UpdateNodeService < BaseService
     node.status = :no_address
     raise
   rescue OpenSSL::SSL::SSLError
-    node.status = :erro
+    node.status = :error
     raise
   rescue HTTP::TimeoutError, HTTP::ConnectionError
     node.status = :busy
