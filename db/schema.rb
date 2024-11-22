@@ -1006,6 +1006,7 @@ ActiveRecord::Schema.define(version: 2024_02_01_030756) do
     t.json "meta"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "blurhash"
     t.index ["var"], name: "index_site_uploads_on_var", unique: true
   end
 
