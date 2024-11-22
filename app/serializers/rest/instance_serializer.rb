@@ -1,73 +1,73 @@
 # frozen_string_literal: true
 
 class REST::InstanceSerializer < ActiveModel::Serializer
+  class ContactSerializer < ActiveModel::Serializer
+    attributes :email
+
+    has_one :account, serializer: REST::AccountSerializer
+  end
+
+  include InstanceHelper
   include RoutingHelper
 
-  attributes :uri, :title, :short_description, :description, :email,
-             :version, :urls, :stats, :thumbnail, :max_toot_chars,
-             :languages, :registrations, :approval_required, :invites_enabled,
-             :configuration,
+  attributes :domain, :title, :version, :source_url, :description,
+             :usage, :thumbnail, :icon, :languages, :configuration,
+             :registrations, :api_versions,
              :feature_quote, :fedibird_capabilities
 
-  has_one :contact_account, serializer: REST::AccountSerializer
-
+  has_one :contact, serializer: ContactSerializer
   has_many :rules, serializer: REST::RuleSerializer
 
-  delegate :contact_account, :rules, to: :instance_presenter
-
-  def uri
-    Rails.configuration.x.local_domain
-  end
-
-  def max_toot_chars
-    StatusLengthValidator::MAX_CHARS
-  end
-
-  def title
-    Setting.site_title
-  end
-
-  def short_description
-    Setting.site_short_description
-  end
-
-  def description
-    Setting.site_description
-  end
-
-  def email
-    Setting.site_contact_email
-  end
-
-  def version
-    Mastodon::Version.to_s
-  end
-
   def thumbnail
-    instance_presenter.thumbnail ? full_asset_url(instance_presenter.thumbnail.file.url) : full_pack_url('media/images/preview.jpg')
+    if object.thumbnail
+      {
+        url: full_asset_url(object.thumbnail.file.url),
+        blurhash: object.thumbnail.blurhash,
+        versions: {
+          '@1x': full_asset_url(object.thumbnail.file.url),
+          '@2x': full_asset_url(object.thumbnail.file.url),
+        },
+      }
+    else
+      {
+        url: full_pack_url('media/images/preview.jpg'),
+      }
+    end
   end
 
-  def stats
+  def icon
     {
-      user_count: instance_presenter.user_count,
-      status_count: instance_presenter.status_count,
-      domain_count: instance_presenter.domain_count,
+      src: full_pack_url('media/images/logo.svg'),
+      size: "192x192",
     }
   end
 
-  def urls
-    { streaming_api: Rails.configuration.x.streaming_api_base_url }
+  def usage
+    {
+      users: {
+        active_month: object.active_user_count(4),
+      },
+    }
   end
 
   def configuration
     {
+      urls: {
+        streaming: Rails.configuration.x.streaming_api_base_url,
+        status: object.status_page_url,
+      },
+
+      vapid: {
+        public_key: Rails.configuration.x.vapid_public_key,
+      },
+
       accounts: {
-        max_favourite_tags: FavouriteTag::LIMIT,
         max_featured_tags: FeaturedTag::LIMIT,
+        max_pinned_statuses: StatusPinValidator::LIMIT,
+        max_favourite_tags: FavouriteTag::LIMIT,
         max_profile_fields: Account::DEFAULT_FIELDS_SIZE,
         max_display_name: LocalDisplayNameValidator::MAX_CHARS,
         characters_reserved_per_emoji: LocalDisplayNameValidator::CUSTOM_EMOJI_PLACEHOLDER_CHARS,
-        max_status_pins: StatusPinValidator::LIMIT,
       },
 
       statuses: {
@@ -90,11 +90,15 @@ class REST::InstanceSerializer < ActiveModel::Serializer
       },
 
       polls: {
-        max_options: [PollValidator::MAX_OPTIONS, Setting.poll_max_options].max,
+        max_options: PollValidator::MAX_OPTIONS,
         max_characters_per_option: PollValidator::MAX_OPTION_CHARS,
         min_expiration: PollValidator::MIN_EXPIRATION,
         max_expiration: PollValidator::MAX_EXPIRATION,
         allow_image: Setting.allow_poll_image,
+      },
+
+      translation: {
+        enabled: false,
       },
 
       emoji_reactions: {
@@ -117,73 +121,26 @@ class REST::InstanceSerializer < ActiveModel::Serializer
     }
   end
 
-  def languages
-    [I18n.default_locale]
-  end
-
   def registrations
-    Setting.registrations_mode != 'none' && !Rails.configuration.x.single_user_mode
+    {
+      enabled: registrations_enabled?,
+      approval_required: Setting.registrations_mode == 'approved',
+      message: registrations_enabled? ? nil : registrations_message,
+      url: ENV.fetch('SSO_ACCOUNT_SIGN_UP', nil),
+    }
   end
 
-  def approval_required
-    Setting.registrations_mode == 'approved'
-  end
-
-  def invites_enabled
-    Setting.min_invite_role == 'user'
-  end
-
-  def feature_quote
-    true
-  end
-
-  def fedibird_capabilities
-    capabilities = [
-      :favourite_hashtag,
-      :favourite_domain,
-      :favourite_list,
-      :status_expire,
-      :follow_no_delivery,
-      :follow_hashtag,
-      :subscribe_account,
-      :subscribe_domain,
-      :subscribe_keyword,
-      :timeline_home_visibility,
-      :timeline_no_local,
-      :timeline_domain,
-      :timeline_group,
-      :timeline_group_directory,
-      :visibility_mutual,
-      :visibility_limited,
-      :visibility_personal,
-      :emoji_reaction,
-      :misskey_birthday,
-      :misskey_location,
-      :status_reference,
-      :searchability,
-      :status_compact_mode,
-      :account_conversations,
-      :enable_wide_emoji,
-      :enable_wide_emoji_reaction,
-      :timeline_bookmark_media_option,
-      :timeline_favourite_media_option,
-      :timeline_emoji_reaction_media_option,
-      :timeline_personal_media_option,
-      :bulk_get_api_for_accounts,
-      :bulk_get_api_for_statuses,
-      :sorted_custom_emojis,
-      :ordered_media_attachment,
-      :followed_message,
-    ]
-
-    capabilities << :profile_search unless Chewy.enabled?
-
-    capabilities
+  def api_versions
+    Mastodon::Version.api_versions
   end
 
   private
 
-  def instance_presenter
-    @instance_presenter ||= InstancePresenter.new
+  def registrations_enabled?
+    Setting.registrations_mode != 'none' && !Rails.configuration.x.single_user_mode
+  end
+
+  def registrations_message
+    Setting.closed_registrations_message
   end
 end

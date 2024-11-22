@@ -3,6 +3,18 @@
 require 'sidekiq_unique_jobs/web' if ENV['ENABLE_SIDEKIQ_UNIQUE_JOBS_UI'] == true
 require 'sidekiq-scheduler/web'
 
+class RedirectWithVary < ActionDispatch::Routing::PathRedirect
+  def build_response(req)
+    super.tap do |response|
+      response.headers['Vary'] = 'Origin, Accept'
+    end
+  end
+end
+
+def redirect_with_vary(path)
+  RedirectWithVary.new(301, path)
+end
+
 Rails.application.routes.draw do
   root 'home#index'
 
@@ -21,11 +33,15 @@ Rails.application.routes.draw do
                 tokens: 'oauth/tokens'
   end
 
-  get '.well-known/host-meta', to: 'well_known/host_meta#show', as: :host_meta, defaults: { format: 'xml' }
-  get '.well-known/nodeinfo', to: 'well_known/nodeinfo#index', as: :nodeinfo, defaults: { format: 'json' }
-  get '.well-known/webfinger', to: 'well_known/webfinger#show', as: :webfinger
-  get '.well-known/change-password', to: redirect('/auth/edit')
-  get '.well-known/keybase-proof-config', to: 'well_known/keybase_proof_config#show'
+  scope path: '.well-known' do
+    scope module: :well_known do
+      get 'host-meta', to: 'host_meta#show', as: :host_meta, defaults: { format: 'xml' }
+      get 'nodeinfo', to: 'nodeinfo#index', as: :nodeinfo, defaults: { format: 'json' }
+      get 'webfinger', to: 'webfinger#show', as: :webfinger
+      get 'keybase-proof-config', to: 'keybase_proof_config#show'
+    end
+    get 'change-password', to: redirect('/auth/edit')
+  end
 
   get '/nodeinfo/2.0', to: 'well_known/nodeinfo#show', as: :nodeinfo_schema
 
@@ -189,7 +205,13 @@ Rails.application.routes.draw do
   resources :emojis, only: [:show]
   resources :emoji_reactions, only: [:show]
   resources :invites, only: [:index, :create, :destroy]
-  resources :filters, except: [:show]
+  resources :filters, except: [:show] do
+    resources :statuses, only: [:index], controller: 'filters/statuses' do
+      collection do
+        post :batch
+      end
+    end
+  end
   resources :generators, only: [:show]
   resource :relationships, only: [:show, :update]
   resource :statuses_cleanup, controller: :statuses_cleanup, only: [:show, :update]
@@ -468,9 +490,15 @@ Rails.application.routes.draw do
       resources :emoji_reactions, only: [:index]
       resources :reports,         only: [:create]
       resources :trends,          only: [:index]
-      resources :filters,         only: [:index, :create, :show, :update, :destroy]
+      resources :filters,         only: [:index, :create, :show, :update, :destroy] do
+        resources :keywords, only: [:index, :create], controller: 'filters/keywords'
+      end
       resources :endorsements,    only: [:index]
       resources :markers,         only: [:index, :create]
+
+      namespace :filters do
+        resources :keywords, only: [:show, :update, :destroy]
+      end
 
       namespace :apps do
         get :verify_credentials, to: 'credentials#show'
@@ -483,9 +511,16 @@ Rails.application.routes.draw do
       end
 
       resource :instance, only: [:show] do
-        resources :peers, only: [:index], controller: 'instances/peers'
-        resource :activity, only: [:show], controller: 'instances/activity'
-        resources :rules, only: [:index], controller: 'instances/rules'
+        scope module: :instances do
+          resources :peers, only: [:index]
+          resources :rules, only: [:index]
+          # resources :domain_blocks, only: [:index]
+          # resource :privacy_policy, only: [:show]
+          # resource :extended_description, only: [:show]
+          # resource :translation_languages, only: [:show]
+          # resource :languages, only: [:show]
+          resource :activity, only: [:show], controller: :activity
+        end
       end
 
       resource :domain_blocks, only: [:show, :create, :destroy]
@@ -614,9 +649,22 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
-      resources :media, only: [:create]
       get '/search', to: 'search#index', as: :search
+
+      resources :media, only: [:create]
       resources :suggestions, only: [:index]
+      resource :instance, only: [:show]
+      resources :filters, only: [:index, :create, :show, :update, :destroy] do
+        scope module: :filters do
+          resources :keywords, only: [:index, :create]
+          resources :statuses, only: [:index, :create]
+        end
+      end
+  
+      namespace :filters do
+        resources :keywords, only: [:show, :update, :destroy]
+        resources :statuses, only: [:show, :destroy]
+      end
     end
 
     namespace :web do

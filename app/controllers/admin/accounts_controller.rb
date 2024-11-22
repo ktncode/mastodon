@@ -11,6 +11,21 @@ module Admin
       @accounts = filtered_accounts.page(params[:page])
     end
 
+    def batch
+      authorize :account, :index?
+
+      @form = Form::AccountBatch.new(form_account_batch_params)
+      @form.current_account = current_account
+      @form.action = action_from_button
+      @form.select_all_matching = params[:select_all_matching]
+      @form.query = filtered_accounts
+      @form.save
+    rescue ActionController::ParameterMissing
+      flash[:alert] = I18n.t('admin.accounts.no_account_selected')
+    ensure
+      redirect_to admin_accounts_path(filter_params)
+    end
+
     def show
       authorize @account, :show?
 

@@ -16,11 +16,11 @@
 #  url                           :string
 #  avatar_file_name              :string
 #  avatar_content_type           :string
-#  avatar_file_size              :integer
+#  avatar_file_size              :bigint(8)
 #  avatar_updated_at             :datetime
 #  header_file_name              :string
 #  header_content_type           :string
-#  header_file_size              :integer
+#  header_file_size              :bigint(8)
 #  header_updated_at             :datetime
 #  avatar_remote_url             :string
 #  locked                        :boolean          default(FALSE), not null
@@ -45,16 +45,16 @@
 #  avatar_storage_schema_version :integer
 #  header_storage_schema_version :integer
 #  devices_url                   :string
-#  suspension_origin             :integer
 #  sensitized_at                 :datetime
-#  settings                      :jsonb            default({}), not null
-#  silence_mode                  :integer          default(0), not null
-#  searchability                 :integer          default(3), not null
+#  suspension_origin             :integer
+#  settings                      :jsonb            not null
+#  searchability                 :integer          default("direct"), not null
 #  featured_tags_collection_url  :string
+#  silence_mode                  :integer          default("soft"), not null
 #  avatar_thumbhash              :string
 #  header_thumbhash              :string
 #  indexable                     :boolean          default(FALSE), not null
-#  priority                      :integer          default(0), not null
+#  priority                      :integer          default("default"), not null
 #
 
 class Account < ApplicationRecord

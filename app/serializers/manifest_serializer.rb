@@ -10,15 +10,15 @@ class ManifestSerializer < ActiveModel::Serializer
              :share_target, :shortcuts
 
   def name
-    object.site_title
+    object.title
   end
 
   def short_name
-    object.site_title
+    object.title
   end
 
   def description
-    strip_tags(object.site_short_description.presence || I18n.t('about.about_mastodon_html'))
+    strip_tags(object.description.presence || I18n.t('about.about_mastodon_html'))
   end
 
   def icons

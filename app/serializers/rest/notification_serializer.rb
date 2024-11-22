@@ -3,6 +3,8 @@
 class REST::NotificationSerializer < ActiveModel::Serializer
   attributes :id, :type, :created_at
 
+  attribute :filtered, if: :filtered?
+
   belongs_to :from_account, key: :account, serializer: REST::AccountSerializer
   belongs_to :target_account, if: :follow_type?, serializer: REST::AccountSerializer
   belongs_to :target_status, key: :status, if: :status_type?, serializer: REST::StatusSerializer
@@ -28,6 +30,11 @@ class REST::NotificationSerializer < ActiveModel::Serializer
   def emoji_reaction?
     object.type == :emoji_reaction
   end
+
+  def filtered?
+    false
+  end
+  # delegate :filtered?, to: :object
 
   class EmojiReactionSerializer < REST::GroupedEmojiReactionSerializer
     attributes :me

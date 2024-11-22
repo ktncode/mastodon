@@ -824,6 +824,42 @@ code {
   }
 }
 
+.oauth-prompt {
+  h3 {
+    color: $ui-secondary-color;
+    font-size: 17px;
+    line-height: 22px;
+    font-weight: 500;
+    margin-bottom: 30px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 18px;
+    margin-bottom: 30px;
+  }
+
+  .permissions-list {
+    border: 1px solid $ui-base-color;
+    border-radius: 4px;
+    background: darken($ui-base-color, 4%);
+    margin-bottom: 30px;
+  }
+
+  .actions {
+    margin: 0 -10px;
+    display: flex;
+
+    form {
+      box-sizing: border-box;
+      padding: 0 10px;
+      flex: 1 1 auto;
+      min-height: 1px;
+      width: 50%;
+    }
+  }
+}
+
 .qr-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -1083,5 +1119,86 @@ code {
 .input.user_website {
   &:not(.field_with_errors) {
     display: none;
+  }
+}
+
+.simple_form .h-captcha {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.permissions-list {
+  &__item {
+    padding: 15px;
+    color: $ui-secondary-color;
+    border-bottom: 1px solid lighten($ui-base-color, 4%);
+    display: flex;
+    align-items: center;
+
+    &__text {
+      flex: 1 1 auto;
+
+      &__title {
+        font-weight: 500;
+      }
+
+      &__type {
+        color: $darker-text-color;
+        word-break: break-word;
+      }
+    }
+
+    &__icon {
+      flex: 0 0 auto;
+      font-size: 18px;
+      width: 30px;
+      color: $valid-value-color;
+      display: flex;
+      align-items: center;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+// Only remove padding when listing applications, to prevent styling issues on
+// the Authorization page.
+.applications-list {
+  .permissions-list__item:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.keywords-table {
+  thead {
+    th {
+      white-space: nowrap;
+    }
+
+    th:first-child {
+      width: 100%;
+    }
+  }
+
+  tfoot {
+    td {
+      border: 0;
+    }
+  }
+
+  .input.string {
+    margin-bottom: 0;
+  }
+
+  .label_input__wrapper {
+    margin-top: 10px;
+  }
+
+  .table-action-link {
+    margin-top: 10px;
+    white-space: nowrap;
   }
 }

@@ -2,7 +2,7 @@
 
 class StatusRelationshipsPresenter
   attr_reader :reblogs_map, :favourites_map, :mutes_map, :pins_map,
-              :bookmarks_map, :emoji_reactions_map
+              :bookmarks_map, :filters_map, :emoji_reactions_map
 
   def initialize(statuses, current_account_id = nil, **options)
     if current_account_id.nil?
@@ -12,6 +12,7 @@ class StatusRelationshipsPresenter
       @emoji_reactions_map = {}
       @mutes_map           = {}
       @pins_map            = {}
+      @filters_map         = {}
     else
       statuses            = Status.where(id: statuses) if statuses.first.is_a?(Integer)
       statuses            = statuses.compact
@@ -29,6 +30,7 @@ class StatusRelationshipsPresenter
           (select string_agg(status_id::text, ',') from status_pins where account_id = :account_id and status_id in (:pinnable_status_ids)) as pins
         SQL
 
+      @filters_map         = build_filters_map(statuses, current_account_id).merge(options[:filters_map] || {})
       @reblogs_map         = mapping(result['reblogs'],         options[:reblogs_map])
       @favourites_map      = mapping(result['favourites'],      options[:favourites_map])
       @bookmarks_map       = mapping(result['bookmarks'],       options[:bookmarks_map])
@@ -42,5 +44,17 @@ class StatusRelationshipsPresenter
 
   def mapping(result, additional)
     (result&.split(',')&.map(&:to_i)&.index_with(true) || {}).merge(additional || {})
+  end
+
+  def build_filters_map(statuses, current_account_id)
+    active_filters = CustomFilter.cached_filters_for(current_account_id)
+    @filters_map = statuses.each_with_object({}) do |status, h|
+      filter_matches = CustomFilter.apply_cached_filters(active_filters, status)
+
+      unless filter_matches.empty?
+        h[status.id] = filter_matches
+        h[status.reblog_of_id] = filter_matches if status.reblog?
+      end
+    end
   end
 end

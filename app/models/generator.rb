@@ -4,7 +4,7 @@
 #
 #  id         :bigint(8)        not null, primary key
 #  uri        :string           default(""), not null
-#  type       :integer          default(:application), not null
+#  type       :integer          default("Application"), not null
 #  name       :string           default(""), not null
 #  website    :string
 #  created_at :datetime         not null

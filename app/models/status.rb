@@ -21,13 +21,15 @@
 #  account_id                   :bigint(8)        not null
 #  application_id               :bigint(8)
 #  in_reply_to_account_id       :bigint(8)
+#  quote_id                     :bigint(8)
 #  poll_id                      :bigint(8)
 #  deleted_at                   :datetime
-#  quote_id                     :bigint(8)
+#  expires_at                   :datetime         default(Infinity), not null
+#  expires_action               :integer          default(0), not null
 #  expired_at                   :datetime
+#  ordered_media_attachment_ids :bigint(8)        is an Array
 #  searchability                :integer
 #  generator_id                 :bigint(8)
-#  ordered_media_attachment_ids :bigint(8)        is an Array
 #
 
 class Status < ApplicationRecord

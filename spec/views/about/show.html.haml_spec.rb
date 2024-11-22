@@ -14,8 +14,8 @@ describe 'about/show.html.haml', without_verify_partial_doubles: true do
     instance_presenter = double(
       :instance_presenter,
       site_title: 'something',
-      site_short_description: 'something',
-      site_description: 'something',
+      short_description: 'something',
+      description: 'something',
       version_number: '1.0',
       source_url: 'https://github.com/mastodon/mastodon',
       open_registrations: false,

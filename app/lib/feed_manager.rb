@@ -366,7 +366,6 @@ class FeedManager
   def filter_from_home?(status, receiver_id, crutches, list_id = nil)
     return false if receiver_id == status.account_id
     return true  if status.reply? && (status.in_reply_to_id.nil? || status.in_reply_to_account_id.nil?)
-    return true  if phrase_filtered?(status, receiver_id, :home)
 
     check_for_blocks = crutches[:active_mentions][status.id] || []
     check_for_blocks.concat([status.account_id])
@@ -414,7 +413,6 @@ class FeedManager
   # @return [Boolean]
   def filter_from_mentions?(status, receiver_id)
     return true if receiver_id == status.account_id
-    return true if phrase_filtered?(status, receiver_id, :notifications)
 
     # This filter is called from NotifyService, but already after the sender of
     # the notification has been checked for mute/block. Therefore, it's not
@@ -435,7 +433,6 @@ class FeedManager
   # @return [Boolean]
   def filter_from_status_references?(status, receiver_id)
     return true if receiver_id == status.account_id
-    return true if phrase_filtered?(status, receiver_id, :notifications)
     return true unless StatusPolicy.new(Account.find(receiver_id), status).subscribe?
 
     # This filter is called from NotifyService, but already after the sender of
@@ -467,42 +464,6 @@ class FeedManager
     end
 
     false
-  end
-
-  # Check if the status hits a phrase filter
-  # @param [Status] status
-  # @param [Integer] receiver_id
-  # @param [Symbol] context
-  # @return [Boolean]
-  def phrase_filtered?(status, receiver_id, context)
-    active_filters = Rails.cache.fetch("filters:#{receiver_id}") { CustomFilter.where(account_id: receiver_id).active_irreversible.to_a }.to_a
-
-    active_filters.select! { |filter| filter.context.include?(context.to_s) && !filter.expired? }
-
-    active_filters.map! do |filter|
-      if filter.whole_word
-        sb = /\A[[:word:]]/.match?(filter.phrase) ? '\b' : ''
-        eb = /[[:word:]]\z/.match?(filter.phrase) ? '\b' : ''
-
-        /(?mix:#{sb}#{Regexp.escape(filter.phrase)}#{eb})/
-      else
-        /#{Regexp.escape(filter.phrase)}/i
-      end
-    end
-
-    return false if active_filters.empty?
-
-    combined_regex = active_filters.reduce { |memo, obj| Regexp.union(memo, obj) }
-    status         = status.reblog if status.reblog?
-
-    combined_text = [
-      Formatter.instance.plaintext(status),
-      status.spoiler_text,
-      status.preloadable_poll ? status.preloadable_poll.options.join("\n\n") : nil,
-      status.ordered_media_attachments.map(&:description).join("\n\n"),
-    ].compact.join("\n\n")
-
-    combined_regex.match?(combined_text)
   end
 
   # Adds a status to an account's feed, returning true if a status was

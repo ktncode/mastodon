@@ -8,7 +8,7 @@
 #  domain                       :string
 #  image_file_name              :string
 #  image_content_type           :string
-#  image_file_size              :integer
+#  image_file_size              :bigint(8)
 #  image_updated_at             :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -21,9 +21,9 @@
 #  width                        :integer
 #  height                       :integer
 #  thumbhash                    :string
-#  copy_permission              :integer          default(0), not null
+#  copy_permission              :integer          default("none"), not null
 #  aliases                      :string           default([]), not null, is an Array
-#  meta                         :jsonb            default({}), not null
+#  meta                         :jsonb            not null
 #
 
 class CustomEmoji < ApplicationRecord

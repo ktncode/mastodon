@@ -184,7 +184,7 @@ export const makeGetStatus = () => {
         map.set('reblog', statusReblog);
         map.set('quote', statusQuote);
         map.set('account', accountBase);
-        map.set('filtered', filtered);
+        map.set('filtered', filtered ? [true] : []);
       });
 
       return statusBase;

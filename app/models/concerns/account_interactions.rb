@@ -222,6 +222,11 @@ module AccountInteractions
     active_subscribes.where(target_account: other_account, list_id: list_id).exists?
   end
 
+  def status_matches_filters(status)
+    active_filters = CustomFilter.cached_filters_for(id)
+    CustomFilter.apply_cached_filters(active_filters, status)
+  end
+
   def followers_for_local_distribution
     delivery_followers.local
                       .joins(:user)
