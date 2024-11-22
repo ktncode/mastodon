@@ -10,6 +10,8 @@ class ActivityPub::GroupDistributionWorker
     groups = Account.local.groups.where(id: status.mentions.select(:account_id)).joins(:passive_relationships)
 
     groups.each do |group|
+      next unless status.account.following?(group)
+
       visibility = Status.visibilities.key([Status.visibilities[status.visibility], Status.visibilities[group.user&.setting_default_privacy]].max)
 
       ReblogService.new.call(group, status, { visibility: visibility })
