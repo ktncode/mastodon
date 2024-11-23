@@ -97,6 +97,8 @@ class Api::V1::NotificationsController < Api::BaseController
     'TheDesk(PC)'          => FEDIBIRD_NOTIFICATION_TYPES,
     'TheDesk(Desktop)'     => FEDIBIRD_NOTIFICATION_TYPES,
     'Fedistar'             => FEDIBIRD_NOTIFICATION_TYPES,
+    'Statuzer'             => FEDIBIRD_NOTIFICATION_TYPES,
+    'Rodent'               => FEDIBIRD_NOTIFICATION_TYPES,
   }
 
   def exclude_types

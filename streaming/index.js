@@ -625,6 +625,12 @@ const startWorker = (workerId) => {
         return;
       }
 
+      const fedibirdNotificationType = ['emoji_reaction', 'status_reference', 'scheduled_status', 'followed'];
+
+      if (event === 'notification' && fedibirdNotificationType.includes(payload.type) && isStatuzer(req)) {
+        return;
+      }
+
       // Only messages that may require filtering are statuses, since notifications
       // are already personalized and deletes do not matter
       if (!needsFiltering || event !== 'update') {
@@ -915,7 +921,7 @@ const startWorker = (workerId) => {
       }
 
       resolve({
-        channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote'] : ['timeline:public'],
+        channelIds: isTootdon(req) || isStatuzer(req) ? ['timeline:public:remote'] : ['timeline:public'],
         options: { needsFiltering: true, notificationOnly: false },
       });
 
@@ -926,7 +932,7 @@ const startWorker = (workerId) => {
       }
 
       resolve({
-        channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nobot'] : ['timeline:public:nobot'],
+        channelIds: isTootdon(req) || isStatuzer(req) ? ['timeline:public:remote:nobot'] : ['timeline:public:nobot'],
         options: { needsFiltering: true, notificationOnly: false },
       });
 
@@ -1021,7 +1027,7 @@ const startWorker = (workerId) => {
       }
 
       resolve({
-        channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:media'] : ['timeline:public:media'],
+        channelIds: isTootdon(req) || isStatuzer(req) ? ['timeline:public:remote:media'] : ['timeline:public:media'],
         options: { needsFiltering: true, notificationOnly: false },
       });
 
@@ -1032,7 +1038,7 @@ const startWorker = (workerId) => {
       }
 
       resolve({
-        channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nobot:media'] : ['timeline:public:nobot:media'],
+        channelIds: isTootdon(req) || isStatuzer(req) ? ['timeline:public:remote:nobot:media'] : ['timeline:public:nobot:media'],
         options: { needsFiltering: true, notificationOnly: false },
       });
 
@@ -1109,7 +1115,7 @@ const startWorker = (workerId) => {
       }
 
       resolve({
-        channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nomedia'] : ['timeline:public:nomedia'],
+        channelIds: isTootdon(req) || isStatuzer(req) ? ['timeline:public:remote:nomedia'] : ['timeline:public:nomedia'],
         options: { needsFiltering: true, notificationOnly: false },
       });
 
@@ -1120,7 +1126,7 @@ const startWorker = (workerId) => {
       }
 
       resolve({
-        channelIds: req.applicationName === '◆ Tootdon ◆' ? ['timeline:public:remote:nobot:nomedia'] : ['timeline:public:nobot:nomedia'],
+        channelIds: isTootdon(req) || isStatuzer(req) ? ['timeline:public:remote:nobot:nomedia'] : ['timeline:public:nobot:nomedia'],
         options: { needsFiltering: true, notificationOnly: false },
       });
 
@@ -1484,6 +1490,22 @@ const startWorker = (workerId) => {
  */
 const isEnableFederatedTimeline = (req) => {
   return req.enableFederatedTimeline;
+};
+
+/**
+ * @param {any} req
+ * @return {boolean}
+ */
+const isTootdon = (req) => {
+  return req.applicationName == '◆ Tootdon ◆';
+};
+
+/**
+ * @param {any} req
+ * @return {boolean}
+ */
+const isStatuzer = (req) => {
+  return req.applicationName == 'Statuzer';
 };
 
 /**
