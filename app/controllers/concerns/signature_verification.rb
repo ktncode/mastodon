@@ -91,7 +91,7 @@ module SignatureVerification
     compare_signed_string = build_signed_string(include_query_string: false)
     return account unless verify_signature(account, signature, compare_signed_string).nil?
 
-    account = stoplight_wrap_request { account_refresh_key!(account) }
+    account = stoplight_wrap_request { account_refresh_key(account) }
 
     raise SignatureVerificationError, "Public key not found for key #{signature_params['keyId']}" if account.nil?
 
