@@ -379,6 +379,7 @@ class Formatter
     status  = url_to_holding_status(url)
     account = status&.account
     account = url_to_holding_account(url) if status.nil?
+    account = account.moved_to_account if account&.moved?
 
     if status.present? && account.present?
       html_attrs[:class]                      = class_append(html_attrs[:class], ['status-url-link'])
@@ -406,6 +407,7 @@ class Formatter
       status  = url_to_holding_status(x['href'])
       account = status&.account
       account = url_to_holding_account(x['href']) if status.nil?
+      account = account.moved_to_account if account&.moved?
 
       if status.present? && account.present?
         x.add_class('status-url-link')
@@ -545,6 +547,16 @@ class Formatter
   end
 
   def mention_html(account, with_domain: false)
-    "<span class=\"h-card\"><a href=\"#{encode(ActivityPub::TagManager.instance.url_for(account))}\" class=\"u-url mention#{account.actor_type == 'Group' ? ' group' : ''}\" data-account-id=\"#{account.id}\" data-account-actor-type=\"#{account.actor_type}\" data-account-acct=\"#{account.acct}\" >@<span>#{encode(with_domain ? account.pretty_acct : account.username)}</span></a></span>"
+    return if account.nil?
+
+    url       = ActivityPub::TagManager.instance.url_for(account)
+    link_text = with_domain ? account.pretty_acct : account.username
+    account   = account.moved_to_account if account&.moved?
+
+    classes = "u-url mention account-url-link#{account.actor_type == 'Group' ? ' group' : ''}"
+
+    <<~HTML.squish
+      <span class="h-card" translate="no"><a href="#{encode(url)}" class="#{classes}" data-account-id="#{account.id}" data-account-actor-type="#{account.actor_type}" data-account-acct="#{account.acct}">@<span>#{encode(link_text)}</span></a></span>
+    HTML
   end
 end

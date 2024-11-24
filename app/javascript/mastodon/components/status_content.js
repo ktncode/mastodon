@@ -65,14 +65,7 @@ export default class StatusContent extends React.PureComponent {
 
       let mention = status.get('mentions').find(item => link.href === item.get('url'));
 
-      if (mention) {
-        if (mention.get('group', false)) {
-          link.addEventListener('click', this.onGroupMentionClick.bind(this, mention), false);
-        } else {
-          link.addEventListener('click', this.onMentionClick.bind(this, mention), false);
-        }
-        link.setAttribute('title', mention.get('acct'));
-      } else if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
+      if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
         link.addEventListener('click', this.onHashtagClick.bind(this, link.text), false);
       } else if (link.classList.contains('account-url-link')) {
         link.setAttribute('title', intl.formatMessage(messages.linkToAcct, { acct: link.dataset.accountAcct }));
@@ -80,6 +73,13 @@ export default class StatusContent extends React.PureComponent {
       } else if (link.classList.contains('status-url-link') && ![status.get('uri'), status.get('url')].includes(link.href)) {
         link.setAttribute('title', intl.formatMessage(messages.postByAcct, { acct: link.dataset.statusAccountAcct }));
         link.addEventListener('click', this.onStatusUrlClick.bind(this, link.dataset.statusId), false);
+      } else if (mention) {
+        if (mention.get('group', false)) {
+          link.addEventListener('click', this.onGroupMentionClick.bind(this, mention), false);
+        } else {
+          link.addEventListener('click', this.onMentionClick.bind(this, mention), false);
+        }
+        link.setAttribute('title', mention.get('acct'));
       } else {
         link.setAttribute('title', link.href);
         link.classList.add('unhandled-link');
