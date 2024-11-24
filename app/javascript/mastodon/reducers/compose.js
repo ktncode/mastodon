@@ -134,12 +134,19 @@ const statusToTextMentions = (text, privacy, replyStatus) => {
   }
 
   let mentions = ImmutableOrderedSet();
+  const replyStatusMentions = replyStatus.get('mentions').filterNot(mention => mention.get('id') === me);
+  const groupMentions = replyStatusMentions.filter(   mention => mention.get('group'));
+  const otherMentions = replyStatusMentions.filterNot(mention => mention.get('group'));
+
+  console.dir(groupMentions);
+
+  mentions = mentions.union(groupMentions.map(mention => `@${mention.get('acct')} `));
 
   if (replyStatus.getIn(['account', 'id']) !== me) {
     mentions = mentions.add(`@${replyStatus.getIn(['account', 'acct'])} `);
   }
 
-  mentions = mentions.union(replyStatus.get('mentions').filterNot(mention => mention.get('id') === me).map(mention => `@${mention.get('acct')} `));
+  mentions = mentions.union(otherMentions.map(mention => `@${mention.get('acct')} `));
 
   const match = /^(\s*(?:(?:@\S+)\s*)*)([\s\S]*)/.exec(text);
   const extrctMentions = ImmutableOrderedSet(match[1].trim().split(/\s+/).filter(Boolean).map(mention => `${mention} `));
