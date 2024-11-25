@@ -167,6 +167,10 @@ class User < ApplicationRecord
   attr_reader :invite_code, :sign_in_token_attempt
   attr_writer :external, :bypass_invite_request_check
 
+  def signed_in_recently?
+    current_sign_in_at.present? && current_sign_in_at >= ACTIVE_DURATION.ago
+  end
+
   def confirmed?
     confirmed_at.present?
   end

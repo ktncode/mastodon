@@ -63,6 +63,7 @@ class FeedManager
   # @param [Status] status
   # @return [Boolean]
   def push_to_home(account, status)
+    return false unless account.user&.signed_in_recently?
     return false unless add_to_feed(:home, account.id, status, account.user&.aggregates_reblogs?)
 
     trim(:home, account.id)
@@ -86,7 +87,9 @@ class FeedManager
   # @param [Status] status
   # @return [Boolean]
   def push_to_list(list, status)
-    return false if filter_from_list?(status, list, build_crutches(list.account_id, [status], list)) || !add_to_feed(:list, list.id, status, list.account.user&.aggregates_reblogs?)
+    return false if filter_from_list?(status, list, build_crutches(list.account_id, [status], list))
+    return false unless list.account.user&.signed_in_recently?
+    return false unless add_to_feed(:list, list.id, status, list.account.user&.aggregates_reblogs?)
 
     trim(:list, list.id)
     PushUpdateWorker.perform_async(list.account_id, status.id, "timeline:list:#{list.id}") if push_update_required?("timeline:list:#{list.id}")
