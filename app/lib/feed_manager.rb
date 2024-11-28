@@ -112,6 +112,8 @@ class FeedManager
   # @param [Account] into_account
   # @return [void]
   def merge_into_home(from_account, into_account, options = {})
+    return unless into_account.user&.signed_in_recently?
+
     options = { show_reblogs: true }.merge(options)
 
     if options[:list_id].nil?
@@ -166,6 +168,8 @@ class FeedManager
   # @param [List] list
   # @return [void]
   def merge_into_list(from_account, list, options = {})
+    return unless list.account.user&.signed_in_recently?
+
     merge_into_home(from_account, list.account, options.merge(list_id: list.id))
   end
 
