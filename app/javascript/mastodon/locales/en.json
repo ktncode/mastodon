@@ -716,6 +716,7 @@
   "upload_modal.preparing_ocr": "Preparing OCR…",
   "upload_modal.preview_label": "Preview ({ratio})",
   "upload_progress.label": "Uploading...",
+  "upload_progress.processing": "Processing…",
   "video.close": "Close video",
   "video.download": "Download file",
   "video.exit_fullscreen": "Exit full screen",
