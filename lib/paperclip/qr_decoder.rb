@@ -18,7 +18,7 @@ module Paperclip
     def decode_qrcode_from_file!
       begin
         command = Terrapin::CommandLine.new(Rails.configuration.x.qrtool_binary, 'decode :source')
-        code_word = command.run(source: @file.path)
+        code_word = command.run(source: @file.path)&.gsub(/[[:^print:]]/){}
       rescue Terrapin::ExitStatusError
         return nil
       rescue Terrapin::CommandNotFoundError
