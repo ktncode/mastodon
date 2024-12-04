@@ -193,7 +193,7 @@ const appendMedia = (state, media, file) => {
     if (media.get('type') === 'image') {
       media = media.set('file', file);
     }
-    map.update('media_attachments', list => list.push(media));
+    map.update('media_attachments', list => list.push(media).sortBy(media => media.get('order')));
     map.set('is_uploading', false);
     map.set('is_processing', false);
     map.set('resetFileKey', Math.floor((Math.random() * 0x10000)));

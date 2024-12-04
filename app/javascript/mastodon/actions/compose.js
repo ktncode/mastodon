@@ -381,6 +381,7 @@ export function uploadCompose(files) {
     const media  = getState().getIn(['compose', 'media_attachments']);
     const pending  = getState().getIn(['compose', 'pending_media_attachments']);
     const progress = new Array(files.length).fill(0);
+    const orderBase = Date.now();
     let total = Array.from(files).reduce((a, v) => a + v.size, 0);
 
     if (files.length + media.size + pending > uploadLimit) {
@@ -411,7 +412,7 @@ export function uploadCompose(files) {
         // poll the server until it is, before showing the media attachment as uploaded
 
         if (status === 200) {
-          dispatch(uploadComposeSuccess(data, file));
+          dispatch(uploadComposeSuccess({ ...data, order: orderBase + i }, file));
         } else if (status === 202) {
           dispatch(uploadComposeProcessing());
 
@@ -420,7 +421,7 @@ export function uploadCompose(files) {
           const poll = () => {
             api(getState).get(`/api/v1/media/${data.id}`).then(response => {
               if (response.status === 200) {
-                dispatch(uploadComposeSuccess(response.data, file));
+                dispatch(uploadComposeSuccess({ ...response.data, order: orderBase + i }, file));
               } else if (response.status === 206) {
                 const retryAfter = (Math.log2(tryCount) || 1) * 1000;
                 tryCount += 1;

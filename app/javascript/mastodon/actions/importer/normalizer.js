@@ -67,6 +67,7 @@ export function normalizeStatus(status, normalOldStatus) {
     normalStatus.spoiler_text = normalOldStatus.get('spoiler_text');
     normalStatus.hidden = normalOldStatus.get('hidden');
     normalStatus.visibility = normalOldStatus.get('visibility');
+    normalStatus.media_attachments = normalOldStatus.get('media_attachments');
   } else {
     // If the status has a CW but no contents, treat the CW as if it were the
     // status' contents, to avoid having a CW toggle with seemingly no effect.
@@ -121,13 +122,14 @@ export function normalizeStatus(status, normalOldStatus) {
       }
     });
 
-    normalStatus.search_index = docContentElem.textContent;
-    normalStatus.shortHtml    = '<p>'+emojify(normalStatus.search_index.substr(0, 150), emojiMap) + (normalStatus.search_index.substr(150) ? '...' : '')+'</p>';
-    normalStatus.contentHtml  = flagment.innerHTML;
-    normalStatus.spoilerHtml  = emojify(escapeTextContentForBrowser(spoilerText), emojiMap);
-    normalStatus.hidden       = expandSpoilers ? false : spoilerText.length > 0 || normalStatus.sensitive;
-    normalStatus.visibility   = normalStatus.visibility_ex ? normalStatus.visibility_ex : normalStatus.visibility;
-    normalStatus.quote        = null;
+    normalStatus.search_index      = docContentElem.textContent;
+    normalStatus.shortHtml         = '<p>'+emojify(normalStatus.search_index.substr(0, 150), emojiMap) + (normalStatus.search_index.substr(150) ? '...' : '')+'</p>';
+    normalStatus.contentHtml       = flagment.innerHTML;
+    normalStatus.spoilerHtml       = emojify(escapeTextContentForBrowser(spoilerText), emojiMap);
+    normalStatus.hidden            = expandSpoilers ? false : spoilerText.length > 0 || normalStatus.sensitive;
+    normalStatus.visibility        = normalStatus.visibility_ex ? normalStatus.visibility_ex : normalStatus.visibility;
+    normalStatus.quote             = null;
+    normalStatus.media_attachments = status.media_attachments?.map( (media, i) => ({ ...media, order: i }));
   }
 
   return normalStatus;
