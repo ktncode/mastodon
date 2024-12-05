@@ -126,7 +126,9 @@ class ActivityPub::TagManager
       cc << COLLECTIONS[:public]
     end
 
-    cc.concat(mentions_uris(status)) unless status.direct_visibility?
+    cc.concat(mentions_uris(status)) if Status::FOLLOWER_VISIBILITY.include?(status.visibility)
+
+    cc
   end
 
   def searchable_by(status)
