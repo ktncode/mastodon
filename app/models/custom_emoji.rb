@@ -150,8 +150,27 @@ class CustomEmoji < ApplicationRecord
     :emoji
   end
 
-  def copy!
+  def copy!(on_existance_action = :override)
     copy = self.class.find_or_initialize_by(domain: nil, shortcode: shortcode) { |new_copy| new_copy.visible_in_picker = false }
+
+    case on_existance_action
+    when :rename
+      unless copy.new_record?
+        _, base, num = shortcode.match(/^(.*?)(\d+)?$/).to_a
+        len = num.length
+        num = num.to_i
+        template = "#{base}%0#{len}<num>d"
+
+        loop do
+          num += 1
+          shortcode = format(template, num: num)
+          copy = self.class.initialize_by(domain: nil, shortcode: shortcode)
+          break unless copy.nil?
+        end
+
+        copy.visible_in_picker = false
+      end
+    end
     copy.image = image
     copy.width = self.width
     copy.height = self.height
