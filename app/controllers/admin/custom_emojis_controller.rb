@@ -71,7 +71,7 @@ module Admin
     end
 
     def resource_params
-      params.require(:custom_emoji).permit(:shortcode, :image, :visible_in_picker, :category_id, :category_name, :keywords, :description, :author, :copy_permission, :license, :usage_info, :sensitive).tap do |p|
+      params.require(:custom_emoji).permit(:shortcode, :image, :visible_in_picker, :category_id, :category_name, :keywords, :description, :author, :copy_permission, :license, :misskey_license, :usage_info, :sensitive).tap do |p|
         p[:category_id] = CustomEmojiCategory.find_or_create_by!(name: p[:category_name]).id if p[:category_name].present?
       end
     end
@@ -109,7 +109,7 @@ module Admin
     end
 
     def form_custom_emoji_batch_params
-      params.require(:form_custom_emoji_batch).permit(:action, :category_id, :category_name, :keyword_action, :keyword_action_value, :description, :author, :copy_permission, :license, :usage_info, :sensitive, custom_emoji_ids: [])
+      params.require(:form_custom_emoji_batch).permit(:action, :category_id, :category_name, :keyword_action, :keyword_action_value, :description, :author, :copy_permission, :license, :misskey_license, :usage_info, :sensitive, custom_emoji_ids: [])
     end
   end
 end

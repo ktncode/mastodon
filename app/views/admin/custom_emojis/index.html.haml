@@ -54,6 +54,27 @@
       %li= filter_link_to t('admin.custom_emojis.order.newer'), order: '0'
       %li= filter_link_to t('admin.custom_emojis.order.older'), order: '1'
 
+  .filter-subset
+    %strong= t('admin.custom_emojis.visibility.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.visibility.all'), visibility: nil
+      %li= filter_link_to t('admin.custom_emojis.visibility.hide'), visibility: '0'
+      %li= filter_link_to t('admin.custom_emojis.visibility.show'), visibility: '1'
+
+  .filter-subset
+    %strong= t('admin.custom_emojis.status.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.status.all'), status: nil
+      %li= filter_link_to t('admin.custom_emojis.status.disable'), status: '0'
+      %li= filter_link_to t('admin.custom_emojis.status.enable'), status: '1'
+
+  .filter-subset
+    %strong= t('admin.custom_emojis.sensitive.title')
+    %ul
+      %li= filter_link_to t('admin.custom_emojis.sensitive.all'), sensitive: nil
+      %li= filter_link_to t('admin.custom_emojis.sensitive.unset'), sensitive: '0'
+      %li= filter_link_to t('admin.custom_emojis.sensitive.set'), sensitive: '1'
+
 = form_tag admin_custom_emojis_url, method: 'GET', class: 'simple_form' do
   .fields-group
     - CustomEmojiFilter::KEYS.each do |key|
@@ -68,7 +89,7 @@
         = select_tag :shortcode_match_type, options_for_select(Form::CustomEmojiBatch::SHORTCODE_MATCH_TYPES.map { |shortcode_match_type| [I18n.t("admin.custom_emojis.shortcode_match_type.#{shortcode_match_type}"), shortcode_match_type]}, selected: params[:shortcode_match_type]), class: 'select optional', 'aria-label': t('admin.custom_emojis.shortcode_match_type.prompt')
 
   .fields-group
-    - %i(by_domain category).each do |key|
+    - %i(by_domain category by_description).each do |key|
       .input.string.optional
         = text_field_tag key, params[key], class: 'string optional', placeholder: I18n.t("admin.custom_emojis.#{key}")
 
@@ -99,7 +120,7 @@
 
         = f.button safe_join([fa_icon('power-off'), t('admin.custom_emojis.disable')]), name: :disable, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
-        - if params[:local] != '1' && can?(:fetch, :custom_emoji)
+        - if can?(:fetch, :custom_emoji)
           = f.button safe_join([fa_icon('refresh'), t('admin.custom_emojis.fetch')]), name: :fetch, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
         - if can?(:destroy, :custom_emoji)
@@ -114,7 +135,7 @@
           .fields-group.fields-row__column.fields-row__column-6
             .input.select.optional
               .label_input
-                = f.select :category_id, options_from_collection_for_select(CustomEmojiCategory.all, 'id', 'name'), prompt: t('admin.custom_emojis.assign_category'), class: 'select optional', 'aria-label': t('admin.custom_emojis.assign_category')
+                = f.select :category_id, options_from_collection_for_select(CustomEmojiCategory.all.order(:name), 'id', 'name'), prompt: t('admin.custom_emojis.assign_category'), class: 'select optional', 'aria-label': t('admin.custom_emojis.assign_category')
 
           .fields-group.fields-row__column.fields-row__column-6
             .input.string.optional
@@ -136,7 +157,7 @@
           .fields-group.fields-row__column.fields-row__column-12
             .input.string.optional
               .label_input
-                = f.text_field :description, class: 'string optional', placeholder: t('admin.custom_emojis.description.title'), 'aria-label': t('admin.custom_emojis.description.title')
+                = f.text_area :description, class: 'string optional', placeholder: t('admin.custom_emojis.description.title'), 'aria-label': t('admin.custom_emojis.description.title')
 
         .fields-row
           .fields-group.fields-row__column.fields-row__column-6
@@ -159,7 +180,13 @@
           .fields-group.fields-row__column.fields-row__column-12
             .input.string.optional
               .label_input
-                = f.text_field :usage_info, class: 'string optional', placeholder: t('admin.custom_emojis.usage_info.title'), 'aria-label': t('admin.custom_emojis.usage_info.title')
+                = f.text_area :usage_info, class: 'string optional', placeholder: t('admin.custom_emojis.usage_info.title'), 'aria-label': t('admin.custom_emojis.usage_info.title')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_area :misskey_license, class: 'string optional', placeholder: t('admin.custom_emojis.misskey_license.title'), 'aria-label': t('admin.custom_emojis.misskey_license.title')
 
     .batch-table__body
       - if @custom_emojis.empty?

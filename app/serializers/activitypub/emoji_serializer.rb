@@ -3,7 +3,7 @@
 class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   include RoutingHelper
 
-  context_extensions :emoji, :category, :copy_permission, :license, :keywords, :usage_info, :is_based_on, :sensitive
+  context_extensions :emoji, :category, :copy_permission, :license, :keywords, :usage_info, :is_based_on, :sensitive, :_misskey_license
 
   attributes :id, :type, :name, :updated
   attribute :category, if: :category_loaded?
@@ -15,6 +15,7 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   attribute :description, if: :description?
   attribute :is_based_on, if: :is_based_on?
   attribute :sensitive, if: :sensitive?
+  attribute :misskey_license, key: :_misskey_license
 
   has_one :icon
 
@@ -71,6 +72,10 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
 
   def usage_info
     object.usage_info
+  end
+
+  def misskey_license
+    object.misskey_license.presence || Formatter.instance.format_misskey_license(object)
   end
 
   def author

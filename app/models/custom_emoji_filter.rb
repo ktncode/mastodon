@@ -9,9 +9,13 @@ class CustomEmojiFilter
     license
     category
     by_domain
+    by_description
     shortcode_match_type
     shortcode
     order
+    status
+    visibility
+    sensitive
   ).freeze
 
   attr_reader :params
@@ -54,21 +58,49 @@ class CustomEmojiFilter
       else
         CustomEmoji.where("NOT (custom_emojis.meta?'license' AND custom_emojis.meta->>'license' != '' OR custom_emojis.meta?'usage_info' AND custom_emojis.meta->>'usage_info' != '')")
       end
+    when 'status'
+      if value == '1'
+        CustomEmoji.where('custom_emojis.disabled = false')
+      else
+        CustomEmoji.where('custom_emojis.disabled = true')
+      end
+    when 'visibility'
+      if value == '1'
+        CustomEmoji.where('custom_emojis.visible_in_picker = false')
+      else
+        CustomEmoji.where('custom_emojis.visible_in_picker = true')
+      end
+    when 'sensitive'
+      if value == '1'
+        CustomEmoji.where("(custom_emojis.meta->>'sensitive')::boolean = true")
+      else
+        CustomEmoji.where("(custom_emojis.meta->>'sensitive')::boolean = false")
+      end
     when 'category'
       if value == '*'
         CustomEmoji.where(category_id: nil)
-      elsif (category_id = CustomEmojiCategory.where('"custom_emoji_categories"."name" ILIKE ?', "%#{value.strip}%").take&.id)
+      elsif (category_id = CustomEmojiCategory.where('"custom_emoji_categories"."name" ILIKE ?', "%#{CustomEmoji.sanitize_sql_like(value.strip)}%").take&.id)
         CustomEmoji.where(category_id: category_id)
       else
         CustomEmoji.none
       end
     when 'by_domain'
-      CustomEmoji.where(domain: value.strip.downcase)
+      CustomEmoji.where(domain: CustomEmoji.sanitize_sql_like(value.strip.downcase))
+    when 'by_description'
+      CustomEmoji.where("custom_emojis.meta->>'license' ILIKE :key OR custom_emojis.meta->>'misskey_license' ILIKE :key OR custom_emojis.meta->>'usage_info' ILIKE :key OR custom_emojis.meta->>'description' ILIKE :key OR custom_emojis.meta->>'author' ILIKE :key", { key: "%#{CustomEmoji.sanitize_sql_like(value.strip)}%" })
     when 'shortcode_match_type'
       @shortcode_match_type = value.to_sym if Form::CustomEmojiBatch::SHORTCODE_MATCH_TYPES.include?(value)
       CustomEmoji.all
     when 'shortcode'
-      CustomEmoji.search(value.strip, @shortcode_match_type)
+      values = value.split(/[\s\u200B]+/).reject(&:blank?).map { |value| value.delete_prefix(':').delete_suffix(':') }
+
+      if values.count == 1
+        CustomEmoji.search(value, @shortcode_match_type)
+      elsif values.count > 1
+        CustomEmoji.where('custom_emojis.shortcode IN(?)', values)
+      else
+        CustomEmoji.all
+      end
     when 'order'
       if value == '0'
         CustomEmoji.reorder(updated_at: :desc)

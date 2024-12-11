@@ -126,6 +126,16 @@ class Formatter
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
+  def format_misskey_license(emoji)
+    val = []
+    val << "author: #{emoji.author}" if emoji.author.present?
+    val << "license: #{emoji.license}" if emoji.license.present?
+    val << "usage: #{emoji.usage_info}" if emoji.usage_info.present?
+    val << "##{emoji.copy_permission.to_s}" unless emoji.none_permission?
+    val << "description: #{emoji.description}" if emoji.description.present?
+    val.compact.join(', ')
+  end
+
   def linkify(text)
     html = encode_and_link_urls(text)
     html = simple_format(html, {}, sanitize: false)

@@ -393,6 +393,7 @@ en:
       assign_category: Assign category
       author:
         title: Author
+      by_description: Description
       by_domain: Domain
       category: Category
       copied_msg: Successfully created local copy of the emoji
@@ -454,6 +455,9 @@ en:
         unset: Unset
       list: List
       listed: Listed
+      misskey_license:
+        hint: It a license string compatible with the Misskey server. If not specified, it will be automatically generated from other items.
+        title: Misskey license
       new:
         title: Add new custom emoji
       not_permitted: You are not permitted to perform this action
@@ -461,8 +465,11 @@ en:
       save_changes: Save changes
       save_changes_and_next: Save changes and next
       sensitive:
+        all: All
         hint: Mark emojis that need to be handled with care
+        set: Set
         title: Sensitive
+        unset: Unset
       shortcode: Shortcode
       shortcode_hint: At least 2 characters, only alphanumeric characters and underscores
       shortcode_match_type:
@@ -471,6 +478,11 @@ en:
         match: Match
         prompt: Select Match Type
         start_with: Start with
+      status:
+        all: All
+        disable: Disable
+        enable: Enable
+        title: Status
       title: Custom emojis
       uncategorized: Uncategorized
       unlist: Unlist
@@ -481,7 +493,12 @@ en:
       upload_once_more: Upload (repeat)
       usage_info:
         hint: Supplemental information that cannot be explained by the license alone, or special contracting methods
-        title: License Details
+        title: License additional information
+      visibility:
+        all: All
+        hide: Hide
+        show: Show
+        title: Visible in picker
     dashboard:
       authorized_fetch_mode: Secure mode
       backlog: backlogged jobs

@@ -378,6 +378,7 @@ ja:
       assign_category: カテゴリーを割り当て
       author:
         title: 制作者
+      by_description: 記述内容
       by_domain: ドメイン
       category: カテゴリー
       copied_msg: 絵文字のコピーをローカルに作成しました
@@ -404,7 +405,7 @@ ja:
       created_msg: 絵文字の追加に成功しました！
       delete: 削除
       description:
-        title: 絵文字の説明
+        title: 絵文字の解説
       destroyed_msg: 絵文字の削除に成功しました！
       disable: 無効化
       disabled: 無効
@@ -439,6 +440,9 @@ ja:
         unset: 未設定
       list: 表示
       listed: 表示
+      misskey_license:
+        hint: Misskeyサーバと互換性のあるライセンス文字列です。未指定にすると、他の項目から自動生成します
+        title: Misskeyライセンス
       new:
         title: 新規カスタム絵文字の追加
       not_permitted: この操作を実行する権限がありません。
@@ -451,8 +455,11 @@ ja:
       save_changes: 保存して一覧へ
       save_changes_and_next: 保存して次へ
       sensitive:
+        all: すべて
         hint: 慎重に取り扱う必要のある絵文字をマークします
+        set: 設定済み
         title: 閲覧注意
+        unset: 未設定
       shortcode: ショートコード
       shortcode_hint: 2文字以上の半角英数字とアンダーバーのみ利用できます
       shortcode_match_type:
@@ -461,6 +468,11 @@ ja:
         match: 一致
         prompt: 一致タイプを選択
         start_with: で始まる
+      status:
+        all: すべて
+        disable: 無効
+        enable: 有効
+        title: 状態
       title: カスタム絵文字
       uncategorized: 未分類
       unlist: 非表示
@@ -471,7 +483,12 @@ ja:
       upload_once_more: アップロード（連続）
       usage_info:
         hint: ライセンスだけで説明できない内容の補足や、特別な契約方法などを記載します。
-        title: ライセンスの詳細
+        title: ライセンス追加情報
+      visibility:
+        all: すべて
+        hide: 非表示
+        show: 表示
+        title: 表示状態
     dashboard:
       authorized_fetch_mode: セキュアモード
       backlog: 未処理のジョブ

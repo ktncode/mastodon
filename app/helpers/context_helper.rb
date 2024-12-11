@@ -51,6 +51,7 @@ module ContextHelper
     '_misskey_votes': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_votes' => 'misskey:_misskey_votes' },
     '_misskey_summary': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_summary' => 'misskey:_misskey_summary' },
     '_misskey_followedMessage': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_followedMessage' => 'misskey:_misskey_followedMessage' },
+    '_misskey_license': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_license' => 'misskey:_misskey_license' },
     is_cat: { 'misskey' => 'https://misskey-hub.net/ns#', 'isCat' => 'misskey:isCat' },
     vcard: { 'vcard' => 'http://www.w3.org/2006/vcard/ns#' },
     subscribable_by: { 'kmyblue' => 'http://kmy.blue/ns#', 'subscribableBy' => { '@id' => "kmyblue:subscribableBy", '@type' => '@id' } },
