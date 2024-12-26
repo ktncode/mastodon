@@ -102,11 +102,10 @@ class SearchQueryTransformer < Parslet::Transform
         privacy_definition = StatusesIndex.filter(term: { searchable_by: @options[:current_account].id })
         privacy_definition = privacy_definition.or(StatusesIndex.filter(terms: { searchability: %w(public unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
       when 'public'
-        privacy_definition = StatusesIndex.all
-        privacy_definition = privacy_definition.or(StatusesIndex.filter(term: { searchability: 'public' }))
+        privacy_definition = StatusesIndex.filter(term: { searchability: 'public' })
       when 'follow'
-        privacy_definition = StatusesIndex.all
-        privacy_definition = privacy_definition.or(StatusesIndex.filter(terms: { searchability: %w(public unlisted private) }).filter(terms: { account_id: following_account_ids})) unless following_account_ids.empty?
+        privacy_definition = StatusesIndex.none
+        privacy_definition = StatusesIndex.filter(terms: { searchability: %w(public unlisted private) }).filter(terms: { account_id: following_account_ids}) unless following_account_ids.empty?
       else
         privacy_definition = StatusesIndex.filter(term: { searchable_by: @options[:current_account].id })
       end
