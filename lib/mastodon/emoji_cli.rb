@@ -43,8 +43,18 @@ module Mastodon
       category = options[:category] ? CustomEmojiCategory.find_or_create_by(name: options[:category]) : nil
 
       Gem::Package::TarReader.new(Zlib::GzipReader.open(path)) do |tar|
+        meta = {}
         tar.each do |entry|
-          next unless entry.file? && entry.full_name.end_with?('.png')
+          filename = File.basename(entry.full_name)
+          next unless entry.file? && filename == 'meta.json'
+
+          meta = Oj.load(entry.read).to_h { |m| [m['shortcode'], m] }
+          break
+        end
+        tar.rewind
+
+        tar.each do |entry|
+          next unless entry.file? && CustomEmoji::IMAGE_FILE_EXTENSIONS.include?(File.extname(entry.full_name))
 
           filename = File.basename(entry.full_name, '.*')
 
@@ -63,11 +73,35 @@ module Mastodon
           custom_emoji.image             = StringIO.new(entry.read)
           custom_emoji.image_file_name   = File.basename(entry.full_name)
           custom_emoji.visible_in_picker = !options[:unlisted]
-          custom_emoji.category          = category
+
+          tag = meta[shortcode]&.transform_keys!(CustomEmoji::ALIAS_KEYS)
+
+          if tag.present?
+            custom_emoji.copy_permission  = case tag['copy_permission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
+            custom_emoji.license          = tag['license']
+            custom_emoji.misskey_license  = tag['misskey_license']
+            custom_emoji.keywords         = tag['keywords']
+            custom_emoji.usage_info       = tag['usage_info']
+            custom_emoji.author           = tag['author']
+            custom_emoji.description      = tag['description']
+            custom_emoji.is_based_on      = tag['is_based_on'] || ActivityPub::TagManager.instance.local_uri?(tag['uri']) ? '' : tag['uri']
+            custom_emoji.sensitive        = tag['sensitive']
+
+            if category.nil?
+              custom_emoji.category = CustomEmojiCategory.find_or_create_by(name: tag['category'])
+            else
+              custom_emoji.category     = category
+              custom_emoji.org_category = tag['category']
+            end
+          else
+            custom_emoji.category = category
+          end
 
           if custom_emoji.save
             imported += 1
           else
+            custom_emoji.reset_image!
+
             failed += 1
             say('Failure/Error: ', :red)
             say(entry.full_name)
@@ -115,6 +149,11 @@ module Mastodon
                 io.write Paperclip.io_adapters.for(emoji.image).read
                 exported += 1
               end
+            end
+            say("Adding 'meta.json'...")
+            json = Oj.dump(ActiveModelSerializers::SerializableResource.new(scope, each_serializer: Export::CustomEmojiSerializer))
+            tar.add_file_simple('meta.json', 0o644, json.bytesize) do |io|
+              io.write json
             end
           end
         end

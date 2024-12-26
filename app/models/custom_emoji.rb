@@ -41,6 +41,22 @@ class CustomEmoji < ApplicationRecord
     :(#{SHORTCODE_RE_FRAGMENT}):
     (?=[^[:alnum:]:]|$)/x
 
+  ALIAS_KEYS = {
+    'aliases'          => 'keywords',
+    'visibleInPicker'  => 'visible_in_picker',
+    'show'             => 'visible_in_picker',
+    'list'             => 'visible_in_picker',
+    'misskeyLicense'   => 'misskey_license',
+    '_misskey_license' => 'misskey_license',
+    '_misskeyLicense'  => 'misskey_license',
+    'usageInfo'        => 'usage_info',
+    'creator'          => 'author',
+    'isBasedOn'        => 'is_based_on',
+    'orgCategory'      => 'org_category',
+    'copyPermission'   => 'copy_permission',
+  }
+
+  IMAGE_FILE_EXTENSIONS = %w(.png .gif .webp .jpg .jpeg .heif .heic .avif .bmp).freeze
   IMAGE_MIME_TYPES = %w(image/png image/gif image/webp image/jpeg image/heif image/heic image/avif image/bmp).freeze
   IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/jpeg image/heif image/heic image/bmp).freeze
 
@@ -83,7 +99,11 @@ class CustomEmoji < ApplicationRecord
   end
 
   def keywords=(val)
-    self.aliases = val.split(' ')
+    if val.is_a?(Array)
+      self.aliases = val
+    else
+      self.aliases = val.split(' ')
+    end
   end
 
   def license
