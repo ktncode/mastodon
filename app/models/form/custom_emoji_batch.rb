@@ -112,6 +112,8 @@ class Form::CustomEmojiBatch
       custom_emoji.update(disabled: false)
       log_action :enable, custom_emoji
     end
+
+    PostProcessEmojiReactionCacheWorker.perform_async(custom_emojis.pluck(:id))
   end
 
   def disable!
@@ -121,6 +123,8 @@ class Form::CustomEmojiBatch
       custom_emoji.update(disabled: true)
       log_action :disable, custom_emoji
     end
+
+    PostProcessEmojiReactionCacheWorker.perform_async(custom_emojis.pluck(:id))
   end
 
   def copy!

@@ -79,7 +79,7 @@ class Status < ApplicationRecord
 
   has_many :favourites, inverse_of: :status, dependent: :destroy
   has_many :bookmarks, inverse_of: :status, dependent: :destroy
-  has_many :emoji_reactions, inverse_of: :status, dependent: :destroy
+  has_many :emoji_reactions, -> { enabled }, inverse_of: :status, dependent: :destroy
   has_many :reblogs, foreign_key: 'reblog_of_id', class_name: 'Status', inverse_of: :reblog, dependent: :destroy
   has_many :replies, foreign_key: 'in_reply_to_id', class_name: 'Status', inverse_of: :thread
   has_many :mentions, dependent: :destroy, inverse_of: :status
@@ -479,7 +479,8 @@ class Status < ApplicationRecord
   end
 
   def grouped_emoji_reactions(account = nil)
-    (Oj.load(status_stat&.emoji_reactions_cache || '', mode: :strict) || []).then do |emoji_reactions|
+    emoji_reactions_cache = (status_stat&.updated_at || Time.at(0)) <= 1.day.ago ? refresh_grouped_emoji_reactions! : status_stat&.emoji_reactions_cache
+    (Oj.load(emoji_reactions_cache || '', mode: :strict) || []).then do |emoji_reactions|
       @emoji_reactions_count = 0
 
       emoji_reactions.filter do |emoji_reaction|
@@ -506,7 +507,25 @@ class Status < ApplicationRecord
 
   def refresh_grouped_emoji_reactions!
     generate_grouped_emoji_reactions.tap do |emoji_reactions_cache|
-      update_status_stat!(emoji_reactions_count: emoji_reactions.count, emoji_reactions_cache: emoji_reactions_cache)
+      updated_at = Time.current
+
+      result = StatusStat.upsert(
+        {
+          status_id: id,
+          emoji_reactions_count: emoji_reactions.count,
+          emoji_reactions_cache: emoji_reactions_cache,
+          created_at: updated_at,
+          updated_at: updated_at,
+        },
+        unique_by: :status_id
+      )
+
+      status_stat_id = result.first['id']
+
+      if association(:status_stat).loaded?
+        status_stat.id = status_stat_id if status_stat.new_record?
+        status_stat.reload
+      end
     end
   end
 

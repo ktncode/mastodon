@@ -28,6 +28,7 @@ class EmojiReaction < ApplicationRecord
 
   scope :local, -> { where(uri: nil) }
   scope :remote, -> { where.not(uri: nil) }
+  scope :enabled, -> { where('NOT EXISTS (SELECT 1 from custom_emojis where disabled AND id = custom_emoji_id)') }
 
   validates :name, presence: true
   validates_with EmojiReactionValidator

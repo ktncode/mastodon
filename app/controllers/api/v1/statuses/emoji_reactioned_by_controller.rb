@@ -23,8 +23,7 @@ class Api::V1::Statuses::EmojiReactionedByController < Api::BaseController
   def default_emoji_reactions
     return EmojiReaction.none if current_user&.setting_hide_list_of_emoji_reactions_to_posts
 
-    EmojiReaction
-      .where(status_id: @status.id)
+    EmojiReaction.enabled.where(status_id: @status.id)
   end
 
   def paginated_emoji_reactions
