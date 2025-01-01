@@ -86,15 +86,21 @@ module AccountCounters
   end
 
   def recount
-    following_count   = active_relationships.count
-    followers_count   = passive_relationships.count
-    subscribing_count = active_subscribes.count
-    statuses_count    = statuses.counting_visibility.count
-    last_status_at    = statuses.counting_visibility.first&.updated_at
-    created_at        = last_status_at
-    updated_at        = last_status_at
+    result = AccountStat.upsert({
+      account_id:        id,
+      following_count:   active_relationships.count,
+      followers_count:   passive_relationships.count,
+      subscribing_count: active_subscribes.count,
+      statuses_count:    statuses.counting_visibility.count,
+      last_status_at:    statuses.counting_visibility.first&.updated_at,
+      created_at:        last_status_at,
+      updated_at:        last_status_at,
+    }, unique_by: :account_id)
 
-    account_stat.save
+    if association(:account_stat).loaded?
+      account_stat.id = result.first['id'] if account_stat.new_record?
+      account_stat.reload
+    end
   end
 
   private
