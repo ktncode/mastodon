@@ -76,7 +76,7 @@ class KeywordSubscribe < ApplicationRecord
       eb = k =~ /[A-Za-z0-9]\z/ ? '\b' : k !~ /[\/\.]\z/ ? '(?![\/\.])' : ''
 
       /(?m#{ignorecase ? 'i': ''}x:#{sb}#{Regexp.quote(k).gsub("\\ ", "[[:space:]]+")}#{eb})/
-    end.join('|')})", ignorecase)
+    end.join('|')})", ignorecase, timeout: 2.0)
   end
 
   def validate_keyword_regexp_syntax
