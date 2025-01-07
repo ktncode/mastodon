@@ -45,7 +45,6 @@ module ContextHelper
     usage_info: { 'schema' => 'http://schema.org#', 'usageInfo' => 'schema:usageInfo' },
     is_based_on: { 'schema' => 'http://schema.org#', 'isBasedOnUrl' => 'schema:isBasedOnUrl' },
     copy_permission: { 'fedibird' => 'http://fedibird.com/ns#', 'copyPermission' => 'fedibird:copyPermission' },
-    '_misskey_content': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_content' => 'misskey:_misskey_content' },
     '_misskey_quote': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_quote' => 'misskey:_misskey_quote' },
     '_misskey_reaction': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_reaction' => 'misskey:_misskey_reaction' },
     '_misskey_votes': { 'misskey' => 'https://misskey-hub.net/ns#', '_misskey_votes' => 'misskey:_misskey_votes' },

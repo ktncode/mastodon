@@ -7,7 +7,6 @@ module ActivityPub::CaseTransform
     end
 
     NON_CONVERSIONS = %w(
-      _misskey_content
       _misskey_quote
       _misskey_reaction
       _misskey_votes

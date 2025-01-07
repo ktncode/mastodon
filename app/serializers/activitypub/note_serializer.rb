@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ActivityPub::NoteSerializer < ActivityPub::Serializer
-  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quote_uri, :'_misskey_quote', :'_misskey_content', :expiry, :references, :emoji_reactions, :searchable_by
+  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quote_uri, :'_misskey_quote', :expiry, :references, :emoji_reactions, :searchable_by
 
   attributes :id, :type, :summary,
              :in_reply_to, :published, :url,
@@ -12,7 +12,6 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
 
   attribute :quote_uri, if: -> { object.quote? }
   attribute :misskey_quote, key: :_misskey_quote, if: -> { object.quote? }
-  attribute :misskey_content, key: :_misskey_content, if: -> { object.quote? }
   attribute :content
   attribute :content_map, if: :language?
 
@@ -178,10 +177,6 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   alias misskey_quote quote_uri
-
-  def misskey_content
-    object.text if object.quote?
-  end
 
   def context
     return if object.conversation.nil?
