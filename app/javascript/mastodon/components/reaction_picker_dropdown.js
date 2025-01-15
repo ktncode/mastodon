@@ -7,7 +7,6 @@ import { supportsPassiveEvents } from 'detect-passive-events';
 
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { EmojiPicker as EmojiPickerAsync } from '../features/ui/util/async-components';
-import { buildCustomEmojis, categoriesFromEmojis } from '../features/emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
 import { pickerEmojiSize, disableAutoFocusToEmojiSearch } from 'mastodon/initial_state';
 
@@ -56,7 +55,7 @@ class ReactionPicker extends React.PureComponent {
 
   static propTypes = {
     intl: PropTypes.object.isRequired,
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     onPickEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -132,7 +131,7 @@ class ReactionPicker extends React.PureComponent {
   }
 
   render () {
-    const { loading, intl, custom_emojis, skinTone, frequentlyUsedEmojis } = this.props;
+    const { loading, intl, pickersEmoji, skinTone, frequentlyUsedEmojis } = this.props;
 
     if (loading) {
       return <div style={{ height: 349, width: 299 }} />;
@@ -152,7 +151,7 @@ class ReactionPicker extends React.PureComponent {
       'flags',
     ];
 
-    categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
+    categoriesSort.splice(1, 0, ...Array.from(pickersEmoji.get('categories')).sort());
     const emojiSize = Number(pickerEmojiSize) || 22;
 
     return (
@@ -160,7 +159,7 @@ class ReactionPicker extends React.PureComponent {
         perLine={Math.floor(24 / emojiSize * 8)}
         emojiSize={emojiSize}
         sheetSize={32}
-        custom={buildCustomEmojis(custom_emojis)}
+        custom={pickersEmoji.get('custom_emojis')}
         color=''
         emoji=''
         set='twitter'
@@ -194,7 +193,7 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
     arrowOffsetLeft: PropTypes.string,
     arrowOffsetTop: PropTypes.string,
     openedViaKeyboard: PropTypes.bool,
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     onPickEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -243,14 +242,14 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
 
   render () {
     const { onClose, style, placement, arrowOffsetLeft, arrowOffsetTop } = this.props;
-    const { custom_emojis, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
+    const { pickersEmoji, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
     const { loading } = this.state;
 
     return (
       <div className={`dropdown-menu dropdown-menu-reaction ${placement}`} style={style} ref={this.setRef}>
         <div className={`dropdown-menu__arrow ${placement}`} style={{ left: arrowOffsetLeft, top: arrowOffsetTop }} />
         <ReactionPicker
-          custom_emojis={custom_emojis}
+          pickersEmoji={pickersEmoji}
           loading={loading}
           onClose={onClose}
           onPickEmoji={onPickEmoji}
@@ -285,7 +284,7 @@ export default class ReactionPickerDropdown extends React.PureComponent {
     dropdownPlacement: PropTypes.string,
     openDropdownId: PropTypes.string,
     openedViaKeyboard: PropTypes.bool,
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     onPickEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -362,7 +361,7 @@ export default class ReactionPickerDropdown extends React.PureComponent {
 
   render () {
     const { icon, size, title, disabled, dropdownPlacement, openDropdownId, openedViaKeyboard, active, pressed, iconButtonClass, counter } = this.props;
-    const { custom_emojis, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
+    const { pickersEmoji, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
     const open = this.state.id === openDropdownId;
 
     return (
@@ -387,7 +386,7 @@ export default class ReactionPickerDropdown extends React.PureComponent {
           <ReactionPickerDropdownMenu
             onClose={this.handleClose}
             openedViaKeyboard={openedViaKeyboard}
-            custom_emojis={custom_emojis}
+            pickersEmoji={pickersEmoji}
             onPickEmoji={onPickEmoji}
             onSkinTone={onSkinTone}
             skinTone={skinTone}

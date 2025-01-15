@@ -6,7 +6,6 @@ import Overlay from 'react-overlays/lib/Overlay';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { supportsPassiveEvents } from 'detect-passive-events';
-import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
 import { pickerEmojiSize, disableAutoFocusToEmojiSearch } from 'mastodon/initial_state';
 
@@ -149,7 +148,7 @@ class ModifierPicker extends React.PureComponent {
 class EmojiPickerMenu extends React.PureComponent {
 
   static propTypes = {
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     frequentlyUsedEmojis: PropTypes.arrayOf(PropTypes.string),
     loading: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
@@ -238,7 +237,7 @@ class EmojiPickerMenu extends React.PureComponent {
   }
 
   render () {
-    const { loading, style, intl, custom_emojis, skinTone, frequentlyUsedEmojis } = this.props;
+    const { loading, style, intl, pickersEmoji, skinTone, frequentlyUsedEmojis } = this.props;
 
     if (loading) {
       return <div style={{ width: 299 }} />;
@@ -260,7 +259,7 @@ class EmojiPickerMenu extends React.PureComponent {
       'flags',
     ];
 
-    categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
+    categoriesSort.splice(1, 0, ...Array.from(pickersEmoji.get('categories')).sort());
     const emojiSize = Number(pickerEmojiSize) || 22;
 
     return (
@@ -269,7 +268,7 @@ class EmojiPickerMenu extends React.PureComponent {
           perLine={Math.floor(24 / emojiSize * 8)}
           emojiSize={emojiSize}
           sheetSize={32}
-          custom={buildCustomEmojis(custom_emojis)}
+          custom={pickersEmoji.get('custom_emojis')}
           color=''
           emoji=''
           set='twitter'
@@ -304,7 +303,7 @@ export default @injectIntl
 class EmojiPickerDropdown extends React.PureComponent {
 
   static propTypes = {
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     frequentlyUsedEmojis: PropTypes.arrayOf(PropTypes.string),
     intl: PropTypes.object.isRequired,
     onPickEmoji: PropTypes.func.isRequired,
@@ -371,7 +370,7 @@ class EmojiPickerDropdown extends React.PureComponent {
   }
 
   render () {
-    const { intl, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis, button } = this.props;
+    const { intl, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis, button, pickersEmoji } = this.props;
     const title = intl.formatMessage(messages.emoji);
     const { active, loading, placement } = this.state;
 
@@ -387,7 +386,7 @@ class EmojiPickerDropdown extends React.PureComponent {
 
         <Overlay show={active} placement={placement} target={this.findTarget}>
           <EmojiPickerMenu
-            custom_emojis={this.props.custom_emojis}
+            pickersEmoji={pickersEmoji}
             loading={loading}
             onClose={this.onHideDropdown}
             onPick={onPickEmoji}

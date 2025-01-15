@@ -11,7 +11,6 @@ import DisplayName from '../../../components/display_name';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import { EmojiPicker as EmojiPickerAsync } from '../util/async-components';
-import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 import { assetHost } from 'mastodon/utils/config';
 import { pickerEmojiSize, disableRelativeTime } from 'mastodon/initial_state';
 
@@ -59,7 +58,7 @@ class ReactionPicker extends React.PureComponent {
 
   static propTypes = {
     intl: PropTypes.object.isRequired,
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     onPickEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -148,7 +147,7 @@ class ReactionPicker extends React.PureComponent {
   }
 
   render () {
-    const { loading, style, intl, custom_emojis, skinTone, frequentlyUsedEmojis } = this.props;
+    const { loading, style, intl, skinTone, frequentlyUsedEmojis, pickersEmoji } = this.props;
 
     if (loading) {
       return <div style={{ width: '100%' ,height: '50%'}} />;
@@ -170,7 +169,7 @@ class ReactionPicker extends React.PureComponent {
       'flags',
     ];
 
-    categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
+    categoriesSort.splice(1, 0, ...Array.from(pickersEmoji.get('categories')).sort());
     const emojiSize = Number(pickerEmojiSize) || 22;
 
     return (
@@ -178,7 +177,7 @@ class ReactionPicker extends React.PureComponent {
         perLine={Math.floor(24 / emojiSize * 8)}
         emojiSize={emojiSize}
         sheetSize={32}
-        custom={buildCustomEmojis(custom_emojis)}
+        custom={pickersEmoji.get('custom_emojis')}
         color=''
         emoji=''
         set='twitter'
@@ -202,7 +201,7 @@ export default class ReactionModal extends ImmutablePureComponent {
 
   static propTypes = {
     status: ImmutablePropTypes.map,
-    custom_emojis: ImmutablePropTypes.list,
+    pickersEmoji: ImmutablePropTypes.map,
     onPickEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -227,7 +226,7 @@ export default class ReactionModal extends ImmutablePureComponent {
   }
 
   render () {
-    const { custom_emojis, onPickEmoji, onSkinTone, onClose, skinTone, frequentlyUsedEmojis } = this.props;
+    const { pickersEmoji, onPickEmoji, onSkinTone, onClose, skinTone, frequentlyUsedEmojis } = this.props;
     const loading = this.state.loading;
     const status = this.props.status && (
       <div className='status light'>
@@ -255,7 +254,7 @@ export default class ReactionModal extends ImmutablePureComponent {
       <div className='modal-root__modal reaction-modal'>
         {status}
         <ReactionPicker
-          custom_emojis={custom_emojis}
+          pickersEmoji={pickersEmoji}
           loading={loading}
           onClose={onClose}
           onPickEmoji={onPickEmoji}

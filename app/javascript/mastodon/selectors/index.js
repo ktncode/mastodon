@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 import { List as ImmutableList, Map as ImmutableMap, is } from 'immutable';
-import { me, enableLimitedTimeline, hideDirectFromTimeline, hidePersonalFromTimeline, enablePersonalTimeline } from '../initial_state';
+import { me, enableLimitedTimeline, hideDirectFromTimeline, hidePersonalFromTimeline, maxFrequentlyUsedEmojis } from '../initial_state';
+import { buildCustomEmojis, categoriesFromEmojis } from 'mastodon/features/emoji/emoji';
 
 const getAccountBase         = (state, id) => state.getIn(['accounts', id], null);
 const getAccountCounters     = (state, id) => state.getIn(['accounts_counters', id], null);
@@ -280,3 +281,53 @@ export const getLimitedVisibilities = createSelector(
 export const getPersonalVisibilities = createSelector(
   state => state.getIn(['settings', 'personal', 'shows']),
 );
+
+const DEFAULTS = [
+  '+1',
+  'grinning',
+  'kissing_heart',
+  'heart_eyes',
+  'laughing',
+  'stuck_out_tongue_winking_eye',
+  'sweat_smile',
+  'joy',
+  'yum',
+  'disappointed',
+  'thinking_face',
+  'weary',
+  'sob',
+  'sunglasses',
+  'heart',
+  'ok_hand',
+];
+
+export const getPickersEmoji = createSelector(
+  state => state.get('custom_emojis'),
+  custom_emojis => {
+    const emojis = custom_emojis.filter(e => e.get('visible_in_picker'));
+
+    return ImmutableMap({
+      custom_emojis: buildCustomEmojis(emojis),
+      categories: categoriesFromEmojis(emojis),
+    });
+  },
+);
+
+export const getFrequentlyUsedEmojis = createSelector([
+  state => state.getIn(['settings', 'frequentlyUsedEmojis'], ImmutableMap()),
+], emojiCounters => {
+  let emojis = emojiCounters
+    .keySeq()
+    .sort((a, b) => emojiCounters.get(a) - emojiCounters.get(b))
+    .reverse()
+    .slice(0, maxFrequentlyUsedEmojis)
+    .toArray();
+
+  if (emojis.length < maxFrequentlyUsedEmojis) {
+    let uniqueDefaults = DEFAULTS.filter(emoji => !emojis.includes(emoji));
+    emojis = emojis.concat(uniqueDefaults.slice(0, maxFrequentlyUsedEmojis - emojis.length));
+  }
+
+  return emojis;
+});
+
