@@ -243,6 +243,7 @@ class CustomEmoji < ApplicationRecord
       styles = {
         original: {
           pixels: MAX_PIXELS,
+          animated: true,
           file_geometry_parser: FastGeometryParser,
         },
     
