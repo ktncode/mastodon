@@ -43,6 +43,10 @@ module JsonLdHelper
     value.is_a?(String) || value.nil? ? value : value['id']
   end
 
+  def value_or_hash_value(value, key)
+    value.is_a?(String) || value.nil? ? value : value[key]
+  end
+
   def supported_context?(json)
     !json.nil? && equals_or_includes?(json['@context'], ActivityPub::TagManager::CONTEXT)
   end

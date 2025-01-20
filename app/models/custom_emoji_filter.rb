@@ -66,9 +66,9 @@ class CustomEmojiFilter
       end
     when 'visibility'
       if value == '1'
-        CustomEmoji.where('custom_emojis.visible_in_picker = false')
-      else
         CustomEmoji.where('custom_emojis.visible_in_picker = true')
+      else
+        CustomEmoji.where('custom_emojis.visible_in_picker = false')
       end
     when 'sensitive'
       if value == '1'
@@ -87,7 +87,7 @@ class CustomEmojiFilter
     when 'by_domain'
       CustomEmoji.where(domain: CustomEmoji.sanitize_sql_like(value.strip.downcase))
     when 'by_description'
-      CustomEmoji.where("custom_emojis.meta->>'license' ILIKE :key OR custom_emojis.meta->>'misskey_license' ILIKE :key OR custom_emojis.meta->>'usage_info' ILIKE :key OR custom_emojis.meta->>'description' ILIKE :key OR custom_emojis.meta->>'author' ILIKE :key", { key: "%#{CustomEmoji.sanitize_sql_like(value.strip)}%" })
+      CustomEmoji.where("custom_emojis.meta->>'license' ILIKE :key OR custom_emojis.meta->>'misskey_license' ILIKE :key OR custom_emojis.meta->>'copyright_notice' ILIKE :key OR custom_emojis.meta->>'credit_text' ILIKE :key OR custom_emojis.meta->>'usage_info' ILIKE :key OR custom_emojis.meta->>'description' ILIKE :key OR custom_emojis.meta->>'creator' ILIKE :key", { key: "%#{CustomEmoji.sanitize_sql_like(value.strip)}%" })
     when 'shortcode_match_type'
       @shortcode_match_type = value.to_sym if Form::CustomEmojiBatch::SHORTCODE_MATCH_TYPES.include?(value)
       CustomEmoji.all

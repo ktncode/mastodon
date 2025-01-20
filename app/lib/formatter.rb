@@ -128,9 +128,12 @@ class Formatter
 
   def format_misskey_license(emoji)
     val = []
-    val << "author: #{emoji.author}" if emoji.author.present?
+    val << "creator: #{emoji.creator}" if emoji.creator.present?
+    val << "copyrightNotice: #{emoji.copyright_notice}" if emoji.copyright_notice.present?
+    val << "creditText: #{emoji.credit_text}" if emoji.credit_text.present?
     val << "license: #{emoji.license}" if emoji.license.present?
     val << "usage: #{emoji.usage_info}" if emoji.usage_info.present?
+    val << "links: #{emoji.related_link}" if emoji.related_link.present?
     val << "##{emoji.copy_permission.to_s}" unless emoji.none_permission?
     val << "description: #{emoji.description}" if emoji.description.present?
     val.compact.join(', ')

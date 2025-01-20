@@ -49,8 +49,11 @@ class CustomEmoji < ApplicationRecord
     'misskeyLicense'   => 'misskey_license',
     '_misskey_license' => 'misskey_license',
     '_misskeyLicense'  => 'misskey_license',
+    'copyrightNotice'  => 'copyright_notice',
+    'creditText'       => 'credit_text',
     'usageInfo'        => 'usage_info',
-    'creator'          => 'author',
+    'relatedLink'      => 'related_link',
+    'author'           => 'creator',
     'isBasedOn'        => 'is_based_on',
     'orgCategory'      => 'org_category',
     'copyPermission'   => 'copy_permission',
@@ -106,6 +109,30 @@ class CustomEmoji < ApplicationRecord
     end
   end
 
+  def related_link
+    meta['related_link']&.join("\n") || ''
+  end
+
+  def related_link=(val)
+    if val.is_a?(Array)
+      meta['related_link'] = val
+    else
+      meta['related_link'] = val.split(/[ \r\n]/).compact_blank
+    end
+  end
+
+  def related_links
+    Array(meta['related_link'])
+  end
+
+  def related_links=(val)
+    if val.is_a?(Array)
+      meta['related_link'] = val
+    else
+      meta['related_link'] = val.split(/[ \r\n]/).compact_blank
+    end
+  end
+
   def license
     meta['license']
   end
@@ -130,12 +157,12 @@ class CustomEmoji < ApplicationRecord
     meta['usage_info'] = val
   end
 
-  def author
-    meta['author']
+  def creator
+    meta['creator']
   end
 
-  def author=(val)
-    meta['author'] = val
+  def creator=(val)
+    meta['creator'] = val
   end
 
   def description
@@ -144,6 +171,22 @@ class CustomEmoji < ApplicationRecord
 
   def description=(val)
     meta['description'] = val
+  end
+
+  def copyright_notice
+    meta['copyright_notice']
+  end
+
+  def copyright_notice=(val)
+    meta['copyright_notice'] = val
+  end
+
+  def credit_text
+    meta['credit_text']
+  end
+
+  def credit_text=(val)
+    meta['credit_text'] = val
   end
 
   def is_based_on

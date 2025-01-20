@@ -27,10 +27,10 @@ class ActivityPub::FetchRemoteCustomEmojiService < BaseService
           break  if misskey_emoji.nil? 
           return if misskey_emoji['localOnly']
 
-          @json['keywords']        ||= misskey_emoji['aliases']
-          @json['category']        ||= misskey_emoji['category']
-          @json['misskey_license'] ||= misskey_emoji['license']
-          @json['isSensitive']     ||= misskey_emoji['isSensitive']
+          @json['keywords']         ||= misskey_emoji['aliases']
+          @json['category']         ||= misskey_emoji['category']
+          @json['_misskey_license'] ||= { freeText: misskey_emoji['license'] }
+          @json['isSensitive']      ||= misskey_emoji['isSensitive']
         end
       rescue
       end

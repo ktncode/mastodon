@@ -53,10 +53,13 @@ class ActivityPub::ProcessCustomEmojiService < BaseService
     emoji.org_category     = @json['category']
     emoji.copy_permission  = case @json['copyPermission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
     emoji.license          = @json['license']
-    emoji.misskey_license  = @json['misskey_license']
+    emoji.misskey_license  = value_or_hash_value(@json['_misskey_license'], 'freeText')
     emoji.aliases          = as_array(@json['keywords'])
+    emoji.copyright_notice = @json['copyrightNotice']
+    emoji.credit_text      = @json['creditText']
     emoji.usage_info       = @json['usageInfo']
-    emoji.author           = @json['author']
+    emoji.related_links    = as_array(@json['relatedLink'])
+    emoji.creator          = @json['creator']
     emoji.description      = @json['description']
     emoji.is_based_on      = @json['isBasedOn']
     emoji.sensitive        = @json['sensitive']

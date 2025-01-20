@@ -8,7 +8,7 @@ class Form::CustomEmojiBatch
   attr_accessor :custom_emoji_ids, :action, :current_account,
                 :category_id, :category_name, :visible_in_picker,
                 :keyword_action, :keyword_action_value,
-                :description, :author, :copy_permission, :license, :misskey_license, :usage_info
+                :description, :creator, :copy_permission, :license, :misskey_license, :copyright_notice, :credit_text, :usage_info, :related_link
 
   SHORTCODE_MATCH_TYPES   = %w(include start_with end_with match)
   KEYWORD_ACTIONS         = %w(apend prepend remove overwrite)
@@ -29,6 +29,8 @@ class Form::CustomEmojiBatch
       disable!
     when 'copy'
       copy!
+    when 'copy_ow'
+      copy_ow!
     when 'delete'
       delete!
     when 'fetch'
@@ -54,14 +56,17 @@ class Form::CustomEmojiBatch
     end
 
     custom_emojis.each do |custom_emoji|
-      custom_emoji.category_id     = category&.id             if category.present?
-      custom_emoji.aliases         = applied_aliases(custom_emoji)
-      custom_emoji.description     = a_strip(description)     if description.present?
-      custom_emoji.author          = a_strip(author)          if author.present?
-      custom_emoji.copy_permission = copy_permission          if COPY_PERMISSION_ACTIONS.include?(copy_permission) && copy_permission != 'prompt'
-      custom_emoji.license         = a_strip(license)         if license.present?
-      custom_emoji.misskey_license = a_strip(misskey_license) if misskey_license.present?
-      custom_emoji.usage_info      = a_strip(usage_info)      if usage_info.present?
+      custom_emoji.category_id      = category&.id              if category.present?
+      custom_emoji.aliases          = applied_aliases(custom_emoji)
+      custom_emoji.description      = a_strip(description)      if description.present?
+      custom_emoji.creator          = a_strip(creator)          if creator.present?
+      custom_emoji.copy_permission  = copy_permission           if COPY_PERMISSION_ACTIONS.include?(copy_permission) && copy_permission != 'prompt'
+      custom_emoji.license          = a_strip(license)          if license.present?
+      custom_emoji.misskey_license  = a_strip(misskey_license)  if misskey_license.present?
+      custom_emoji.copyright_notice = a_strip(copyright_notice) if copyright_notice.present?
+      custom_emoji.credit_text      = a_strip(credit_text)      if credit_text.present?
+      custom_emoji.usage_info       = a_strip(usage_info)       if usage_info.present?
+      custom_emoji.related_link     = a_strip(related_link)     if related_link.present?      
       custom_emoji.save
       log_action :update, custom_emoji
     end
@@ -132,6 +137,15 @@ class Form::CustomEmojiBatch
 
     custom_emojis.each do |custom_emoji|
       copied_custom_emoji = custom_emoji.copy!
+      log_action :create, copied_custom_emoji
+    end
+  end
+
+  def copy_ow!
+    custom_emojis.each { |custom_emoji| authorize(custom_emoji, :copy?) }
+
+    custom_emojis.each do |custom_emoji|
+      copied_custom_emoji = custom_emoji.copy!(on_existance_action: :overwrite)
       log_action :create, copied_custom_emoji
     end
   end

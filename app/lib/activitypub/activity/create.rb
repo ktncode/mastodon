@@ -276,10 +276,13 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     emoji.org_category     = tag['category']
     emoji.copy_permission  = case tag['copyPermission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
     emoji.license          = tag['license']
-    emoji.misskey_license  = tag['misskey_license']
+    emoji.misskey_license  = value_or_hash_value(tag['_misskey_license'], 'freeText')
     emoji.aliases          = as_array(tag['keywords'])
+    emoji.copyright_notice = tag['copyrightNotice']
+    emoji.credit_text      = tag['creditText']
     emoji.usage_info       = tag['usageInfo']
-    emoji.author           = tag['author']
+    emoji.related_links    = as_array(tag['relatedLink'])
+    emoji.creator          = tag['creator']
     emoji.description      = tag['description']
     emoji.is_based_on      = tag['isBasedOn']
     emoji.sensitive        = tag['sensitive']

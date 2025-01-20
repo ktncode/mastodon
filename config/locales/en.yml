@@ -391,14 +391,13 @@ en:
     custom_emojis:
       apply_batch_assignment: Apply batch assignment
       assign_category: Assign category
-      author:
-        title: Author
       by_description: Description
       by_domain: Domain
       category: Category
       copied_msg: Successfully created local copy of the emoji
-      copy: Copy
+      copy: Copy(Add)
       copy_failed_msg: Could not make a local copy of that emoji
+      copy_ow: Copy(O/W)
       copy_permission:
         all: All
         allow: Allow
@@ -416,8 +415,16 @@ en:
         deny: Deny copy use
         none: Unset
         prompt: (select copy permission)
+      copyright_notice:
+        hint: Include a copyright notice to indicate who owns the intellectual property rights.
+        title: Copyright notice
       create_new_category: Create new category
       created_msg: Emoji successfully created!
+      creator:
+        title: Creator
+      credit_text:
+        hint: This section lists the credits you must give when distributing emojis.
+        title: Credit text
       delete: Delete
       description:
         title: Custom emoji description
@@ -433,7 +440,8 @@ en:
       enabled_msg: Successfully enabled that emoji
       fetch: Refetch
       go_to_index: Go to index
-      image_hint: PNG up to 50KB
+      image: Image
+      image_hint: "%{types} up to %{kbsize}KB"
       keyword_action:
         apend: Add keywords at the end
         overwrite: Overwrite keywords
@@ -462,6 +470,9 @@ en:
         title: Add new custom emoji
       not_permitted: You are not permitted to perform this action
       overwrite: Overwrite
+      related_link:
+        hint: Related links, such as emoji explanation pages and registration application posts, are listed in line breaks.
+        title: Related link
       save_changes: Save changes
       save_changes_and_next: Save changes and next
       sensitive:
@@ -492,8 +503,8 @@ en:
       upload: Upload
       upload_once_more: Upload (repeat)
       usage_info:
-        hint: Supplemental information that cannot be explained by the license alone, or special contracting methods
-        title: License additional information
+        hint: It describes the things you need to follow when using the software, procedures, and how to sign a commercial license.
+        title: Usage information (conditions, procedures, contracts)
       visibility:
         all: All
         hide: Hide

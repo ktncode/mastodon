@@ -35,17 +35,25 @@
   .fields-group
     = f.input :shortcode, wrapper: :with_label, label: t('admin.custom_emojis.shortcode'), hint: t('admin.custom_emojis.shortcode_hint'), fedibird_features: true
   .fields-group
+    = f.input :image, wrapper: :with_label, label: t('admin.custom_emojis.image'), input_html: { accept: (CustomEmoji::IMAGE_FILE_EXTENSIONS + CustomEmoji::IMAGE_MIME_TYPES).join(',') }, hint: t('admin.custom_emojis.image_hint', kbsize: CustomEmoji::LOCAL_LIMIT / 1.kilobytes, types: (CustomEmoji::IMAGE_MIME_TYPES - CustomEmoji::IMAGE_CONVERTIBLE_MIME_TYPES).map{|t| t.delete_prefix('image/').upcase}.join(', '))
+  .fields-group
     = f.input :keywords, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.keywords.title'), hint: t('admin.custom_emojis.keywords.hint'), input_html: { autofocus: true, rows: 2 }, fedibird_features: true
   .fields-group
-    = f.input :description, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.description.title'), input_html: { rows: 4 }, fedibird_features: true
+    = f.input :creator, wrapper: :with_label, label: t('admin.custom_emojis.creator.title'), fedibird_features: true
   .fields-group
-    = f.input :copy_permission, collection: CustomEmoji.copy_permissions.keys, wrapper: :with_label, label: t('admin.custom_emojis.copy_permission.title'), include_blank: false, label_method: lambda { |copy_permission| safe_join([I18n.t("admin.custom_emojis.copy_permission.#{copy_permission}"), I18n.t("admin.custom_emojis.copy_permission.#{copy_permission}_long")], ' - ') }, required: false, hint: false, fedibird_features: true
+    = f.input :copyright_notice, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.copyright_notice.title'), hint: t('admin.custom_emojis.copyright_notice.hint'), input_html: { rows: 4 }, fedibird_features: true
   .fields-group
-    = f.input :author, wrapper: :with_label, label: t('admin.custom_emojis.author.title'), fedibird_features: true
+    = f.input :credit_text, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.credit_text.title'), hint: t('admin.custom_emojis.credit_text.hint'), input_html: { rows: 4 }, fedibird_features: true
   .fields-group
     = f.input :license, wrapper: :with_label, label: t('admin.custom_emojis.license.title'), hint: t('admin.custom_emojis.license.hint'), fedibird_features: true
   .fields-group
+    = f.input :copy_permission, collection: CustomEmoji.copy_permissions.keys, wrapper: :with_label, label: t('admin.custom_emojis.copy_permission.title'), include_blank: false, label_method: lambda { |copy_permission| safe_join([I18n.t("admin.custom_emojis.copy_permission.#{copy_permission}"), I18n.t("admin.custom_emojis.copy_permission.#{copy_permission}_long")], ' - ') }, required: false, hint: false, fedibird_features: true
+  .fields-group
     = f.input :usage_info, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.usage_info.title'), hint: t('admin.custom_emojis.usage_info.hint'), input_html: { rows: 4 }, fedibird_features: true
+  .fields-group
+    = f.input :related_link, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.related_link.title'), hint: t('admin.custom_emojis.related_link.hint'), input_html: { rows: 4 }, fedibird_features: true
+  .fields-group
+    = f.input :description, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.description.title'), input_html: { rows: 4 }, fedibird_features: true
   .fields-group
     = f.input :sensitive, as: :boolean, wrapper: :with_label, label: t('admin.custom_emojis.sensitive.title'), hint: t('admin.custom_emojis.sensitive.hint'), fedibird_features: true
   .fields-group

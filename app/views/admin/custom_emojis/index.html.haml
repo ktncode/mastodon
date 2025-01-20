@@ -128,6 +128,7 @@
 
         - if can?(:copy, :custom_emoji) && params[:local] != '1'
           = f.button safe_join([fa_icon('copy'), t('admin.custom_emojis.copy')]), name: :copy, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
+          = f.button safe_join([fa_icon('copy'), t('admin.custom_emojis.copy_ow')]), name: :copy_ow, class: 'table-action-link', type: :submit, data: { confirm: t('admin.reports.are_you_sure') }
 
     - if params[:local] == '1'
       .batch-table__form.simple_form
@@ -163,12 +164,24 @@
           .fields-group.fields-row__column.fields-row__column-6
             .input.select.optional
               .label_input
-                = f.text_field :author, class: 'string optional', placeholder: t('admin.custom_emojis.author.title'), 'aria-label': t('admin.custom_emojis.author.title')
+                = f.text_field :creator, class: 'string optional', placeholder: t('admin.custom_emojis.creator.title'), 'aria-label': t('admin.custom_emojis.creator.title')
 
           .fields-group.fields-row__column.fields-row__column-6
             .input.select.optional
               .label_input
                 = f.select :copy_permission, options_for_select(Form::CustomEmojiBatch::COPY_PERMISSION_ACTIONS.map { |copy_permission_action| [I18n.t("admin.custom_emojis.copy_permission_action.#{copy_permission_action}"), copy_permission_action]}), class: 'select optional', 'aria-label': t('admin.custom_emojis.copy_permission_action.prompt')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_area :copyright_notice, class: 'string optional', placeholder: t('admin.custom_emojis.copyright_notice.title'), 'aria-label': t('admin.custom_emojis.copyright_notice.title')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_area :credit_text, class: 'string optional', placeholder: t('admin.custom_emojis.credit_text.title'), 'aria-label': t('admin.custom_emojis.credit_text.title')
 
         .fields-row
           .fields-group.fields-row__column.fields-row__column-12
@@ -181,6 +194,12 @@
             .input.string.optional
               .label_input
                 = f.text_area :usage_info, class: 'string optional', placeholder: t('admin.custom_emojis.usage_info.title'), 'aria-label': t('admin.custom_emojis.usage_info.title')
+
+        .fields-row
+          .fields-group.fields-row__column.fields-row__column-12
+            .input.string.optional
+              .label_input
+                = f.text_area :related_link, class: 'string optional', placeholder: t('admin.custom_emojis.related_link.title'), 'aria-label': t('admin.custom_emojis.related_link.title')
 
         .fields-row
           .fields-group.fields-row__column.fields-row__column-12

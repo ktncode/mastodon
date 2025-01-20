@@ -2,10 +2,11 @@
 
 class Export::CustomEmojiSerializer < ActiveModel::Serializer
   attributes :uri, :shortcode, :filename
-  attributes :copy_permission, :license, :misskey_license, :usage_info, :author, :description, :is_based_on, :sensitive, :org_category
+  attributes :copy_permission, :license, :misskey_license, :usage_info, :creator, :description, :copyright_notice, :credit_text, :is_based_on, :sensitive, :org_category
 
   attribute :category, if: :category_loaded?
   attribute :keywords, if: :aliases?
+  attribute :related_link, if: :related_link?
 
   def uri
     ActivityPub::TagManager.instance.uri_for(object)
@@ -29,6 +30,10 @@ class Export::CustomEmojiSerializer < ActiveModel::Serializer
 
   def aliases?
     aliases.present?
+  end
+
+  def related_link?
+    object.related_link.present?
   end
 
   def is_based_on

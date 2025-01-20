@@ -71,7 +71,7 @@ module Admin
     end
 
     def resource_params
-      params.require(:custom_emoji).permit(:shortcode, :image, :visible_in_picker, :category_id, :category_name, :keywords, :description, :author, :copy_permission, :license, :misskey_license, :usage_info, :sensitive).tap do |p|
+      params.require(:custom_emoji).permit(:shortcode, :image, :visible_in_picker, :category_id, :category_name, :keywords, :related_link, :description, :creator, :copy_permission, :license, :misskey_license, :copyright_notice, :credit_text, :usage_info, :sensitive).tap do |p|
         p[:category_id] = CustomEmojiCategory.find_or_create_by!(name: p[:category_name]).id if p[:category_name].present?
       end
     end
@@ -101,6 +101,8 @@ module Admin
         'disable'
       elsif params[:copy]
         'copy'
+      elsif params[:copy_ow]
+        'copy_ow'
       elsif params[:delete]
         'delete'
       elsif params[:fetch]
@@ -109,7 +111,7 @@ module Admin
     end
 
     def form_custom_emoji_batch_params
-      params.require(:form_custom_emoji_batch).permit(:action, :category_id, :category_name, :keyword_action, :keyword_action_value, :description, :author, :copy_permission, :license, :misskey_license, :usage_info, :sensitive, custom_emoji_ids: [])
+      params.require(:form_custom_emoji_batch).permit(:action, :category_id, :category_name, :keyword_action, :keyword_action_value, :description, :creator, :copy_permission, :license, :misskey_license, :copyright_notice, :credit_text, :usage_info, :sensitive, :related_link, custom_emoji_ids: [])
     end
   end
 end
