@@ -46,7 +46,7 @@ class ActivityPub::TagManager
         account_status_url(target.account, target)
       end
     when :emoji
-      emoji_url(target)
+      emoji_url(target.shortcode.downcase)
     when :emoji_reaction
       emoji_reaction_url(target)
     when :conversation
