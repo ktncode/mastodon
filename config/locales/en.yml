@@ -429,6 +429,7 @@ en:
       description:
         title: Custom emoji description
       destroyed_msg: Emojo successfully destroyed!
+      detail: Detail of custom emoji
       disable: Disable
       disabled: Disabled
       disabled_msg: Successfully disabled that emoji
@@ -442,6 +443,10 @@ en:
       go_to_index: Go to index
       image: Image
       image_hint: "%{types} up to %{kbsize}KB"
+      image_meta: Image information
+      is_based_on:
+        category: Category to copy from
+        title: Copy from
       keyword_action:
         apend: Add keywords at the end
         overwrite: Overwrite keywords
@@ -489,6 +494,7 @@ en:
         match: Match
         prompt: Select Match Type
         start_with: Start with
+      source: Source
       status:
         all: All
         disable: Disable
@@ -499,6 +505,7 @@ en:
       unlist: Unlist
       unlisted: Unlisted
       update_failed_msg: Could not update that emoji
+      updated_at: Updated At
       updated_msg: Emoji successfully updated!
       upload: Upload
       upload_once_more: Upload (repeat)

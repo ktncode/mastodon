@@ -29,7 +29,7 @@ class ActivityPub::FetchRemoteCustomEmojiService < BaseService
 
           @json['keywords']         ||= misskey_emoji['aliases']
           @json['category']         ||= misskey_emoji['category']
-          @json['_misskey_license'] ||= { freeText: misskey_emoji['license'] }
+          @json['_misskey_license'] ||= misskey_emoji['license']
           @json['isSensitive']      ||= misskey_emoji['isSensitive']
         end
       rescue

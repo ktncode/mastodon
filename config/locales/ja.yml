@@ -392,7 +392,7 @@ ja:
         deny: 禁止
         deny_long: リモートサーバーへのコピー利用を拒否する
         none: 未設定
-        none_long: 設定しない
+        none_long: 設定なし
         title: コピー許可
       copy_permission_action:
         allow: コピー利用を許可する
@@ -412,8 +412,9 @@ ja:
         title: クレジット
       delete: 削除
       description:
-        title: 絵文字の解説
+        title: 絵文字の説明
       destroyed_msg: 絵文字の削除に成功しました！
+      detail: カスタム絵文字の詳細
       disable: 無効化
       disabled: 無効
       disabled_msg: 絵文字を無効化しました
@@ -427,6 +428,10 @@ ja:
       go_to_index: 一覧へ（保存しない）
       image: 画像
       image_hint: "%{kbsize}KBまでの%{types}画像を利用できます"
+      image_meta: 画像情報
+      is_based_on:
+        category: コピー元のカテゴリー
+        title: コピー元
       keyword_action:
         apend: キーワードを末尾に追加
         overwrite: キーワードを上書き
@@ -479,6 +484,7 @@ ja:
         match: 一致
         prompt: 一致タイプを選択
         start_with: で始まる
+      source: ソース
       status:
         all: すべて
         disable: 無効
@@ -489,6 +495,7 @@ ja:
       unlist: 非表示
       unlisted: 非表示
       update_failed_msg: 絵文字を更新できませんでした
+      updated_at: 更新日時
       updated_msg: 絵文字の更新に成功しました！
       upload: アップロード
       upload_once_more: アップロード（連続）

@@ -78,7 +78,7 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   end
 
   def keywords
-    object.aliases
+    object.aliases&.compact
   end
 
   def related_links
@@ -90,7 +90,7 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   end
 
   def misskey_license
-    MisskeyLicensePresenter.new(freeText: object.misskey_license.presence || Formatter.instance.format_misskey_license(object).presence)
+    MisskeyLicensePresenter.new(freeText: object.misskey_license.presence || Formatter.instance.format_summary(object).presence)
   end
 
   def creator

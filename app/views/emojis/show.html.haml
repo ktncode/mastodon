@@ -1,0 +1,112 @@
+- content_for :page_title do
+  = t('admin.custom_emojis.title')
+
+.emoji-detail
+  %h2= t('admin.custom_emojis.detail')
+
+  = render 'shared/error_messages', object: @emoji
+
+  .emoji-table-wrapper
+    %table.table
+      %tbody
+        %tr
+          %th.nowrap= t('admin.custom_emojis.image')
+          %td
+            = custom_emoji_tag(@emoji, animate = true)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.image_meta')
+          %td= "#{@emoji.image_content_type}, #{@emoji.width} x #{@emoji.height}, #{@emoji.image_file_size/1.kilobytes}KB"
+        %tr
+          %th.nowrap= t('admin.custom_emojis.shortcode')
+          %td= @emoji.shortcode
+        %tr
+          %th.nowrap= t('admin.custom_emojis.category')
+          %td
+            %span.account-role.bot= @emoji.category&.name || t('admin.custom_emojis.uncategorized')
+        %tr
+          %th.nowrap= t('admin.custom_emojis.status.title')
+          %td
+            - if @emoji.disabled?
+              = t('admin.custom_emojis.disabled')
+            - else
+              = t('admin.custom_emojis.enabled')
+        %tr
+          %th.nowrap= t('admin.custom_emojis.source')
+          %td= link_to 'JSON', emoji_url(@emoji.shortcode.downcase, format: :json)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.keywords.title')
+          %td
+            - @emoji.aliases.each do |keyword|
+              %span.account-role.bot= keyword
+        %tr
+          %th.nowrap= t('admin.custom_emojis.creator.title')
+          %td= Formatter.instance.linkify(@emoji.creator)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.copyright_notice.title')
+          %td= Formatter.instance.linkify(@emoji.copyright_notice)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.credit_text.title')
+          %td= Formatter.instance.linkify(@emoji.credit_text)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.license.title')
+          %td
+            - if CustomEmoji::COMMON_LICENSES[@emoji.license].present?
+              = link_to @emoji.license, target: '_blank' do |license|
+                = CustomEmoji::COMMON_LICENSES[@emoji.license]
+                = fa_icon 'external-link fw'
+            - elsif @emoji.license&.start_with?(%r(https?://))
+              = link_to @emoji.license, target: '_blank' do |license|
+                = @emoji.license
+                = fa_icon 'external-link fw'
+            - else
+              = Formatter.instance.linkify(@emoji.license)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.copy_permission.title')
+          %td= t("admin.custom_emojis.copy_permission.#{@emoji.copy_permission}")
+        %tr
+          %th.nowrap= t('admin.custom_emojis.usage_info.title')
+          %td= Formatter.instance.linkify(@emoji.usage_info)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.related_link.title')
+          %td
+            - @emoji.related_links&.each do |link|
+              - decoded_link_text = Addressable::URI.unencode(Addressable::URI.parse(link).to_s).then {|text| text.valid_encoding? ? text : link}
+              %div
+                - if link&.start_with?('http://') || link&.start_with?('https://')
+                  = link_to link, target: '_blank' do
+                    = decoded_link_text
+                    = fa_icon 'external-link fw'
+                - else
+                  = link
+        %tr
+          %th.nowrap= t('admin.custom_emojis.description.title')
+          %td= Formatter.instance.linkify(@emoji.description)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.sensitive.title')
+          %td
+            - if @emoji.sensitive
+              = fa_icon 'check fw'
+        %tr
+          %th.nowrap= t('admin.custom_emojis.misskey_license.title')
+          %td
+            - if @emoji.misskey_license.present?
+              = Formatter.instance.linkify(@emoji.misskey_license)
+            - else
+              .generated= Formatter.instance.format_summary(@emoji)
+        %tr
+          %th.nowrap= t('admin.custom_emojis.is_based_on.title')
+          %td
+            - if @emoji.is_based_on.present?
+              = link_to @emoji.is_based_on, target: '_blank' do
+                = @emoji.is_based_on
+                = fa_icon 'external-link fw'
+        %tr
+          %th.nowrap= t('admin.custom_emojis.is_based_on.category')
+          %td
+            - if @emoji.org_category.present?
+              %span.account-role.bot= @emoji.org_category
+        %tr
+          %th.nowrap= t('admin.custom_emojis.updated_at')
+          %td
+            = l(@emoji.updated_at.in_time_zone(current_user&.time_zone.presence))
+            = " (#{current_user&.time_zone.presence || 'UTC'})"

@@ -126,17 +126,17 @@ class Formatter
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
-  def format_misskey_license(emoji)
+  def format_summary(emoji)
     val = []
     val << "creator: #{emoji.creator}" if emoji.creator.present?
     val << "copyrightNotice: #{emoji.copyright_notice}" if emoji.copyright_notice.present?
     val << "creditText: #{emoji.credit_text}" if emoji.credit_text.present?
-    val << "license: #{emoji.license}" if emoji.license.present?
+    val << "license: #{emoji.license_name.presence || emoji.license}" if emoji.license.present?
     val << "usage: #{emoji.usage_info}" if emoji.usage_info.present?
     val << "links: #{emoji.related_link}" if emoji.related_link.present?
     val << "##{emoji.copy_permission.to_s}" unless emoji.none_permission?
     val << "description: #{emoji.description}" if emoji.description.present?
-    val.compact.join(', ')
+    val.compact.join(', ').gsub!(/\r\n|\r|\n/, ' ')
   end
 
   def linkify(text)

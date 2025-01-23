@@ -907,3 +907,35 @@
     }
   }
 }
+
+.emoji-detail {
+  h2 {
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: $darker-text-color;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+}
+
+.emoji-table-wrapper {
+  .table {
+    th {
+      text-align: end;
+      color: $light-text-color;
+      width: 1%;
+    }
+
+    td {
+      word-break: break-all;
+
+      .generated {
+        color: $light-text-color;
+      }
+    }
+  }
+}
