@@ -90,7 +90,7 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   end
 
   def misskey_license
-    MisskeyLicensePresenter.new(freeText: object.misskey_license.presence || Formatter.instance.format_misskey_license(object))
+    MisskeyLicensePresenter.new(freeText: object.misskey_license.presence || Formatter.instance.format_misskey_license(object).presence)
   end
 
   def creator
