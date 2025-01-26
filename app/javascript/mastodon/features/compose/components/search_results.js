@@ -6,6 +6,7 @@ import AccountContainer from '../../../containers/account_container';
 import StatusContainer from '../../../containers/status_container';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import Hashtag from '../../../components/hashtag';
+import CustomEmojiResult from '../../../components/custom_emoji_result';
 import Icon from 'mastodon/components/icon';
 import { searchEnabled } from '../../../initial_state';
 import LoadMore from 'mastodon/components/load_more';
@@ -14,7 +15,6 @@ const messages = defineMessages({
   dismissSuggestion: { id: 'suggestions.dismiss', defaultMessage: 'Dismiss suggestion' },
 });
 
-export default @injectIntl
 class SearchResults extends ImmutablePureComponent {
 
   static propTypes = {
@@ -73,7 +73,7 @@ class SearchResults extends ImmutablePureComponent {
       );
     }
 
-    let accounts, statuses, hashtags, profiles;
+    let accounts, statuses, hashtags, profiles, custom_emojis;
     let count = 0;
 
     if (results.get('accounts') && results.get('accounts').size > 0) {
@@ -138,6 +138,20 @@ class SearchResults extends ImmutablePureComponent {
       );
     }
 
+    if (results.get('custom_emojis') && results.get('custom_emojis').size > 0) {
+      count += results.get('custom_emojis').size;
+      custom_emojis = (
+        <div className='search-results__section'>
+          <h5>
+            <Icon id='smile-o' fixedWidth />
+            <FormattedMessage id='search_results.custom_emojis' defaultMessage='Custom emojis' />
+          </h5>
+
+          {results.get('custom_emojis').map(shortcode_with_domain => <CustomEmojiResult key={shortcode_with_domain} shortcode_with_domain={shortcode_with_domain} />)}
+        </div>
+      );
+    }
+
     return (
       <div className='search-results'>
         <div className='search-results__header'>
@@ -149,8 +163,11 @@ class SearchResults extends ImmutablePureComponent {
         {profiles}
         {statuses}
         {hashtags}
+        {custom_emojis}
       </div>
     );
   }
 
 }
+
+export default injectIntl(SearchResults);

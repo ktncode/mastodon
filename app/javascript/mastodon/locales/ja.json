@@ -593,6 +593,8 @@
   "search_popout.tips.text": "表示名やユーザー名、ハッシュタグに一致する単純なテキスト",
   "search_popout.tips.user": "ユーザー",
   "search_results.accounts": "人々",
+  "search_results.custom_emojis": "カスタム絵文字",
+  "search_results.custom_emojis.misskey_license": "ライセンス情報",
   "search_results.hashtags": "ハッシュタグ",
   "search_results.profiles": "プロフィールに一致する人々",
   "search_results.statuses": "投稿",

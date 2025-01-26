@@ -1,6 +1,6 @@
 import api from '../api';
 import { fetchRelationshipsSuccess, fetchRelationships } from './accounts';
-import { importFetchedAccounts, importFetchedStatuses } from './importer';
+import { importFetchedAccounts, importFetchedStatuses, importFetchedCustomEmojisDetail } from './importer';
 
 export const SEARCH_CHANGE = 'SEARCH_CHANGE';
 export const SEARCH_CLEAR  = 'SEARCH_CLEAR';
@@ -32,7 +32,7 @@ export function submitSearch() {
     const value = getState().getIn(['search', 'value']);
 
     if (value.length === 0) {
-      dispatch(fetchSearchSuccess({ accounts: [], statuses: [], hashtags: [], profiles: [] }, ''));
+      dispatch(fetchSearchSuccess({ accounts: [], statuses: [], hashtags: [], profiles: [], custom_emojis: [] }, ''));
       return;
     }
 
@@ -65,6 +65,10 @@ export function submitSearch() {
         } else {
           dispatch(importFetchedStatuses(response.data.statuses));
         }
+      }
+
+      if (response.data.custom_emojis) {
+        dispatch(importFetchedCustomEmojisDetail(response.data.custom_emojis));
       }
 
       dispatch(fetchSearchSuccess(response.data, value));
@@ -139,6 +143,10 @@ export const expandSearch = type => (dispatch, getState) => {
       } else {
         dispatch(importFetchedStatuses(data.statuses));
       }
+    }
+
+    if (data.custom_emojis) {
+      dispatch(importFetchedCustomEmojisDetail(data.custom_emojis));
     }
 
     dispatch(expandSearchSuccess(data, value, type));

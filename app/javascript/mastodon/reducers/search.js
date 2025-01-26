@@ -60,6 +60,7 @@ export default function search(state = initialState, action) {
       statuses: ImmutableOrderedSet(action.results.statuses.map(item => item.id)),
       hashtags: ImmutableOrderedSet(fromJS(action.results.hashtags)),
       profiles: ImmutableOrderedSet(action.results.profiles.map(item => item.id)),
+      custom_emojis: ImmutableOrderedSet(action.results.custom_emojis.map(item => `${item.shortcode}${item.local ? '' : `@${item.domain}`}`)),
     })).set('submitted', true).set('searchTerm', action.searchTerm);
   case SEARCH_EXPAND_SUCCESS:
     const results = action.searchType === 'hashtags' ? ImmutableOrderedSet(fromJS(action.results.hashtags)) : action.results[action.searchType].map(item => item.id);

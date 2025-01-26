@@ -8733,3 +8733,45 @@ noscript {
   pointer-events: none;
 }
 
+.custom-emoji__result {
+  border-bottom: 1px solid lighten($ui-base-color, 8%);
+  padding: 6px;
+
+  .custom-emoji__image {
+    img.emojione:not(.reaction) {
+      height: 64px;
+      max-width: min(100%, 30em);
+    }
+    padding-bottom: 4px;
+  }
+
+  .custom-emoji__shortcode {
+    color: $darker-text-color;
+  }
+
+  .custom-emoji__misskey-license {
+    margin: 4px 0;
+    color: $primary-text-color;
+
+    border: solid 1px $valid-value-color;
+    border-radius: 6px;
+    background: color-mix(in srgb, $valid-value-color, transparent 90%);
+    padding: 6px 8px;
+
+    &_header {
+      display: block;
+      font-size: 12px;
+      color: $darker-text-color;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    &_content {
+      word-break: break-all;
+
+      a {
+        color: inherit;
+      }
+    }
+  }
+}

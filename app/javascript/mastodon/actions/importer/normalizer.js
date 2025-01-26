@@ -156,3 +156,18 @@ export function normalizeAnnouncement(announcement) {
 
   return normalAnnouncement;
 }
+
+export function normalizeCustomEmojiDetail(emoji) {
+  const normalEmoji   = { ...emoji };
+
+  if (typeof emoji.creator === 'object') {
+    normalEmoji.creator = creator.creator.id;
+  }
+
+  normalEmoji.shortcode_with_domain = `${emoji.shortcode}${emoji.local ? '' : `@${emoji.domain}`}`;
+  normalEmoji.aliases = emoji.aliases?.map( alias => alias ? escapeTextContentForBrowser(alias) : null );
+  normalEmoji.category = emoji.category ? escapeTextContentForBrowser(emoji.category) : null;
+  normalEmoji.org_category = emoji.org_category ? escapeTextContentForBrowser(emoji.org_category) : null;
+
+  return normalEmoji;
+}

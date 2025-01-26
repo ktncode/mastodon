@@ -963,10 +963,11 @@ a.name-tag,
 }
 
 .emoji-detail {
-  .emojione {
+  img.emojione:not(.reaction) {
     max-width: 640px;
     width: auto;
     height: 64px;
+    max-width: min(100%, 30em);
   }
 }
 

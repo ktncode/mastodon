@@ -1,10 +1,12 @@
-import { normalizeAccount, normalizeStatus, normalizePoll } from './normalizer';
+import { normalizeAccount, normalizeStatus, normalizePoll, normalizeCustomEmojiDetail } from './normalizer';
 
 export const ACCOUNT_IMPORT  = 'ACCOUNT_IMPORT';
 export const ACCOUNTS_IMPORT = 'ACCOUNTS_IMPORT';
 export const STATUS_IMPORT   = 'STATUS_IMPORT';
 export const STATUSES_IMPORT = 'STATUSES_IMPORT';
 export const POLLS_IMPORT    = 'POLLS_IMPORT';
+export const CUSTOM_EMOJI_DETAIL_IMPORT  = 'CUSTOM_EMOJI_DETAIL_IMPORT';
+export const CUSTOM_EMOJIS_DETAIL_IMPORT = 'CUSTOM_EMOJIS_DETAIL_IMPORT';
 
 function pushUnique(array, object) {
   if (array.every(element => element.id !== object.id)) {
@@ -30,6 +32,20 @@ export function importStatuses(statuses) {
 
 export function importPolls(polls) {
   return { type: POLLS_IMPORT, polls };
+}
+
+export function importCustomEmojiDetail(custom_emoji) {
+  return {
+    type: CUSTOM_EMOJI_DETAIL_IMPORT,
+    customEmojiDetail: custom_emoji,
+  };
+}
+
+export function importCustomEmojisDetail(custom_emojis) {
+  return {
+    type: CUSTOM_EMOJIS_DETAIL_IMPORT,
+    customEmojisDetail: custom_emojis,
+  };
 }
 
 export function importFetchedAccount(account) {
@@ -91,5 +107,23 @@ export function importFetchedStatuses(statuses) {
 export function importFetchedPoll(poll) {
   return dispatch => {
     dispatch(importPolls([normalizePoll(poll)]));
+  };
+}
+
+export function importFetchedCustomEmojiDetail(custom_emoji) {
+  return importFetchedCustomEmojisDetail([custom_emoji]);
+}
+
+export function importFetchedCustomEmojisDetail(custom_emojis) {
+  const normalizeCustomEmojisDetail = [];
+
+  return (dispatch, _getState) => {
+    function processCustomEmojiDetail(custom_emoji) {
+      pushUnique(normalizeCustomEmojisDetail, normalizeCustomEmojiDetail(custom_emoji));
+    }
+
+    custom_emojis.forEach(processCustomEmojiDetail);
+
+    dispatch(importCustomEmojisDetail(normalizeCustomEmojisDetail));
   };
 }

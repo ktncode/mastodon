@@ -593,6 +593,8 @@
   "search_popout.tips.text": "Simple text returns matching display names, usernames and hashtags",
   "search_popout.tips.user": "user",
   "search_results.accounts": "People",
+  "search_results.custom_emojis": "Custom emojis",
+  "search_results.custom_emojis.misskey_license": "License infomation",
   "search_results.hashtags": "Hashtags",
   "search_results.profiles": "People with matching profiles",
   "search_results.statuses": "Posts",
