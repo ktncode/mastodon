@@ -72,6 +72,7 @@ import {
   Suggestions,
   EmptyColumn,
   ScheduledStatuses,
+  EmojiDetail,
 } from './util/async-components';
 import { me, enableEmptyColumn, maxAttachments } from '../../initial_state';
 import { closeOnboarding, INTRODUCTION_VERSION } from 'mastodon/actions/onboarding';
@@ -238,6 +239,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/lists' component={Lists} content={children} />
           <WrappedRoute path='/circles' component={Circles} content={children} />
           <WrappedRoute path='/scheduled_statuses' component={ScheduledStatuses} content={children} />
+          <WrappedRoute path='/emoji_detail/:shortcode_with_domain' component={EmojiDetail} content={children} />
 
           <WrappedRoute path='/empty' component={EmptyColumn} content={children} />
 

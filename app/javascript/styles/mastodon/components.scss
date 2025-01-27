@@ -8733,23 +8733,12 @@ noscript {
   pointer-events: none;
 }
 
-.custom-emoji__result {
+.custom-emoji__result,
+.custom-emoji__detail {
   border-bottom: 1px solid lighten($ui-base-color, 8%);
   padding: 6px;
 
-  .custom-emoji__image {
-    img.emojione:not(.reaction) {
-      height: 64px;
-      max-width: min(100%, 30em);
-    }
-    padding-bottom: 4px;
-  }
-
-  .custom-emoji__shortcode {
-    color: $darker-text-color;
-  }
-
-  .custom-emoji__misskey-license {
+  .custom-emoji__summary_wrapper {
     margin: 4px 0;
     color: $primary-text-color;
 
@@ -8757,21 +8746,61 @@ noscript {
     border-radius: 6px;
     background: color-mix(in srgb, $valid-value-color, transparent 90%);
     padding: 6px 8px;
+  }
 
-    &_header {
-      display: block;
-      font-size: 12px;
-      color: $darker-text-color;
-      font-weight: 500;
-      margin-bottom: 5px;
+  .custom-emoji__property {
+    border-top: 1px solid lighten($ui-base-color, 8%);
+  }
+
+  .custom-emoji__label {
+    display: block;
+    font-size: 12px;
+    color: $darker-text-color;
+    font-weight: 500;
+    padding: 4px 0;
+  }
+
+  .custom-emoji__shortcode,
+  .custom-emoji__dimension,
+  .custom-emoji__domain,
+  .custom-emoji__category,
+  .custom-emoji__creator,
+  .custom-emoji__license,
+  .custom-emoji__misskey_license,
+  .custom-emoji__copy_permission,
+  .custom-emoji__keyword,
+  .custom-emoji__related_link,
+  .custom-emoji__date,
+  .custom-emoji__copyright_notice,
+  .custom-emoji__credit_text,
+  .custom-emoji__usage_info,
+  .custom-emoji__is_based_on,
+  .custom-emoji__sensitive,
+  .custom-emoji__description,
+  .custom-emoji__summary {
+    color: $primary-text-color;
+    word-break: break-all;
+    padding: 2px 4px;
+    margin: 4px;
+    font-size: 16px;
+    line-height: 22px;
+
+    a {
+      color: inherit;
     }
+  }
 
-    &_content {
-      word-break: break-all;
+  .custom-emoji__domain_part {
+    float: right;
+    font-size: 12px;
+  }
 
-      a {
-        color: inherit;
-      }
+  .custom-emoji__image {
+    img.emojione:not(.reaction) {
+      box-sizing: border-box;
+      height: 96px;
+      max-width: min(100%, 30em);
+      padding: 10px;
     }
   }
 }

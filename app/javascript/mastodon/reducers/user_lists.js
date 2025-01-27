@@ -92,6 +92,11 @@ import {
   FEATURED_TAGS_FETCH_SUCCESS,
   FEATURED_TAGS_FETCH_FAIL,
 } from 'mastodon/actions/featured_tags';
+import {
+  CUSTOM_EMOJI_DETAIL_FETCH_REQUEST,
+  CUSTOM_EMOJI_DETAIL_FETCH_SUCCESS,
+  CUSTOM_EMOJI_DETAIL_FETCH_FAIL,
+} from 'mastodon/actions/custom_emojis';
 import { Map as ImmutableMap, List as ImmutableList, fromJS } from 'immutable';
 
 const initialListState = ImmutableMap({
@@ -112,6 +117,7 @@ const initialState = ImmutableMap({
   blocks: initialListState,
   mutes: initialListState,
   featured_tags: initialListState,
+  custom_emojis_detail: initialListState,
 });
 
 const normalizeList = (state, path, accounts, next) => {
@@ -298,6 +304,11 @@ export default function userLists(state = initialState, action) {
     return state.setIn(['featured_tags', action.id, 'isLoading'], true);
   case FEATURED_TAGS_FETCH_FAIL:
     return state.setIn(['featured_tags', action.id, 'isLoading'], false);
+  case CUSTOM_EMOJI_DETAIL_FETCH_REQUEST:
+        return state.setIn(['custom_emojis_detail', 'isLoading'], true);
+  case CUSTOM_EMOJI_DETAIL_FETCH_SUCCESS:
+  case CUSTOM_EMOJI_DETAIL_FETCH_FAIL:
+    return state.setIn(['custom_emojis_detail', 'isLoading'], false);
   default:
     return state;
   }

@@ -237,3 +237,7 @@ export function EmptyColumn () {
 export function ScheduledStatuses () {
   return import(/* webpackChunkName: "features/scheduled_statuses" */'../../scheduled_statuses');
 }
+
+export function EmojiDetail () {
+  return import(/* webpackChunkName: "features/emoji_detail" */'../../emoji_detail');
+}
