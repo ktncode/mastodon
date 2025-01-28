@@ -89,7 +89,7 @@ class Form::AdminSettings
   validates :bootstrap_timeline_accounts, existing_username: { multiple: true }
   validates :show_domain_blocks, inclusion: { in: %w(disabled users all) }
   validates :show_domain_blocks_rationale, inclusion: { in: %w(disabled users all) }
-  validates :poll_max_options, numericality: { greater_than: 2, less_than_or_equal_to: PollValidator::MAX_OPTIONS_LIMIT }
+  validates :poll_max_options, numericality: { greater_than: 2, less_than_or_equal_to: PollOptionsValidator::MAX_OPTIONS_LIMIT }
   validates :reaction_max_per_account, numericality: { greater_than_or_equal: 1, less_than_or_equal_to: EmojiReactionValidator::MAX_PER_ACCOUNT_LIMIT }
   validates :attachments_max, numericality: { greater_than_or_equal: 1, less_than_or_equal_to: MediaAttachment::ATTACHMENTS_LIMIT }
   validates :reject_pattern, regexp_syntax: true

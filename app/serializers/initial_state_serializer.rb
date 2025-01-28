@@ -156,7 +156,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:default_expires_action]  = object.current_account.user.setting_default_expires_action
       store[:prohibited_visibilities] = object.current_account.user.setting_prohibited_visibilities.filter(&:present?)
       store[:prohibited_words]        = (object.current_account.user.setting_prohibited_words || '').split(',').map(&:strip).filter(&:present?)
-      store[:poll_max_options]        = [PollValidator::MAX_OPTIONS, Setting.poll_max_options].max
+      store[:poll_max_options]        = [PollOptionsValidator::MAX_OPTIONS, Setting.poll_max_options].max
     end
 
     store[:text] = object.text if object.text
