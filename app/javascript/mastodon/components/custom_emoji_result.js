@@ -31,6 +31,20 @@ class CustomEmojiResult extends React.PureComponent {
     hovered: false,
   };
 
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
+
+  handleMouseEnter = () => this.setState({ hovered: true });
+  handleMouseLeave = () => this.setState({ hovered: false });
+
   _updateLinks () {
     const { intl } = this.props;
     const node = this.node;
@@ -74,39 +88,16 @@ class CustomEmojiResult extends React.PureComponent {
     }
   }
 
-  handleMouseEnter = () => {
-    this.setState({
-      hovered: true,
-    });
-  };
-
-  handleMouseLeave = () => {
-    this.setState({
-      hovered: false,
-    });
-  };
-
-  setTargetRef = c => {
-    this.target = c;
-  };
-
   setRef = (c) => {
     this.node = c;
   }
 
   componentDidMount () {
     this._updateLinks();
-    this.target?.addEventListener('mouseenter', this.handleMouseEnter, { capture: true });
-    this.target?.addEventListener('mouseleave', this.handleMouseLeave, false);
   }
 
   componentDidUpdate () {
     this._updateLinks();
-  }
-
-  componentWillUnmount () {
-    this.target?.removeEventListener('mouseenter', this.handleMouseEnter, { capture: true });
-    this.target?.removeEventListener('mouseleave', this.handleMouseLeave, false);
   }
 
   onHashtagClick = (hashtag, e) => {
@@ -140,10 +131,10 @@ class CustomEmojiResult extends React.PureComponent {
   }
 
   render () {
-    const { shortcode_with_domain, custom_emoji } = this.props;
+    const { custom_emoji } = this.props;
 
     if (!custom_emoji) {
-      return <div />;
+      return null;
     }
 
     const shortcode = custom_emoji.get('shortcode');
@@ -152,7 +143,7 @@ class CustomEmojiResult extends React.PureComponent {
 
     return (
       <div className='custom-emoji__result'>
-        <div className='custom-emoji__image' ref={this.setTargetRef}><Emoji emoji={shortcode_with_domain} hovered={this.state.hovered} url={custom_emoji.get('url')} static_url={custom_emoji.get('static_url')} /></div>
+        <div className='custom-emoji__image' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}><Emoji emoji={shortcode} domain={domain} hovered={this.state.hovered} url={custom_emoji.get('url')} static_url={custom_emoji.get('static_url')} onClick={this.handleEmojiClick}/></div>
         <div className='custom-emoji__shortcode'>:{shortcode}:{domain && <span className='custom-emoji__domain_part'>{domain}</span>}</div>
         {summary && 
           <div className='custom-emoji__summary_wrapper' ref={this.setRef}>

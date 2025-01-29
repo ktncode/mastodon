@@ -114,8 +114,6 @@ const dateFormatOptions = {
   minute: '2-digit',
 };
 
-export default @connect(mapStateToProps)
-@injectIntl
 class Status extends ImmutablePureComponent {
 
   static contextTypes = {
@@ -204,6 +202,73 @@ class Status extends ImmutablePureComponent {
       };
     } else {
       return null;
+    }
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.status && nextProps.status.get('id') !== prevState.statusId) {
+      return {
+        showMedia: defaultMediaVisibility(nextProps.status),
+        showQuoteMedia: defaultMediaVisibility(nextProps.status.get('quote', null)),
+        statusId: nextProps.status.get('id'),
+      };
+    } else {
+      return null;
+    }
+  }
+
+  componentDidMount () {
+    this._updateEmojiLinks();
+  }
+
+  componentDidUpdate () {
+    this._updateEmojiLinks();
+  }
+
+  componentWillUnmount () {
+    this._removeEmojiLinks();
+  }
+
+  _updateEmojiLinks () {
+    const node = this.emoji_node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.addEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'pointer';
+    }
+  }
+
+  _removeEmojiLinks () {
+    const node = this.emoji_node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.removeEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'default';
+    }
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
     }
   }
 
@@ -401,6 +466,10 @@ class Status extends ImmutablePureComponent {
     this.node = c;
   }
 
+  emojiRef = c => {
+    this.emoji_node = c;
+  }
+
   render () {
     let media = null;
     let statusAvatar, prepend, rebloggedByText;
@@ -465,7 +534,7 @@ class Status extends ImmutablePureComponent {
 
     if (featured) {
       prepend = (
-        <div className='status__prepend'>
+        <div className='status__prepend' ref={this.emojiRef}>
           <div className='status__prepend-icon-wrapper'><Icon id='thumb-tack' className='status__prepend-icon' fixedWidth /></div>
           <FormattedMessage id='status.pinned' defaultMessage='Pinned toot' />
         </div>
@@ -477,7 +546,7 @@ class Status extends ImmutablePureComponent {
         const visibilityReblogLink = <Icon id={visibilityReblogIcon.icon} className='status__prepend-icon' title={visibilityReblogIcon.text} />;
 
         prepend = (
-          <div className='status__prepend'>
+          <div className='status__prepend' ref={this.emojiRef}>
             <div className='status__prepend-icon-wrapper'><Icon id='retweet' className='status__prepend-icon' fixedWidth /></div>
             <FormattedMessage id='status.reblogged_by' defaultMessage='{name} boosted' values={{ name: <a onClick={this.handleAccountClick} data-id={status.getIn(['account', 'id'])} data-group={status.getIn(['account', 'group'])} href={status.getIn(['account', 'url'])} className='status__display-name muted'><bdi><strong dangerouslySetInnerHTML={display_name_html} /></bdi></a> }} />
             {visibilityReblogLink}
@@ -812,3 +881,5 @@ class Status extends ImmutablePureComponent {
   }
 
 }
+
+export default injectIntl(connect(mapStateToProps)(Status));

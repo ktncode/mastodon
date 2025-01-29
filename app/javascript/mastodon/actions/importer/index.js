@@ -93,7 +93,7 @@ export function importFetchedStatuses(statuses) {
         processStatus(status.quote);
       }
 
-      pushUnique(normalStatuses, normalizeStatus(status, getState().getIn(['statuses', status.id])));
+      pushUnique(normalStatuses, normalizeStatus(status, getState().getIn(['statuses', status.id]), (typeof status.account === 'object' ? status.account.acct : getState().getIn(['accounts', status.account, 'acct']))?.split('@')[1] ?? ''));
     }
 
     statuses.forEach(processStatus);

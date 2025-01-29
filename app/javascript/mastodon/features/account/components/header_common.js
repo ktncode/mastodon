@@ -56,6 +56,10 @@ const messages = defineMessages({
 export default @injectIntl
 class HeaderCommon extends ImmutablePureComponent {
 
+  static contextTypes = {
+    router: PropTypes.object,
+  };
+
   static propTypes = {
     account: ImmutablePropTypes.map,
     onFollow: PropTypes.func.isRequired,
@@ -77,6 +81,41 @@ class HeaderCommon extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
     domain: PropTypes.string.isRequired,
   };
+
+  componentDidMount () {
+    this._updateEmojiLinks();
+  }
+
+  componentDidUpdate () {
+    this._updateEmojiLinks();
+  }
+
+  _updateEmojiLinks () {
+    const node = this.node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.addEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'pointer';
+    }
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
 
   openEditProfile = () => {
     window.open('/settings/profile', '_blank');
@@ -381,7 +420,7 @@ class HeaderCommon extends ImmutablePureComponent {
           </div>
 
           <div className='account__header__tabs__name'>
-            <h1>
+            <h1 ref={this.setRef}>
               <span dangerouslySetInnerHTML={displayNameHtml} /> {badge}
               <small>@{acct} {lockedIcon}</small>
             </h1>

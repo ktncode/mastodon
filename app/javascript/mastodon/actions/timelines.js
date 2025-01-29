@@ -156,8 +156,8 @@ export function expandTimeline(timelineId, path, params = {}, done = noOp) {
       if (response.data) {
         if ('statuses' in response.data && 'accounts' in response.data) {
           const { statuses, referenced_statuses, accounts, relationships } = response.data;
-          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(importFetchedAccounts(accounts));
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(fetchRelationshipsSuccess(relationships));
           dispatch(expandTimelineSuccess(timelineId, statuses, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
         } else {

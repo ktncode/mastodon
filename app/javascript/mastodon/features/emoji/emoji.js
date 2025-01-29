@@ -24,7 +24,7 @@ const emojiFilename = (filename) => {
 
 const domParser = new DOMParser();
 
-const emojifyTextNode = (node, customEmojis) => {
+const emojifyTextNode = (node, customEmojis, domain) => {
   let str = node.textContent;
 
   const fragment = new DocumentFragment();
@@ -54,7 +54,10 @@ const emojifyTextNode = (node, customEmojis) => {
         // if you want additional emoji handler, add statements below which set replacement and return true.
         if (shortname in customEmojis) {
           const filename = autoPlayGif ? customEmojis[shortname].url : customEmojis[shortname].static_url;
-          replacement = `<img draggable="false" class="emojione custom-emoji" alt="${shortname}" title="${shortname}" src="${filename}" data-original="${customEmojis[shortname].url}" data-static="${customEmojis[shortname].static_url}" />`;
+          const aliases = customEmojis[shortname].aliases ?? [];
+          const shortcode = shortname.slice(1, -1);
+          const displayname = !domain && aliases[0] ? aliases[0] : shortcode;
+          replacement = `<img draggable="false" class="emojione custom-emoji" alt="${shortname}" title="${displayname}" src="${filename}" data-shortcode="${shortcode}" data-domain="${domain}" data-original="${customEmojis[shortname].url}" data-static="${customEmojis[shortname].static_url}" />`;
           return true;
         }
         return false;
@@ -82,28 +85,28 @@ const emojifyTextNode = (node, customEmojis) => {
   node.parentElement.replaceChild(fragment, node);
 };
 
-const emojifyNode = (node, customEmojis) => {
+const emojifyNode = (node, customEmojis, domain) => {
   for (const child of node.childNodes) {
     switch(child.nodeType) {
     case Node.TEXT_NODE:
-      emojifyTextNode(child, customEmojis);
+      emojifyTextNode(child, customEmojis, domain);
       break;
     case Node.ELEMENT_NODE:
       if (!child.classList.contains('invisible'))
-        emojifyNode(child, customEmojis);
+        emojifyNode(child, customEmojis, domain);
       break;
     }
   }
 };
 
-const emojify = (str, customEmojis = {}) => {
+const emojify = (str, customEmojis = {}, domain = '') => {
   const wrapper = document.createElement('div');
   wrapper.innerHTML = str;
 
   if (!Object.keys(customEmojis).length)
     customEmojis = null;
 
-  emojifyNode(wrapper, customEmojis);
+  emojifyNode(wrapper, customEmojis, domain);
 
   return wrapper.innerHTML;
 };

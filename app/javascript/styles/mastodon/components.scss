@@ -786,6 +786,10 @@
   img {
     width: auto;
   }
+
+  &.clickable {
+    cursor: pointer;
+  }
 }
 
 .reply-indicator {

@@ -18,20 +18,21 @@ export function searchTextFromRawStatus (status) {
 
 export function normalizeAccount(account) {
   account = { ...account };
+  const domain = account.acct?.split('@')[1] ?? '';
 
   const emojiMap = makeEmojiMap(account);
   const displayName = account.display_name.trim().length === 0 ? account.username : account.display_name;
 
-  account.display_name_html = emojify(escapeTextContentForBrowser(displayName), emojiMap);
-  account.note_emojified = emojify(account.note, emojiMap);
+  account.display_name_html = emojify(escapeTextContentForBrowser(displayName), emojiMap, domain);
+  account.note_emojified = emojify(account.note, emojiMap, domain);
   account.note_plain = unescapeHTML(account.note);
-  account.followed_message_emojified = emojify(account.followed_message, emojiMap);
+  account.followed_message_emojified = emojify(account.followed_message, emojiMap, domain);
 
   if (account.fields) {
     account.fields = account.fields.map(pair => ({
       ...pair,
-      name_emojified: emojify(escapeTextContentForBrowser(pair.name), emojiMap),
-      value_emojified: emojify(pair.value, emojiMap),
+      name_emojified: emojify(escapeTextContentForBrowser(pair.name), emojiMap, domain),
+      value_emojified: emojify(pair.value, emojiMap, domain),
       value_plain: unescapeHTML(pair.value),
     }));
   }
@@ -43,8 +44,9 @@ export function normalizeAccount(account) {
   return account;
 }
 
-export function normalizeStatus(status, normalOldStatus) {
+export function normalizeStatus(status, normalOldStatus, domain) {
   const normalStatus   = { ...status };
+
   if (typeof status.account === 'object') {
     normalStatus.account = status.account.id;
   }
@@ -85,7 +87,7 @@ export function normalizeStatus(status, normalOldStatus) {
     docContentElem.querySelector('.reference-link-inline')?.remove();
     docContentElem.querySelector('.original-media-link')?.remove();
 
-    const flagment = domParser.parseFromString(emojify(normalStatus.content, emojiMap), 'text/html').documentElement;
+    const flagment = domParser.parseFromString(emojify(normalStatus.content, emojiMap, domain), 'text/html').documentElement;
 
     flagment.querySelectorAll('body>p').forEach(p => {
       let imgCount = 0;
@@ -123,9 +125,9 @@ export function normalizeStatus(status, normalOldStatus) {
     });
 
     normalStatus.search_index      = docContentElem.textContent;
-    normalStatus.shortHtml         = '<p>'+emojify(normalStatus.search_index.substr(0, 150), emojiMap) + (normalStatus.search_index.substr(150) ? '...' : '')+'</p>';
+    normalStatus.shortHtml         = '<p>'+emojify(normalStatus.search_index.substr(0, 150), emojiMap, domain) + (normalStatus.search_index.substr(150) ? '...' : '')+'</p>';
     normalStatus.contentHtml       = flagment.innerHTML;
-    normalStatus.spoilerHtml       = emojify(escapeTextContentForBrowser(spoilerText), emojiMap);
+    normalStatus.spoilerHtml       = emojify(escapeTextContentForBrowser(spoilerText), emojiMap, domain);
     normalStatus.hidden            = expandSpoilers ? false : spoilerText.length > 0 || normalStatus.sensitive;
     normalStatus.visibility        = normalStatus.visibility_ex ? normalStatus.visibility_ex : normalStatus.visibility;
     normalStatus.quote             = null;

@@ -106,17 +106,17 @@ const initialListState = ImmutableMap({
 });
 
 const initialState = ImmutableMap({
-  followers: initialListState,
-  following: initialListState,
-  subscribing: initialListState,
-  reblogged_by: initialListState,
-  favourited_by: initialListState,
-  emoji_reactioned_by: initialListState,
-  mentioned_by: initialListState,
+  followers: ImmutableMap(),
+  following: ImmutableMap(),
+  subscribing: ImmutableMap(),
+  reblogged_by: ImmutableMap(),
+  favourited_by: ImmutableMap(),
+  emoji_reactioned_by: ImmutableMap(),
+  mentioned_by: ImmutableMap(),
   follow_requests: initialListState,
   blocks: initialListState,
   mutes: initialListState,
-  featured_tags: initialListState,
+  featured_tags: ImmutableMap(),
   custom_emojis_detail: initialListState,
 });
 

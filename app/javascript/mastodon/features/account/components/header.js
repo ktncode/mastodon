@@ -82,7 +82,6 @@ const dateFormatOptions = {
   minute: '2-digit',
 };
 
-export default @injectIntl
 class Header extends ImmutablePureComponent {
 
   static contextTypes = {
@@ -112,6 +111,51 @@ class Header extends ImmutablePureComponent {
     domain: PropTypes.string.isRequired,
     hideProfile: PropTypes.bool.isRequired,
   };
+
+  componentDidMount () {
+    this._updateEmojiLinks();
+  }
+
+  componentDidUpdate () {
+    this._updateEmojiLinks();
+  }
+
+  _updateEmojiLinks () {
+    const node = this.node;
+    const node2 = this.node2;
+
+    if (node) {
+      const emojis = node.querySelectorAll('.custom-emoji');
+
+      for (var i = 0; i < emojis.length; i++) {
+        let emoji = emojis[i];
+        emoji.addEventListener('click', this.handleEmojiClick, false);
+        emoji.style.cursor = 'pointer';
+      }
+    }
+
+    if (node2) {
+      const emojis = node2.querySelectorAll('.custom-emoji');
+
+      for (var i = 0; i < emojis.length; i++) {
+        let emoji = emojis[i];
+        emoji.addEventListener('click', this.handleEmojiClick, false);
+        emoji.style.cursor = 'pointer';
+      }
+    }
+
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
 
   openEditProfile = () => {
     window.open('/settings/profile', '_blank');
@@ -165,6 +209,14 @@ class Header extends ImmutablePureComponent {
     } else {
       this.props.onAddToList(this.props.account);
     }
+  }
+
+  setRef = (c) => {
+    this.node = c;
+  }
+
+  setRef2 = (c) => {
+    this.node2 = c;
   }
 
   render () {
@@ -455,7 +507,7 @@ class Header extends ImmutablePureComponent {
           </div>
 
           <div className='account__header__tabs__name'>
-            <h1>
+            <h1 ref={this.setRef}>
               <span dangerouslySetInnerHTML={displayNameHtml} /> {badge}
               <small>@{acct} {lockedIcon}</small>
             </h1>
@@ -473,7 +525,7 @@ class Header extends ImmutablePureComponent {
                 </div>}
 
                 {(fields.size > 0 || identity_proofs.size > 0) && (
-                  <div className='account__header__fields'>
+                  <div className='account__header__fields' ref={this.setRef2}>
                     {identity_proofs.map((proof, i) => (
                       <dl key={i}>
                         <dt dangerouslySetInnerHTML={{ __html: proof.get('provider') }} />
@@ -567,3 +619,5 @@ class Header extends ImmutablePureComponent {
   }
 
 }
+
+export default injectIntl(Header);

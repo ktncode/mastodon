@@ -59,8 +59,8 @@ export function submitSearch() {
         if (response.data.statuses.statuses && response.data.statuses.accounts) {
           const { statuses, referenced_statuses, accounts, relationships } = response.data.statuses;
           response.data.statuses = statuses;
-          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(importFetchedAccounts(accounts));
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(fetchRelationshipsSuccess(relationships));
         } else {
           dispatch(importFetchedStatuses(response.data.statuses));
@@ -137,8 +137,8 @@ export const expandSearch = type => (dispatch, getState) => {
       if (data.statuses.statuses && data.statuses.accounts) {
         const { statuses, referenced_statuses, accounts, relationships } = data.statuses;
         data.statuses = statuses;
-        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
         dispatch(importFetchedAccounts(accounts));
+        dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
         dispatch(fetchRelationshipsSuccess(relationships));
       } else {
         dispatch(importFetchedStatuses(data.statuses));

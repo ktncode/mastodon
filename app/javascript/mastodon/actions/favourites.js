@@ -26,8 +26,8 @@ export function fetchFavouritedStatuses({ onlyMedia, withoutMedia } = {}) {
       if (response.data) {
         if ('statuses' in response.data && 'accounts' in response.data) {
           const { statuses, referenced_statuses, accounts, relationships } = response.data;
-          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(importFetchedAccounts(accounts));
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(fetchRelationshipsSuccess(relationships));
           dispatch(fetchFavouritedStatusesSuccess(statuses, next ? next.uri : null));
         } else {
@@ -82,8 +82,8 @@ export function expandFavouritedStatuses() {
       if (response.data) {
         if ('statuses' in response.data && 'accounts' in response.data) {
           const { statuses, referenced_statuses, accounts, relationships } = response.data;
-          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(importFetchedAccounts(accounts));
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(fetchRelationshipsSuccess(relationships));
           dispatch(expandFavouritedStatusesSuccess(statuses, next ? next.uri : null));
         } else {

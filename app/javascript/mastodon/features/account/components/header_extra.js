@@ -48,6 +48,45 @@ class HeaderExtra extends ImmutablePureComponent {
     intl: PropTypes.object.isRequired,
   };
 
+  componentDidMount () {
+    this._updateEmojiLinks();
+  }
+
+  componentDidUpdate () {
+    this._updateEmojiLinks();
+  }
+
+  _updateEmojiLinks () {
+    const node = this.node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.addEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'pointer';
+    }
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
+
+  setRef = (c) => {
+    this.node = c;
+  }
+
   isStatusesPageActive = (match, location) => {
     if (!match) {
       return false;
@@ -114,7 +153,7 @@ class HeaderExtra extends ImmutablePureComponent {
             </div>}
 
             {(fields.size > 0 || identity_proofs.size > 0) && (
-              <div className='account__header__fields'>
+              <div className='account__header__fields' ref={this.setRef}>
                 {identity_proofs.map((proof, i) => (
                   <dl key={i}>
                     <dt dangerouslySetInnerHTML={{ __html: proof.get('provider') }} />

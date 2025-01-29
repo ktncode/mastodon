@@ -5,11 +5,50 @@ import { autoPlayGif } from 'mastodon/initial_state';
 
 export default class DisplayName extends React.PureComponent {
 
+  static contextTypes = {
+    router: PropTypes.object,
+  };
+
   static propTypes = {
     account: ImmutablePropTypes.map.isRequired,
     others: ImmutablePropTypes.list,
     localDomain: PropTypes.string,
   };
+
+  componentDidMount () {
+    this._updateEmojiLinks();
+  }
+
+  componentDidUpdate () {
+    this._updateEmojiLinks();
+  }
+
+  _updateEmojiLinks () {
+    const node = this.node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.addEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'pointer';
+    }
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
 
   handleMouseEnter = ({ currentTarget }) => {
     if (autoPlayGif) {
@@ -35,6 +74,10 @@ export default class DisplayName extends React.PureComponent {
       let emoji = emojis[i];
       emoji.src = emoji.getAttribute('data-static');
     }
+  }
+
+  setRef = (c) => {
+    this.node = c;
   }
 
   render () {
@@ -66,7 +109,7 @@ export default class DisplayName extends React.PureComponent {
     }
 
     return (
-      <span className='display-name' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+      <span className='display-name' ref={this.setRef} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
         {displayName} {suffix}
       </span>
     );

@@ -24,6 +24,33 @@ export default class Content extends React.PureComponent {
     intl: PropTypes.object.isRequired,
   };
 
+  _updateEmojiLinks () {
+    const node = this.node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.addEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'pointer';
+    }
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
+
   _updateContentLinks () {
     const { intl } = this.props;
     const node = this.node;
@@ -87,10 +114,12 @@ export default class Content extends React.PureComponent {
 
   componentDidMount () {
     this._updateContentLinks();
+    this._updateEmojiLinks();
   }
 
   componentDidUpdate () {
     this._updateContentLinks();
+    this._updateEmojiLinks();
   }
 
   onMentionClick = (mention, e) => {

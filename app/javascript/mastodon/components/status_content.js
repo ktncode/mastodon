@@ -15,8 +15,7 @@ const messages = defineMessages({
 
 const MAX_HEIGHT = 642; // 20px * 32 (+ 2px padding at the top)
 
-@injectIntl
-export default class StatusContent extends React.PureComponent {
+class StatusContent extends React.PureComponent {
 
   static contextTypes = {
     router: PropTypes.object,
@@ -37,6 +36,39 @@ export default class StatusContent extends React.PureComponent {
   state = {
     hidden: true,
   };
+
+  _updateEmojiLinks () {
+    const node = this.node;
+
+    if (!node) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+      emoji.addEventListener('mouseup', this.handleEmojiMouseUp, false);
+      emoji.addEventListener('click', this.handleEmojiClick, false);
+      emoji.style.cursor = 'pointer';
+    }
+  }
+
+  handleEmojiMouseUp = e => {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  handleEmojiClick = e => {
+    const shortcode = e.target.dataset.shortcode;
+    const domain = e.target.dataset.domain;
+
+    if (this.context.router) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
+    }
+  }
 
   _updateStatusLinks () {
     const { intl, status, collapsable, onClick, onCollapsedToggle } = this.props;
@@ -130,10 +162,12 @@ export default class StatusContent extends React.PureComponent {
 
   componentDidMount () {
     this._updateStatusLinks();
+    this._updateEmojiLinks();
   }
 
   componentDidUpdate () {
     this._updateStatusLinks();
+    this._updateEmojiLinks();
   }
 
   onMentionClick = (mention, e) => {
@@ -334,3 +368,5 @@ export default class StatusContent extends React.PureComponent {
   }
 
 }
+
+export default injectIntl(StatusContent);

@@ -26,8 +26,8 @@ export function fetchEmojiReactionedStatuses({ onlyMedia, withoutMedia } = {}) {
       if (response.data) {
         if ('statuses' in response.data && 'accounts' in response.data) {
           const { statuses, referenced_statuses, accounts, relationships } = response.data;
-          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(importFetchedAccounts(accounts));
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(fetchRelationshipsSuccess(relationships));
           dispatch(fetchEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
         } else {
@@ -79,8 +79,8 @@ export function expandEmojiReactionedStatuses() {
       if (response.data) {
         if ('statuses' in response.data && 'accounts' in response.data) {
           const { statuses, referenced_statuses, accounts, relationships } = response.data;
-          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(importFetchedAccounts(accounts));
+          dispatch(importFetchedStatuses(statuses.concat(referenced_statuses)));
           dispatch(fetchRelationshipsSuccess(relationships));
           dispatch(expandEmojiReactionedStatusesSuccess(statuses, next ? next.uri : null));
         } else {
