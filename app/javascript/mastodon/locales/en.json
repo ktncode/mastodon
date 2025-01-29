@@ -518,6 +518,7 @@
   "notifications.filter.all": "All",
   "notifications.filter.boosts": "Boosts",
   "notifications.filter.favourites": "Favourites",
+  "notifications.filter.followed": "Followed message",
   "notifications.filter.follows": "Follows",
   "notifications.filter.mentions": "Mentions",
   "notifications.filter.polls": "Poll results",

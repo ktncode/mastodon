@@ -518,6 +518,7 @@
   "notifications.filter.all": "すべて",
   "notifications.filter.boosts": "ブースト",
   "notifications.filter.favourites": "お気に入り",
+  "notifications.filter.followed": "フォロワーへのメッセージ",
   "notifications.filter.follows": "フォロー",
   "notifications.filter.mentions": "返信",
   "notifications.filter.polls": "アンケート結果",
