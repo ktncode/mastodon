@@ -355,7 +355,10 @@ class StatusActionBar extends ImmutablePureComponent {
 
     if (publicStatus && !expired) {
       menu.push({ text: intl.formatMessage(messages.copy), action: this.handleCopy });
-      menu.push({ text: intl.formatMessage(messages.embed), action: this.handleEmbed });
+
+      if (!domain) {
+        menu.push({ text: intl.formatMessage(messages.embed), action: this.handleEmbed });
+      }
     }
 
     if (reblogsCount > 0 || favouritesCount > 0 || !status.get('emoji_reactions').isEmpty()) {
