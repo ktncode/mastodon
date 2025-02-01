@@ -371,6 +371,7 @@ ja:
         setting_hide_video_preview: プレビューカード（動画）を隠す
         setting_info_font_size: 情報ヘッダのフォントサイズ
         setting_match_visibility_of_references: 投稿の公開範囲を参照先に合わせる
+        setting_missing_alt_text_modal: 代替テキストなしでメディアを投稿する前に確認ダイアログを表示する
         setting_max_frequently_used_emojis: よく使う絵文字の表示数
         setting_new_features_policy: 新機能へのポリシー
         setting_new_features_policy_conservative: 無効にしておき、自分で判断する

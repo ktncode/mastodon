@@ -8,11 +8,12 @@ export default @injectIntl
 class ConfirmationModal extends React.PureComponent {
 
   static propTypes = {
+    title: PropTypes.node,
     message: PropTypes.node.isRequired,
-    confirm: PropTypes.string.isRequired,
+    confirm: PropTypes.node.isRequired,
+    secondary: PropTypes.node,
     onClose: PropTypes.func.isRequired,
     onConfirm: PropTypes.func.isRequired,
-    secondary: PropTypes.string,
     onSecondary: PropTypes.func,
     closeWhenConfirm: PropTypes.bool,
     destructive: PropTypes.bool,
@@ -72,12 +73,13 @@ class ConfirmationModal extends React.PureComponent {
   }
 
   render () {
-    const { message, confirm, secondary, destructive, passphrase } = this.props;
+    const { title, message, confirm, secondary, destructive, passphrase } = this.props;
 
     return (
       <div className='modal-root__modal confirmation-modal'>
         <div className='confirmation-modal__container'>
-          {message}
+          {title && <h1>{title}</h1>}
+          <p>{message}</p>
         </div>
 
         {passphrase && (

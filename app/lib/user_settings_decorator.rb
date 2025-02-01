@@ -39,6 +39,7 @@ class UserSettingsDecorator
     add_reference_modal
     unselect_reference_modal
     delete_scheduled_status_modal
+    missing_alt_text_modal
     auto_play_gif
     expand_spoilers
     reduce_motion

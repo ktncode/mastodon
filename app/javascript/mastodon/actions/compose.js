@@ -12,7 +12,7 @@ import { getHomeVisibilities, getLimitedVisibilities } from 'mastodon/selectors'
 import { openModal } from './modal';
 import { addYears, addMonths, addDays, addHours, addMinutes, addSeconds, millisecondsToSeconds, set, formatISO, format } from 'date-fns';
 import { Set as ImmutableSet } from 'immutable';
-import { postReferenceModal, enableFederatedTimeline, allowPollImage, maxAttachments } from '../initial_state';
+import { postReferenceModal, missingAltTextModal, enableFederatedTimeline, allowPollImage, maxAttachments } from '../initial_state';
 import { deleteScheduledStatus } from './scheduled_statuses';
 
 let cancelFetchComposeSuggestionsAccounts, cancelFetchComposeSuggestionsTags;
@@ -92,11 +92,17 @@ export const COMPOSE_REFERENCE_ADD    = 'COMPOSE_REFERENCE_ADD';
 export const COMPOSE_REFERENCE_REMOVE = 'COMPOSE_REFERENCE_REMOVE';
 export const COMPOSE_REFERENCE_RESET  = 'COMPOSE_REFERENCE_RESET';
 
+export const COMPOSE_REFERENCE_CHECK_IGNORE  = 'COMPOSE_REFERENCE_CHECK_IGNORE';
+
 const messages = defineMessages({
   uploadErrorLimit: { id: 'upload_error.limit', defaultMessage: 'File upload limit exceeded.' },
   uploadErrorPoll:  { id: 'upload_error.poll', defaultMessage: 'File upload not allowed with polls.' },
   postReferenceMessage:  { id: 'confirmations.post_reference.message', defaultMessage: 'It contains references, do you want to post it?' },
   postReferenceConfirm:  { id: 'confirmations.post_reference.confirm', defaultMessage: 'Post' },
+  missingAltTextTitle:     { id: "confirmations.missing_alt_text.title", defaultMessage: 'Add alt text?' },
+  missingAltTextMessage:   { id: "confirmations.missing_alt_text.message", defaultMessage: 'Your post contains media without alt text. Adding descriptions helps make your content accessible to more people.' },
+  missingAltTextSecondary: { id: "confirmations.missing_alt_text.secondary", defaultMessage: 'Post anyway' },
+  missingAltTextConfirm:   { id: "confirmations.missing_alt_text.confirm", defaultMessage: 'Add alt text' },
 });
 
 const COMPOSE_PANEL_BREAKPOINT = 600 + (285 * 1) + (10 * 1);
@@ -238,21 +244,42 @@ export function submitComposeWithCheck(routerHistory, intl) {
   return function (dispatch, getState) {
     const status = getState().getIn(['compose', 'text'], '');
     const media  = getState().getIn(['compose', 'media_attachments']);
+    const missingAltTextMediaId = media.find(media => ['image', 'gifv'].includes(media.get('type')) && (media.get('description') ?? '').length === 0)?.get('id');
     const statusReferenceIds = getState().getIn(['compose', 'references']);
+    const ignoreStatusReferenceCheck = getState().getIn(['compose', 'ignore_reference_check']);
 
     if ((!status || !status.length) && media.size === 0) {
       return;
     }
 
-    if (postReferenceModal && !statusReferenceIds.isEmpty()) {
+    if (postReferenceModal && !statusReferenceIds.isEmpty() && !ignoreStatusReferenceCheck) {
       dispatch(openModal('CONFIRM', {
         message: intl.formatMessage(messages.postReferenceMessage),
         confirm: intl.formatMessage(messages.postReferenceConfirm),
-        onConfirm: () => dispatch(submitCompose(routerHistory)),
+        onConfirm: () => dispatch(submitComposeIgnoreReferenceCheck(routerHistory)),
+      }));
+    } else if (missingAltTextModal && missingAltTextMediaId) {
+      dispatch(openModal('CONFIRM', {
+        title: intl.formatMessage(messages.missingAltTextTitle),
+        message: intl.formatMessage(messages.missingAltTextMessage),
+        confirm: intl.formatMessage(messages.missingAltTextConfirm),
+        secondary: intl.formatMessage(messages.missingAltTextSecondary),
+        onConfirm: () => dispatch(initMediaEditModal(missingAltTextMediaId)),
+        onSecondary: () => dispatch(submitCompose(routerHistory)),
       }));
     } else {
       dispatch(submitCompose(routerHistory));
     }
+  };
+};
+
+export function submitComposeIgnoreReferenceCheck(routerHistory, intl) {
+  return function (dispatch) {
+    dispatch({
+      type: COMPOSE_REFERENCE_CHECK_IGNORE,
+    });
+
+    dispatch(submitComposeWithCheck(routerHistory, intl));
   };
 };
 

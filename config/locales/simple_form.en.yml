@@ -375,6 +375,7 @@ en:
         setting_hide_video_preview: Hide preview card (video)
         setting_info_font_size: Information header font size
         setting_match_visibility_of_references: Match the visibility of the post to the references
+        setting_missing_alt_text_modal: Show confirmation dialog before posting media without alt text
         setting_max_frequently_used_emojis: Number of frequently used emojis displayed
         setting_new_features_policy: Policy for new features
         setting_new_features_policy_tester: Participate in the beta test

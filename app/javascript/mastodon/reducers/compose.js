@@ -56,6 +56,7 @@ import {
   COMPOSE_REFERENCE_ADD,
   COMPOSE_REFERENCE_REMOVE,
   COMPOSE_REFERENCE_RESET,
+  COMPOSE_REFERENCE_CHECK_IGNORE,
   COMPOSE_SCHEDULED_EDIT_CANCEL,
 } from '../actions/compose';
 import { TIMELINE_DELETE, TIMELINE_EXPIRE } from '../actions/timelines';
@@ -117,6 +118,7 @@ const initialState = ImmutableMap({
   expires_action: 'mark',
   references: ImmutableSet(),
   context_references: ImmutableSet(),
+  ignore_reference_check: false,
   prohibited_visibilities: ImmutableSet(),
   prohibited_words: ImmutableSet(),
   scheduled_status_id: null,
@@ -182,6 +184,7 @@ const clearAll = state => {
     map.set('expires_action', state.get('default_expires_action', 'mark'));
     map.update('references', set => set.clear());
     map.update('context_references', set => set.clear());
+    map.set('ignore_reference_check', false);
     map.set('scheduled_status_id', null);
   });
 };
@@ -657,6 +660,7 @@ export default function compose(state = initialState, action) {
       map.set('expires_action', action.status.get('expires_action') ?? state.get('default_expires_action', 'mark'));
       map.update('references', set => set.clear().concat(action.status.get('status_reference_ids', ImmutableList())).delete(action.status.getIn(['quote', 'id'], ImmutableList())));
       map.update('context_references', set => set.clear().concat(action.context_references));
+      map.set('ignore_reference_check', true);
       map.set('scheduled_status_id', action.status.get('scheduled_status_id', null));
 
       if (action.status.get('spoiler_text', '').length > 0) {
@@ -702,17 +706,19 @@ export default function compose(state = initialState, action) {
       map.set('dirty', true);
     });
   case COMPOSE_SCHEDULED_CHANGE:
-    return state.set('scheduled', action.value).set('dirty', true);;
+    return state.set('scheduled', action.value).set('dirty', true);
   case COMPOSE_EXPIRES_CHANGE:
-    return state.set('expires', action.value).set('dirty', true);;
+    return state.set('expires', action.value).set('dirty', true);
   case COMPOSE_EXPIRES_ACTION_CHANGE:
-    return state.set('expires_action', action.value).set('dirty', true);;
+    return state.set('expires_action', action.value).set('dirty', true);
   case COMPOSE_REFERENCE_ADD:
     return state.update('references', set => set.add(action.id));
   case COMPOSE_REFERENCE_REMOVE:
     return state.update('references', set => set.delete(action.id));
   case COMPOSE_REFERENCE_RESET:
     return state.update('references', set => set.clear());
+  case COMPOSE_REFERENCE_CHECK_IGNORE:
+    return state.set('ignore_reference_check', true);
   default:
     return state;
   }

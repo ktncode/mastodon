@@ -45,6 +45,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_unsubscribe_modal,
       :setting_boost_modal,
       :setting_delete_modal,
+      :setting_missing_alt_text_modal,
       :setting_auto_play_gif,
       :setting_display_media,
       :setting_expand_spoilers,
