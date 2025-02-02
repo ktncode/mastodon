@@ -7,7 +7,6 @@ import { loadingBarReducer } from 'react-redux-loading-bar';
 import modal from './modal';
 import user_lists from './user_lists';
 import domain_lists from './domain_lists';
-import status_status_lists from './status_status_lists';
 import accounts from './accounts';
 import accounts_counters from './accounts_counters';
 import statuses from './statuses';
@@ -61,7 +60,6 @@ const reducers = {
   user_lists,
   domain_lists,
   status_lists,
-  status_status_lists,
   accounts,
   accounts_counters,
   statuses,

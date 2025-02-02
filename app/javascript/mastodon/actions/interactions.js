@@ -615,9 +615,9 @@ export function fetchReferredByStatusesFail(id, error) {
 
 export function expandReferredByStatuses(id) {
   return (dispatch, getState) => {
-    const url = getState().getIn(['status_status_lists', 'referred_by', id, 'next'], null);
+    const url = getState().getIn(['user_lists', 'referred_by', id, 'next'], null);
 
-    if (url === null || getState().getIn(['status_status_lists', 'referred_by', id, 'isLoading'])) {
+    if (url === null || getState().getIn(['user_lists', 'referred_by', id, 'isLoading'])) {
       return;
     }
 

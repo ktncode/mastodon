@@ -28,15 +28,13 @@ const mapStateToProps = (state, { columnId, params }) => {
   const columnWidth = (columnId && index >= 0) ? columns.get(index).getIn(['params', 'columnWidth']) : state.getIn(['settings', 'referred_by_statuses', 'columnWidth']);
 
   return {
-    statusIds: state.getIn(['status_status_lists', 'referred_by', params.statusId, 'items']),
-    isLoading: state.getIn(['status_status_lists', 'referred_by', params.statusId, 'isLoading'], true),
-    hasMore: !!state.getIn(['status_status_lists', 'referred_by', params.statusId, 'next']),
+    statusIds: state.getIn(['user_lists', 'referred_by', params.statusId, 'items']),
+    isLoading: state.getIn(['user_lists', 'referred_by', params.statusId, 'isLoading'], true),
+    hasMore: !!state.getIn(['user_lists', 'referred_by', params.statusId, 'next']),
     columnWidth: columnWidth ?? defaultColumnWidth,
   };
 };
 
-export default @connect(mapStateToProps)
-@injectIntl
 class ReferredByStatuses extends ImmutablePureComponent {
 
   static propTypes = {
@@ -47,17 +45,24 @@ class ReferredByStatuses extends ImmutablePureComponent {
     columnWidth: PropTypes.string,
     hasMore: PropTypes.bool,
     isLoading: PropTypes.bool,
+    params: PropTypes.shape({
+      statusId: PropTypes.string,
+    }),
   };
 
-  componentWillMount () {
-    if (!this.props.statusIds) {
-      this.props.dispatch(fetchReferredByStatuses(this.props.params.statusId));
+  componentDidMount () {
+    const { statusIds, params: { statusId }, dispatch } = this.props;
+
+    if (!statusIds) {
+      dispatch(fetchReferredByStatuses(statusId));
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.params.statusId !== this.props.params.statusId && nextProps.params.statusId) {
-      this.props.dispatch(fetchEmojiReactions(nextProps.params.statusId));
+  componentDidUpdate (prevProps) {
+    const { statusIds, params: { statusId }, dispatch } = this.props;
+
+    if (!statusIds || prevProps.params.statusId !== statusId) {
+      dispatch(fetchReferredByStatuses(statusId));
     }
   }
 
@@ -120,3 +125,5 @@ class ReferredByStatuses extends ImmutablePureComponent {
   }
 
 }
+
+export default injectIntl(connect(mapStateToProps)(ReferredByStatuses));

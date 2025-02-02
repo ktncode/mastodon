@@ -97,6 +97,14 @@ import {
   CUSTOM_EMOJI_DETAIL_FETCH_SUCCESS,
   CUSTOM_EMOJI_DETAIL_FETCH_FAIL,
 } from 'mastodon/actions/custom_emojis';
+import {
+  REFERRED_BY_STATUSES_FETCH_REQUEST,
+  REFERRED_BY_STATUSES_FETCH_SUCCESS,
+  REFERRED_BY_STATUSES_FETCH_FAIL,
+  REFERRED_BY_STATUSES_EXPAND_REQUEST,
+  REFERRED_BY_STATUSES_EXPAND_SUCCESS,
+  REFERRED_BY_STATUSES_EXPAND_FAIL,
+} from '../actions/interactions';
 import { Map as ImmutableMap, List as ImmutableList, fromJS } from 'immutable';
 
 const initialListState = ImmutableMap({
@@ -118,7 +126,22 @@ const initialState = ImmutableMap({
   mutes: initialListState,
   featured_tags: ImmutableMap(),
   custom_emojis_detail: initialListState,
+  referred_by: ImmutableMap(),
 });
+
+const normalizeStatusesList = (state, path, statuses, next) => {
+  return state.setIn(path, ImmutableMap({
+    next,
+    items: ImmutableList(statuses.map(item => item.id)),
+    isLoading: false,
+  }));
+};
+
+const appendToStatusesList = (state, path, statuses, next) => {
+  return state.updateIn(path, map => {
+    return map.set('next', next).set('isLoading', false).update('items', list => list.concat(statuses.map(item => item.id)));
+  });
+};
 
 const normalizeList = (state, path, accounts, next) => {
   return state.setIn(path, ImmutableMap({
@@ -305,10 +328,20 @@ export default function userLists(state = initialState, action) {
   case FEATURED_TAGS_FETCH_FAIL:
     return state.setIn(['featured_tags', action.id, 'isLoading'], false);
   case CUSTOM_EMOJI_DETAIL_FETCH_REQUEST:
-        return state.setIn(['custom_emojis_detail', 'isLoading'], true);
+    return state.setIn(['custom_emojis_detail', 'isLoading'], true);
   case CUSTOM_EMOJI_DETAIL_FETCH_SUCCESS:
   case CUSTOM_EMOJI_DETAIL_FETCH_FAIL:
     return state.setIn(['custom_emojis_detail', 'isLoading'], false);
+  case REFERRED_BY_STATUSES_FETCH_SUCCESS:
+    return normalizeStatusesList(state, ['referred_by', action.id], action.statuses, action.next);
+  case REFERRED_BY_STATUSES_EXPAND_SUCCESS:
+    return appendToStatusesList(state, ['referred_by', action.id], action.statuses, action.next);
+  case REFERRED_BY_STATUSES_FETCH_REQUEST:
+  case REFERRED_BY_STATUSES_EXPAND_REQUEST:
+    return state.setIn(['referred_by', action.id, 'isLoading'], true);
+  case REFERRED_BY_STATUSES_FETCH_FAIL:
+  case REFERRED_BY_STATUSES_EXPAND_FAIL:
+    return state.setIn(['referred_by', action.id, 'isLoading'], false);
   default:
     return state;
   }
