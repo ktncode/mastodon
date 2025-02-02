@@ -1678,18 +1678,25 @@ en:
     title: '%{name}: "%{quote}"'
     visibilities:
       direct: Direct
+      direct_hint: ""
       direct_long: Only show to mentioned users
       limited: Circle
+      limited_hint: (Mutual visibility is also prohibited)
       limited_long: Only show to circle users
       mutual: Mutual
+      mutual_hint: ""
       mutual_long: Only show to mutual followers
       personal: Personal
+      personal_hint: ""
       personal_long: Only show to personal
       private: Followers-only
+      private_hint: ""
       private_long: Only show to followers
       public: Public
+      public_hint: ""
       public_long: Everyone can see
       unlisted: Unlisted
+      unlisted_hint: ""
       unlisted_long: Everyone can see, but not listed on public timelines
   statuses_cleanup:
     enabled: Automatically delete old posts

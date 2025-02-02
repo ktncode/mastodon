@@ -1600,18 +1600,25 @@ ja:
     title: '%{name}: "%{quote}"'
     visibilities:
       direct: ダイレクト
+      direct_hint: ""
       direct_long: 送信した相手のみ閲覧可
       limited: サークル
+      limited_hint: （相互フォロー限定も同時に禁止されます）
       limited_long: サークルで指定したユーザーのみ閲覧可
       mutual: 相互フォロー限定
+      mutual_hint: ""
       mutual_long: 相互フォロー相手にのみ表示されます
       personal: 自分限定
+      personal_hint: ""
       personal_long: 自分にのみ表示されます
       private: フォロワー限定
+      private_hint: ""
       private_long: フォロワーにのみ表示されます
       public: 公開
+      public_hint: ""
       public_long: 誰でも見ることができ、かつ公開タイムラインに表示されます
       unlisted: 未収載
+      unlisted_hint: ""
       unlisted_long: 誰でも見ることができますが、公開タイムラインには表示されません
   status_prohibit:
     validations:
