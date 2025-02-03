@@ -58,10 +58,13 @@ module Mastodon
 
           filename = File.basename(entry.full_name, '.*')
 
+          key = meta.key?(filename) ? filename : meta.find { |k, v| v['filename'] === entry.full_name }&.first;
+          next if key.nil?
+
           # Skip macOS shadow files
           next if filename.start_with?('._')
 
-          shortcode    = [options[:prefix], filename, options[:suffix]].compact.join
+          shortcode    = [options[:prefix], key, options[:suffix]].compact.join
           custom_emoji = CustomEmoji.local.find_by("LOWER(shortcode) = ?", shortcode.downcase)
 
           if custom_emoji && !options[:overwrite]
@@ -74,7 +77,7 @@ module Mastodon
           custom_emoji.image_file_name   = File.basename(entry.full_name)
           custom_emoji.visible_in_picker = !options[:unlisted]
 
-          tag = meta[shortcode]&.transform_keys!(CustomEmoji::ALIAS_KEYS)
+          tag = meta[key]&.transform_keys!(CustomEmoji::ALIAS_KEYS)
 
           if tag.present?
             custom_emoji.copy_permission  = case tag['copy_permission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end

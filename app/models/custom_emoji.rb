@@ -123,8 +123,10 @@ class CustomEmoji < ApplicationRecord
   def keywords=(val)
     if val.is_a?(Array)
       self.aliases = val
+    elsif val.is_a?(String)
+      self.aliases = val.split(/[ \r\n]/).compact_blank
     else
-      self.aliases = val.split(' ')
+      self.aliases = []
     end
   end
 
@@ -135,8 +137,10 @@ class CustomEmoji < ApplicationRecord
   def related_link=(val)
     if val.is_a?(Array)
       meta['related_link'] = val
-    else
+    elsif val.is_a?(String)
       meta['related_link'] = val.split(/[ \r\n]/).compact_blank
+    else
+      meta.delete('related_link')
     end
   end
 
@@ -147,8 +151,10 @@ class CustomEmoji < ApplicationRecord
   def related_links=(val)
     if val.is_a?(Array)
       meta['related_link'] = val
-    else
+    elsif val.is_a?(String)
       meta['related_link'] = val.split(/[ \r\n]/).compact_blank
+    else
+      meta.delete('related_link')
     end
   end
 
