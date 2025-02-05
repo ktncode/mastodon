@@ -143,7 +143,7 @@ class FeedManager
       query      = query.where(reblog_of_id: nil) if options[:show_reblogs] == false
     end
 
-    query        = query.includes(:preloadable_poll, reblog: :account).limit(FeedManager::MAX_ITEMS / 4)
+    query        = query.includes(reblog: :account).limit(FeedManager::MAX_ITEMS / 4)
 
     if redis.zcard(timeline_key) >= FeedManager::MAX_ITEMS / 4
       oldest_home_score = redis.zrange(timeline_key, 0, 0).first.to_i
@@ -256,23 +256,32 @@ class FeedManager
     limit        = FeedManager::MAX_ITEMS / 2
     aggregate    = account.user&.aggregates_reblogs?
     timeline_key = key(:home, account.id)
+    over_limit = false
 
     account.statuses.limit(limit).each do |status|
       add_to_feed(:home, account.id, status, aggregate)
     end
 
     account.delivery_following.includes(:account_stat).find_each do |target_account|
-      if redis.zcard(timeline_key) >= limit
+      query = target_account.statuses.list_eligible_visibility.includes(reblog: :account).limit(limit)
+
+      over_limit ||= redis.zcard(timeline_key) >= limit
+      if over_limit
         oldest_home_score = redis.zrange(timeline_key, 0, 0, with_scores: true).first.last.to_i
-        last_status_score = Mastodon::Snowflake.id_at(account.last_status_at)
+        last_status_score = Mastodon::Snowflake.id_at(target_account.last_status_at, with_random: false)
 
         # If the feed is full and this account has not posted more recently
         # than the last item on the feed, then we can skip the whole account
         # because none of its statuses would stay on the feed anyway
         next if last_status_score < oldest_home_score
+
+        # No need to get older statuses
+        query = query.where(id: oldest_home_score...)
       end
 
-      statuses = target_account.statuses.where(visibility: [:public, :unlisted, :private]).includes(:preloadable_poll, reblog: :account).limit(limit)
+      statuses = query.to_a
+      next if statuses.empty?
+
       crutches = build_crutches(account.id, statuses)
 
       statuses.each do |status|

@@ -148,6 +148,7 @@ class Status < ApplicationRecord
   }
   scope :unset_searchability, -> { where(searchability: nil, reblog_of_id: nil) }
   scope :indexable, -> { without_reblogs.where(visibility: :public).joins(:account).where(account: { indexable: true }) }
+  scope :list_eligible_visibility, -> { where(visibility: %i(public unlisted private)) }
 
   cache_associated :application,
                    :media_attachments,
