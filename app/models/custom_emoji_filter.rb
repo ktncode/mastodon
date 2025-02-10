@@ -54,9 +54,9 @@ class CustomEmojiFilter
       CustomEmoji.where(copy_permission: value)
     when 'license'
       if value == '1'
-        CustomEmoji.where("custom_emojis.meta?'license' AND custom_emojis.meta->>'license' != '' OR custom_emojis.meta?'usage_info' AND custom_emojis.meta->>'usage_info' != ''")
+        CustomEmoji.where.not(license: '').or(CustomEmoji.where.not(usage_info: ''))
       else
-        CustomEmoji.where("NOT (custom_emojis.meta?'license' AND custom_emojis.meta->>'license' != '' OR custom_emojis.meta?'usage_info' AND custom_emojis.meta->>'usage_info' != '')")
+        CustomEmoji.where(license: '', usage_info: '')
       end
     when 'status'
       if value == '1'
@@ -72,9 +72,9 @@ class CustomEmojiFilter
       end
     when 'sensitive'
       if value == '1'
-        CustomEmoji.where("(custom_emojis.meta->>'sensitive')::boolean = true")
+        CustomEmoji.where(sensitive: true)
       else
-        CustomEmoji.where("(custom_emojis.meta->>'sensitive')::boolean = false")
+        CustomEmoji.where(sensitive: false)
       end
     when 'category'
       if value == '*'
@@ -87,7 +87,16 @@ class CustomEmojiFilter
     when 'by_domain'
       CustomEmoji.where(domain: CustomEmoji.sanitize_sql_like(value.strip.downcase))
     when 'by_description'
-      CustomEmoji.where("custom_emojis.meta->>'license' ILIKE :key OR custom_emojis.meta->>'misskey_license' ILIKE :key OR custom_emojis.meta->>'copyright_notice' ILIKE :key OR custom_emojis.meta->>'credit_text' ILIKE :key OR custom_emojis.meta->>'usage_info' ILIKE :key OR custom_emojis.meta->>'description' ILIKE :key OR custom_emojis.meta->>'creator' ILIKE :key", { key: "%#{CustomEmoji.sanitize_sql_like(value.strip)}%" })
+      CustomEmoji.where("
+        custom_emojis.license ILIKE :key OR
+        custom_emojis.meta->>'misskey_license' ILIKE :key OR
+        custom_emojis.copyright_notice ILIKE :key OR
+        custom_emojis.credit_text ILIKE :key OR
+        custom_emojis.usage_info ILIKE :key OR
+        custom_emojis.description ILIKE :key OR
+        custom_emojis.creator ILIKE :key",
+        { key: "%#{CustomEmoji.sanitize_sql_like(value.strip)}%" }
+      )
     when 'shortcode_match_type'
       @shortcode_match_type = value.to_sym if Form::CustomEmojiBatch::SHORTCODE_MATCH_TYPES.include?(value)
       CustomEmoji.all

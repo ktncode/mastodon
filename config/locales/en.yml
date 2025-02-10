@@ -389,6 +389,9 @@ en:
       unpublished_msg: Announcement successfully unpublished!
       updated_msg: Announcement successfully updated!
     custom_emojis:
+      alternate_name:
+        hint: Enter the name to be used for alternative text and search
+        title: Name
       apply_batch_assignment: Apply batch assignment
       assign_category: Assign category
       by_description: Description
@@ -478,6 +481,9 @@ en:
       related_link:
         hint: Related links, such as emoji explanation pages and registration application posts, are listed in line breaks.
         title: Related link
+      ruby:
+        hint: Enter the pronunciation of emoji names for sorting, searching, and ruby a​​notation.
+        title: Reading of name
       save_changes: Save changes
       save_changes_and_next: Save changes and next
       sensitive:

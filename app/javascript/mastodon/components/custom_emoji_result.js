@@ -139,11 +139,14 @@ class CustomEmojiResult extends React.PureComponent {
 
     const shortcode = custom_emoji.get('shortcode');
     const domain = custom_emoji.get('domain');    
+    const title = custom_emoji.get('alternate_name') ?? shortcode;
     const summary = custom_emoji.get('summary') ?? custom_emoji.get('misskey_license');
 
     return (
       <div className='custom-emoji__result'>
-        <div className='custom-emoji__image' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}><Emoji emoji={shortcode} domain={domain} hovered={this.state.hovered} url={custom_emoji.get('url')} static_url={custom_emoji.get('static_url')} onClick={this.handleEmojiClick}/></div>
+        <div className='custom-emoji__image' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+          <Emoji emoji={shortcode} domain={domain} hovered={this.state.hovered} title={title} url={custom_emoji.get('url')} static_url={custom_emoji.get('static_url')} onClick={this.handleEmojiClick}/>
+        </div>
         <div className='custom-emoji__shortcode'>:{shortcode}:{domain && <span className='custom-emoji__domain_part'>{domain}</span>}</div>
         {summary && 
           <div className='custom-emoji__summary_wrapper' ref={this.setRef}>

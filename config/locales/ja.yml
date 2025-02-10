@@ -374,6 +374,9 @@ ja:
       unpublished_msg: お知らせを非掲載にしました
       updated_msg: お知らせを更新しました
     custom_emojis:
+      alternate_name:
+        hint: 代替テキストや検索に使う名称を記載します
+        title: 絵文字の名称
       apply_batch_assignment: 一括指定を適用
       assign_category: カテゴリーを割り当て
       by_description: 記述内容
@@ -468,6 +471,9 @@ ja:
       related_link:
         hint: 絵文字の説明ページ、登録申請の投稿など、関連するリンクを改行区切りで記載します
         title: 関連リンク
+      ruby:
+        hint: 絵文字の並べ替え、検索、ルビ表記に使う、絵文字の名称の読み方を記載します
+        title: ふりがな
       save_changes: 保存して一覧へ
       save_changes_and_next: 保存して次へ
       sensitive:

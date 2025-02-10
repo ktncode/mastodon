@@ -68,9 +68,11 @@ class Reaction extends ImmutablePureComponent {
   render () {
     const { emojiReaction } = this.props;
 
+    const title = emojiReaction.get('alternate_name') ?? emojiReaction.get('name')
+
     return (
       <div className='account__emoji_reaction' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} ref={this.setRef}>
-        <Emoji className='reaction' hovered={this.state.hovered} emoji={emojiReaction.get('name')} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} domain={emojiReaction.get('domain')} onClick={this.handleEmojiClick} />
+        <Emoji className='reaction' hovered={this.state.hovered} emoji={emojiReaction.get('name')} url={emojiReaction.get('url')} static_url={emojiReaction.get('static_url')} domain={emojiReaction.get('domain')} title={title} onClick={this.handleEmojiClick} />
       </div>
     );
   };

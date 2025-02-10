@@ -3,7 +3,7 @@
 class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   include RoutingHelper
 
-  context_extensions :emoji, :category, :copy_permission, :license, :keywords, :related_link, :usage_info, :copyright_notice, :credit_text, :is_based_on, :sensitive, :_misskey_license, :free_text
+  context_extensions :emoji, :category, :alternate_name, :ruby, :copy_permission, :license, :keywords, :related_link, :usage_info, :copyright_notice, :credit_text, :is_based_on, :sensitive, :_misskey_license, :free_text
 
   class MisskeyLicensePresenter < ActiveModelSerializers::Model
     attributes :freeText
@@ -15,6 +15,8 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
   
   attributes :id, :type, :name, :updated
   attribute :category, if: :category_loaded?
+  attribute :alternate_name, if: :alternate_name?
+  attribute :ruby, if: :ruby?
   attribute :copy_permission, if: :copy_permission?
   attribute :license, if: :license?
   attribute :keywords, if: :keywords?
@@ -69,6 +71,14 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
     ":#{object.shortcode}:"
   end
 
+  def alternate_name
+    object.alternate_name
+  end
+
+  def ruby
+    object.ruby
+  end
+
   def category
     object.category.name
   end
@@ -119,6 +129,14 @@ class ActivityPub::EmojiSerializer < ActivityPub::Serializer
 
   def category_loaded?
     object.association(:category).loaded? && object.category.present?
+  end
+
+  def alternate_name?
+    object.alternate_name.present?
+  end
+
+  def ruby?
+    object.ruby.present?
   end
 
   def copy_permission?

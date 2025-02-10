@@ -24,6 +24,12 @@
           %td
             %span.account-role.bot= @emoji.category&.name || t('admin.custom_emojis.uncategorized')
         %tr
+          %th.nowrap= t('admin.custom_emojis.alternate_name.title')
+          %td= @emoji.alternate_name
+        %tr
+          %th.nowrap= t('admin.custom_emojis.ruby.title')
+          %td= @emoji.ruby
+        %tr
           %th.nowrap= t('admin.custom_emojis.status.title')
           %td
             - if @emoji.disabled?

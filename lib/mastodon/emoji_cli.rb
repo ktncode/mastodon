@@ -83,15 +83,17 @@ module Mastodon
             custom_emoji.copy_permission  = case tag['copy_permission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
             custom_emoji.license          = tag['license']
             custom_emoji.misskey_license  = tag['misskey_license']
+            custom_emoji.alternate_name   = tag['alternate_name']
+            custom_emoji.ruby             = tag['ruby']
             custom_emoji.keywords         = tag['keywords']
             custom_emoji.related_links    = tag['related_links']
-            custom_emoji.copyright_notice = tag['copyrightNotice']
-            custom_emoji.credit_text      = tag['creditText']
+            custom_emoji.copyright_notice = tag['copyright_notice']
+            custom_emoji.credit_text      = tag['credit_text']
             custom_emoji.usage_info       = tag['usage_info']
             custom_emoji.creator          = tag['creator'] || tag['author']
             custom_emoji.description      = tag['description']
-            custom_emoji.is_based_on      = tag['is_based_on'] || ActivityPub::TagManager.instance.local_uri?(tag['uri']) ? '' : tag['uri']
-            custom_emoji.sensitive        = tag['sensitive']
+            custom_emoji.is_based_on      = tag['is_based_on'] || (ActivityPub::TagManager.instance.local_uri?(tag['uri']) ? '' : tag['uri'])
+            custom_emoji.sensitive        = !!tag['sensitive']
 
             if category.nil?
               custom_emoji.category = CustomEmojiCategory.find_or_create_by(name: tag['category'])

@@ -37,7 +37,11 @@
   .fields-group
     = f.input :image, wrapper: :with_label, label: t('admin.custom_emojis.image'), input_html: { accept: (CustomEmoji::IMAGE_FILE_EXTENSIONS + CustomEmoji::IMAGE_MIME_TYPES).join(',') }, hint: t('admin.custom_emojis.image_hint', kbsize: CustomEmoji::LOCAL_LIMIT / 1.kilobytes, types: (CustomEmoji::IMAGE_MIME_TYPES - CustomEmoji::IMAGE_CONVERTIBLE_MIME_TYPES).map{|t| t.delete_prefix('image/').upcase}.join(', '))
   .fields-group
-    = f.input :keywords, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.keywords.title'), hint: t('admin.custom_emojis.keywords.hint'), input_html: { autofocus: true, rows: 2 }, fedibird_features: true
+    = f.input :alternate_name, wrapper: :with_label, label: t('admin.custom_emojis.alternate_name.title'), hint: t('admin.custom_emojis.alternate_name.hint'), input_html: { autofocus: true }, fedibird_features: true
+  .fields-group
+    = f.input :ruby, wrapper: :with_label, label: t('admin.custom_emojis.ruby.title'), hint: t('admin.custom_emojis.ruby.hint'), fedibird_features: true
+  .fields-group
+    = f.input :keywords, as: :text, wrapper: :with_label, label: t('admin.custom_emojis.keywords.title'), hint: t('admin.custom_emojis.keywords.hint'), input_html: { rows: 2 }, fedibird_features: true
   .fields-group
     = f.input :creator, wrapper: :with_label, label: t('admin.custom_emojis.creator.title'), fedibird_features: true
   .fields-group

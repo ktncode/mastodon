@@ -11,6 +11,8 @@ class REST::EmojiReactionSerializer < ActiveModel::Serializer
   attribute :width, if: :width?
   attribute :height, if: :height?
   attribute :thumbhash, if: :thumbhash?
+  attribute :alternate_name, if: :alternate_name?
+  attribute :ruby, if: :ruby?
 
   belongs_to :account, serializer: REST::AccountSerializer
 
@@ -42,6 +44,14 @@ class REST::EmojiReactionSerializer < ActiveModel::Serializer
     object.custom_emoji.thumbhash
   end
 
+  def alternate_name
+    object.custom_emoji.alternate_name
+  end
+
+  def ruby
+    object.custom_emoji.ruby
+  end
+
   def width?
     custom_emoji? && object.custom_emoji.width
   end
@@ -52,5 +62,13 @@ class REST::EmojiReactionSerializer < ActiveModel::Serializer
 
   def thumbhash?
     custom_emoji? && !object.custom_emoji.thumbhash.blank?
+  end
+
+  def alternate_name?
+    custom_emoji? && object.custom_emoji.alternate_name.present?
+  end
+
+  def ruby?
+    custom_emoji? && object.custom_emoji.ruby.present?
   end
 end

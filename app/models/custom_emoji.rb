@@ -24,6 +24,18 @@
 #  copy_permission              :integer          default("none"), not null
 #  aliases                      :string           default([]), not null, is an Array
 #  meta                         :jsonb            not null
+#  alternate_name               :string           default(""), not null
+#  ruby                         :string           default(""), not null
+#  license                      :string           default(""), not null
+#  usage_info                   :string           default(""), not null
+#  creator                      :string           default(""), not null
+#  description                  :string           default(""), not null
+#  copyright_notice             :string           default(""), not null
+#  credit_text                  :string           default(""), not null
+#  is_based_on                  :string           default(""), not null
+#  sensitive                    :boolean          default(FALSE), not null
+#  related_links                :string           default([]), not null, is an Array
+#  last_fetched_at              :datetime
 #
 
 class CustomEmoji < ApplicationRecord
@@ -42,6 +54,7 @@ class CustomEmoji < ApplicationRecord
     (?=[^[:alnum:]:]|$)/x
 
   ALIAS_KEYS = {
+    'alterneteName'    => 'alternate_name',
     'aliases'          => 'keywords',
     'visibleInPicker'  => 'visible_in_picker',
     'show'             => 'visible_in_picker',
@@ -82,7 +95,7 @@ class CustomEmoji < ApplicationRecord
   IMAGE_CONVERTIBLE_MIME_TYPES = %w(image/jpeg image/heif image/heic image/bmp).freeze
 
   GLOBAL_CONVERT_OPTIONS = {
-    all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 90',
+    all: '+profile "!icc,*" +set modify-date +set create-date -define webp:use-sharp-yuv=1 -define webp:emulate-jpeg-size=true -quality 70',
     static: '-coalesce',
   }.freeze
 
@@ -116,58 +129,86 @@ class CustomEmoji < ApplicationRecord
   before_save :extract_dimensions
   after_commit :remove_entity_cache
 
+  def possibly_stale?
+    return false if domain.nil?
+
+    last_fetched_at.nil? || last_fetched_at <= 1.day.ago
+  end
+
+  def alternate_name=(val)
+    self[:alternate_name] = val.presence || ''
+  end
+
+  def ruby=(val)
+    self[:ruby] = val.presence || ''
+  end
+
+  def copyright_notice=(val)
+    self[:copyright_notice] = val.presence || ''
+  end
+
+  def credit_text=(val)
+    self[:credit_text] = val.presence || ''
+  end
+
+  def usage_info=(val)
+    self[:usage_info] = val.presence || ''
+  end
+
+  def creator=(val)
+    self[:creator] = val.presence || ''
+  end
+
+  def description=(val)
+    self[:description] = val.presence || ''
+  end
+
+  def is_based_on=(val)
+    self[:is_based_on] = val.presence || ''
+  end
+
   def keywords
-    self.aliases.join(' ')
+    aliases.join(' ')
   end
 
   def keywords=(val)
     if val.is_a?(Array)
-      self.aliases = val
+      self[:aliases] = val.compact_blank
     elsif val.is_a?(String)
-      self.aliases = val.split(/[ \r\n]/).compact_blank
+      self[:aliases] = val.split(/[ \r\n]/).compact_blank
     else
-      self.aliases = []
+      self[:aliases] = []
     end
   end
 
   def related_link
-    meta['related_link']&.join("\n") || ''
-  end
-
-  def related_link=(val)
-    if val.is_a?(Array)
-      meta['related_link'] = val
-    elsif val.is_a?(String)
-      meta['related_link'] = val.split(/[ \r\n]/).compact_blank
-    else
-      meta.delete('related_link')
-    end
+    self[:related_links].join("\n") || ''
   end
 
   def related_links
-    Array(meta['related_link']).compact_blank
+    self[:related_links].compact_blank
+  end
+
+  def related_link=(val)
+    self.related_links=(val)
   end
 
   def related_links=(val)
     if val.is_a?(Array)
-      meta['related_link'] = val
+      self[:related_links] = val.compact_blank
     elsif val.is_a?(String)
-      meta['related_link'] = val.split(/[ \r\n]/).compact_blank
+      self[:related_links] = val.split(/[ \r\n]/).compact_blank
     else
-      meta.delete('related_link')
+      self[:related_links] = []
     end
   end
 
-  def license
-    meta['license']
-  end
-
   def license=(val)
-    meta['license'] = COMMON_LICENSES.find { |_k, v| v == val }&.first || val
+    self[:license] = COMMON_LICENSES.find { |_k, v| v == val }&.first || val.presence || ''
   end
 
   def license_name
-    COMMON_LICENSES[meta['license']]
+    COMMON_LICENSES[self[:license]]
   end
 
   def misskey_license
@@ -175,63 +216,7 @@ class CustomEmoji < ApplicationRecord
   end
 
   def misskey_license=(val)
-    meta['misskey_license'] = val
-  end
-
-  def usage_info
-    meta['usage_info']
-  end
-
-  def usage_info=(val)
-    meta['usage_info'] = val
-  end
-
-  def creator
-    meta['creator']
-  end
-
-  def creator=(val)
-    meta['creator'] = val
-  end
-
-  def description
-    meta['description']
-  end
-
-  def description=(val)
-    meta['description'] = val
-  end
-
-  def copyright_notice
-    meta['copyright_notice']
-  end
-
-  def copyright_notice=(val)
-    meta['copyright_notice'] = val
-  end
-
-  def credit_text
-    meta['credit_text']
-  end
-
-  def credit_text=(val)
-    meta['credit_text'] = val
-  end
-
-  def is_based_on
-    meta['is_based_on']
-  end
-
-  def is_based_on=(val)
-    meta['is_based_on'] = val
-  end
-
-  def sensitive
-    ActiveRecord::Type::Boolean.new.cast(meta['sensitive'])
-  end
-
-  def sensitive=(val)
-    meta['sensitive'] = ActiveRecord::Type::Boolean.new.cast(val)
+    meta['misskey_license'] = val.presence || ''
   end
 
   def org_category
@@ -239,7 +224,7 @@ class CustomEmoji < ApplicationRecord
   end
 
   def org_category=(val)
-    meta['org_category'] = val
+    meta['org_category'] = val.presence || ''
   end
 
   def local?
@@ -275,9 +260,19 @@ class CustomEmoji < ApplicationRecord
     copy.width = self.width
     copy.height = self.height
     copy.thumbhash = self.thumbhash
+    copy.alternate_name = self.alternate_name
+    copy.ruby = self.ruby
+    copy.license = self.license
+    copy.usage_info = self.usage_info
+    copy.creator = self.creator
+    copy.description = self.description
+    copy.copyright_notice = self.copyright_notice
+    copy.credit_text = self.credit_text
+    copy.is_based_on = self.uri
+    copy.sensitive = self.sensitive
     copy.copy_permission = self.copy_permission unless none_permission?
     copy.aliases = self.aliases if copy.aliases.blank?
-    copy.meta.merge!(self.meta.compact, { is_based_on: self.uri })
+    copy.meta.merge!(self.meta.compact_blank)
     copy.tap(&:save!)
   end
 
@@ -306,7 +301,8 @@ class CustomEmoji < ApplicationRecord
     def search(searchtext, type = :include)
       prefix = %i(end_with include).include?(type) ? '%' : ''
       suffix = %i(start_with include).include?(type) ? '%' : ''
-      where('custom_emojis.id IN (select distinct id from (select id, unnest(shortcode || aliases) as val from custom_emojis) e where val ilike :searchtext)', { searchtext: "#{prefix}#{CustomEmoji.sanitize_sql_like(searchtext.strip)}#{suffix}" })
+      searchtext = "#{prefix}#{CustomEmoji.sanitize_sql_like(searchtext.strip)}#{suffix}"
+      where("custom_emojis.id IN (select distinct id from (select id, unnest(shortcode || alternate_name || ruby || aliases) as val from custom_emojis) e where val ilike :searchtext)", { searchtext: searchtext })
     end
 
     private

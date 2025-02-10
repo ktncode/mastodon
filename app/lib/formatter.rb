@@ -128,6 +128,8 @@ class Formatter
 
   def format_summary(emoji)
     val = []
+    val << "name: #{emoji.alternate_name}" if emoji.alternate_name.present?
+    val << "(#{emoji.ruby})" if emoji.ruby.present?
     val << "creator: #{emoji.creator}" if emoji.creator.present?
     val << "copyrightNotice: #{emoji.copyright_notice}" if emoji.copyright_notice.present?
     val << "creditText: #{emoji.credit_text}" if emoji.credit_text.present?

@@ -54,6 +54,8 @@ class ActivityPub::ProcessCustomEmojiService < BaseService
     emoji.copy_permission  = case @json['copyPermission'] when 'allow', true, '1' then 'allow' when 'deny', false, '0' then 'deny' when 'conditional' then 'conditional' else 'none' end
     emoji.license          = @json['license']
     emoji.misskey_license  = value_or_hash_value(@json['_misskey_license'], 'freeText')
+    emoji.alternate_name   = @json['alternate_name']
+    emoji.ruby             = @json['ruby']
     emoji.aliases          = as_array(@json['keywords'])
     emoji.copyright_notice = @json['copyrightNotice']
     emoji.credit_text      = @json['creditText']
@@ -62,9 +64,10 @@ class ActivityPub::ProcessCustomEmojiService < BaseService
     emoji.creator          = @json['creator']
     emoji.description      = @json['description']
     emoji.is_based_on      = @json['isBasedOn']
-    emoji.sensitive        = @json['sensitive']
+    emoji.sensitive        = !!@json['sensitive']
     emoji.image_remote_url = @json['icon']['url']
     emoji.updated_at       = @json['updated'] if @json['updated']
+    emoji.last_fetched_at  = Time.current
     emoji.save
 
     emoji

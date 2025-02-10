@@ -15,6 +15,8 @@ export default class Emoji extends React.PureComponent {
     static_url: PropTypes.string,
     domain: PropTypes.string,
     onClick: PropTypes.func,
+    alt: PropTypes.string,
+    title: PropTypes.string,
   };
 
   render () {
@@ -22,14 +24,15 @@ export default class Emoji extends React.PureComponent {
 
     if (unicodeMapping[emoji]) {
       const { filename, shortCode } = unicodeMapping[emoji];
-      const title = shortCode ? `:${shortCode}:` : '';
+      const alt = this.props.alt ?? emoji;
+      const title = this.props.title ?? (shortCode ? `:${shortCode}:` : '');
       const className = classNames('emojione', this.props.className);
 
       return (
         <img
           draggable='false'
           className={className}
-          alt={emoji}
+          alt={alt}
           title={title}
           src={`${assetHost}/emoji/${filename}.svg`}
         />
@@ -38,13 +41,15 @@ export default class Emoji extends React.PureComponent {
       const filename  = (autoPlayGif || hovered) && url ? url : static_url;
       const shortCode = `:${emoji}:`;
       const className = classNames('emojione custom-emoji', this.props.className, { 'clickable': onClick });
+      const alt = this.props.alt ?? shortCode;
+      const title = this.props.title ?? emoji;
 
       return (
         <img
           draggable='false'
           className={className}
-          alt={shortCode}
-          title={emoji}
+          alt={alt}
+          title={title}
           src={filename}
           data-shortcode={emoji}
           data-domain={domain}

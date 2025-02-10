@@ -9,6 +9,8 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
   attribute :width, if: :width?
   attribute :height, if: :height?
   attribute :thumbhash, if: :thumbhash?
+  attribute :alternate_name, if: :alternate_name?
+  attribute :ruby, if: :ruby?
   attribute :aliases, if: :aliases?
 
   def url
@@ -35,8 +37,16 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
     object.height
   end
 
+  def alternate_name
+    object.alternate_name
+  end
+
+  def ruby
+    object.ruby
+  end
+
   def aliases
-    object.aliases&.compact
+    [alternate_name, ruby].concat(object.aliases)&.compact_blank.uniq
   end
 
   def width?
@@ -52,6 +62,14 @@ class REST::CustomEmojiSerializer < ActiveModel::Serializer
   end
 
   def aliases?
-    object.aliases&.compact&.present?
+    aliases&.present?
+  end
+
+  def alternate_name?
+    object.alternate_name.present?
+  end
+
+  def ruby?
+    object.ruby.present?
   end
 end

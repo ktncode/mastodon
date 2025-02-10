@@ -25,60 +25,112 @@ const emojiFilename = (filename) => {
 const domParser = new DOMParser();
 
 const emojifyTextNode = (node, customEmojis, domain) => {
+  const VS15 = 0xFE0E;
+  const VS16 = 0xFE0F;
+
   let str = node.textContent;
 
   const fragment = new DocumentFragment();
+  let i = 0;
 
   for (;;) {
-    let match, i = 0;
+    let unicode_emoji;
 
+    // Skip to the next potential emoji to replace (either custom emoji or custom emoji :shortcode:
     if (customEmojis === null) {
-      while (i < str.length && !(match = trie.search(str.slice(i)))) {
+      while (i < str.length && !(unicode_emoji = trie.search(str.slice(i)))) {
         i += str.codePointAt(i) < 65536 ? 1 : 2;
       }
     } else {
-      while (i < str.length && str[i] !== ':' && !(match = trie.search(str.slice(i)))) {
+      while (i < str.length && str[i] !== ':' && !(unicode_emoji = trie.search(str.slice(i)))) {
         i += str.codePointAt(i) < 65536 ? 1 : 2;
       }
     }
 
-    let rend, replacement = '';
+    // We reached the end of the string, nothing to replace
     if (i === str.length) {
       break;
-    } else if (str[i] === ':') {
-      if (!(() => {
-        rend = str.indexOf(':', i + 1) + 1;
-        if (!rend) return false; // no pair of ':'
-        const shortname = str.slice(i, rend);
-        // now got a replacee as ':shortname:'
-        // if you want additional emoji handler, add statements below which set replacement and return true.
-        if (shortname in customEmojis) {
-          const filename = autoPlayGif ? customEmojis[shortname].url : customEmojis[shortname].static_url;
-          const aliases = customEmojis[shortname].aliases ?? [];
-          const shortcode = shortname.slice(1, -1);
-          const displayname = !domain && aliases[0] ? aliases[0] : shortcode;
-          replacement = `<img draggable="false" class="emojione custom-emoji" alt="${shortname}" title="${displayname}" src="${filename}" data-shortcode="${shortcode}" data-domain="${domain}" data-original="${customEmojis[shortname].url}" data-static="${customEmojis[shortname].static_url}" />`;
-          return true;
-        }
-        return false;
-      })()) rend = ++i;
-    } else { // matched to unicode emoji
-      const { filename, shortCode } = unicodeMapping[match];
-      const title = shortCode ? `:${shortCode}:` : '';
-      replacement = `<img draggable="false" class="emojione" alt="${match}" title="${title}" src="${assetHost}/emoji/${emojiFilename(filename)}.svg" />`;
-      rend = i + match.length;
+    }
+    
+    let rend, replacement = '';
+    if (str[i] === ':') {
+      rend = str.indexOf(':', i + 1) + 1;
+        
+      // no matching ending ':', skip
+      if (!rend) {
+        i++;
+        continue;
+      }
+
+      const shortcode = str.slice(i, rend);
+      const custom_emoji = customEmojis[shortcode];
+
+      // not a recognized shortcode, skip
+      if (!custom_emoji) {
+        i++;
+        continue;
+      }
+
+      // now got a replacee as ':shortcode:'
+      // if you want additional emoji handler, add statements below which set replacement and return true.
+      const filename = autoPlayGif ? custom_emoji.url : custom_emoji.static_url;
+
+      const striped_shortcode = shortcode.slice(1, -1);
+      const alt = shortcode;
+      const title = custom_emoji.alternate_name ?? striped_shortcode;
+
+      replacement = document.createElement('img');
+      replacement.setAttribute('draggable', 'false');
+      replacement.setAttribute('class', 'emojione custom-emoji');
+      replacement.setAttribute('alt', alt);
+      replacement.setAttribute('title', title);
+      replacement.setAttribute('src', filename);
+      replacement.setAttribute('data-shortcode', striped_shortcode);
+      replacement.setAttribute('data-domain', domain);
+      replacement.setAttribute('data-original', custom_emoji.url);
+      replacement.setAttribute('data-static', custom_emoji.static_url);
+    } else { // start of an unicode emoji
+      rend = i + unicode_emoji.length;
+
       // If the matched character was followed by VS15 (for selecting text presentation), skip it.
-      if (str.codePointAt(rend) === 65038) {
-        rend += 1;
+      if (str.codePointAt(rend - 1) !== VS16 && str.codePointAt(rend) === VS15) {
+        i = rend + 1;
+        continue;
+      }
+
+      const { filename, shortCode } = unicodeMapping[unicode_emoji];
+      const title = shortCode ? `:${shortCode}:` : '';
+
+      const isSystemTheme = !!document.body?.classList.contains('theme-system');
+
+      const theme = (isSystemTheme || document.body?.classList.contains('theme-mastodon-light')) ? 'light' : 'dark';
+
+      const imageFilename = emojiFilename(filename, theme);
+
+      const img = document.createElement('img');
+      img.setAttribute('draggable', 'false');
+      img.setAttribute('class', 'emojione');
+      img.setAttribute('alt', unicode_emoji);
+      img.setAttribute('title', title);
+      img.setAttribute('src', `${assetHost}/emoji/${imageFilename}.svg`);
+
+      if (isSystemTheme && imageFilename !== emojiFilename(filename, 'dark')) {
+        replacement = document.createElement('picture');
+
+        const source = document.createElement('source');
+        source.setAttribute('media', '(prefers-color-scheme: dark)');
+        source.setAttribute('srcset', `${assetHost}/emoji/${emojiFilename(filename, 'dark')}.svg`);
+        replacement.appendChild(source);
+        replacement.appendChild(img);
+      } else {
+        replacement = img;
       }
     }
 
     fragment.append(document.createTextNode(str.slice(0, i)));
-    if (replacement) {
-      fragment.append(domParser.parseFromString(replacement, 'text/html').documentElement.getElementsByTagName('img')[0]);
-    }
-    node.textContent = str.slice(0, i);
+    fragment.append(replacement);
     str = str.slice(rend);
+    i = 0;
   }
 
   fragment.append(document.createTextNode(str));
@@ -121,9 +173,9 @@ export const buildCustomEmojis = (customEmojis) => {
     const url       = autoPlayGif ? emoji.get('url') : emoji.get('static_url');
     const name      = shortcode.replace(':', '');
     const aliases   = emoji.get('aliases', null) ?? ImmutableList();
-    const hiragana  = aliases.isEmpty() ? toHiragana(name) : null;
-    let keywords    = hiragana && name !== hiragana && !aliases.includes(hiragana) ? [name, hiragana] : [name, ...aliases.toArray()];
-    if (emoji.get('category')) {
+    const ruby      = emoji.get('ruby') ?? toHiragana(name);
+    let keywords    = ruby && name !== ruby && !aliases.includes(ruby) ? [name, ruby] : [name, ...aliases.toArray()];
+    if (emoji.get('category') && !aliases.includes(emoji.get('category'))) {
       keywords.push(emoji.get('category'))
     }
 

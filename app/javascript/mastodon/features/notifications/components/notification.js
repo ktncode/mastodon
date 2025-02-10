@@ -435,13 +435,18 @@ class Notification extends ImmutablePureComponent {
     }
 
     const wide = notification.getIn(['emoji_reaction', 'width'], 1) / notification.getIn(['emoji_reaction', 'height'], 1) >= 1.4;
+    const emoji = notification.getIn(['emoji_reaction', 'name'])
+    const url = notification.getIn(['emoji_reaction', 'url'])
+    const static_url = notification.getIn(['emoji_reaction', 'static_url'])
+    const domain = notification.getIn(['emoji_reaction', 'domain'])
+    const title = notification.getIn(['emoji_reaction', 'alternate_name']) || emoji
 
     return (
       <HotKeys handlers={this.getHandlers()}>
         <div className={classNames('notification notification-reaction focusable', { unread })} tabIndex='0' aria-label={notificationForScreenReader(intl, intl.formatMessage(messages.emoji_reaction, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
           <div className='notification__message' ref={this.setRef}>
             <div className={classNames('notification__reaction-icon-wrapper', { wide })}>
-              <Emoji hovered={false} emoji={notification.getIn(['emoji_reaction', 'name'])} url={notification.getIn(['emoji_reaction', 'url'])} static_url={notification.getIn(['emoji_reaction', 'static_url'])} domain={notification.getIn(['emoji_reaction', 'domain'])} />
+              <Emoji hovered={false} emoji={emoji} title={title} url={url} static_url={static_url} domain={domain} />
             </div>
 
             <span title={notification.get('created_at')} className={classNames('notification__reaction-message-wrapper', { wide })}>

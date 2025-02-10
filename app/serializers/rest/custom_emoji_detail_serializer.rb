@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class REST::CustomEmojiDetailSerializer < REST::CustomEmojiSerializer
-  attributes :local, :domain, :updated_at
+  attributes :local, :domain, :updated_at, :last_fetched_at
 
   attribute :copy_permission, if: :copy_permission?
   attribute :license, if: :license?
@@ -71,6 +71,10 @@ class REST::CustomEmojiDetailSerializer < REST::CustomEmojiSerializer
 
   def updated_at
     object.updated_at
+  end
+
+  def last_fetched_at
+    object.last_fetched_at
   end
 
   def copy_permission?
