@@ -147,12 +147,13 @@ class Item extends React.PureComponent {
                 className='media-gallery__preview'
                 dummy={!useBlurhash}
               />
-              :
+              : attachment.get('blurhash') ?
               <Blurhash
                 hash={attachment.get('blurhash')}
                 className='media-gallery__preview'
                 dummy={!useBlurhash}
               />
+              : null
             }
           </a>
         </div>
@@ -227,7 +228,7 @@ class Item extends React.PureComponent {
               'media-gallery__preview--hidden': visible && this.state.loaded,
             })}
           />
-          :
+          : attachment.get('blurhash') ?
           <Blurhash
             hash={attachment.get('blurhash')}
             dummy={!useBlurhash}
@@ -235,6 +236,7 @@ class Item extends React.PureComponent {
               'media-gallery__preview--hidden': visible && this.state.loaded,
             })}
           />
+          : null
         }
         {visible && thumbnail}
       </div>
