@@ -3,6 +3,7 @@ import unicodeMapping from './emoji_unicode_mapping_light';
 import { assetHost } from 'mastodon/utils/config';
 import Trie from 'substring-trie';
 import { List as ImmutableList } from 'immutable';
+import { uniqCompact } from 'mastodon/utils/uniq';
 
 const { toHiragana } = require('@koozaki/romaji-conv');
 
@@ -174,10 +175,8 @@ export const buildCustomEmojis = (customEmojis) => {
     const name      = shortcode.replace(':', '');
     const aliases   = emoji.get('aliases', null) ?? ImmutableList();
     const ruby      = emoji.get('ruby') ?? toHiragana(name);
-    let keywords    = ruby && name !== ruby && !aliases.includes(ruby) ? [name, ruby] : [name, ...aliases.toArray()];
-    if (emoji.get('category') && !aliases.includes(emoji.get('category'))) {
-      keywords.push(emoji.get('category'))
-    }
+    const category  = emoji.get('category');
+    const keywords  = uniqCompact([name, ruby, category, ...aliases.toArray()]);
 
     emojis.push({
       id: name,
@@ -188,7 +187,7 @@ export const buildCustomEmojis = (customEmojis) => {
       keywords: keywords,
       imageUrl: url,
       custom: true,
-      customCategory: emoji.get('category'),
+      customCategory: category,
     });
   });
 

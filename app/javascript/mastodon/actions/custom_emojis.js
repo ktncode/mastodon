@@ -49,7 +49,7 @@ export function fetchCustomEmojiDetail(shortcode_with_domain) {
   return (dispatch, getState) => {
     dispatch(fetchCustomEmojiDetailRequest());
 
-    api(getState).get(`/api/v1/custom_emojis/${shortcode_with_domain}`).then(response => {
+    api(getState).post(`/api/v1/custom_emojis/${shortcode_with_domain}/fetch`).then(response => {
       dispatch(importFetchedCustomEmojiDetail(response.data));
       dispatch(fetchCustomEmojiDetailSuccess(response.data));
     }).catch(error => {

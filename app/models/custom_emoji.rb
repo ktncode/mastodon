@@ -231,6 +231,10 @@ class CustomEmoji < ApplicationRecord
     domain.nil?
   end
 
+  def remote?
+    !local?
+  end
+
   def object_type
     :emoji
   end

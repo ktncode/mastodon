@@ -444,7 +444,12 @@ Rails.application.routes.draw do
       get '/streaming', to: 'streaming#index'
       get '/streaming/(*any)', to: 'streaming#index'
 
-      resources :custom_emojis, only: [:index, :show], constraints: { id: %r{[^/]+} }
+      resources :custom_emojis, only: [:index, :show], constraints: { id: %r{[^/]+} } do
+        member do
+          post :fetch
+        end
+      end
+
       resources :suggestions, only: [:index, :destroy]
       resources :scheduled_statuses, only: [:index, :show, :update, :destroy]
       resources :preferences, only: [:index]
