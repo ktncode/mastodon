@@ -30,8 +30,96 @@ RSpec.describe ActivityPub::Activity::Create do
     context 'when fetching' do
       subject { described_class.new(json, sender, delivered_to_account_id: delivered_to_account_id) }
 
-      before do
-        subject.perform
+      context 'when object publication date is below ISO8601 range' do
+        let(:object_json) do
+          {
+            id: [ActivityPub::TagManager.instance.uri_for(sender), '#bar'].join,
+            type: 'Note',
+            content: 'Lorem ipsum',
+            published: '-0977-11-03T08:31:22Z',
+          }
+        end
+
+        it 'creates status with a valid creation date', :aggregate_failures do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
+          status = sender.statuses.first
+
+          expect(status).to_not be_nil
+          expect(status.text).to eq 'Lorem ipsum'
+
+          expect(status.created_at).to be_within(30).of(Time.now.utc)
+        end
+      end
+
+      context 'when object publication date is above ISO8601 range' do
+        let(:object_json) do
+          {
+            id: [ActivityPub::TagManager.instance.uri_for(sender), '#bar'].join,
+            type: 'Note',
+            content: 'Lorem ipsum',
+            published: '10000-11-03T08:31:22Z',
+          }
+        end
+
+        it 'creates status with a valid creation date', :aggregate_failures do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
+          status = sender.statuses.first
+
+          expect(status).to_not be_nil
+          expect(status.text).to eq 'Lorem ipsum'
+
+          expect(status.created_at).to be_within(30).of(Time.now.utc)
+        end
+      end
+
+      context 'when object has been edited' do
+        let(:object_json) do
+          {
+            id: [ActivityPub::TagManager.instance.uri_for(sender), '#bar'].join,
+            type: 'Note',
+            content: 'Lorem ipsum',
+            published: '2022-01-22T15:00:00Z',
+            updated: '2022-01-22T16:00:00Z',
+          }
+        end
+
+        it 'creates status with appropriate creation and edition dates', :aggregate_failures do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
+          status = sender.statuses.first
+
+          expect(status).to_not be_nil
+          expect(status.text).to eq 'Lorem ipsum'
+
+          expect(status.created_at).to eq '2022-01-22T15:00:00Z'.to_datetime
+
+          expect(status.edited?).to be true
+          expect(status.edited_at).to eq '2022-01-22T16:00:00Z'.to_datetime
+        end
+      end
+
+      context 'object has update date equal to creation date' do
+        let(:object_json) do
+          {
+            id: [ActivityPub::TagManager.instance.uri_for(sender), '#bar'].join,
+            type: 'Note',
+            content: 'Lorem ipsum',
+            published: '2022-01-22T15:00:00Z',
+            updated: '2022-01-22T15:00:00Z',
+          }
+        end
+
+        it 'creates status and does not mark it as edited' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
+          status = sender.statuses.first
+
+          expect(status).to_not be_nil
+          expect(status.text).to eq 'Lorem ipsum'
+          expect(status.edited?).to be false
+        end
       end
 
       context 'unknown object type' do
@@ -44,7 +132,7 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'does not create a status' do
-          expect(sender.statuses.count).to be_zero
+          expect { subject.perform }.to_not change(sender.statuses, :count)
         end
       end
 
@@ -106,6 +194,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -113,6 +203,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'missing to/cc defaults to direct privacy' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -131,6 +223,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -149,6 +243,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -167,6 +263,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -185,6 +283,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -203,6 +303,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -221,6 +323,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -239,6 +343,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -261,6 +367,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -283,16 +391,14 @@ RSpec.describe ActivityPub::Activity::Create do
           }
         end
 
-        it 'creates status' do
+        it 'creates status with a silent mention' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
           expect(status.visibility).to eq 'limited'
-        end
-
-        it 'creates silent mention' do
-          status = sender.statuses.first
-          expect(status.mentions.find_by(account: recipient)).to be_silent
+          expect(status.mentions.first).to be_silent
         end
       end
 
@@ -313,6 +419,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -333,6 +441,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -361,6 +471,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -383,6 +495,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
         end
@@ -405,6 +519,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -431,6 +547,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -456,6 +574,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -481,6 +601,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -504,6 +626,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
         end
@@ -526,6 +650,42 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
+          status = sender.statuses.first
+
+          expect(status).to_not be_nil
+          expect(status.tags.map(&:name)).to include('test')
+        end
+      end
+
+      context 'with featured hashtags' do
+        let(:object_json) do
+          {
+            id: [ActivityPub::TagManager.instance.uri_for(sender), '#bar'].join,
+            type: 'Note',
+            content: 'Lorem ipsum',
+            to: 'https://www.w3.org/ns/activitystreams#Public',
+            tag: [
+              {
+                type: 'Hashtag',
+                href: 'http://example.com/blah',
+                name: '#test',
+              },
+            ],
+          }
+        end
+
+        before do
+          sender.featured_tags.create!(name: 'test')
+        end
+
+        it 'creates status and updates featured tag' do
+          expect { subject.perform }
+            .to change(sender.statuses, :count).by(1)
+            .and change { sender.featured_tags.first.reload.statuses_count }.by(1)
+            .and change { sender.featured_tags.first.reload.last_status_at }.from(nil).to(be_within(0.1).of(Time.now.utc))
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -549,6 +709,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
         end
@@ -571,6 +733,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
         end
@@ -595,6 +759,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -621,6 +787,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
 
           expect(status).to_not be_nil
@@ -646,6 +814,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
         end
@@ -667,6 +837,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'creates status' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
         end
@@ -697,13 +869,13 @@ RSpec.describe ActivityPub::Activity::Create do
           }
         end
 
-        it 'creates status' do
+        it 'creates status with a poll' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
           status = sender.statuses.first
           expect(status).to_not be_nil
           expect(status.poll).to_not be_nil
-        end
 
-        it 'creates a poll' do
           poll = sender.polls.first
           expect(poll).to_not be_nil
           expect(poll.status).to_not be_nil
@@ -726,6 +898,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'adds a vote to the poll with correct uri' do
+          expect { subject.perform }.to change(poll.votes, :count).by(1)
+
           vote = poll.votes.first
           expect(vote).to_not be_nil
           expect(vote.uri).to eq object_json[:id]
@@ -751,6 +925,8 @@ RSpec.describe ActivityPub::Activity::Create do
         end
 
         it 'does not add a vote to the poll' do
+          expect { subject.perform }.to_not change(poll.votes, :count)
+
           expect(poll.votes.first).to be_nil
         end
       end

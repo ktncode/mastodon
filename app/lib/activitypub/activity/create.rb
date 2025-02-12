@@ -93,6 +93,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     ApplicationRecord.transaction do
       @status = Status.create!(@params)
       attach_tags(@status)
+      attach_mentions(@status)
     end
 
     resolve_references(@status, @mentions, @object['references'])
@@ -167,6 +168,15 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
       tag.use!(@account, status: status, at_time: status.created_at) if status.public_visibility?
     end
 
+    # Update featured tags
+    return if @tags.empty? || !status.distributable?
+
+    @account.featured_tags.where(tag_id: @tags.pluck(:id)).find_each do |featured_tag|
+      featured_tag.increment(status.created_at)
+    end
+  end
+
+  def attach_mentions(status)
     @mentions.each do |mention|
       mention.status = status
       mention.save
