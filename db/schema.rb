@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_02_10_122434) do
+ActiveRecord::Schema.define(version: 2025_02_13_025454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -542,6 +542,7 @@ ActiveRecord::Schema.define(version: 2025_02_10_122434) do
     t.datetime "last_status_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "url"
     t.index ["account_id"], name: "index_featured_tags_on_account_id"
     t.index ["tag_id"], name: "index_featured_tags_on_tag_id"
   end

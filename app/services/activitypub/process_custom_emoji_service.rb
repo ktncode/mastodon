@@ -56,7 +56,7 @@ class ActivityPub::ProcessCustomEmojiService < BaseService
     emoji.misskey_license  = value_or_hash_value(@json['_misskey_license'], 'freeText')
     emoji.alternate_name   = @json['alternate_name']
     emoji.ruby             = @json['ruby']
-    emoji.aliases          = as_array(@json['keywords'])
+    emoji.keywords         = as_array(@json['keywords'])
     emoji.copyright_notice = @json['copyrightNotice']
     emoji.credit_text      = @json['creditText']
     emoji.usage_info       = @json['usageInfo']

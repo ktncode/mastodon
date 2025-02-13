@@ -76,12 +76,13 @@ class ActivityPub::FetchFeaturedCollectionService < BaseService
   end
 
   def process_hashtag_items(items)
-    names     = items.filter_map { |item| item['type'] == 'Hashtag' && item['name']&.delete_prefix('#') } #.map { |name| HashtagNormalizer.new.normalize(name) }
-    to_remove = []
-    to_add    = names
+    items        = items.filter { |item| item['type'] == 'Hashtag' && item['name'].present? }    
+    item_by_name = items.index_by { |item| item['name'].delete_prefix('#') }
+    to_remove    = []
+    to_add       = item_by_name.keys
 
     FeaturedTag.where(account: @account).map(&:name).each do |name|
-      if names.include?(name)
+      if item_by_name.key?(name)
         to_add.delete(name)
       else
         to_remove << name
@@ -91,7 +92,7 @@ class ActivityPub::FetchFeaturedCollectionService < BaseService
     FeaturedTag.includes(:tag).where(account: @account, tags: { name: to_remove }).delete_all unless to_remove.empty?
 
     to_add.each do |name|
-      FeaturedTag.create!(account: @account, name: name)
+      FeaturedTag.create!(account: @account, name: name, url: item_by_name[name]['href'])
     end
   end
 

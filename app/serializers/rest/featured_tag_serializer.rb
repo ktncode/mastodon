@@ -10,6 +10,6 @@ class REST::FeaturedTagSerializer < ActiveModel::Serializer
   end
 
   def url
-    short_account_tag_url(object.account, object.tag)
+    object.account.local? ? short_account_tag_url(object.account, object.tag) : object.url
   end
 end

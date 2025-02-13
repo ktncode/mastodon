@@ -72,7 +72,13 @@ Rails.application.routes.draw do
     confirmations:      'auth/confirmations',
   }
 
-  get '/users/:username', to: redirect('/@%{username}'), constraints: lambda { |req| req.format.nil? || req.format.html? }
+  with_options constraints: ->(req) { req.format.nil? || req.format.html? } do
+    get '/users/:username', to: redirect_with_vary('/@%{username}')
+    get '/users/:username/following', to: redirect_with_vary('/@%{username}/following')
+    get '/users/:username/followers', to: redirect_with_vary('/@%{username}/followers')
+    get '/users/:username/statuses/:id', to: redirect_with_vary('/@%{username}/%{id}')
+  end
+
   get '/authorize_follow', to: redirect { |_, request| "/authorize_interaction?#{request.params.to_query}" }
 
   resources :accounts, path: 'users', only: [:show], param: :username do
@@ -105,14 +111,22 @@ Rails.application.routes.draw do
   resource :inbox, only: [:create], module: :activitypub
   resources :contexts, only: [:show], module: :activitypub
 
-  get '/@:username', to: 'accounts#show', as: :short_account
-  get '/@:username/with_replies', to: 'accounts#show', as: :short_account_with_replies
-  get '/@:username/media', to: 'accounts#show', as: :short_account_media
-  get '/@:username/tagged/:tag', to: 'accounts#show', as: :short_account_tag
-  get '/@:account_username/:id', to: 'statuses#show', as: :short_account_status
-  get '/@:account_username/:id/embed', to: 'statuses#embed', as: :embed_short_account_status
-  get '/@:account_username/:id/references', to: 'statuses#references', as: :references_short_account_status
-  get '/@:account_username/:id/custom', to: 'statuses#custom', as: :custom_short_account_status
+  constraints(username: %r{[^@/.]+}) do
+    with_options to: 'accounts#show' do
+      get '/@:username', as: :short_account
+      get '/@:username/with_replies', as: :short_account_with_replies
+      get '/@:username/media', as: :short_account_media
+      get '/@:username/tagged/:tag', as: :short_account_tag
+    end
+  end
+
+  constraints(account_username: %r{[^@/.]+}) do
+    get '/@:account_username/following', to: 'following_accounts#index', as: :short_account_following_index
+    get '/@:account_username/followers', to: 'follower_accounts#index', as: :short_account_followers_index
+    get '/@:account_username/:id', to: 'statuses#show', as: :short_account_status
+    get '/@:account_username/:id/embed', to: 'statuses#embed', as: :embed_short_account_status
+    get '/@:account_username/:id/references', to: 'statuses#references', as: :references_short_account_status
+  end
 
   get  '/interact/:id', to: 'remote_interaction#new', as: :remote_interaction
   post '/interact/:id', to: 'remote_interaction#create'

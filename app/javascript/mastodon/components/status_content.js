@@ -10,6 +10,8 @@ import { autoPlayGif, disableReactions } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   linkToAcct: { id: 'status.link_to_acct', defaultMessage: 'Link to @{acct}' },
+  linkToCustomEmojiInLocal: { id: 'status.link_to_custom_emoji_in_local', defaultMessage: 'Link to :@{shortcode}:' },
+  linkToCustomEmojiInRemote: { id: 'status.link_to_custom_emoji_in_remote', defaultMessage: 'Link to :@{shortcode}: in @{domain}' },
   postByAcct: { id: 'status.post_by_acct', defaultMessage: 'Post by @{acct}' },
 });
 
@@ -97,14 +99,21 @@ class StatusContent extends React.PureComponent {
 
       let mention = status.get('mentions').find(item => link.href === item.get('url'));
 
-      if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
+      if (link.classList.contains('custom-emoji-url-link') && link.dataset.shortcode) {
+        if (link.dataset.domain) {
+          link.setAttribute('title', intl.formatMessage(messages.linkToCustomEmojiInRemote, { shortcode: link.dataset.shortcode, domain: link.dataset.domain }));
+        } else {
+          link.setAttribute('title', intl.formatMessage(messages.linkToCustomEmojiInLocal, { shortcode: link.dataset.shortcode }));
+        }
+        link.addEventListener('click', this.onCustomEmojiUrlClick.bind(this, link.dataset.shortcode, link.dataset.domain), false);
+      } else if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
         link.addEventListener('click', this.onHashtagClick.bind(this, link.text), false);
       } else if (link.classList.contains('account-url-link')) {
         link.setAttribute('title', intl.formatMessage(messages.linkToAcct, { acct: link.dataset.accountAcct }));
-        link.addEventListener('click', this.onAccountUrlClick.bind(this, link.dataset.accountId, link.dataset.accountActorType), false);
+        link.addEventListener('click', this.onAccountUrlClick.bind(this, link.dataset.accountId, link.dataset.path ?? '', link.dataset.accountActorType), false);
       } else if (link.classList.contains('status-url-link') && ![status.get('uri'), status.get('url')].includes(link.href)) {
         link.setAttribute('title', intl.formatMessage(messages.postByAcct, { acct: link.dataset.statusAccountAcct }));
-        link.addEventListener('click', this.onStatusUrlClick.bind(this, link.dataset.statusId), false);
+        link.addEventListener('click', this.onStatusUrlClick.bind(this, link.dataset.statusId, link.dataset.path ?? ''), false);
       } else if (mention) {
         if (mention.get('group', false)) {
           link.addEventListener('click', this.onGroupMentionClick.bind(this, mention), false);
@@ -193,17 +202,17 @@ class StatusContent extends React.PureComponent {
     }
   }
 
-  onAccountUrlClick = (accountId, accountActorType, e) => {
+  onAccountUrlClick = (accountId, path, accountActorType, e) => {
     if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      this.context.router.history.push(`${accountActorType == 'Group' ? '/timelines/groups/' : '/accounts/'}${accountId}`);
+      this.context.router.history.push(`${accountActorType == 'Group' ? '/timelines/groups/' : '/accounts/'}${accountId}${path}`);
     }
   }
 
-  onStatusUrlClick = (statusId, e) => {
+  onStatusUrlClick = (statusId, path, e) => {
     if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      this.context.router.history.push(`/statuses/${statusId}`);
+      this.context.router.history.push(`/statuses/${statusId}${path}`);
     }
   }
 
@@ -220,6 +229,13 @@ class StatusContent extends React.PureComponent {
     if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       this.context.router.history.push(`/statuses/${statusId}/references`);
+    }
+  }
+
+  onCustomEmojiUrlClick = (shortcode, domain, e) => {
+    if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
     }
   }
 

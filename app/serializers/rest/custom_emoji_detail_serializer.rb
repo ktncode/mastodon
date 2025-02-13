@@ -11,6 +11,7 @@ class REST::CustomEmojiDetailSerializer < REST::CustomEmojiSerializer
   attribute :description, if: :description?
   attribute :copyright_notice, if: :copyright_notice?
   attribute :credit_text, if: :credit_text?
+  attribute :is_based_on_uri, if: :is_based_on?
   attribute :is_based_on, if: :is_based_on?
   attribute :sensitive, if: :sensitive?
   attribute :misskey_license, if: :misskey_license?
@@ -59,6 +60,14 @@ class REST::CustomEmojiDetailSerializer < REST::CustomEmojiSerializer
     object.related_links.map do |link|
       Formatter.instance.linkify(link)
     end
+  end
+
+  def is_based_on_uri
+    object.is_based_on
+  end
+
+  def is_based_on
+    Formatter.instance.linkify(object.is_based_on)
   end
 
   def local

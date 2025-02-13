@@ -18,6 +18,8 @@ const messages = defineMessages({
   copy_permission_deny: { id: 'copy_permission_none.deny', defaultMessage: 'Deny' },
   copy_permission_conditional: { id: 'copy_permission_none.conditional', defaultMessage: 'Conditional' },
   linkToAcct: { id: 'status.link_to_acct', defaultMessage: 'Link to @{acct}' },
+  linkToCustomEmojiInLocal: { id: 'status.link_to_custom_emoji_in_local', defaultMessage: 'Link to :@{shortcode}:' },
+  linkToCustomEmojiInRemote: { id: 'status.link_to_custom_emoji_in_remote', defaultMessage: 'Link to :@{shortcode}: in @{domain}' },
   postByAcct: { id: 'status.post_by_acct', defaultMessage: 'Post by @{acct}' },
 });
 
@@ -69,14 +71,21 @@ class EmojiDetailItem extends React.PureComponent {
       }
       link.classList.add('status-link');
 
-      if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
+      if (link.classList.contains('custom-emoji-url-link') && link.dataset.shortcode) {
+        if (link.dataset.domain) {
+          link.setAttribute('title', intl.formatMessage(messages.linkToCustomEmojiInRemote, { shortcode: link.dataset.shortcode, domain: link.dataset.domain }));
+        } else {
+          link.setAttribute('title', intl.formatMessage(messages.linkToCustomEmojiInLocal, { shortcode: link.dataset.shortcode }));
+        }
+        link.addEventListener('click', this.onCustomEmojiUrlClick.bind(this, link.dataset.shortcode, link.dataset.domain), false);
+      } else if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
         link.addEventListener('click', this.onHashtagClick.bind(this, link.text), false);
       } else if (link.classList.contains('account-url-link')) {
         link.setAttribute('title', intl.formatMessage(messages.linkToAcct, { acct: link.dataset.accountAcct }));
-        link.addEventListener('click', this.onAccountUrlClick.bind(this, link.dataset.accountId, link.dataset.accountActorType), false);
+        link.addEventListener('click', this.onAccountUrlClick.bind(this, link.dataset.accountId, link.dataset.path ?? '', link.dataset.accountActorType), false);
       } else if (link.classList.contains('status-url-link')) {
         link.setAttribute('title', intl.formatMessage(messages.postByAcct, { acct: link.dataset.statusAccountAcct }));
-        link.addEventListener('click', this.onStatusUrlClick.bind(this, link.dataset.statusId), false);
+        link.addEventListener('click', this.onStatusUrlClick.bind(this, link.dataset.statusId, link.dataset.path ?? ''), false);
       } else {
         link.setAttribute('title', link.href);
         link.classList.add('unhandled-link');
@@ -133,17 +142,17 @@ class EmojiDetailItem extends React.PureComponent {
     }
   }
 
-  onAccountUrlClick = (accountId, accountActorType, e) => {
+  onAccountUrlClick = (accountId, path, accountActorType, e) => {
     if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      this.context.router.history.push(`${accountActorType == 'Group' ? '/timelines/groups/' : '/accounts/'}${accountId}`);
+      this.context.router.history.push(`${accountActorType == 'Group' ? '/timelines/groups/' : '/accounts/'}${accountId}${path}`);
     }
   }
 
-  onStatusUrlClick = (statusId, e) => {
+  onStatusUrlClick = (statusId, path, e) => {
     if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      this.context.router.history.push(`/statuses/${statusId}`);
+      this.context.router.history.push(`/statuses/${statusId}${path}`);
     }
   }
 
@@ -151,6 +160,13 @@ class EmojiDetailItem extends React.PureComponent {
     if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       this.context.router.history.push(`/statuses/${statusId}/references`);
+    }
+  }
+
+  onCustomEmojiUrlClick = (shortcode, domain, e) => {
+    if (this.context.router && e.button === 0 && !(e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      this.context.router.history.push(`/emoji_detail/${shortcode}${domain ? `@${domain}` : ''}`);
     }
   }
 
@@ -254,7 +270,7 @@ class EmojiDetailItem extends React.PureComponent {
         </div>}
         {is_based_on && <div className='custom-emoji__property'>
           <div className='custom-emoji__label'><FormattedMessage id='search_results.custom_emojis.is_based_on' defaultMessage='Copy from' /></div>
-          <div className='custom-emoji__is_based_on'><a href={is_based_on} target='_blank' rel='noopener noreferrer'>{is_based_on}</a></div>
+          <div className='custom-emoji__is_based_on' dangerouslySetInnerHTML={{ __html: is_based_on }} />
         </div>}
         {sensitive && <div className='custom-emoji__property'>
           <div className='custom-emoji__label'><FormattedMessage id='search_results.custom_emojis.sensitive' defaultMessage='Sensitive' /></div>

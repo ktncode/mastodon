@@ -483,7 +483,7 @@ class ActivityPub::ProcessAccountService < BaseService
     emoji.misskey_license  = value_or_hash_value(tag['_misskey_license'], 'freeText')
     emoji.alternate_name   = tag['alternate_name']
     emoji.ruby             = tag['ruby']
-    emoji.aliases          = as_array(tag['keywords'])
+    emoji.keywords         = as_array(tag['keywords'])
     emoji.copyright_notice = tag['copyrightNotice']
     emoji.credit_text      = tag['creditText']
     emoji.usage_info       = tag['usageInfo']

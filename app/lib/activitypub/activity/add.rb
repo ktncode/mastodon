@@ -28,6 +28,6 @@ class ActivityPub::Activity::Add < ActivityPub::Activity
   def add_featured_tags
     name = @object['name']&.delete_prefix('#')
 
-    FeaturedTag.create!(account: @account, name: name) if name.present?
+    FeaturedTag.create!(account: @account, name: name, url: @object['href']) if name.present?
   end
 end

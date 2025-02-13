@@ -173,9 +173,9 @@ class CustomEmoji < ApplicationRecord
 
   def keywords=(val)
     if val.is_a?(Array)
-      self[:aliases] = val.compact_blank
+      self[:aliases] = val.join(' ').split(/[ \u3000\r\n]/).compact_blank
     elsif val.is_a?(String)
-      self[:aliases] = val.split(/[ \r\n]/).compact_blank
+      self[:aliases] = val.split(/[ \u3000\r\n]/).compact_blank
     else
       self[:aliases] = []
     end
@@ -275,7 +275,7 @@ class CustomEmoji < ApplicationRecord
     copy.is_based_on = self.uri
     copy.sensitive = self.sensitive
     copy.copy_permission = self.copy_permission unless none_permission?
-    copy.aliases = self.aliases if copy.aliases.blank?
+    copy.keywords = self.aliases if copy.aliases.blank?
     copy.meta.merge!(self.meta.compact_blank)
     copy.tap(&:save!)
   end

@@ -391,20 +391,37 @@ class Formatter
 
     html_attrs[:rel] = "me #{html_attrs[:rel]}" if options[:me]
 
-    status  = url_to_holding_status(url)
-    account = status&.account
-    account = url_to_holding_account(url) if status.nil?
-    account = account.moved_to_account if account&.moved?
+    status, path  = url_to_holding_status(url)
+    account       = status&.account
+    account, path = url_to_holding_account(url) if status.nil?
+    account       = account.moved_to_account if account&.moved?
 
-    if status.present? && account.present?
+    emoji = nil
+    if TagManager.instance.local_url?(url)
+      Rails.application.routes.recognize_path(url).tap do |recognized_params|
+        if recognized_params[:action] == 'show' && recognized_params[:controller] == 'emojis'
+          emoji = CustomEmoji.find_by(shortcode: recognized_params[:id], domain: nil)
+        end
+      end
+    else
+      emoji = CustomEmoji.find_by(uri: url)
+    end
+
+    if emoji.present?
+      html_attrs[:class]            = class_append(html_attrs[:class], ['custom-emoji-url-link'])
+      html_attrs[:'data-shortcode'] = emoji.shortcode
+      html_attrs[:'data-domain']    = emoji.domain if emoji.domain.present?
+    elsif status.present? && account.present?
       html_attrs[:class]                      = class_append(html_attrs[:class], ['status-url-link'])
       html_attrs[:'data-status-id']           = status.id
       html_attrs[:'data-status-account-acct'] = account.acct
+      html_attrs[:'data-path']                = path
     elsif account.present?
       html_attrs[:class]                     = class_append(html_attrs[:class], ['account-url-link'])
       html_attrs[:'data-account-id']         = account.id
       html_attrs[:'data-account-actor-type'] = account.actor_type
       html_attrs[:'data-account-acct']       = account.acct
+      html_attrs[:'data-path']               = path
     elsif options[:redirected_urls]&.key?(url)
       entity_url = url = options[:redirected_urls][url]
     elsif (redirect_link = RedirectLink.find_by(url: url))
@@ -419,20 +436,37 @@ class Formatter
   def apply_inner_link(html, options = {})
     doc = Nokogiri::HTML.parse(html, nil, 'utf-8')
     doc.css('a').map do |x|
-      status  = url_to_holding_status(x['href'])
-      account = status&.account
-      account = url_to_holding_account(x['href']) if status.nil?
-      account = account.moved_to_account if account&.moved?
+      status, path  = url_to_holding_status(x['href'])
+      account       = status&.account
+      account, path = url_to_holding_account(x['href']) if status.nil?
+      account       = account.moved_to_account if account&.moved?
 
-      if status.present? && account.present?
+      emoji = nil
+      if TagManager.instance.local_url?(x['href'])
+        Rails.application.routes.recognize_path(x['href']).tap do |recognized_params|
+          if recognized_params[:action] == 'show' && recognized_params[:controller] == 'emojis'
+            emoji = CustomEmoji.find_by(shortcode: recognized_params[:id], domain: nil)
+          end
+        end
+      else
+        emoji = CustomEmoji.find_by(uri: x['href']) if status.nil? && account.nil?
+      end
+
+      if emoji.present?
+        x.add_class('custom-emoji-url-link')
+        x['data-shortcode']      = emoji.shortcode
+        x['data-domain']         = emoji.domain if emoji.domain.present?
+      elsif status.present? && account.present?
         x.add_class('status-url-link')
         x['data-status-id']           = status.id
         x['data-status-account-acct'] = account.acct
+        x['data-path']                = path
       elsif account.present?
         x.add_class('account-url-link')
         x['data-account-id']         = account.id
         x['data-account-actor-type'] = account.actor_type
         x['data-account-acct']       = account.acct
+        x['data-path']               = path
       elsif options[:redirected_urls]&.key?(x['href'])
         x['href']    = options[:redirected_urls][x['href']]
         x.inner_html = link_html(x['href']) if x.text.start_with?('https://')
@@ -498,7 +532,12 @@ class Formatter
 
     return if url.nil?
 
-    EntityCache.instance.holding_account(url)
+    account_url, path = url.match(%r{^(.+)(/tagged/[^/]+|/with_replies|/media|/following|/followers).*$}).to_a.values_at(1,2)
+
+    url  = account_url if account_url.present?
+    path = "/posts#{path.delete_prefix('/tagged')}" if path&.start_with?('/tagged')
+
+    [EntityCache.instance.holding_account(url), path]
   end
 
   def url_to_holding_status(url)
@@ -506,7 +545,12 @@ class Formatter
 
     return if url.nil?
 
-    EntityCache.instance.holding_status(url)
+    if url.end_with?('/references')
+      path = '/references'
+      url.delete_suffix!(path)
+    end
+
+    [EntityCache.instance.holding_status(url), path]
   end
 
   def link_to_mention(entity, linkable_accounts, options = {})

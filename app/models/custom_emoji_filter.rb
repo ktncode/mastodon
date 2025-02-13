@@ -46,9 +46,9 @@ class CustomEmojiFilter
       CustomEmoji.remote
     when 'keywords'
       if value == '1'
-        CustomEmoji.where('array_length(custom_emojis.aliases, 1) IS NOT NULL')
+        CustomEmoji.where('array_length(custom_emojis.aliases, 1) > 0')
       else
-        CustomEmoji.where('array_length(custom_emojis.aliases, 1) IS NULL')
+        CustomEmoji.where('array_length(custom_emojis.aliases, 1) = 0')
       end
     when 'copy_permission'
       CustomEmoji.where(copy_permission: value)
