@@ -37,6 +37,7 @@ class FanOutOnWriteService < BaseService
       deliver_to_group(status)
     end
 
+    deliver_to_hashtag_followers(status)
     deliver_to_keyword_subscribers(status)
 
     return if status.account.silenced? || !status.public_visibility?
@@ -60,7 +61,6 @@ class FanOutOnWriteService < BaseService
     return if status.reblog?
 
     deliver_to_hashtags(status)
-    deliver_to_hashtag_followers(status)
   end
 
   private
@@ -149,14 +149,13 @@ class FanOutOnWriteService < BaseService
   end
 
   def visibility_scope(status, klass)
-    @visibility_scope ||=
-      if status.public_visibility? && !status.account.silenced?
-        klass.all
-      else
-        scope = klass.where(account_id: status.account_id).or(klass.where(account_id: status.mentions.select(:account_id)))
-        scope = scope.or(klass.where(account_id: status.account.followers.local.select(:id))) unless %w(limited direct).include?(status.visibility)
-        scope
-      end
+    if status.public_visibility? && !status.account.silenced?
+      klass.all
+    else
+      scope = klass.where(account_id: status.account_id).or(klass.where(account_id: status.mentions.select(:account_id)))
+      scope = scope.or(klass.where(account_id: status.account.followers.local.select(:id))) unless %w(limited direct).include?(status.visibility)
+      scope
+    end
   end
 
   def deliver_to_lists(status)
@@ -230,13 +229,13 @@ class FanOutOnWriteService < BaseService
   end
 
   def deliver_to_hashtag_followers_home(status)
-    @feedInsertWorker.push_bulk(FollowTag.home.where(tag: status.tags_without_mute).with_media(status.proper).pluck(:account_id).uniq) do |follower|
+    @feedInsertWorker.push_bulk(FollowTag.home.where(tag: status.tags_without_mute).with_media(status.proper).merge(visibility_scope(status, FollowTag)).pluck(:account_id).uniq) do |follower|
       [status.id, follower, :home]
     end
   end
 
   def deliver_to_hashtag_followers_list(status)
-    @feedInsertWorker.push_bulk(FollowTag.list.where(tag: status.tags_without_mute).with_media(status.proper).pluck(:list_id).uniq) do |list_id|
+    @feedInsertWorker.push_bulk(FollowTag.list.where(tag: status.tags_without_mute).with_media(status.proper).merge(visibility_scope(status, FollowTag)).pluck(:list_id).uniq) do |list_id|
       [status.id, list_id, :list]
     end
   end
