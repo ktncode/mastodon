@@ -1796,6 +1796,8 @@ ja:
     formats:
       default: "%Y年%m月%d日 %H:%M"
       month: "%Y年 %b"
+      time: "%H:%M"
+      with_time_zone: "%Y年%m月%d日 %H:%M %Z"
   two_factor_authentication:
     add: 追加
     disable: 無効化

@@ -1873,6 +1873,8 @@ en:
     formats:
       default: "%b %d, %Y, %H:%M"
       month: "%b %Y"
+      time: "%H:%M"
+      with_time_zone: "%b %d, %Y, %H:%M %Z"
   two_factor_authentication:
     add: Add
     disable: Disable 2FA

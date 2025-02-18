@@ -114,5 +114,4 @@
         %tr
           %th.nowrap= t('admin.custom_emojis.updated_at')
           %td
-            = l(@emoji.updated_at.in_time_zone(current_user&.time_zone.presence))
-            = " (#{current_user&.time_zone.presence || 'UTC'})"
+            = l(@emoji.updated_at.in_time_zone(current_user&.time_zone.presence), format: :with_time_zone)
