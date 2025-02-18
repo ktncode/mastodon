@@ -30,8 +30,12 @@ class InitialStateSerializer < ActiveModel::Serializer
 
     if object.current_account
       store[:me]                                    = object.current_account.id.to_s
+      store[:follow_modal]                          = object.current_account.user.setting_follow_modal
       store[:unfollow_modal]                        = object.current_account.user.setting_unfollow_modal
+      store[:subscribe_modal]                       = object.current_account.user.setting_subscribe_modal
       store[:unsubscribe_modal]                     = object.current_account.user.setting_unsubscribe_modal
+      store[:follow_tag_modal]                      = object.current_account.user.setting_follow_tag_modal
+      store[:unfollow_tag_modal]                    = object.current_account.user.setting_unfollow_tag_modal
       store[:boost_modal]                           = object.current_account.user.setting_boost_modal
       store[:delete_modal]                          = object.current_account.user.setting_delete_modal
       store[:missing_alt_text_modal]                = object.current_account.user.setting_missing_alt_text_modal

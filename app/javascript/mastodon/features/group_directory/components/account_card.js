@@ -13,7 +13,9 @@ import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import {
   autoPlayGif,
   me,
+  followModal,
   unfollowModal,
+  subscribeModal,
   unsubscribeModal,
   show_followed_by,
   follow_button_to_list_adder,
@@ -41,14 +43,10 @@ const messages = defineMessages({
   requested: { id: 'account.requested', defaultMessage: 'Awaiting approval' },
   unblock: { id: 'account.unblock', defaultMessage: 'Unblock @{name}' },
   unmute: { id: 'account.unmute', defaultMessage: 'Unmute @{name}' },
-  unfollowConfirm: {
-    id: 'confirmations.unfollow.confirm',
-    defaultMessage: 'Unfollow',
-  },
-  unsubscribeConfirm: {
-    id: 'confirmations.unsubscribe.confirm',
-    defaultMessage: 'Unsubscribe'
-  },
+  followConfirm: { id: 'confirmations.follow.confirm', defaultMessage: 'Follow' },
+  unfollowConfirm: { id: 'confirmations.unfollow.confirm', defaultMessage: 'Unfollow' },
+  subscribeConfirm: { id: 'confirmations.subscribe.confirm', defaultMessage: 'Subscribe' },
+  unsubscribeConfirm: { id: 'confirmations.unsubscribe.confirm', defaultMessage: 'Unsubscribe' },
 });
 
 const makeMapStateToProps = () => {
@@ -68,24 +66,24 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
       account.getIn(['relationship', 'requested'])
     ) {
       if (unfollowModal) {
-        dispatch(
-          openModal('CONFIRM', {
-            message: (
-              <FormattedMessage
-                id='confirmations.unfollow.message'
-                defaultMessage='Are you sure you want to unfollow {name}?'
-                values={{ name: <strong>@{account.get('acct')}</strong> }}
-              />
-            ),
-            confirm: intl.formatMessage(messages.unfollowConfirm),
-            onConfirm: () => dispatch(unfollowAccount(account.get('id'))),
-          }),
-        );
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.unfollow.message' defaultMessage='Are you sure you want to unfollow {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.unfollowConfirm),
+          onConfirm: () => dispatch(unfollowAccount(account.get('id'))),
+        }));
       } else {
         dispatch(unfollowAccount(account.get('id')));
       }
     } else {
-      dispatch(followAccount(account.get('id')));
+      if (followModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.follow.message' defaultMessage='Are you sure you want to follow {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.followConfirm),
+          onConfirm: () => dispatch(followAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(followAccount(account.get('id')));
+      }
     }
   },
 
@@ -101,7 +99,15 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
         dispatch(unsubscribeAccount(account.get('id')));
       }
     } else {
-      dispatch(subscribeAccount(account.get('id')));
+      if (subscribeModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.subscribe.message' defaultMessage='Are you sure you want to subscribe {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.subscribeConfirm),
+          onConfirm: () => dispatch(subscribeAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(subscribeAccount(account.get('id')));
+      }
     }
   },
 
@@ -128,9 +134,6 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
   },
 });
 
-export default
-@injectIntl
-@connect(makeMapStateToProps, mapDispatchToProps)
 class AccountCard extends ImmutablePureComponent {
 
   static propTypes = {
@@ -360,3 +363,5 @@ class AccountCard extends ImmutablePureComponent {
   }
 
 }
+
+export default injectIntl(connect(makeMapStateToProps, mapDispatchToProps)(AccountCard));

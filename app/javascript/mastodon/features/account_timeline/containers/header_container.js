@@ -22,11 +22,13 @@ import { initReport } from '../../../actions/reports';
 import { openModal } from '../../../actions/modal';
 import { blockDomain, unblockDomain } from '../../../actions/domain_blocks';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { unfollowModal, unsubscribeModal, confirmDomainBlock } from '../../../initial_state';
+import { followModal, unfollowModal, subscribeModal, unsubscribeModal, confirmDomainBlock } from '../../../initial_state';
 import { List as ImmutableList } from 'immutable';
 
 const messages = defineMessages({
+  followConfirm: { id: 'confirmations.follow.confirm', defaultMessage: 'Follow' },
   unfollowConfirm: { id: 'confirmations.unfollow.confirm', defaultMessage: 'Unfollow' },
+  subscribeConfirm: { id: 'confirmations.subscribe.confirm', defaultMessage: 'Subscribe' },
   unsubscribeConfirm: { id: 'confirmations.unsubscribe.confirm', defaultMessage: 'Unsubscribe' },
   blockDomainConfirm: { id: 'confirmations.domain_block.confirm', defaultMessage: 'Hide entire domain' },
   blockDomainPassphrase: { id: 'confirmations.domain_block.passphrase', defaultMessage: 'block' },
@@ -60,7 +62,15 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
         dispatch(unfollowAccount(account.get('id')));
       }
     } else {
-      dispatch(followAccount(account.get('id')));
+      if (followModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.follow.message' defaultMessage='Are you sure you want to follow {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.followConfirm),
+          onConfirm: () => dispatch(followAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(followAccount(account.get('id')));
+      }
     }
   },
 
@@ -76,7 +86,15 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
         dispatch(unsubscribeAccount(account.get('id')));
       }
     } else {
-      dispatch(subscribeAccount(account.get('id')));
+      if (subscribeModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.subscribe.message' defaultMessage='Are you sure you want to subscribe {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.subscribeConfirm),
+          onConfirm: () => dispatch(subscribeAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(subscribeAccount(account.get('id')));
+      }
     }
   },
 

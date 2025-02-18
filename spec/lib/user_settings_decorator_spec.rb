@@ -35,11 +35,46 @@ describe UserSettingsDecorator do
       expect(user.settings['default_sensitive']).to eq true
     end
 
+    it 'updates the user settings value for follow modal' do
+      values = { 'setting_follow_modal' => '0' }
+
+      settings.update(values)
+      expect(user.settings['follow_modal']).to eq false
+    end
+
     it 'updates the user settings value for unfollow modal' do
       values = { 'setting_unfollow_modal' => '0' }
 
       settings.update(values)
       expect(user.settings['unfollow_modal']).to eq false
+    end
+
+    it 'updates the user settings value for subscribe modal' do
+      values = { 'setting_subscribe_modal' => '0' }
+
+      settings.update(values)
+      expect(user.settings['subscribe_modal']).to eq false
+    end
+
+    it 'updates the user settings value for unsubscribe modal' do
+      values = { 'setting_unsubscribe_modal' => '0' }
+
+      settings.update(values)
+      expect(user.settings['unsubscribe_modal']).to eq false
+    end
+
+    it 'updates the user settings value for follow tag modal' do
+      values = { 'setting_follow_tag_modal' => '0' }
+
+      settings.update(values)
+      expect(user.settings['follow_tag_modal']).to eq false
+    end
+
+    it 'updates the user settings value for unfollow tag modal' do
+      values = { 'setting_unfollow_tag_modal' => '0' }
+
+      settings.update(values)
+      expect(user.settings['unfollow_tag_modal']).to eq false
     end
 
     it 'updates the user settings value for unsubscribe modal' do

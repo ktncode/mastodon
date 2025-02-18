@@ -343,6 +343,8 @@ ja:
         setting_enable_wide_emoji_reaction: ワイド絵文字を有効にする（リアクション）
         setting_expand_spoilers: 閲覧注意としてマークされた投稿を常に展開する
         setting_follow_button_to_list_adder: フォローボタンでリスト追加ダイアログを開く
+        setting_follow_modal: フォローする前に確認ダイアログを表示する
+        setting_follow_tag_modal: ハッシュタグをフォローする前に確認ダイアログを表示する
         setting_hexagon_avatar: NFTアイコンを体験する
         setting_hide_bot_on_public_timeline: 公開タイムラインのBotアカウントを非表示
         setting_hide_direct_from_timeline: ダイレクトメッセージをタイムラインから隠す
@@ -397,12 +399,14 @@ ja:
         setting_show_tab_bar_label: タブバーにラベルを表示する
         setting_show_followed_by: 被フォロー状態をフォローボタンに反映する
         setting_show_target: ターゲット機能を有効にする
+        setting_subscribe_modal: 購読する前に確認ダイアログを表示する
         setting_system_font_ui: システムのデフォルトフォントを使う
         setting_theme: サイトテーマ
         setting_theme_instance_ticker: インスタンス・ティッカー
         setting_theme_public: 公開ページにテーマを反映する
         setting_trends: 本日のトレンドタグを表示する
         setting_unfollow_modal: フォローを解除する前に確認ダイアログを表示する
+        setting_unfollow_tag_modal: ハッシュタグのフォローを解除する前に確認ダイアログを表示する
         setting_unlocked_for_official_app: Mastodon公式アプリに対し、フォロー承認制を無効にする
         setting_unsubscribe_modal: 購読を解除する前に確認ダイアログを表示する
         setting_use_blurhash: 非表示のメディアを色付きのぼかしで表示する

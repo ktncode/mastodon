@@ -15,10 +15,12 @@ import {
 } from '../actions/accounts';
 import { openModal } from '../actions/modal';
 import { initMuteModal } from '../actions/mutes';
-import { unfollowModal, unsubscribeModal } from '../initial_state';
+import { followModal, unfollowModal, subscribeModal, unsubscribeModal } from '../initial_state';
 
 const messages = defineMessages({
+  followConfirm: { id: 'confirmations.follow.confirm', defaultMessage: 'Follow' },
   unfollowConfirm: { id: 'confirmations.unfollow.confirm', defaultMessage: 'Unfollow' },
+  subscribeConfirm: { id: 'confirmations.subscribe.confirm', defaultMessage: 'Subscribe' },
   unsubscribeConfirm: { id: 'confirmations.unsubscribe.confirm', defaultMessage: 'Unsubscribe' },
 });
 
@@ -46,7 +48,15 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
         dispatch(unfollowAccount(account.get('id')));
       }
     } else {
-      dispatch(followAccount(account.get('id')));
+      if (followModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.follow.message' defaultMessage='Are you sure you want to follow {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.followConfirm),
+          onConfirm: () => dispatch(followAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(followAccount(account.get('id')));
+      }
     }
   },
 
@@ -62,7 +72,15 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
         dispatch(unsubscribeAccount(account.get('id')));
       }
     } else {
-      dispatch(subscribeAccount(account.get('id')));
+      if (subscribeModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.subscribe.message' defaultMessage='Are you sure you want to subscribe {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.subscribeConfirm),
+          onConfirm: () => dispatch(subscribeAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(subscribeAccount(account.get('id')));
+      }
     }
   },
 

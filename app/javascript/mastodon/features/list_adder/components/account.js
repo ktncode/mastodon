@@ -7,7 +7,7 @@ import Avatar from '../../../components/avatar';
 import DisplayName from '../../../components/display_name';
 import IconButton from '../../../components/icon_button';
 import { unfollowAccount, followAccount } from '../../../actions/accounts';
-import { me, show_followed_by, unfollowModal, disableFollow, disableUnfollow } from '../../../initial_state';
+import { me, show_followed_by, followModal, unfollowModal, disableFollow, disableUnfollow } from '../../../initial_state';
 import { openModal } from '../../../actions/modal';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
@@ -15,6 +15,7 @@ const messages = defineMessages({
   follow: { id: 'account.follow', defaultMessage: 'Follow' },
   unfollow: { id: 'account.unfollow', defaultMessage: 'Unfollow' },
   requested: { id: 'account.requested', defaultMessage: 'Awaiting approval' },
+  followConfirm: { id: 'confirmations.follow.confirm', defaultMessage: 'Follow' },
   unfollowConfirm: { id: 'confirmations.unfollow.confirm', defaultMessage: 'Unfollow' },
 });
 
@@ -34,13 +35,19 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
         dispatch(unfollowAccount(account.get('id')));
       }
     } else {
-      dispatch(followAccount(account.get('id')));
+      if (followModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.follow.message' defaultMessage='Are you sure you want to follow {name}?' values={{ name: <strong>@{account.get('acct')}</strong> }} />,
+          confirm: intl.formatMessage(messages.followConfirm),
+          onConfirm: () => dispatch(followAccount(account.get('id'))),
+        }));
+      } else {
+        dispatch(followAccount(account.get('id')));
+      }
     }
   },
 });
 
-export default @injectIntl
-@connect(MapStateToProps, mapDispatchToProps)
 class Account extends ImmutablePureComponent {
 
   static propTypes = {
@@ -90,3 +97,5 @@ class Account extends ImmutablePureComponent {
   }
 
 }
+
+export default injectIntl(connect(MapStateToProps, mapDispatchToProps)(Account));

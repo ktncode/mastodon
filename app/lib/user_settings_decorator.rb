@@ -31,8 +31,12 @@ class UserSettingsDecorator
 
   BOOLEAN_KEYS = %w(
     default_sensitive
+    follow_modal
     unfollow_modal
+    subscribe_modal
     unsubscribe_modal
+    follow_tag_modal
+    unfollow_tag_modal
     boost_modal
     delete_modal
     post_reference_modal

@@ -347,6 +347,8 @@ en:
         setting_enable_wide_emoji_reaction: Enable wide emoji (for reaction)
         setting_expand_spoilers: Always expand posts marked with content warnings
         setting_follow_button_to_list_adder: Open list add dialog with follow button
+        setting_follow_modal: Show confirmation dialog before following someone
+        setting_follow_tag_modal: Show confirmation dialog before following a tag
         setting_hexagon_avatar: Experience NFT Avatar
         setting_hide_bot_on_public_timeline: Hide bot account on public timeline
         setting_hide_direct_from_timeline: Hide direct messages from the timeline
@@ -401,12 +403,14 @@ en:
         setting_show_tab_bar_label: Show labels in the tab bar
         setting_show_followed_by: Reflect the following status on the follow button
         setting_show_target: Enable targeting features
+        setting_subscribe_modal: Show confirmation dialog before subscribing someone
         setting_system_font_ui: Use system's default font
         setting_theme: Site theme
         setting_theme_instance_ticker: '#InstanceTicker'
         setting_theme_public: Reflecting the theme on the public page
         setting_trends: Show today's trends
         setting_unfollow_modal: Show confirmation dialog before unfollowing someone
+        setting_unfollow_tag_modal: Show confirmation dialog before unfollowing a tag
         setting_unlocked_for_official_app: Disable follow approval-only for against the official Mastodon App
         setting_unsubscribe_modal: Show confirmation dialog before unsubscribing someone
         setting_use_blurhash: Show colorful gradients for hidden media

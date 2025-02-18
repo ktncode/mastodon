@@ -14,13 +14,16 @@ import { isEqual } from 'lodash';
 import { fetchHashtag, followHashtag, unfollowHashtag } from 'mastodon/actions/tags';
 import Icon from 'mastodon/components/icon';
 import classNames from 'classnames';
-import { defaultColumnWidth } from 'mastodon/initial_state';
+import { defaultColumnWidth, followTagModal, unfollowTagModal } from 'mastodon/initial_state';
+import { openModal } from 'mastodon/actions/modal';
 import { changeSetting } from '../../actions/settings';
 import { changeColumnParams } from '../../actions/columns';
 
 const messages = defineMessages({
   followHashtag: { id: 'hashtag.follow', defaultMessage: 'Follow hashtag' },
   unfollowHashtag: { id: 'hashtag.unfollow', defaultMessage: 'Unfollow hashtag' },
+  followHashtagConfirm: { id: 'confirmations.follow_hashtag.confirm', defaultMessage: 'Follow hastag' },
+  unfollowHashtagConfirm: { id: 'confirmations.unfollow_hashtag.confirm', defaultMessage: 'Unfollow hashtag' },
 });
 
 const mapStateToProps = (state, { columnId, params }) => {
@@ -36,8 +39,6 @@ const mapStateToProps = (state, { columnId, params }) => {
   };
 };
 
-export default @connect(mapStateToProps)
-@injectIntl
 class HashtagTimeline extends React.PureComponent {
 
   disconnects = [];
@@ -168,13 +169,29 @@ class HashtagTimeline extends React.PureComponent {
   }
 
   handleFollow = () => {
-    const { dispatch, params, tag } = this.props;
+    const { intl, dispatch, params, tag } = this.props;
     const { id } = params;
 
     if (tag.get('following')) {
-      dispatch(unfollowHashtag(id));
+      if (unfollowTagModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.unfollow_hashtag.message' defaultMessage='Are you sure you want to unfollow hashtag {name}?' values={{ name: <strong> #{tag.get('name')}</strong> }} />,
+          confirm: intl.formatMessage(messages.unfollowHashtagConfirm),
+          onConfirm: () => dispatch(unfollowHashtag(id)),
+        }));
+      } else {
+        dispatch(unfollowHashtag(id));
+      }
     } else {
-      dispatch(followHashtag(id));
+      if (followTagModal) {
+        dispatch(openModal('CONFIRM', {
+          message: <FormattedMessage id='confirmations.follow_hashtag.message' defaultMessage='Are you sure you want to follow hashtag {name}?' values={{ name: <strong>#{tag.get('name')}</strong> }} />,
+          confirm: intl.formatMessage(messages.followHashtagConfirm),
+          onConfirm: () => dispatch(followHashtag(id)),
+        }));
+      } else {
+        dispatch(followHashtag(id));
+      }
     }
   }
 
@@ -237,3 +254,5 @@ class HashtagTimeline extends React.PureComponent {
   }
 
 }
+
+export default injectIntl(connect(mapStateToProps)(HashtagTimeline));

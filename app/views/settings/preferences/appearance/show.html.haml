@@ -105,8 +105,12 @@
   %h4= t 'appearance.confirmation_dialogs'
 
   .fields-group
+    = f.input :setting_follow_modal, as: :boolean, wrapper: :with_label, fedibird_features: true
+    = f.input :setting_subscribe_modal, as: :boolean, wrapper: :with_label, fedibird_features: true
+    = f.input :setting_follow_tag_modal, as: :boolean, wrapper: :with_label, fedibird_features: true
     = f.input :setting_unfollow_modal, as: :boolean, wrapper: :with_label
     = f.input :setting_unsubscribe_modal, as: :boolean, wrapper: :with_label, fedibird_features: true
+    = f.input :setting_unfollow_tag_modal, as: :boolean, wrapper: :with_label, fedibird_features: true
     = f.input :setting_boost_modal, as: :boolean, wrapper: :with_label
     = f.input :setting_delete_modal, as: :boolean, wrapper: :with_label
     = f.input :setting_confirm_domain_block, as: :boolean, wrapper: :with_label

@@ -20,8 +20,12 @@ defaults: &defaults
   show_moderator_badge: true
   default_sensitive: false
   hide_network: false
+  follow_modal: false
   unfollow_modal: false
+  subscribe_modal: false
   unsubscribe_modal: false
+  follow_tag_modal: true
+  unfollow_tag_modal: true
   boost_modal: false
   delete_modal: true
   missing_alt_text_modal: true
