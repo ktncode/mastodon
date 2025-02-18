@@ -123,7 +123,9 @@ class AccountsController < ApplicationController
   end
 
   def pagination_url(max_id: nil, min_id: nil)
-    if tag_requested?
+    if tag_requested? && media_requested?
+      short_account_tag_media_url(@account, params[:tag], max_id: max_id, min_id: min_id)
+    elsif tag_requested?
       short_account_tag_url(@account, params[:tag], max_id: max_id, min_id: min_id)
     elsif media_requested?
       short_account_media_url(@account, max_id: max_id, min_id: min_id)
@@ -135,7 +137,7 @@ class AccountsController < ApplicationController
   end
 
   def media_requested?
-    request.path.split('.').first.end_with?('/media') && !tag_requested?
+    request.path.split('.').first.end_with?('/media')
   end
 
   def replies_requested?
@@ -143,7 +145,7 @@ class AccountsController < ApplicationController
   end
 
   def tag_requested?
-    request.path.split('.').first.end_with?(Addressable::URI.parse("/tagged/#{params[:tag]}").normalize)
+    request.path.split('.').first.delete_suffix('/media').end_with?(Addressable::URI.parse("/tagged/#{params[:tag]}").normalize)
   end
 
   def cached_filtered_status_pins

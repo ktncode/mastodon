@@ -117,6 +117,7 @@ Rails.application.routes.draw do
       get '/@:username/with_replies', as: :short_account_with_replies
       get '/@:username/media', as: :short_account_media
       get '/@:username/tagged/:tag', as: :short_account_tag
+      get '/@:username/tagged/:tag/media', as: :short_account_tag_media
     end
   end
 
