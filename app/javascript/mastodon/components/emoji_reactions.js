@@ -10,7 +10,7 @@ import Emoji from './emoji';
 import unicodeMapping from 'mastodon/features/emoji/emoji_unicode_mapping_light';
 import AnimatedNumber from 'mastodon/components/animated_number';
 import { disableReactions } from 'mastodon/initial_state';
-import Overlay from 'react-overlays/lib/Overlay';
+import Overlay from 'react-overlays/Overlay';
 import { isUserTouching } from 'mastodon/is_mobile';
 import AccountPopup from 'mastodon/components/account_popup';
 
@@ -46,8 +46,7 @@ const mergeProps = ({ emojiReaction, relationships }, dispatchProps, ownProps) =
   emojiReaction: getFilteredEmojiReaction(emojiReaction, relationships),
 });
 
-@connect(mapStateToProps, null, mergeProps)
-export default class EmojiReaction extends ImmutablePureComponent {
+class EmojiReaction extends ImmutablePureComponent {
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
@@ -139,7 +138,13 @@ export default class EmojiReaction extends ImmutablePureComponent {
         </div>
         {!hideAccountList && !isUserTouching() &&
         <Overlay show={this.state.hovered} placement={this.state.placement} target={this.findTarget}>
-          <AccountPopup accountIds={emojiReaction.get('account_ids', List())} />
+          {({ props, placement }) => (
+            <div {...props}>
+              <div className={`dropdown-animation ${placement}`}>
+                <AccountPopup accountIds={emojiReaction.get('account_ids', List())} />
+              </div>
+            </div>
+          )}
         </Overlay>
         }
       </Fragment>
@@ -147,3 +152,6 @@ export default class EmojiReaction extends ImmutablePureComponent {
   };
 
 }
+
+export default connect(mapStateToProps, null, mergeProps)(EmojiReaction);
+

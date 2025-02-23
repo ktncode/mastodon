@@ -11,7 +11,7 @@ import elephantUIPlane from 'mastodon/../images/elephant_ui_plane.svg';
 import { mascot } from 'mastodon/initial_state';
 import unicodeMapping from 'mastodon/features/emoji/emoji_unicode_mapping_light';
 import classNames from 'classnames';
-import EmojiPickerDropdown from 'mastodon/features/compose/containers/emoji_picker_dropdown_container';
+import EmojiPickerDropdownContainer from 'mastodon/features/compose/containers/emoji_picker_dropdown_container';
 import AnimatedNumber from 'mastodon/components/animated_number';
 import TransitionMotion from 'react-motion/lib/TransitionMotion';
 import spring from 'react-motion/lib/spring';
@@ -310,7 +310,7 @@ class ReactionsBar extends ImmutablePureComponent {
               />
             ))}
 
-            {visibleReactions.size < 8 && <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} button={<Icon id='plus' />} />}
+            {visibleReactions.size < 8 && <EmojiPickerDropdownContainer onPickEmoji={this.handleEmojiPick} button={<Icon id='plus' />} />}
           </div>
         )}
       </TransitionMotion>

@@ -343,8 +343,8 @@
   }
 }
 
-.dropdown-menu {
-  position: absolute;
+body > [data-popper-placement] {
+  z-index: 3;
 }
 
 .invisible {
@@ -441,12 +441,6 @@
         text-decoration: none;
       }
     }
-  }
-
-  .emoji-picker-dropdown {
-    position: absolute;
-    top: 0;
-    right: 0;
   }
 
   .compose-form__autosuggest-wrapper {
@@ -2192,6 +2186,42 @@ a.account__display-name {
   text-decoration: none;
 }
 
+.dropdown-animation {
+  animation: dropdown 300ms cubic-bezier(0.1, 0.7, 0.1, 1);
+
+  @keyframes dropdown {
+    from {
+      opacity: 0;
+      transform: scaleX(0.85) scaleY(0.75);
+    }
+
+    to {
+      opacity: 1;
+      transform: scaleX(1) scaleY(1);
+    }
+  }
+
+  &.top {
+    transform-origin: bottom;
+  }
+
+  &.right {
+    transform-origin: left;
+  }
+
+  &.bottom {
+    transform-origin: top;
+  }
+
+  &.left {
+    transform-origin: right;
+  }
+
+  .reduce-motion & {
+    animation: none;
+  }
+}
+
 .dropdown {
   display: inline-block;
 }
@@ -2207,7 +2237,8 @@ a.account__display-name {
   height: 0;
 }
 
-.dropdown-menu {
+.dropdown-menu,
+.emoji-picker-dropdown__menu {
   background: $ui-secondary-color;
   padding: 4px 0;
   border-radius: 4px;
@@ -2237,36 +2268,41 @@ a.account__display-name {
 
 .dropdown-menu__arrow {
   position: absolute;
-  width: 0;
-  height: 0;
-  border: 0 solid transparent;
 
-  &.left {
-    right: -5px;
-    margin-top: -5px;
-    border-width: 5px 0 5px 5px;
-    border-left-color: $ui-secondary-color;
+  &::before {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 5px;
+    background-color: $ui-secondary-color;
+    mask-image: url("data:image/svg+xml;utf8,<svg width='14' height='5' xmlns='http://www.w3.org/2000/svg'><path d='M7 0L0 5h14L7 0z' fill='white'/></svg>");
   }
 
   &.top {
     bottom: -5px;
-    margin-left: -7px;
-    border-width: 5px 7px 0;
-    border-top-color: $ui-secondary-color;
+    &::before {
+      transform: rotate(180deg);
+    }
+  }
+
+  &.right {
+    left: -9px;
+
+    &::before {
+      transform: rotate(-90deg);
+    }
   }
 
   &.bottom {
     top: -5px;
-    margin-left: -7px;
-    border-width: 0 7px 5px;
-    border-bottom-color: $ui-secondary-color;
   }
 
-  &.right {
-    left: -5px;
-    margin-top: -5px;
-    border-width: 5px 5px 5px 0;
-    border-right-color: $ui-secondary-color;
+  &.left {
+    right: -9px;
+
+    &::before {
+      transform: rotate(90deg);
+    }
   }
 }
 
@@ -4682,12 +4718,10 @@ a.status-card.compact:hover {
 }
 
 .emoji-picker-dropdown__menu {
-  background: $simple-background-color;
-  position: absolute;
-  box-shadow: 4px 4px 6px rgba($base-shadow-color, 0.4);
-  border-radius: 4px;
-  margin-top: 5px;
-  z-index: 2;
+  max-height: 80vh;
+  max-width: 80vw;
+  background: $white;
+  padding: 0 0 4px 0;
 
   .emoji-mart-scroll {
     transition: opacity 200ms ease;
@@ -4836,7 +4870,6 @@ a.status-card.compact:hover {
 
 .emoji-button {
   display: block;
-  padding: 5px 5px 2px 2px;
   outline: 0;
   cursor: pointer;
 
@@ -4870,7 +4903,6 @@ a.status-card.compact:hover {
 }
 
 .privacy-dropdown__dropdown {
-  position: absolute;
   background: $simple-background-color;
   box-shadow: 2px 4px 15px rgba($base-shadow-color, 0.4);
   border-radius: 4px;
@@ -5161,7 +5193,6 @@ a.status-card.compact:hover {
 .modal-root__modal {
   pointer-events: auto;
   display: flex;
-  z-index: 9999;
 }
 
 .video-modal__container {

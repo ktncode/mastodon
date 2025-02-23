@@ -17,7 +17,7 @@ import SearchabilityDropdownContainer from '../containers/searchability_dropdown
 import CircleDropdownContainer from '../containers/circle_dropdown_container';
 import DateTimeFormContainer from '../containers/datetime_form_container';
 import ExpiresIndicatorContainer from '../containers/expires_indicator_container';
-import EmojiPickerDropdown from '../containers/emoji_picker_dropdown_container';
+import EmojiPickerDropdownContainer from '../containers/emoji_picker_dropdown_container';
 import PollFormContainer from '../containers/poll_form_container';
 import UploadFormContainer from '../containers/upload_form_container';
 import WarningContainer from '../containers/warning_container';
@@ -270,7 +270,6 @@ class ComposeForm extends ImmutablePureComponent {
           onPaste={onPaste}
           autoFocus={!showSearch && !isMobile(window.innerWidth)}
         >
-          <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
           <div className='compose-form__modifiers'>
             <UploadFormContainer />
             <PollFormContainer />
@@ -285,6 +284,7 @@ class ComposeForm extends ImmutablePureComponent {
             <PollButtonContainer />
             <PrivacyDropdownContainer />
             <SpoilerButtonContainer />
+            <EmojiPickerDropdownContainer onPickEmoji={this.handleEmojiPick} />
             <DateTimeButtonContainer />
             <SearchabilityDropdownContainer />
           </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import IconButton from './icon_button';
-import Overlay from 'react-overlays/lib/Overlay';
+import Overlay from 'react-overlays/Overlay';
 import { supportsPassiveEvents } from 'detect-passive-events';
 
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
@@ -63,9 +63,6 @@ class ReactionPicker extends React.PureComponent {
     frequentlyUsedEmojis: PropTypes.arrayOf(PropTypes.string),
     loading: PropTypes.bool,
     style: PropTypes.object,
-    placement: PropTypes.string,
-    arrowOffsetLeft: PropTypes.string,
-    arrowOffsetTop: PropTypes.string,
   };
 
   static defaultProps = {
@@ -218,7 +215,6 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
 
   componentDidMount () {
     document.addEventListener('click', this.handleDocumentClick, false);
-    document.addEventListener('keydown', this.handleKeyDown, false);
     document.addEventListener('touchend', this.handleDocumentClick, listenerOptions);
     this.setState({ loading: true });
     EmojiPickerAsync().then(EmojiMart => {
@@ -232,7 +228,6 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
 
   componentWillUnmount () {
     document.removeEventListener('click', this.handleDocumentClick, false);
-    document.removeEventListener('keydown', this.handleKeyDown, false);
     document.removeEventListener('touchend', this.handleDocumentClick, listenerOptions);
   }
 
@@ -241,13 +236,12 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
   }
 
   render () {
-    const { onClose, style, placement, arrowOffsetLeft, arrowOffsetTop } = this.props;
+    const { onClose, style, placement } = this.props;
     const { pickersEmoji, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
     const { loading } = this.state;
 
     return (
       <div className={`dropdown-menu dropdown-menu-reaction ${placement}`} style={style} ref={this.setRef}>
-        <div className={`dropdown-menu__arrow ${placement}`} style={{ left: arrowOffsetLeft, top: arrowOffsetTop }} />
         <ReactionPicker
           pickersEmoji={pickersEmoji}
           loading={loading}
@@ -263,7 +257,7 @@ class ReactionPickerDropdownMenu extends React.PureComponent {
 
 }
 
-export default class ReactionPickerDropdown extends React.PureComponent {
+class ReactionPickerDropdown extends React.PureComponent {
 
   static contextTypes = {
     router: PropTypes.object,
@@ -281,7 +275,6 @@ export default class ReactionPickerDropdown extends React.PureComponent {
     isUserTouching: PropTypes.func,
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    dropdownPlacement: PropTypes.string,
     openDropdownId: PropTypes.string,
     openedViaKeyboard: PropTypes.bool,
     pickersEmoji: ImmutablePropTypes.map,
@@ -303,13 +296,11 @@ export default class ReactionPickerDropdown extends React.PureComponent {
     id: `reaction:${id++}`,
   };
 
-  handleClick = ({ target, type }) => {
+  handleClick = ({ type }) => {
     if (this.state.id === this.props.openDropdownId) {
       this.handleClose();
     } else {
-      const { top } = target.getBoundingClientRect();
-      const placement = top * 2 < innerHeight ? 'bottom' : 'top';
-      this.props.onOpen(this.state.id, placement, type !== 'click');
+      this.props.onOpen(this.state.id, type !== 'click');
     }
   }
 
@@ -360,41 +351,52 @@ export default class ReactionPickerDropdown extends React.PureComponent {
   }
 
   render () {
-    const { icon, size, title, disabled, dropdownPlacement, openDropdownId, openedViaKeyboard, active, pressed, iconButtonClass, counter } = this.props;
+    const { icon, size, title, disabled, openDropdownId, openedViaKeyboard, active, pressed, iconButtonClass, counter } = this.props;
     const { pickersEmoji, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
     const open = this.state.id === openDropdownId;
 
     return (
       <div className='emoji-picker-dropdown'>
-        <IconButton
-          icon={icon}
-          title={title}
-          active={active}
-          pressed={pressed}
-          className={iconButtonClass}
-          disabled={disabled}
-          size={size}
-          ref={this.setTargetRef}
-          onClick={this.handleClick}
-          onMouseDown={this.handleMouseDown}
-          onKeyDown={this.handleButtonKeyDown}
-          onKeyPress={this.handleKeyPress}
-          counter={counter}
-        />
-
-        <Overlay show={open} placement={dropdownPlacement} target={this.findTarget}>
-          <ReactionPickerDropdownMenu
-            onClose={this.handleClose}
-            openedViaKeyboard={openedViaKeyboard}
-            pickersEmoji={pickersEmoji}
-            onPickEmoji={onPickEmoji}
-            onSkinTone={onSkinTone}
-            skinTone={skinTone}
-            frequentlyUsedEmojis={frequentlyUsedEmojis}
+        <span ref={this.setTargetRef}>
+          <IconButton
+            icon={icon}
+            title={title}
+            active={active}
+            pressed={pressed}
+            className={iconButtonClass}
+            disabled={disabled}
+            size={size}
+            onClick={this.handleClick}
+            onMouseDown={this.handleMouseDown}
+            onKeyDown={this.handleButtonKeyDown}
+            onKeyPress={this.handleKeyPress}
+            counter={counter}
           />
+        </span>
+
+        <Overlay show={open} offset={[5, 5]} placement={'bottom'} flip target={this.findTarget} popperConfig={{ strategy: 'fixed' }}>
+          {({ props, arrowProps, placement }) => (
+            <div {...props}>
+              <div className={`dropdown-animation ${placement}`}>
+                <div className={`dropdown-menu__arrow ${placement}`} {...arrowProps} />
+                <ReactionPickerDropdownMenu
+                  onClose={this.handleClose}
+                  openedViaKeyboard={openedViaKeyboard}
+                  pickersEmoji={pickersEmoji}
+                  onPickEmoji={onPickEmoji}
+                  onSkinTone={onSkinTone}
+                  skinTone={skinTone}
+                  frequentlyUsedEmojis={frequentlyUsedEmojis}
+                />
+              </div>
+            </div>
+          )}
         </Overlay>
       </div>
     );
   }
 
 }
+
+export default ReactionPickerDropdown;
+
