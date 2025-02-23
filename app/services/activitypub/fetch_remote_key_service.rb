@@ -7,6 +7,9 @@ class ActivityPub::FetchRemoteKeyService < BaseService
   def call(uri)
     return if uri.blank?
 
+    parsed_uri = Addressable::URI.parse(uri)
+    return if parsed_uri.host.blank? || !%w(http https).include?(parsed_uri.scheme)
+
     @json = fetch_resource(uri, false)
 
     return unless supported_context?(@json) && expected_type?
