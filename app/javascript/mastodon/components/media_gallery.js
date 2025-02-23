@@ -8,6 +8,7 @@ import { isIOS } from '../is_mobile';
 import classNames from 'classnames';
 import { autoPlayGif, cropImages, displayMedia, useBlurhash, useLowResolutionThumbnails, maxAttachments } from '../initial_state';
 import { debounce } from 'lodash';
+import AltTextBadge from 'mastodon/components/alt_text_badge';
 import Blurhash from 'mastodon/components/blurhash';
 import Thumbhash from 'mastodon/components/thumbhash';
 
@@ -88,6 +89,7 @@ class Item extends React.PureComponent {
     let left   = 'auto';
     let bottom = 'auto';
     let right  = 'auto';
+    let badges = [];
 
     if (size === 1) {
       width = 100;
@@ -134,6 +136,12 @@ class Item extends React.PureComponent {
         top = `${Math.floor(index / 2) * 4 - 2}px`;
       }
     }
+
+    if (attachment.get('description')?.length > 0) {
+      badges.push(<AltTextBadge key='alt' description={attachment.get('description')} />);
+    }
+
+    const description = attachment.get('description');
 
     let thumbnail = '';
 
@@ -187,8 +195,8 @@ class Item extends React.PureComponent {
             src={previewUrl}
             srcSet={srcSet}
             sizes={sizes}
-            alt={attachment.get('description')}
-            title={attachment.get('description')}
+            alt={description}
+            title={description}
             style={{ objectPosition: `${x}% ${y}%` }}
             onLoad={this.handleImageLoad}
           />
@@ -197,12 +205,18 @@ class Item extends React.PureComponent {
     } else if (attachment.get('type') === 'gifv') {
       const autoPlay = !isIOS() && this.getAutoPlay();
 
+      if (attachment.get('type') === 'gifv') {
+        badges.push(<span key='gif' className='media-gallery__alt__label media-gallery__alt__label--non-interactive'>GIF</span>);
+      } else {
+        badges.push(<span key='video' className='media-gallery__alt__label media-gallery__alt__label--non-interactive'>{formatTime(Math.floor(duration))}</span>);
+      }
+
       thumbnail = (
         <div className={classNames('media-gallery__gifv', { autoplay: autoPlay })}>
           <video
             className='media-gallery__item-gifv-thumbnail'
-            aria-label={attachment.get('description')}
-            title={attachment.get('description')}
+            aria-label={description}
+            title={description}
             role='application'
             src={attachment.get('url')}
             onClick={this.handleClick}
@@ -212,8 +226,6 @@ class Item extends React.PureComponent {
             loop
             muted
           />
-
-          <span className='media-gallery__gifv__label'>GIF</span>
         </div>
       );
     }
@@ -238,7 +250,14 @@ class Item extends React.PureComponent {
           />
           : null
         }
+
         {visible && thumbnail}
+
+        {badges && (
+          <div className='media-gallery__item__badges'>
+            {badges}
+          </div>
+        )}
       </div>
     );
   }

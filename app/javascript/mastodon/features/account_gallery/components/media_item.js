@@ -1,3 +1,4 @@
+import AltTextBadge from 'mastodon/components/alt_text_badge';
 import Blurhash from 'mastodon/components/blurhash';
 import Thumbhash from 'mastodon/components/thumbhash';
 import classNames from 'classnames';
@@ -59,12 +60,18 @@ export default class MediaItem extends ImmutablePureComponent {
     const { attachment, displayWidth } = this.props;
     const { visible, loaded } = this.state;
 
-    const width  = `${Math.floor((displayWidth - 4) / 3) - 4}px`;
-    const height = width;
-    const status = attachment.get('status');
-    const title  = status.get('spoiler_text') || attachment.get('description');
-
+    const width       = `${Math.floor((displayWidth - 4) / 3) - 4}px`;
+    const height      = width;
+    const status      = attachment.get('status');
+    const description = attachment.get('description');
+    const type        = attachment.get('type');
     let thumbnail, label, icon, content;
+
+    const badges = [];
+
+    if (description && description.length > 0) {
+      badges.push(<AltTextBadge key='alt' description={description} />);
+    }
 
     if (!visible) {
       icon = (
@@ -73,21 +80,21 @@ export default class MediaItem extends ImmutablePureComponent {
         </span>
       );
     } else {
-      if (['audio', 'video'].includes(attachment.get('type'))) {
+      if (['audio', 'video'].includes(type)) {
         content = (
           <img
             src={attachment.get('preview_url') || attachment.getIn(['account', 'avatar_static'])}
-            alt={attachment.get('description')}
+            alt={description}
             onLoad={this.handleImageLoad}
           />
         );
 
-        if (attachment.get('type') === 'audio') {
+        if (type === 'audio') {
           label = <Icon id='music' />;
         } else {
           label = <Icon id='play' />;
         }
-      } else if (attachment.get('type') === 'image') {
+      } else if (type === 'image') {
         const focusX = attachment.getIn(['meta', 'focus', 'x']) || 0;
         const focusY = attachment.getIn(['meta', 'focus', 'y']) || 0;
         const x      = ((focusX /  2) + .5) * 100;
@@ -96,16 +103,16 @@ export default class MediaItem extends ImmutablePureComponent {
         content = (
           <img
             src={attachment.get('preview_url')}
-            alt={attachment.get('description')}
+            alt={description}
             style={{ objectPosition: `${x}% ${y}%` }}
             onLoad={this.handleImageLoad}
           />
         );
-      } else if (attachment.get('type') === 'gifv') {
+      } else if (type === 'gifv') {
         content = (
           <video
             className='media-gallery__item-gifv-thumbnail'
-            aria-label={attachment.get('description')}
+            aria-label={description}
             role='application'
             src={attachment.get('url')}
             onMouseEnter={this.handleMouseEnter}
@@ -116,7 +123,25 @@ export default class MediaItem extends ImmutablePureComponent {
           />
         );
 
-        label = 'GIF';
+        if (type === 'gifv') {
+          badges.push(
+            <span
+              key='gif'
+              className='media-gallery__alt__label media-gallery__alt__label--non-interactive'
+            >
+              GIF
+            </span>,
+          );
+        } else {
+          badges.push(
+            <span
+              key='video'
+              className='media-gallery__alt__label media-gallery__alt__label--non-interactive'
+            >
+              {formatTime(Math.floor(duration))}
+            </span>,
+          );
+        }
       }
 
       thumbnail = (
@@ -130,7 +155,7 @@ export default class MediaItem extends ImmutablePureComponent {
 
     return (
       <div className='account-gallery__item' style={{ width, height }}>
-        <a className='media-gallery__item-thumbnail' href={status.get('url')} onClick={this.handleClick} title={title} target='_blank' rel='noopener noreferrer'>
+        <a className='media-gallery__item-thumbnail' href={status.get('url')} onClick={this.handleClick} target='_blank' rel='noopener noreferrer'>
           {attachment.get('thumbhash') ?
             <Thumbhash
               hash={attachment.get('thumbhash')}
@@ -146,6 +171,10 @@ export default class MediaItem extends ImmutablePureComponent {
           }
           {visible ? thumbnail : icon}
         </a>
+
+        {badges.length > 0 && (
+          <div className='media-gallery__item__badges'>{badges}</div>
+        )}
       </div>
     );
   }

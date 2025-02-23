@@ -105,6 +105,7 @@
   "alert.rate_limited.title": "制限に達しました",
   "alert.unexpected.message": "不明なエラーが発生しました。",
   "alert.unexpected.title": "エラー！",
+  "alt_text_badge.title": "代替テキスト",
   "announcement.announcement": "お知らせ",
   "announcement.published_at": "{date}",
   "announcement.updated_at": "{date} 更新",
