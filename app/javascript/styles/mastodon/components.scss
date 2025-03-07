@@ -562,6 +562,11 @@ body > [data-popper-placement] {
     justify-content: flex-start;
     line-height: 18px;
     font-size: 14px;
+
+    .emojione {
+      width: calc(var(--picker-emoji-size, 22px));
+      height: calc(var(--picker-emoji-size, 22px));
+    }
   }
 
   .autosuggest-hashtag {
@@ -4722,6 +4727,7 @@ a.status-card.compact:hover {
   max-width: 80vw;
   background: $white;
   padding: 0 0 4px 0;
+  position: relative;
 
   .emoji-mart-scroll {
     transition: opacity 200ms ease;

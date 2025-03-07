@@ -14,7 +14,6 @@ const mapStateToProps = state => ({
   skinTone: state.getIn(['settings', 'skinTone']),
   frequentlyUsedEmojis: getFrequentlyUsedEmojis(state),
   openDropdownId: state.getIn(['dropdown_menu', 'openId']),
-  openedViaKeyboard: state.getIn(['dropdown_menu', 'keyboard']),
 });
 
 const mapDispatchToProps = (dispatch, { status, onPickEmoji, scrollKey }) => ({

@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { EmojiPicker as EmojiPickerAsync } from '../../ui/util/async-components';
 import IconButton from '../../../components/icon_button';
+import emojiCompressed from 'mastodon/features/emoji/emoji_compressed';
 import Overlay from 'react-overlays/Overlay';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import { assetHost } from 'mastodon/utils/config';
 import { pickerEmojiSize, disableAutoFocusToEmojiSearch } from 'mastodon/initial_state';
+
+const nimblePickerData = emojiCompressed[5];
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -29,16 +32,20 @@ const messages = defineMessages({
 let EmojiPicker, Emoji; // load asynchronously
 
 const listenerOptions = supportsPassiveEvents ? { passive: true } : false;
+let id = 0;
 
-const backgroundImageFn = () => `${assetHost}/emoji/sheet_13.png`;
+const backgroundImageFn = () => `${assetHost}/emoji/sheet_15.png`;
 
 const notFoundFn = () => (
   <div className='emoji-mart-no-results'>
     <Emoji
+      data={nimblePickerData}
       emoji='sleuth_or_spy'
       set='twitter'
       size={32}
       sheetSize={32}
+      sheetColumns={62}
+      sheetRows={62}
       backgroundImageFn={backgroundImageFn}
     />
 
@@ -60,7 +67,7 @@ class ModifierPickerMenu extends React.PureComponent {
     this.props.onSelect(e.currentTarget.getAttribute('data-index') * 1);
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.active) {
       this.attachListeners();
     } else {
@@ -68,7 +75,7 @@ class ModifierPickerMenu extends React.PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.removeListeners();
   }
 
@@ -78,12 +85,12 @@ class ModifierPickerMenu extends React.PureComponent {
     }
   }
 
-  attachListeners () {
+  attachListeners() {
     document.addEventListener('click', this.handleDocumentClick, false);
     document.addEventListener('touchend', this.handleDocumentClick, listenerOptions);
   }
 
-  removeListeners () {
+  removeListeners() {
     document.removeEventListener('click', this.handleDocumentClick, false);
     document.removeEventListener('touchend', this.handleDocumentClick, listenerOptions);
   }
@@ -92,17 +99,17 @@ class ModifierPickerMenu extends React.PureComponent {
     this.node = c;
   }
 
-  render () {
+  render() {
     const { active } = this.props;
 
     return (
       <div className='emoji-picker-dropdown__modifiers__menu' style={{ display: active ? 'block' : 'none' }} ref={this.setRef}>
-        <button onClick={this.handleClick} data-index={1}><Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={1} backgroundImageFn={backgroundImageFn} /></button>
-        <button onClick={this.handleClick} data-index={2}><Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={2} backgroundImageFn={backgroundImageFn} /></button>
-        <button onClick={this.handleClick} data-index={3}><Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={3} backgroundImageFn={backgroundImageFn} /></button>
-        <button onClick={this.handleClick} data-index={4}><Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={4} backgroundImageFn={backgroundImageFn} /></button>
-        <button onClick={this.handleClick} data-index={5}><Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={5} backgroundImageFn={backgroundImageFn} /></button>
-        <button onClick={this.handleClick} data-index={6}><Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={6} backgroundImageFn={backgroundImageFn} /></button>
+        <button onClick={this.handleClick} data-index={1}><Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={1} backgroundImageFn={backgroundImageFn} /></button>
+        <button onClick={this.handleClick} data-index={2}><Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={2} backgroundImageFn={backgroundImageFn} /></button>
+        <button onClick={this.handleClick} data-index={3}><Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={3} backgroundImageFn={backgroundImageFn} /></button>
+        <button onClick={this.handleClick} data-index={4}><Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={4} backgroundImageFn={backgroundImageFn} /></button>
+        <button onClick={this.handleClick} data-index={5}><Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={5} backgroundImageFn={backgroundImageFn} /></button>
+        <button onClick={this.handleClick} data-index={6}><Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={6} backgroundImageFn={backgroundImageFn} /></button>
       </div>
     );
   }
@@ -132,12 +139,12 @@ class ModifierPicker extends React.PureComponent {
     this.props.onClose();
   }
 
-  render () {
+  render() {
     const { active, modifier } = this.props;
 
     return (
       <div className='emoji-picker-dropdown__modifiers'>
-        <Emoji emoji='fist' set='twitter' size={22} sheetSize={32} skin={modifier} onClick={this.handleClick} backgroundImageFn={backgroundImageFn} />
+        <Emoji data={nimblePickerData} sheetColumns={62} sheetRows={62} emoji='fist' set='twitter' size={22} sheetSize={32} skin={modifier} onClick={this.handleClick} backgroundImageFn={backgroundImageFn} />
         <ModifierPickerMenu active={active} onSelect={this.handleSelect} onClose={this.props.onClose} />
       </div>
     );
@@ -177,12 +184,12 @@ class EmojiPickerMenu extends React.PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('click', this.handleDocumentClick, false);
     document.addEventListener('touchend', this.handleDocumentClick, { passive: false });
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     document.removeEventListener('click', this.handleDocumentClick, false);
     document.removeEventListener('touchend', this.handleDocumentClick, { passive: false });
   }
@@ -234,7 +241,7 @@ class EmojiPickerMenu extends React.PureComponent {
     this.props.onSkinTone(modifier);
   }
 
-  render () {
+  render() {
     const { loading, style, intl, pickersEmoji, skinTone, frequentlyUsedEmojis } = this.props;
 
     if (loading) {
@@ -263,7 +270,10 @@ class EmojiPickerMenu extends React.PureComponent {
     return (
       <div className={classNames('emoji-picker-dropdown__menu', { selecting: modifierOpen })} style={style} ref={this.setRef}>
         <EmojiPicker
-          perLine={Math.floor(24 * 8 / emojiSize)}
+          data={nimblePickerData}
+          sheetColumns={62}
+          sheetRows={62}
+          perLine={Math.floor(34 * 8 / (emojiSize + 12))}
           emojiSize={emojiSize}
           sheetSize={32}
           custom={pickersEmoji.get('custom_emojis')}
@@ -303,6 +313,9 @@ class EmojiPickerDropdown extends React.PureComponent {
     pickersEmoji: ImmutablePropTypes.map,
     frequentlyUsedEmojis: PropTypes.arrayOf(PropTypes.string),
     intl: PropTypes.object.isRequired,
+    onOpen: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    openDropdownId: PropTypes.string,
     onPickEmoji: PropTypes.func.isRequired,
     onSkinTone: PropTypes.func.isRequired,
     skinTone: PropTypes.number.isRequired,
@@ -310,40 +323,39 @@ class EmojiPickerDropdown extends React.PureComponent {
   };
 
   state = {
-    active: false,
     loading: false,
     placement: 'bottom',
+    id: `custom_emoji:${id++}`,
   };
 
-  onShowDropdown = ({ target }) => {
-    this.setState({ active: true });
-
+  onShowDropdown = ({ target, type }) => {
     if (!EmojiPicker) {
       this.setState({ loading: true });
 
       EmojiPickerAsync().then(EmojiMart => {
         EmojiPicker = EmojiMart.Picker;
-        Emoji       = EmojiMart.Emoji;
+        Emoji = EmojiMart.Emoji;
 
         this.setState({ loading: false });
       }).catch(() => {
-        this.setState({ loading: false, active: false });
+        this.setState({ loading: false });
       });
     }
 
     const { top } = target.getBoundingClientRect();
     this.setState({ placement: top * 2 < innerHeight ? 'bottom' : 'top' });
+    this.props.onOpen(this.state.id, type !== 'click');
   }
 
   onHideDropdown = (e) => {
-    this.setState({ active: false });
     e.stopPropagation();
     e.preventDefault();
+    this.props.onClose(this.state.id);
 }
 
   handleClick = (e) => {
     if (!this.state.loading && (!e.key || e.key === 'Enter')) {
-      if (this.state.active) {
+      if (this.state.id === this.props.openDropdownId) {
         this.onHideDropdown(e);
       } else {
         this.onShowDropdown(e);
@@ -384,10 +396,17 @@ class EmojiPickerDropdown extends React.PureComponent {
     return this.target;
   }
 
-  render () {
-    const { intl, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis, button, pickersEmoji } = this.props;
+  componentWillUnmount = () => {
+    if (this.state.id === this.props.openDropdownId) {
+      this.onHideDropdown();
+    }
+  }
+
+  render() {
+    const { intl, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis, button, pickersEmoji, openDropdownId } = this.props;
     const title = intl.formatMessage(messages.emoji);
-    const { active, loading, placement } = this.state;
+    const { loading, placement } = this.state;
+    const open = this.state.id === openDropdownId;
 
     return (
       <div className='emoji-picker-dropdown'>
@@ -395,7 +414,7 @@ class EmojiPickerDropdown extends React.PureComponent {
           className='emoji-button'
           title={title}
           aria-label={title}
-          aria-expanded={active}
+          aria-expanded={open}
           role='button'
           onClick={button ? this.handleClick : null}
           tabIndex={0}
@@ -404,7 +423,7 @@ class EmojiPickerDropdown extends React.PureComponent {
             className='privacy-dropdown__value-icon'
             icon='smile-o'
             title={intl.formatMessage(messages.emoji)}
-            expanded={active}
+            expanded={open}
             inverted
             style={{ height: null, lineHeight: '27px' }}
             onClick={this.handleClick}
@@ -414,8 +433,8 @@ class EmojiPickerDropdown extends React.PureComponent {
           />}
         </div>
 
-        <Overlay show={active && !loading} offset={[5, 15]} placement={placement} target={this.findTarget} popperConfig={{ strategy: 'fixed' }}>
-          {({ props, arrowProps, placement })=> (
+        <Overlay show={open && !loading} offset={[5, 15]} placement={placement} target={this.findTarget} popperConfig={{ strategy: 'fixed' }}>
+          {({ props, arrowProps, placement }) => (
             <div {...props}>
               <div className={`dropdown-animation ${placement}`}>
                 <div className={`dropdown-menu__arrow ${placement}`} {...arrowProps} />

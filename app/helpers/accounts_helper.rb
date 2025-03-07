@@ -146,6 +146,7 @@ module AccountsHelper
       --emoji-scale-multi: #{emoji_size_css(user&.setting_emoji_size_in_multi || Setting.default_settings['emoji_size_in_multi'])};
       --emoji-scale-mix: #{emoji_size_css(user&.setting_emoji_size_in_mix || Setting.default_settings['emoji_size_in_mix'])};
       --emoji-scale-other: #{emoji_size_css(user&.setting_emoji_size_in_other || Setting.default_settings['emoji_size_in_other'])};
+      --picker-emoji-size: #{h(user&.setting_picker_emoji_size || Setting.default_settings['picker_emoji_size'])}px;
     }
     EOS
 
