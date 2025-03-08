@@ -72,12 +72,14 @@ class MediaAttachment < ApplicationRecord
 
   IMAGE_STYLES = {
     original: {
+      animated: false,
       pixels: 8_294_400, # 3840x2160px
       file_geometry_parser: FastGeometryParser,
     }.freeze,
 
     small: {
       format: 'webp',
+      animated: false,
       content_type: 'image/webp',
       pixels: 160_000, # 400x400px
       file_geometry_parser: FastGeometryParser,
@@ -85,6 +87,7 @@ class MediaAttachment < ApplicationRecord
 
     tiny: {
       format: 'webp',
+      animated: false,
       content_type: 'image/webp',
       pixels: 40_000, # 200x200px
       file_geometry_parser: FastGeometryParser,
@@ -95,6 +98,7 @@ class MediaAttachment < ApplicationRecord
   IMAGE_CONVERTED_STYLES = {
     original: {
       format: 'webp',
+      animated: false,
       content_type: 'image/webp',
       pixels: 8_294_400, # 3840x2160px
       file_geometry_parser: FastGeometryParser,
