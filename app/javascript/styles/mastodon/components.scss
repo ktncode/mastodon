@@ -1633,24 +1633,6 @@ body > [data-popper-placement] {
     background: $white;
   }
 
-  &__arrow.dropdown-menu__arrow {
-    &.left {
-      border-left-color: $white;
-    }
-  
-    &.top {
-      border-top-color: $white;
-    }
-  
-    &.bottom {
-      border-bottom-color: $white;
-    }
-  
-    &.right {
-      border-right-color: $white;
-    }
-  }
-
   &__wapper {
     padding: 2px 6px;
     white-space: nowrap;

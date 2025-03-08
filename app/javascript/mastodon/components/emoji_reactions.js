@@ -137,10 +137,11 @@ class EmojiReaction extends ImmutablePureComponent {
           </button>
         </div>
         {!hideAccountList && !isUserTouching() &&
-        <Overlay show={this.state.hovered} placement={this.state.placement} target={this.findTarget}>
-          {({ props, placement }) => (
+        <Overlay show={this.state.hovered} offset={[5, 5]} placement={this.state.placement} target={this.findTarget}>
+          {({ props, arrowProps, placement }) => (
             <div {...props}>
-              <div className={`dropdown-animation ${placement}`}>
+              <div className={`dropdown-menu dropdown-animation account-popup ${placement}`}>
+                <div className={`dropdown-menu__arrow account-popup ${placement}`} {...arrowProps} />
                 <AccountPopup accountIds={emojiReaction.get('account_ids', List())} />
               </div>
             </div>
