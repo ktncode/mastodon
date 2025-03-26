@@ -72,8 +72,8 @@ class KeywordSubscribe < ApplicationRecord
 
   def to_regexp(words)
     Regexp.new(regexp ? words : "(?<![#])(#{words.split(',').map do |k|
-      sb = k =~ /\A[A-Za-z0-9]/ ? '\b' : k !~ /\A[\/\.]/ ? '(?<![\/\.])' : ''
-      eb = k =~ /[A-Za-z0-9]\z/ ? '\b' : k !~ /[\/\.]\z/ ? '(?![\/\.])' : ''
+      sb = case k when /\A[A-Za-z0-9]/ then '(?<![A-Za-z0-9])' when /\A[\/\.]/ then '' else '(?<![\/\.])' end
+      eb = case k when /[A-Za-z0-9]\z/ then '(?![A-Za-z0-9])'  when /[\/\.]\z/ then '' else '(?![\/\.])'  end
 
       /(?m#{ignorecase ? 'i': ''}x:#{sb}#{Regexp.quote(k).gsub("\\ ", "[[:space:]]+")}#{eb})/
     end.join('|')})", ignorecase, timeout: 2.0)
