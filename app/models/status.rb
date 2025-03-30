@@ -95,6 +95,7 @@ class Status < ApplicationRecord
   has_many :references, through: :reference_relationships, source: :target_status
   has_many :referred_by_relationships, class_name: 'StatusReference', foreign_key: :target_status_id, dependent: :destroy
   has_many :referred_by, through: :referred_by_relationships, source: :status
+  has_one :unresolve_status_reference_param, inverse_of: :status, dependent: :destroy
 
   has_one :notification, as: :activity, dependent: :destroy
   has_one :status_stat, inverse_of: :status
@@ -404,6 +405,10 @@ class Status < ApplicationRecord
     @reported ||= Report.where(target_account: account).unresolved.where('? = ANY(status_ids)', id).exists?
   end
 
+  def needs_fetch?
+    unresolve_status_reference_param.present?
+  end
+
   def emojis
     return @emojis if defined?(@emojis)
 
@@ -418,7 +423,7 @@ class Status < ApplicationRecord
   end
 
   def urls
-    @urls ||= ProcessStatusReferenceService.new.call(self, urls: references.map(&:url), skip_process: true)
+    @urls ||= ProcessStatusReferenceService.urls(self, urls: references.map(&:url))
   end
 
   def searchable_text
@@ -539,6 +544,13 @@ class Status < ApplicationRecord
 
     statuses.reject! { |status| StatusFilter.new(status, account, account_relations, status_relations).filtered? }
     statuses.sort!.reverse!
+  end
+
+  def resolve_reference!
+    unresolve_status_reference_param.tap do |param|
+      ProcessStatusReferenceService.new.call(param.status, **param.options) if param.present?
+      param&.destroy!
+    end
   end
 
   def increment_count!(key)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_02_13_025454) do
+ActiveRecord::Schema.define(version: 2025_03_17_173338) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -1161,6 +1161,14 @@ ActiveRecord::Schema.define(version: 2025_02_13_025454) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["domain"], name: "index_unavailable_domains_on_domain", unique: true
+  end
+
+  create_table "unresolve_status_reference_params", id: false, force: :cascade do |t|
+    t.bigint "status_id", null: false
+    t.jsonb "options"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["status_id"], name: "index_unresolve_status_reference_params_on_status_id"
   end
 
   create_table "user_invite_requests", force: :cascade do |t|

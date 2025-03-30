@@ -11,7 +11,7 @@ class ActivityPub::Activity
     @json    = json
     @account = account
     @object  = @json['object']
-    @options = options
+    @options = options.symbolize_keys!
   end
 
   def perform

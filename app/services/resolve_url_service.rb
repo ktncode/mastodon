@@ -4,9 +4,10 @@ class ResolveURLService < BaseService
   include JsonLdHelper
   include Authorization
 
-  def call(url, on_behalf_of: nil)
+  def call(url, **options)
     @url          = url
-    @on_behalf_of = on_behalf_of
+    @options      = options.symbolize_keys!
+    @on_behalf_of = @options[:on_behalf_of].presence
 
     if local_url?
       process_local_url
@@ -23,7 +24,7 @@ class ResolveURLService < BaseService
     if equals_or_includes_any?(type, ActivityPub::FetchRemoteAccountService::SUPPORTED_TYPES)
       ActivityPub::FetchRemoteAccountService.new.call(resource_url, prefetched_body: body)
     elsif equals_or_includes_any?(type, ActivityPub::Activity::Create::SUPPORTED_TYPES + ActivityPub::Activity::Create::CONVERTED_TYPES)
-      status = FetchRemoteStatusService.new.call(resource_url, body)
+      status = FetchRemoteStatusService.new.call(resource_url, body, **@options)
       authorize_with @on_behalf_of, status, :show? unless status.nil?
       status
     elsif equals_or_includes_any?(type, %w(Emoji))

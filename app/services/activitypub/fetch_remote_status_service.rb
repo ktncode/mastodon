@@ -3,13 +3,20 @@
 class ActivityPub::FetchRemoteStatusService < BaseService
   include JsonLdHelper
 
+  MAX_FETCH_DEPTH = 7
+
   # Should be called when uri has already been checked for locality
-  def call(uri, prefetched_body: nil, on_behalf_of: nil)
+  def call(uri, **options)
+    @options = { prefetched_body: nil, on_behalf_of: nil, depth: 1 }.merge(**options)
+
+    return if @options[:depth] > MAX_FETCH_DEPTH
+    @options[:depth] += 1
+
     @json = begin
-      if prefetched_body.nil?
-        fetch_resource(uri, true, on_behalf_of)
+      if @options[:prefetched_body].nil?
+        fetch_resource(uri, true, @options[:on_behalf_of])
       else
-        body_to_json(prefetched_body, compare_id: uri)
+        body_to_json(@options[:prefetched_body], compare_id: uri)
       end
     end
 
@@ -20,7 +27,7 @@ class ActivityPub::FetchRemoteStatusService < BaseService
 
     return if actor.nil? || actor.suspended?
 
-    ActivityPub::Activity.factory(activity_json, actor, delivery: false).perform
+    ActivityPub::Activity.factory(activity_json, actor, **@options.merge({ delivery: false })).perform
   end
 
   private

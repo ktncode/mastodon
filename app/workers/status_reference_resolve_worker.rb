@@ -7,9 +7,9 @@ class StatusReferenceResolveWorker
 
   sidekiq_options queue: 'pull', retry: 3
 
-  def perform(status_id, reference_url)
+  def perform(status_id, reference_url, options = {})
     status        = Status.find(status_id)
-    target_status = FetchRemoteStatusService.new.call(reference_url)
+    target_status = FetchRemoteStatusService.new.call(reference_url, **options)
 
     return if target_status.nil? || !(target_status.distributable? || target_status&.private_visibility?)
 

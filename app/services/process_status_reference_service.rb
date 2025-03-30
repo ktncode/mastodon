@@ -3,14 +3,29 @@
 class ProcessStatusReferenceService
   include Redisable
 
+  MAX_RESOLVE_STATUS_DEPTH = 1
+
   def call(status, **options)
     @status = status
+    @options = { depth: 1 }.merge(options)
 
-    urls = (parse_urls(status, **options).union(options[:urls]) - [ActivityPub::TagManager.instance.uri_for(status), ActivityPub::TagManager.instance.url_for(status)]).compact
+    urls = urls(status, **options)
 
-    return urls if options[:skip_process]
+    if @options[:depth] <= MAX_RESOLVE_STATUS_DEPTH
+      process_reference(urls, (options[:status_reference_ids] || []).compact.uniq, status.id)
+    else
+      UnresolveStatusReferenceParam.create(status: status, options: @options.slice(:urls, :mentions, :status_reference_ids))
+    end
+  end
 
-    process_reference(urls, (options[:status_reference_ids] || []).compact.uniq, status.id)
+  def urls(status, **options)
+    (parse_urls(status, **options).union(options[:urls] || []) - [ActivityPub::TagManager.instance.uri_for(status), ActivityPub::TagManager.instance.url_for(status)]).compact
+  end
+
+  class << self
+    def urls(status, **options)
+      self.new.urls(status, **options)
+    end
   end
 
   private

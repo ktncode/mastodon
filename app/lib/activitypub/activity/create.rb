@@ -314,7 +314,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def resolve_references(status, mentions, collection)
     references = []
     references = ActivityPub::FetchReferencesService.new.call(status, collection) unless collection.nil?
-    ProcessStatusReferenceService.new.call(status, mentions: mentions, urls: (references + [quote_uri]).compact.uniq)
+    ProcessStatusReferenceService.new.call(status, **@options.merge({ mentions: mentions, urls: (references + [quote_uri]).compact.uniq }) )
   end
 
   def process_attachments
@@ -670,7 +670,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def quote_from_url(url)
     return nil if url.nil?
 
-    quote = ResolveURLService.new.call(url)
+    quote = ResolveURLService.new.call(url, depth: @options[:depth] || 1)
     status_from_uri(quote.uri) if quote
   rescue
     nil

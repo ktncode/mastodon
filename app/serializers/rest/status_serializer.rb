@@ -48,6 +48,8 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   delegate :quote?, to: :object
 
+  attribute :needs_fetch, if: :needs_fetch?
+
   def application
     object.account.local? ? object.application : object.generator
   end
@@ -266,6 +268,14 @@ class REST::StatusSerializer < ActiveModel::Serializer
 
   def joke_applied?
     !source_requested? && object.account.cat? && nyaize_content != content
+  end
+
+  def needs_fetch?
+    object.needs_fetch?
+  end
+
+  def needs_fetch
+    object.needs_fetch?
   end
 
   def ordered_mentions
