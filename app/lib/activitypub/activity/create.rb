@@ -44,8 +44,14 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     )
   end
 
+  def reject_pattern
+    return @reject_pattern if defined?(@reject_pattern)
+
+    @reject_pattern = Setting.reject_pattern
+  end
+
   def reject_pattern?(text)
-    Setting.reject_pattern.present? && text&.match?(Setting.reject_pattern)
+    reject_pattern.present? && text&.match?(reject_pattern)
   end
 
   def create_status
