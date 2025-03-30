@@ -5,6 +5,7 @@ class Settings::KeywordSubscribesController < ApplicationController
 
   layout 'admin'
 
+  before_action :authenticate_user!
   before_action :set_lists, only: [:index, :new, :edit, :update]
   before_action :set_keyword_subscribes, only: :index
   before_action :set_keyword_subscribe, only: [:edit, :update, :destroy]
