@@ -26,6 +26,7 @@
     :is(#mastodon, .public-layout) .tabs-bar__wrapper .tabs-bar.bottom-bar {
       width: 100%;
       position: unset;
+      padding-bottom: env(safe-area-inset-bottom);
     }
       
     :is(#mastodon, .public-layout) #tabs-bar__portal,

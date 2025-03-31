@@ -1142,7 +1142,6 @@ body > [data-popper-placement] {
     height: 18px;
     width: 18px;
     position: absolute;
-    top: 5px !important;
     left: 5px !important;
     cursor: pointer;
 
@@ -1152,6 +1151,14 @@ body > [data-popper-placement] {
     }
   }
 
+  .status__avatar {
+    top: 5px !important;
+  }
+    
+  .detailed-status__display-avatar {
+    top: 7px !important;
+  }
+    
   .display-name__account {
     color: $ui-base-lighter-color;
   }

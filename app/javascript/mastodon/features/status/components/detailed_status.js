@@ -279,11 +279,12 @@ class DetailedStatus extends ImmutablePureComponent {
       } else {
         quote = (
           <div className='quote-status' data-id={quote_status.get('id')} dataurl={quote_status.get('url')}>
-            <a href={quote_status.getIn(['account', 'url'])} onClick={this.handleAccountClick} data-id={quote_status.getIn(['account', 'id'])} data-group={quote_status.getIn(['account', 'group'])} className='detailed-status__display-name'>
-              <div className='detailed-status__display-avatar'><Avatar account={quote_status.get('account')} size={18} /></div>
-              <DisplayName account={quote_status.get('account')} localDomain={this.props.domain} />
-            </a>
-
+            <div className='status__info'>
+              <a href={quote_status.getIn(['account', 'url'])} onClick={this.handleAccountClick} data-id={quote_status.getIn(['account', 'id'])} data-group={quote_status.getIn(['account', 'group'])} className='detailed-status__display-name'>
+                <div className='detailed-status__display-avatar'><Avatar account={quote_status.get('account')} size={18} /></div>
+                <DisplayName account={quote_status.get('account')} localDomain={this.props.domain} />
+              </a>
+            </div>
             <StatusContent status={quote_status} onClick={this.handleQuoteClick} expanded={!quote_status.get('hidden')} onExpandedToggle={this.handleExpandedQuoteToggle} quote />
             {quote_media}
           </div>

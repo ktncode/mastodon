@@ -45,11 +45,7 @@ div.status__info:nth-child(1) > a:nth-child(1) > div:nth-child(1),
 div.quote-status > div.status__info > a.status__display-name > div.status__avatar {
     top: revert !important;
 }
-div.status__info:nth-child(1) > a:nth-child(1) > span:nth-child(2),
-div.quote-status > div.status__info > a.status__display-name > .display-name{
-    padding-left: 35px !important; /* 本当は div.status__avatar に left revert; を指定できたほうがいいが、元の css で `15 px !important;` されてしまっているのでこちらの元の padding に +15px する */
-}
-  
+
 /* 引用に含まれるテキストエリアの調整 */
 div.status__content:nth-child(2),
 div.quote-status > div.status__content.status__content--with-action {

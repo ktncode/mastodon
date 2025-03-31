@@ -784,7 +784,7 @@
     .public-layout .tabs-bar__wrapper .tabs-bar a::before {
       content: "";
       position: absolute;
-      bottom: -10px;
+      bottom: calc(-10px - env(safe-area-inset-bottom));
       width: 5px;
       height: 10px;
       border-radius: 100px;
@@ -808,7 +808,7 @@
     }
     #mastodon .tabs-bar__wrapper .tabs-bar a.active::before,
     .public-layout .tabs-bar__wrapper .tabs-bar a.active::before {
-      bottom: -6px;
+      bottom: calc(-6px - env(safe-area-inset-bottom));
       width: 10px;
       margin-left: -5px;
     }
