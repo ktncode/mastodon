@@ -10,7 +10,7 @@ class UpdateNodeService < BaseService
   
   def call(domain, **options)
     @domain   = Addressable::URI.parse(domain)&.normalize&.to_s
-    @options  = { fetch: true, process: false }.merge(options)
+    @options  = { fetch: true, process: false }.merge(options.symbolize_keys)
     @node     = Node.find_or_create_by!(domain: @domain)
 
     last_fetched_at = node.last_fetched_at
@@ -55,7 +55,7 @@ class UpdateNodeService < BaseService
     node.info.merge!(process_software)
     node.info.merge!(last_week_users_local)
 
-    node.status          = :up
+    node.status = :up
   rescue Mastodon::UnexpectedResponseError => e
     case e.response.code
     when 401
