@@ -115,7 +115,7 @@ class FetchLinkCardService < BaseService
   end
 
   def status_reference_url?(uri)
-    recognized_params = Rails.application.routes.recognize_path(uri)
+    recognized_params = Rails.application.routes.recognize_path(uri) rescue {}
     recognized_params && recognized_params[:controller] == 'statuses' && recognized_params[:action] == 'references'
   end
 

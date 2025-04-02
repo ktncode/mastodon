@@ -398,7 +398,7 @@ class Formatter
 
     emoji = nil
     if TagManager.instance.local_url?(url)
-      Rails.application.routes.recognize_path(url).tap do |recognized_params|
+      (Rails.application.routes.recognize_path(url) rescue {}).tap do |recognized_params|
         if recognized_params[:action] == 'show' && recognized_params[:controller] == 'emojis'
           emoji = CustomEmoji.find_by(shortcode: recognized_params[:id], domain: nil)
         end
@@ -443,7 +443,7 @@ class Formatter
 
       emoji = nil
       if TagManager.instance.local_url?(x['href'])
-        Rails.application.routes.recognize_path(x['href']).tap do |recognized_params|
+        (Rails.application.routes.recognize_path(x['href']) rescue {}).tap do |recognized_params|
           if recognized_params[:action] == 'show' && recognized_params[:controller] == 'emojis'
             emoji = CustomEmoji.find_by(shortcode: recognized_params[:id], domain: nil)
           end

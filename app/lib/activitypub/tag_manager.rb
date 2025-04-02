@@ -195,7 +195,7 @@ class ActivityPub::TagManager
   end
 
   def uri_to_local_id(uri, param = :id)
-    path_params = Rails.application.routes.recognize_path(uri)
+    path_params = Rails.application.routes.recognize_path(uri) rescue {}
     path_params[:username] = Rails.configuration.x.local_domain if path_params[:controller] == 'instance_actors'
     path_params[param]
   end

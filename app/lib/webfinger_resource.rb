@@ -41,7 +41,7 @@ class WebfingerResource
   end
 
   def path_params
-    Rails.application.routes.recognize_path(resource)
+    Rails.application.routes.recognize_path(resource) rescue {}
   end
 
   def username_from_acct

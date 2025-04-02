@@ -83,7 +83,7 @@ class ResolveURLService < BaseService
   end
 
   def process_local_url
-    recognized_params = Rails.application.routes.recognize_path(@url)
+    recognized_params = Rails.application.routes.recognize_path(@url) rescue {}
 
     return unless recognized_params[:action] == 'show'
 

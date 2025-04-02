@@ -40,7 +40,7 @@ class EntityCache
 
     account = begin
       if ActivityPub::TagManager.instance.local_uri?(url)
-        recognized_params = Rails.application.routes.recognize_path(url)
+        recognized_params = Rails.application.routes.recognize_path(url) rescue {}
 
         return nil unless recognized_params[:action] == 'show'
 

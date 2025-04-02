@@ -23,7 +23,7 @@ class StatusFinder
   private
 
   def recognized_params
-    Rails.application.routes.recognize_path(url)
+    Rails.application.routes.recognize_path(url) rescue {}
   end
 
   def verify_action!
