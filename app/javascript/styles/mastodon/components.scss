@@ -1167,6 +1167,11 @@ body > [data-popper-placement] {
     padding-left: 20px;
   }
 
+  .status__info .status__display-name {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .detailed-status__display-name {
     margin-bottom: 0px;
 
