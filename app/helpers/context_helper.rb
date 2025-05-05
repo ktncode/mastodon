@@ -61,6 +61,13 @@ module ContextHelper
     vcard: { 'vcard' => 'http://www.w3.org/2006/vcard/ns#' },
     subscribable_by: { 'kmyblue' => 'http://kmy.blue/ns#', 'subscribableBy' => { '@id' => "kmyblue:subscribableBy", '@type' => '@id' } },
     emoji_react: { 'litepub' => 'http://litepub.social/ns#', 'EmojiReact' => 'litepub:EmojiReact'},
+    interaction_policies: {
+      'gts' => 'https://gotosocial.org/ns#',
+      'interactionPolicy' => { '@id' => 'gts:interactionPolicy', '@type' => '@id' },
+      'canQuote' => { '@id' => 'gts:canQuote', '@type' => '@id' },
+      'automaticApproval' => { '@id' => 'gts:automaticApproval', '@type' => '@id' },
+      'manualApproval' => { '@id' => 'gts:manualApproval', '@type' => '@id' },
+    },
   }.freeze
 
   def full_context
