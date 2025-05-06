@@ -326,8 +326,15 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
       next if attachment['url'].blank? || media_attachments.size >= Setting.attachments_max
 
       begin
-        href             = Addressable::URI.parse(attachment['url']).normalize.to_s
-        media_attachment = MediaAttachment.create(account: @account, remote_url: href, thumbnail_remote_url: icon_url_from_attachment(attachment), description: attachment['summary'].presence || attachment['name'].presence, focus: attachment['focalPoint'], blurhash: supported_blurhash?(attachment['blurhash']) ? attachment['blurhash'] : nil, thumbhash: attachment['thumbhash'])
+        media_attachment = MediaAttachment.create(
+          account:              @account,
+          remote_url:           remote_url_from_attachment(attachment),
+          thumbnail_remote_url: thumbnail_remote_url_from_attachment(attachment),
+          description:          attachment['summary'].presence || attachment['name'].presence,
+          focus:                attachment['focalPoint'],
+          blurhash:             supported_blurhash?(attachment['blurhash']) ? attachment['blurhash'] : nil,
+          thumbhash:            attachment['thumbhash'],
+        )
         media_attachments << media_attachment
 
         next if unsupported_media_type?(attachment['mediaType']) || skip_download?
@@ -348,9 +355,16 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     media_attachments
   end
 
-  def icon_url_from_attachment(attachment)
-    url = attachment['icon'].is_a?(Hash) ? attachment['icon']['url'] : attachment['icon']
-    Addressable::URI.parse(url).normalize.to_s if url.present?
+  def remote_url_from_attachment(attachment)
+    url = Addressable::URI.parse(attachment['url'])&.normalize&.to_s
+    url unless unsupported_uri_scheme?(url)
+  rescue Addressable::URI::InvalidURIError
+    nil
+  end
+
+  def thumbnail_remote_url_from_attachment(attachment)
+    url = Addressable::URI.parse(attachment['icon'].is_a?(Hash) ? attachment['icon']['url'] : attachment['icon'])&.normalize&.to_s
+    url unless unsupported_uri_scheme?(url)
   rescue Addressable::URI::InvalidURIError
     nil
   end
@@ -553,13 +567,8 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def object_url
     return if @object['url'].blank?
 
-    url_candidate = url_to_href(@object['url'], 'text/html')
-
-    if unsupported_uri_scheme?(url_candidate)
-      nil
-    else
-      url_candidate
-    end
+    url = url_to_href(@object['url'], 'text/html')
+    url unless unsupported_uri_scheme?(url)
   end
 
   def summary_language_map?

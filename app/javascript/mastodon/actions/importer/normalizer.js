@@ -41,6 +41,10 @@ export function normalizeAccount(account) {
     account.moved = account.moved.id;
   }
 
+  if (!(account.url.startsWith('http://') || account.url.startsWith('https://'))) {
+    account.url = account.uri;
+  }
+
   return account;
 }
 
@@ -132,6 +136,17 @@ export function normalizeStatus(status, normalOldStatus, domain) {
     normalStatus.visibility        = normalStatus.visibility_ex ? normalStatus.visibility_ex : normalStatus.visibility;
     normalStatus.quote             = null;
     normalStatus.media_attachments = status.media_attachments?.map( (media, i) => ({ ...media, order: i }));
+
+    if (normalStatus.url && !(normalStatus.url.startsWith('http://') || normalStatus.url.startsWith('https://'))) {
+      normalStatus.url = null;
+    }
+
+    normalStatus.url ||= normalStatus.uri;
+
+    normalStatus.media_attachments.forEach(item => {
+      if (item.remote_url && !(item.remote_url.startsWith('http://') || item.remote_url.startsWith('https://')))
+        item.remote_url = null;
+    });
   }
 
   return normalStatus;

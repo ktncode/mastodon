@@ -52,7 +52,7 @@ module JsonLdHelper
   end
 
   def unsupported_uri_scheme?(uri)
-    !uri.start_with?('http://', 'https://')
+    uri.blank? || !uri.start_with?('http://', 'https://')
   end
 
   def same_origin?(url_a, url_b)
