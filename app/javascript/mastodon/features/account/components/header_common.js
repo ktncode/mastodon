@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import Button from 'mastodon/components/button';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { autoPlayGif, me, isStaff, show_followed_by, follow_button_to_list_adder, disablePost, disableBlock, disableDomainBlock, disableFollow, disableUnfollow } from 'mastodon/initial_state';
+import { autoPlayHeader, autoPlayEmoji, me, isStaff, show_followed_by, follow_button_to_list_adder, disablePost, disableBlock, disableDomainBlock, disableFollow, disableUnfollow } from 'mastodon/initial_state';
 import classNames from 'classnames';
 import Icon from 'mastodon/components/icon';
 import IconButton from 'mastodon/components/icon_button';
@@ -130,7 +130,7 @@ class HeaderCommon extends ImmutablePureComponent {
   }
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -143,7 +143,7 @@ class HeaderCommon extends ImmutablePureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -378,13 +378,13 @@ class HeaderCommon extends ImmutablePureComponent {
     }
 
     if (account.get('header_full')) {
-      if (autoPlayGif) {
+      if (autoPlayHeader) {
         header = account.get('header_full');
       } else {
         header = account.get('header_full_static');
       }
     } else {
-      if (autoPlayGif) {
+      if (autoPlayHeader) {
         header = account.get('header');
       } else {
         header = account.get('header_static');

@@ -132,7 +132,7 @@ nn:
         phrase: Nykelord eller frase
         setting_advanced_layout: Skruv på det avanserte nettgrensesnittet
         setting_aggregate_reblogs: Gruppeframhevingar på tidsliner
-        setting_auto_play_gif: Spel av animerte GIF-ar automatisk
+        setting_auto_play_emoji: Spel av animerte GIF-ar automatisk
         setting_boost_modal: Vis stadfesting før framheving
         setting_crop_images: Skjer bilete i ikkje-utvida tut til 16x9
         setting_default_language: Språk på innlegg

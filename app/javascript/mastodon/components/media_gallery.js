@@ -6,7 +6,7 @@ import IconButton from './icon_button';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { isIOS } from '../is_mobile';
 import classNames from 'classnames';
-import { autoPlayGif, cropImages, displayMedia, useBlurhash, useLowResolutionThumbnails, maxAttachments } from '../initial_state';
+import { autoPlayMedia, cropImages, displayMedia, useBlurhash, useLowResolutionThumbnails, maxAttachments } from '../initial_state';
 import { debounce } from 'lodash';
 import AltTextBadge from 'mastodon/components/alt_text_badge';
 import Blurhash from 'mastodon/components/blurhash';
@@ -53,7 +53,7 @@ class Item extends React.PureComponent {
   }
 
   getAutoPlay() {
-    return this.props.autoplay || autoPlayGif;
+    return this.props.autoplay || autoPlayMedia;
   }
 
   hoverToPlay () {

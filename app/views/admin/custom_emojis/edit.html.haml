@@ -10,7 +10,7 @@
     = hidden_field_tag key, params[key] if params[key].present?
 
   .fields-group.emoji-detail
-    = custom_emoji_tag(@custom_emoji, animate = current_account&.user&.setting_auto_play_gif)
+    = custom_emoji_tag(@custom_emoji, animate = current_account&.user&.setting_auto_play_emoji)
     %samp= ":#{@custom_emoji.shortcode}:"
     - if @custom_emoji.local?
       %span.account-role.bot= @custom_emoji.category&.name || t('admin.custom_emojis.uncategorized')

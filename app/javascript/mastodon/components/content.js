@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, defineMessages } from 'react-intl';
-import { autoPlayGif } from 'mastodon/initial_state';
+import { autoPlayEmoji } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   linkToAcct: { id: 'status.link_to_acct', defaultMessage: 'Link to @{acct}' },
@@ -96,7 +96,7 @@ export default class Content extends React.PureComponent {
   }
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -109,7 +109,7 @@ export default class Content extends React.PureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 

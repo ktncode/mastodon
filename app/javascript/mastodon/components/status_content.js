@@ -6,7 +6,7 @@ import Permalink from './permalink';
 import classnames from 'classnames';
 import PollContainer from 'mastodon/containers/poll_container';
 import Icon from 'mastodon/components/icon';
-import { autoPlayGif, disableReactions } from 'mastodon/initial_state';
+import { autoPlayEmoji, disableReactions } from 'mastodon/initial_state';
 
 const messages = defineMessages({
   linkToAcct: { id: 'status.link_to_acct', defaultMessage: 'Link to @{acct}' },
@@ -144,7 +144,7 @@ class StatusContent extends React.PureComponent {
   }
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -157,7 +157,7 @@ class StatusContent extends React.PureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 

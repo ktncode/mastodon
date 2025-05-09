@@ -1,7 +1,7 @@
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
-import { autoPlayGif } from 'mastodon/initial_state';
+import { autoPlayEmoji } from 'mastodon/initial_state';
 
 export default class DisplayName extends React.PureComponent {
 
@@ -51,7 +51,7 @@ export default class DisplayName extends React.PureComponent {
   }
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -64,7 +64,7 @@ export default class DisplayName extends React.PureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 

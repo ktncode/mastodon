@@ -147,7 +147,7 @@ gl:
         phrase: Palabra chave ou frase
         setting_advanced_layout: Activar interface web avanzada
         setting_aggregate_reblogs: Agrupar promocións nas cronoloxías
-        setting_auto_play_gif: Reprodución automática de GIFs animados
+        setting_auto_play_emoji: Reprodución automática de GIFs animados
         setting_boost_modal: Pedir confirmación antes de promocionar
         setting_crop_images: Recortar imaxes a 16x9 en publicacións non despregadas
         setting_default_language: Idioma de publicación

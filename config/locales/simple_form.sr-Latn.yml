@@ -29,7 +29,7 @@ sr-Latn:
         note: Biografija
         otp_attempt: Dvofaktorski kod
         password: Lozinka
-        setting_auto_play_gif: Automatski puštaj animirane GIF-ove
+        setting_auto_play_emoji: Automatski puštaj animirane GIF-ove
         setting_boost_modal: Prikaži dijalog za potvrdu pre davanja podrške
         setting_default_privacy: Privatnost objava
         setting_default_sensitive: Uvek označi multimediju kao osetljivu

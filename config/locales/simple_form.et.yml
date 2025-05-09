@@ -128,7 +128,7 @@ et:
         phrase: Võtmesõna või fraas
         setting_advanced_layout: Aktiveeri arenenud veebiliides
         setting_aggregate_reblogs: Grupita upitused ajajoontes
-        setting_auto_play_gif: Mängi GIF-e automaatselt
+        setting_auto_play_emoji: Mängi GIF-e automaatselt
         setting_boost_modal: Näita kinnitusdialoogi enne upitamist
         setting_crop_images: Kärbi suurendamata tuututuste pildid resolutsiooni 16x9
         setting_default_language: Postituse keel

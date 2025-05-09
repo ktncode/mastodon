@@ -29,7 +29,7 @@ hr:
         note: Biografija
         otp_attempt: Dvofaktorski kôd
         password: Lozinka
-        setting_auto_play_gif: Automatski pokreni animirane GIF-ove
+        setting_auto_play_emoji: Automatski pokreni animirane GIF-ove
         setting_default_privacy: Privatnost objavljivanja
         setting_display_media_default: Zadano
         setting_display_media_hide_all: Sakrij sve

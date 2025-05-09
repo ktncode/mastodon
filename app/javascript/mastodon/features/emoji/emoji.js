@@ -1,4 +1,4 @@
-import { autoPlayGif } from '../../initial_state';
+import { autoPlayEmoji } from '../../initial_state';
 import unicodeMapping from './emoji_unicode_mapping_light';
 import { assetHost } from 'mastodon/utils/config';
 import Trie from 'substring-trie';
@@ -74,7 +74,7 @@ const emojifyTextNode = (node, customEmojis, domain) => {
 
       // now got a replacee as ':shortcode:'
       // if you want additional emoji handler, add statements below which set replacement and return true.
-      const filename = autoPlayGif ? custom_emoji.url : custom_emoji.static_url;
+      const filename = autoPlayEmoji ? custom_emoji.url : custom_emoji.static_url;
 
       const striped_shortcode = shortcode.slice(1, -1);
       const alt = shortcode;
@@ -171,7 +171,7 @@ export const buildCustomEmojis = (customEmojis) => {
 
   customEmojis.forEach(emoji => {
     const shortcode = emoji.get('shortcode');
-    const url       = autoPlayGif ? emoji.get('url') : emoji.get('static_url');
+    const url       = autoPlayEmoji ? emoji.get('url') : emoji.get('static_url');
     const name      = shortcode.replace(':', '');
     const aliases   = emoji.get('aliases', null) ?? ImmutableList();
     const ruby      = emoji.get('ruby') ?? toHiragana(name);

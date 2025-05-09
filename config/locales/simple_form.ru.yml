@@ -147,7 +147,7 @@ ru:
         phrase: Слово или фраза
         setting_advanced_layout: Включить многоколоночный интерфейс
         setting_aggregate_reblogs: Группировать продвижения в лентах
-        setting_auto_play_gif: Автоматически проигрывать анимированные GIF
+        setting_auto_play_emoji: Автоматически проигрывать анимированные GIF
         setting_boost_modal: Всегда спрашивать перед продвижением
         setting_crop_images: Кадрировать изображения в нераскрытых постах до 16:9
         setting_default_language: Язык отправляемых постов

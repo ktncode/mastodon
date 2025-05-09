@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { autoPlayGif } from '../initial_state';
+import { autoPlayAvatar } from '../initial_state';
 
 export default class AvatarComposite extends React.PureComponent {
 
@@ -12,7 +12,7 @@ export default class AvatarComposite extends React.PureComponent {
   };
 
   static defaultProps = {
-    animate: autoPlayGif,
+    animate: autoPlayAvatar,
   };
 
   renderItem (account, size, index) {

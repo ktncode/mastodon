@@ -1,7 +1,7 @@
 .reactions-bar__item-wrapper
   %button.reactions-bar__item{ title: reaction_item['name'], style: 'transform: scale(1); position: static;', disable: true }
     %span.reactions-bar__item__emoji
-      = grouped_reaction_custom_emoji_tag(reaction_item, animate = current_account&.user&.setting_auto_play_gif)
+      = grouped_reaction_custom_emoji_tag(reaction_item, animate = current_account&.user&.setting_auto_play_emoji)
     %span.reactions-bar__item__count
       %span.animated-number
         %span{ style: 'position: static; transform: translateY(0%);' }

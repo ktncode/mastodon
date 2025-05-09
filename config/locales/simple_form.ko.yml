@@ -147,7 +147,7 @@ ko:
         phrase: 키워드 또는 문장
         setting_advanced_layout: 고급 웹 UI 활성화
         setting_aggregate_reblogs: 타임라인의 부스트를 그룹화
-        setting_auto_play_gif: 애니메이션 GIF를 자동 재생
+        setting_auto_play_emoji: 애니메이션 GIF를 자동 재생
         setting_boost_modal: 부스트 전 확인 창을 표시
         setting_crop_images: 확장되지 않은 게시물의 이미지를 16x9로 자르기
         setting_default_language: 게시물 언어

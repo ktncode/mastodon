@@ -44,7 +44,10 @@ class UserSettingsDecorator
     unselect_reference_modal
     delete_scheduled_status_modal
     missing_alt_text_modal
-    auto_play_gif
+    auto_play_avatar
+    auto_play_emoji
+    auto_play_header
+    auto_play_media
     expand_spoilers
     reduce_motion
     disable_swiping

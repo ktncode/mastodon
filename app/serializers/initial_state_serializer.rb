@@ -39,7 +39,10 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:boost_modal]                           = object.current_account.user.setting_boost_modal
       store[:delete_modal]                          = object.current_account.user.setting_delete_modal
       store[:missing_alt_text_modal]                = object.current_account.user.setting_missing_alt_text_modal
-      store[:auto_play_gif]                         = object.current_account.user.setting_auto_play_gif
+      store[:auto_play_avatar]                      = object.current_account.user.setting_auto_play_avatar
+      store[:auto_play_emoji]                       = object.current_account.user.setting_auto_play_emoji
+      store[:auto_play_header]                      = object.current_account.user.setting_auto_play_header
+      store[:auto_play_media]                       = object.current_account.user.setting_auto_play_media
       store[:display_media]                         = object.current_account.user.setting_display_media
       store[:expand_spoilers]                       = object.current_account.user.setting_expand_spoilers
       store[:reduce_motion]                         = object.current_account.user.setting_reduce_motion
@@ -134,11 +137,14 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:max_frequently_used_emojis]            = object.current_account.user.setting_max_frequently_used_emojis
       
     else
-      store[:auto_play_gif] = Setting.auto_play_gif
-      store[:display_media] = Setting.display_media
-      store[:reduce_motion] = Setting.reduce_motion
-      store[:use_blurhash]  = Setting.use_blurhash
-      store[:crop_images]   = Setting.crop_images
+      store[:auto_play_avatar] = Setting.auto_play_avatar
+      store[:auto_play_emoji]  = Setting.auto_play_emoji
+      store[:auto_play_header] = Setting.auto_play_header
+      store[:auto_play_media]  = Setting.auto_play_media
+      store[:display_media]    = Setting.display_media
+      store[:reduce_motion]    = Setting.reduce_motion
+      store[:use_blurhash]     = Setting.use_blurhash
+      store[:crop_images]      = Setting.crop_images
     end
 
     store

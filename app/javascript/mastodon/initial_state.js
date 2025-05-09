@@ -4,7 +4,10 @@ const initialState = element && JSON.parse(element.textContent);
 const getMeta = (prop) => initialState && initialState.meta && initialState.meta[prop];
 
 export const reduceMotion = getMeta('reduce_motion');
-export const autoPlayGif = getMeta('auto_play_gif');
+export const autoPlayAvatar = getMeta('auto_play_avatar');
+export const autoPlayEmoji = getMeta('auto_play_emoji');
+export const autoPlayHeader = getMeta('auto_play_header');
+export const autoPlayMedia = getMeta('auto_play_media');
 export const displayMedia = getMeta('display_media');
 export const expandSpoilers = getMeta('expand_spoilers');
 export const followModal = getMeta('follow_modal');

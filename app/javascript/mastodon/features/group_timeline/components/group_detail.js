@@ -10,7 +10,8 @@ import DisplayName from 'mastodon/components/display_name';
 import IconButton from 'mastodon/components/icon_button';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import {
-  autoPlayGif,
+  autoPlayHeader,
+  autoPlayEmoji,
   me,
   followModal,
   unfollowModal,
@@ -149,7 +150,7 @@ class GroupDetail extends ImmutablePureComponent {
   _updateEmojis() {
     const node = this.node;
 
-    if (!node || autoPlayGif) {
+    if (!node || autoPlayEmoji) {
       return;
     }
 
@@ -298,7 +299,7 @@ class GroupDetail extends ImmutablePureComponent {
         <div className='group__detail__img'>
           <img
             src={
-              autoPlayGif ? account.get('header') : account.get('header_static')
+              autoPlayHeader ? account.get('header') : account.get('header_static')
             }
             alt=''
           />

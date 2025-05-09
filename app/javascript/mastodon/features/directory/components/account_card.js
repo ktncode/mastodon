@@ -11,7 +11,8 @@ import RelativeTimestamp from 'mastodon/components/relative_timestamp';
 import IconButton from 'mastodon/components/icon_button';
 import { FormattedMessage, injectIntl, defineMessages } from 'react-intl';
 import {
-  autoPlayGif,
+  autoPlayHeader,
+  autoPlayEmoji,
   me,
   followModal,
   unfollowModal,
@@ -147,7 +148,7 @@ class AccountCard extends ImmutablePureComponent {
   };
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -160,7 +161,7 @@ class AccountCard extends ImmutablePureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -282,7 +283,7 @@ class AccountCard extends ImmutablePureComponent {
         <div className='directory__card__img'>
           <img
             src={
-              autoPlayGif ? account.get('header') : account.get('header_static')
+              autoPlayHeader ? account.get('header') : account.get('header_static')
             }
             alt=''
           />

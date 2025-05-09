@@ -147,7 +147,7 @@ gd:
         phrase: Facal no abairt-luirg
         setting_advanced_layout: Cuir an comas an eadar-aghaidh-lìn adhartach
         setting_aggregate_reblogs: Buidhnich na brosnachaidhean air an loidhne-ama
-        setting_auto_play_gif: Cluich GIFs beòthaichte gu fèin-obrachail
+        setting_auto_play_emoji: Cluich GIFs beòthaichte gu fèin-obrachail
         setting_boost_modal: Seall còmhradh dearbhaidh mus dèan thu brosnachadh
         setting_crop_images: Beàrr na dealbhan sna postaichean gun leudachadh air 16x9
         setting_default_language: Cànan postaidh

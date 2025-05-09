@@ -224,6 +224,6 @@ module StatusesHelper
   end
 
   def prefers_autoplay?
-    ActiveModel::Type::Boolean.new.cast(params[:autoplay]) || current_user&.setting_auto_play_gif
+    ActiveModel::Type::Boolean.new.cast(params[:autoplay]) || current_user&.setting_auto_play_media
   end
 end

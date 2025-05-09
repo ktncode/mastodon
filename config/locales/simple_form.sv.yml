@@ -106,7 +106,7 @@ sv:
         phrase: Nyckelord eller fras
         setting_advanced_layout: Aktivera avancerat webbgränssnitt
         setting_aggregate_reblogs: Gruppera knuffar i tidslinjer
-        setting_auto_play_gif: Spela upp animerade GIF-bilder automatiskt
+        setting_auto_play_emoji: Spela upp animerade GIF-bilder automatiskt
         setting_boost_modal: Visa bekräftelsedialog innan du knuffar
         setting_crop_images: Beskär bilder i icke-utökade tutningar till 16x9
         setting_default_language: Språk

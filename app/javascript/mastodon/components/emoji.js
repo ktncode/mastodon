@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { autoPlayGif } from 'mastodon/initial_state';
+import { autoPlayEmoji } from 'mastodon/initial_state';
 import { assetHost } from 'mastodon/utils/config';
 import unicodeMapping from 'mastodon/features/emoji/emoji_unicode_mapping_light';
 import classNames from 'classnames';
@@ -38,7 +38,7 @@ export default class Emoji extends React.PureComponent {
         />
       );
     } else if (url || static_url) {
-      const filename  = (autoPlayGif || hovered) && url ? url : static_url;
+      const filename  = (autoPlayEmoji || hovered) && url ? url : static_url;
       const shortCode = `:${emoji}:`;
       const className = classNames('emojione custom-emoji', this.props.className, { 'clickable': onClick });
       const alt = this.props.alt ?? shortCode;

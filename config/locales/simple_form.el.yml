@@ -147,7 +147,7 @@ el:
         phrase: Λέξη ή φράση κλειδί
         setting_advanced_layout: Ενεργοποίηση προηγμένης λειτουργίας χρήσης
         setting_aggregate_reblogs: Ομαδοποίηση προωθήσεων στις ροές
-        setting_auto_play_gif: Αυτόματη αναπαραγωγή των GIF
+        setting_auto_play_emoji: Αυτόματη αναπαραγωγή των GIF
         setting_boost_modal: Επιβεβαίωση πριν την προώθηση
         setting_crop_images: Περιορισμός των εικόνων σε μη-ανεπτυγμένα τουτ σε αναλογία 16x9
         setting_default_language: Γλώσσα δημοσιεύσεων

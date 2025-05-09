@@ -147,7 +147,7 @@ vi:
         phrase: Từ khóa hoặc cụm từ
         setting_advanced_layout: Bật giao diện nhiều cột
         setting_aggregate_reblogs: Không hiện lượt chia sẻ trùng lặp
-        setting_auto_play_gif: Tự động phát ảnh GIF
+        setting_auto_play_emoji: Tự động phát ảnh GIF
         setting_boost_modal: Yêu cầu xác nhận trước khi chia sẻ tút
         setting_crop_images: Hiển thị ảnh theo tỉ lệ 16x9
         setting_default_language: Ngôn ngữ đăng

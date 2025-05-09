@@ -12,7 +12,7 @@ import IconButton from 'mastodon/components/icon_button';
 import AbsoluteTimestamp from 'mastodon/components/absolute_timestamp';
 import RelativeTimestamp from 'mastodon/components/relative_timestamp';
 import { HotKeys } from 'react-hotkeys';
-import { autoPlayGif, disableRelativeTime } from 'mastodon/initial_state';
+import { autoPlayEmoji, disableRelativeTime } from 'mastodon/initial_state';
 import classNames from 'classnames';
 
 const messages = defineMessages({
@@ -46,7 +46,7 @@ class Conversation extends ImmutablePureComponent {
   };
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -59,7 +59,7 @@ class Conversation extends ImmutablePureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 

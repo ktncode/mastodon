@@ -147,7 +147,7 @@ is:
         phrase: Stikkorð eða frasi
         setting_advanced_layout: Virkja ítarlegt vefviðmót
         setting_aggregate_reblogs: Hópa endurbirtingar í tímalínum
-        setting_auto_play_gif: Spila sjálfkrafa GIF-hreyfimyndir
+        setting_auto_play_emoji: Spila sjálfkrafa GIF-hreyfimyndir
         setting_boost_modal: Sýna staðfestingarglugga fyrir endurbirtingu
         setting_crop_images: Utansníða myndir í ekki útfelldum tístum í 16x9
         setting_default_language: Tungumál sem skrifað er á

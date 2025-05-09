@@ -147,7 +147,7 @@ fr:
         phrase: Mot-clé ou phrase
         setting_advanced_layout: Activer l’interface Web avancée
         setting_aggregate_reblogs: Grouper les partages dans les fils d’actualités
-        setting_auto_play_gif: Lire automatiquement les GIFs animés
+        setting_auto_play_emoji: Lire automatiquement les GIFs animés
         setting_boost_modal: Demander confirmation avant de partager un message
         setting_crop_images: Recadrer en 16x9 les images des messages qui ne sont pas ouverts en vue détaillée
         setting_default_language: Langue de publication

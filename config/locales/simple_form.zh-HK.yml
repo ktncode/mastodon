@@ -147,7 +147,7 @@ zh-HK:
         phrase: 關鍵字或片語
         setting_advanced_layout: 啟用進階網頁介面
         setting_aggregate_reblogs: 時間軸中的群組轉推
-        setting_auto_play_gif: 自動播放 GIF
+        setting_auto_play_emoji: 自動播放 GIF
         setting_boost_modal: 在轉推前詢問我
         setting_crop_images: 將未展開文章中的圖片裁剪到 16x9
         setting_default_language: 文章語言

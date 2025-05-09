@@ -287,7 +287,10 @@ ja:
         setting_add_reference_modal: フォロワー限定投稿への参照を追加する前に確認ダイアログを表示する
         setting_advanced_layout: 上級者向け UI を有効にする
         setting_aggregate_reblogs: ブーストをまとめる
-        setting_auto_play_gif: アニメーションGIFを自動再生する
+        setting_auto_play_avatar: アイコンのアニメーションを自動再生する
+        setting_auto_play_emoji: カスタム絵文字のアニメーションを自動再生する
+        setting_auto_play_header: ヘッダーのアニメーションを自動再生する
+        setting_auto_play_media: 添付メディアのアニメーションを自動再生する
         setting_boost_modal: ブーストする前に確認ダイアログを表示する
         setting_compact_reaction: リアクションをコンパクトに表示
         setting_composer_font_size: 編集画面のフォントサイズ

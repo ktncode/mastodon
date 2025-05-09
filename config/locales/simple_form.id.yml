@@ -147,7 +147,7 @@ id:
         phrase: Kata kunci atau frasa
         setting_advanced_layout: Aktifkan antar muka web mahir
         setting_aggregate_reblogs: Boost grup di linimasa
-        setting_auto_play_gif: Mainkan otomatis animasi GIF
+        setting_auto_play_emoji: Mainkan otomatis animasi GIF
         setting_boost_modal: Tampilkan dialog konfirmasi dialog sebelum boost
         setting_crop_images: Potong gambar ke 16x9 pada toot yang tidak dibentangkan
         setting_default_language: Bahasa posting

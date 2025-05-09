@@ -59,7 +59,7 @@ ast:
         password: Contraseña
         phrase: Pallabra clave o fras
         setting_advanced_layout: Activar la interfaz web avanzada
-        setting_auto_play_gif: Reproducir GIFs automáticamente
+        setting_auto_play_emoji: Reproducir GIFs automáticamente
         setting_boost_modal: Amosar el diálogu de confirmación enantes de compartir un barritu
         setting_default_language: Llingua de los espublizamientos
         setting_default_privacy: Privacidá de los espublizamientos

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import IconButton from 'mastodon/components/icon_button';
 import Icon from 'mastodon/components/icon';
 import { defineMessages, injectIntl, FormattedMessage, FormattedDate } from 'react-intl';
-import { autoPlayGif, reduceMotion, disableSwiping } from 'mastodon/initial_state';
+import { autoPlayEmoji, reduceMotion, disableSwiping } from 'mastodon/initial_state';
 import elephantUIPlane from 'mastodon/../images/elephant_ui_plane.svg';
 import { mascot } from 'mastodon/initial_state';
 import unicodeMapping from 'mastodon/features/emoji/emoji_unicode_mapping_light';
@@ -128,7 +128,7 @@ class Content extends ImmutablePureComponent {
   }
 
   handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -141,7 +141,7 @@ class Content extends ImmutablePureComponent {
   }
 
   handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
+    if (autoPlayEmoji) {
       return;
     }
 
@@ -194,7 +194,7 @@ class Emoji extends React.PureComponent {
         />
       );
     } else if (emojiMap.get(emoji)) {
-      const filename  = (autoPlayGif || hovered) ? emojiMap.getIn([emoji, 'url']) : emojiMap.getIn([emoji, 'static_url']);
+      const filename  = (autoPlayEmoji || hovered) ? emojiMap.getIn([emoji, 'url']) : emojiMap.getIn([emoji, 'static_url']);
       const shortCode = `:${emoji}:`;
 
       return (

@@ -55,7 +55,7 @@ ka:
         otp_attempt: მეორე-ფაქტორის კოდი
         password: პაროლი
         phrase: სიტყვა ან ფრაზა
-        setting_auto_play_gif: ანიმაციური გიფების ავტო-დაკვრა
+        setting_auto_play_emoji: ანიმაციური გიფების ავტო-დაკვრა
         setting_boost_modal: ბუსტამე მოხდეს დამოწმება
         setting_default_language: პოსტინგის ენა
         setting_default_privacy: პოსტის კონფიდენციალურობა

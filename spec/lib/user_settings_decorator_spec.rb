@@ -98,11 +98,32 @@ describe UserSettingsDecorator do
       expect(user.settings['delete_modal']).to eq false
     end
 
-    it 'updates the user settings value for gif auto play' do
-      values = { 'setting_auto_play_gif' => '0' }
+    it 'updates the user settings value for avatar auto play' do
+      values = { 'setting_auto_play_avatar' => '0' }
 
       settings.update(values)
-      expect(user.settings['auto_play_gif']).to eq false
+      expect(user.settings['auto_play_avatar']).to eq false
+    end
+
+    it 'updates the user settings value for header auto play' do
+      values = { 'setting_auto_play_header' => '0' }
+
+      settings.update(values)
+      expect(user.settings['auto_play_header']).to eq false
+    end
+
+    it 'updates the user settings value for emoji auto play' do
+      values = { 'setting_auto_play_emoji' => '0' }
+
+      settings.update(values)
+      expect(user.settings['auto_play_emoji']).to eq false
+    end
+
+    it 'updates the user settings value for media auto play' do
+      values = { 'setting_auto_play_media' => '0' }
+
+      settings.update(values)
+      expect(user.settings['auto_play_media']).to eq false
     end
 
     it 'updates the user settings value for system font in UI' do
