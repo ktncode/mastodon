@@ -13,9 +13,13 @@ module Mastodon
       true
     end
 
+    UPDATE_COLUMNS = %i(file_file_name file_content_type file_file_size file_updated_at remote_url thumbnail_file_name thumbnail_content_type thumbnail_file_size thumbnail_updated_at thumbnail_remote_url file_storage_schema_version).freeze
+    SELECT_COLUMNS = (%i(id account_id) + UPDATE_COLUMNS).freeze
+
     option :days, type: :numeric, default: 7, aliases: [:d]
     option :skip_followee, type: :boolean, default: false
     option :concurrency, type: :numeric, default: 5, aliases: [:c]
+    option :db_only, type: :boolean, default: false
     option :verbose, type: :boolean, default: false, aliases: [:v]
     option :dry_run, type: :boolean, default: false
     desc 'remove', 'Remove remote media files'
@@ -31,19 +35,33 @@ module Mastodon
 
       skip_followee_ids = options[:skip_followee] ? Account.remote.where(id: Follow.where(account_id: User.where(current_sign_in_at: User::ACTIVE_DURATION.ago...).select(:account_id)).select(:target_account_id).distinct).pluck(:id).sort : []
 
-      processed, aggregate = parallelize_with_progress(MediaAttachment.cached.where.not(remote_url: '').where('created_at < ?', time_ago)) do |media_attachment|
-        next if media_attachment.file.blank?
-        next if b_include?(skip_followee_ids, media_attachment.account_id)
-
-        size = (media_attachment.file_file_size || 0) + (media_attachment.thumbnail_file_size || 0)
-
-        unless options[:dry_run]
-          media_attachment.file.destroy
-          media_attachment.thumbnail.destroy
-          media_attachment.save
+      if options[:db_only]
+        query = MediaAttachment.cached
+        processed = query.where('id < ?', Mastodon::Snowflake.id_at(time_ago)).count(:all)
+        aggregate = 0
+        progress  = create_progress_bar(processed)
+        query.in_batches(of: 1000, finish: Mastodon::Snowflake.id_at(time_ago), load: false, order: :desc) do |media_attachments|
+          result = media_attachments.update_all(file_file_name: nil, file_content_type: nil, file_file_size: nil, file_updated_at: nil, thumbnail_file_name: nil, thumbnail_content_type: nil, thumbnail_file_size: nil, thumbnail_updated_at: nil)
+          progress.log("Processing #{media_attachments.first.id}") if options[:verbose]
+          aggregate += result
+          progress.progress += result
         end
+        progress.stop
+      else
+        processed, aggregate = parallelize_with_progress(MediaAttachment.cached.where('id < ?', Mastodon::Snowflake.id_at(time_ago)).select(SELECT_COLUMNS)) do |media_attachment|
+          next if media_attachment.file.blank?
+          next if b_include?(skip_followee_ids, media_attachment.account_id)
 
-        size
+          size = (media_attachment.file_file_size || 0) + (media_attachment.thumbnail_file_size || 0)
+
+          unless options[:dry_run]
+            media_attachment.file.destroy
+            media_attachment.thumbnail.destroy
+            MediaAttachment.where(id: media_attachment.id).update_all(media_attachment.attributes)
+          end
+
+          size
+        end
       end
 
       say("Removed #{processed} media attachments (approx. #{number_to_human_size(aggregate)}) #{dry_run}", :green, true)

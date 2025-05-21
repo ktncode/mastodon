@@ -29,7 +29,7 @@ module Mastodon
       db_config['pool'] = options[:concurrency] + 1
       ActiveRecord::Base.establish_connection(db_config)
 
-      progress  = create_progress_bar(scope.count)
+      progress  = create_progress_bar(scope.count(:all))
       pool      = Concurrent::FixedThreadPool.new(options[:concurrency])
       total     = Concurrent::AtomicFixnum.new(0)
       aggregate = Concurrent::AtomicFixnum.new(0)
