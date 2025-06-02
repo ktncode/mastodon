@@ -21,7 +21,7 @@ module Mastodon
     end
 
     def suffix
-      ''
+      '+ktn'
     end
 
     def to_a
@@ -43,7 +43,7 @@ module Mastodon
     end
 
     def repository
-      ENV.fetch('GITHUB_REPOSITORY', 'fedibird/mastodon')
+      ENV.fetch('GITHUB_REPOSITORY', 'ktncode/mastodon')
     end
 
     def source_base_url
@@ -64,7 +64,7 @@ module Mastodon
     end
 
     def fedibird_verson
-      '0.1'
+      '0.1+ktn'
     end
 
     def user_agent

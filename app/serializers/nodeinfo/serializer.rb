@@ -10,7 +10,7 @@ class NodeInfo::Serializer < ActiveModel::Serializer
   end
 
   def software
-    { name: 'fedibird', version: Mastodon::Version.fedibird_verson }
+    { name: 'fedibird', version: Mastodon::Version.to_s }
   end
 
   def services
