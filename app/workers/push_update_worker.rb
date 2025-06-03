@@ -10,6 +10,8 @@ class PushUpdateWorker
     @timeline_id = timeline_id || "timeline:#{account.id}"
     @options     = options.symbolize_keys
 
+    Rails.logger.debug "PushUpdateWorker: account_id=#{account_id}, status_id=#{status_id}, options=#{@options.inspect}"
+
     publish!
   rescue ActiveRecord::RecordNotFound
     true

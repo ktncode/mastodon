@@ -63,12 +63,11 @@ class FeedManager
   # @param [Status] status
   # @param [Boolean] update
   # @return [Boolean]
-  def push_to_home(account, status, update: false)
-    return false unless account.user&.signed_in_recently?
-    return false unless add_to_feed(:home, account.id, status, account.user&.aggregates_reblogs?)
-
-    trim(:home, account.id)
-    PushUpdateWorker.perform_async(account.id, status.id, "timeline:#{account.id}", update: update) if push_update_required?("timeline:#{account.id}")
+  def push_to_home(account, status, options = {})
+    return false unless add_to_feed(:home, account.id, status, options)
+    
+    # PushUpdateWorkerにオプションを渡す部分
+    PushUpdateWorker.perform_async(account.id, status.id, "timeline:#{account.id}", options)
     true
   end
 

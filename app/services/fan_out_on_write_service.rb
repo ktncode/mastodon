@@ -12,13 +12,24 @@ class FanOutOnWriteService < BaseService
     @status    = status
     @account   = status.account
     @options   = options
-    @is_update = !!options[:update]
+    @is_update = !!options[:update]  # この値が適切に設定されているか確認
 
-    check_race_condition!
+    # ここで処理が分岐するかもしれません
+    deliver_to_self if @status.account.local?
 
-    fan_out_to_local_recipients!
-    fan_out_to_public_streams! if broadcastable?
-    
+    if @status.direct_visibility?
+      deliver_to_mentioned_followers
+      deliver_to_direct_timelines
+    elsif @status.limited_visibility?
+      deliver_to_mentioned_followers
+    else
+      deliver_to_followers
+      deliver_to_lists
+      deliver_to_keyword_subscribers if @status.searchability != :private
+    end
+
+    return if @status.account.silenced? || (!@is_update && @status.reblog?) || @status.reply? && @status.in_reply_to_account_id != @status.account_id
+
     # 追加機能
     deliver_to_hashtag_followers!
     deliver_to_keyword_subscribers!
