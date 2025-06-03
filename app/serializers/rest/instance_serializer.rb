@@ -10,11 +10,13 @@ class REST::InstanceSerializer < ActiveModel::Serializer
   include InstanceHelper
   include RoutingHelper
 
-  attributes :domain, :title, :version, :source_url, :description,
-             :usage, :thumbnail, :icon, :languages, :configuration,
-             :registrations, :api_versions,
+  attributes :domain, :uri, :title, :version, :source_url, :description,
+             :short_description, :email, :urls, :stats, :usage, :thumbnail, 
+             :icon, :languages, :configuration, :registrations, 
+             :approval_required, :invites_enabled, :api_versions,
              :feature_quote, :fedibird_capabilities
 
+  has_one :contact_account, serializer: REST::AccountSerializer
   has_one :contact, serializer: ContactSerializer
   has_many :rules, serializer: REST::RuleSerializer
 
@@ -119,6 +121,10 @@ class REST::InstanceSerializer < ActiveModel::Serializer
         supported_searchablity_filter: SearchQueryTransformer::SUPPORTED_SEARCHABLITY_FILTER,
       },
     }
+  end
+
+  def languages
+    [I18n.default_locale]
   end
 
   def registrations
